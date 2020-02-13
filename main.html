@@ -8,14 +8,14 @@
   </head>
   <body>
     <h1 align=center>One Day Planner</h1>
-    <input type="text" id='newItem' name="newItem" value="">
+    <input type="text" id='inputBox' autofocus value="">
     <br>
     <br>
-    <button class='topButton' type="button" onclick='addTaskTop()'>&#x25BC;</button>
+    <button class='topButton' type="button" onclick='addTask("afterbegin")'>&#x25BC;</button>
     <br>
-    <span id="day" class="day"></span>
+    <span id="day" class="day" data-taskList=[]></span>
     <br>
-    <button class='bottomButton' type="button" onclick='addTaskBottom()'>&#x25B2;</button>
+    <button class='bottomButton' type="button" onclick='addTask("beforeend")'>&#x25B2;</button>
   </body>
 </html>
 

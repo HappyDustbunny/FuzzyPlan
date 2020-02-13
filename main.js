@@ -1,3 +1,6 @@
+// document.getElementById('day').setAttribute('data-taskList', []);
+var taskList = [];
+
 for (var i = 0; i < 24; i += 1) {
   let node = document.createElement('span');
   node.setAttribute('id', i);  // Time in hours
@@ -7,52 +10,102 @@ for (var i = 0; i < 24; i += 1) {
   document.getElementById('day').appendChild(node);
 }
 
-function addTaskTop() {
-  let list = document.getElementById('day');
-  let node = document.createElement('div');
-  node.setAttribute('class', 'unprocessed')
-  node.setAttribute('onClick', 'addTaskBefore(this.id)');
-  let newItem = document.getElementById('newItem').value;
+function Task(timeH, timeM, duration, text, isProcessed, isFused, gotFocus) {
+  let today = new Date();
+  this.startTime = new Date(today.getFullYear(), today.getMonth(), today.getDay(), timeH, timeM);
+  this.duration = duration;  // In seconds
+  this.text = text;
+  this.isProcessed = isProcessed;
+  this.isFused = isFused;
+  this.gotFocus = gotFocus;
 
-  let parsedList = parseTask(newItem);
-  console.log(parsedList);
-  node.setAttribute('id', parsedList[0] + '1');
-  if (parsedList[0] > 0) {
-    node.setAttribute('data-hours', parseInt(parsedList[0]));
-    node.setAttribute('data-minutes', parseInt(parsedList[1]));
+  this.endTime = function() {
+    if (this.isProcessed && this.duration) {
+      return this.startTime + timeH * 3600000 + timeM * 60000;
+    }
   }
-  let taskText = generateText(parsedList);
-  let textNode = document.createTextNode(taskText);
-  node.appendChild(textNode);
-  document.getElementById('day').insertBefore(node, document.getElementById(Math.abs(parsedList[0])));
-  document.getElementById('newItem').value = '';
-  document.getElementById('newItem').focus();
 }
 
-function addTaskBefore(thisId) {
-  // let newItem = prompt('Add task just before this event: ');
-  let list = document.getElementById('day');
-  let node = document.createElement('div');
-  node.setAttribute('onClick', 'addTaskBefore(this.id)');
-  let newItem = document.getElementById('newItem').value;
+function addTask(here) {
+  let task = new Task(0, 0, 30, '', false, false, false);
 
-  let parsedList = parseTask(newItem);
-  console.log(parsedList);
-  console.log(typeof thisId);
-  node.setAttribute('id', thisId + '1');
-  let taskText = generateText(parsedList);
-  let textNode = document.createTextNode(taskText);
-  node.appendChild(textNode);
-  document.getElementById('day').insertBefore(node, document.getElementById(thisId));
-  document.getElementById('newItem').value = '';
-  document.getElementById('newItem').focus();
+  let newNode = document.createElement('div');
+  newNode.setAttribute('onClick', 'addTask(this.id)');
+  newNode.setAttribute('id', Math.floor(Math.random() * 1000000));  // Set random id in order to be able to pick element later
+
+  let newText = document.getElementById('inputBox').value;  // Get the text
+  if (newText.trim() == '') {  // If no input is found, don't add empty task
+    resetInputBox();
+    return
+  }
+  let parsedText = parseTask(newText);  // Pull out information and store in array
+  let clearText = generateText(parsedText);  // Generate human readable text
+
+  task.text = clearText;
+  let textNode = document.createTextNode(clearText);
+  newNode.appendChild(textNode);
+
+  taskList.push(task);
+  if (here == 'afterbegin' || here == 'beforeend') {  // The result from top and bottom button.
+    document.getElementById('day').insertAdjacentElement(here, newNode)
+  } else {  // If a task is clicked here is its id
+    document.getElementById(here).insertAdjacentElement("beforebegin", newNode)
+  }
+
+  resetInputBox()
 }
 
-function fiddleWithHeight() {
-  document.getElementById('151').style.height='20px';
+function resetInputBox() {
+  document.getElementById('inputBox').value = '';
+  document.getElementById('inputBox').focus();
 }
 
-function generateText(pList) {
+// function addTaskTop() {
+//   let list = document.getElementById('day');
+//   let node = document.createElement('div');
+//   node.setAttribute('class', 'unprocessed')
+//   node.setAttribute('onClick', 'addTaskBefore(this.id)');
+//   let newItem = document.getElementById('inputBox').value;
+//
+//   let parsedList = parseTask(newItem);
+//   console.log(parsedList);
+//   node.setAttribute('id', parsedList[0] + '1');
+//   if (parsedList[0] > 0) {
+//     node.setAttribute('data-hours', parseInt(parsedList[0]));
+//     node.setAttribute('data-minutes', parseInt(parsedList[1]));
+//   }
+//   let taskText = generateText(parsedList);
+//   let textNode = document.createTextNode(taskText);
+//   node.appendChild(textNode);
+//   document.getElementById('day').insertBefore(node, document.getElementById(Math.abs(parsedList[0])));
+//   document.getElementById('inputBox').value = '';
+//   document.getElementById('inputBox').focus();
+// }
+//
+// function addTaskBefore(thisId) {
+//   // let newItem = prompt('Add task just before this event: ');
+//   let list = document.getElementById('day');
+//   let node = document.createElement('div');
+//   node.setAttribute('onClick', 'addTaskBefore(this.id)');
+//   let newItem = document.getElementById('inputBox').value;
+//
+//   let parsedList = parseTask(newItem);
+//   console.log(parsedList);
+//   console.log(typeof thisId);
+//   node.setAttribute('id', thisId + '1');
+//   let taskText = generateText(parsedList);
+//   let textNode = document.createTextNode(taskText);
+//   node.appendChild(textNode);
+//   document.getElementById('day').insertBefore(node, document.getElementById(thisId));
+//   document.getElementById('inputBox').value = '';
+//   document.getElementById('inputBox').focus();
+// }
+//
+// function fiddleWithHeight() {
+//   document.getElementById('151').style.height='20px';
+// }
+
+function generateText(pList) {  // pList: parsedList
   let extraH = 0;
   let endH = 0;
   let endM = 0;
