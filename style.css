@@ -17,37 +17,49 @@ div {
 }
 
 .unprocessed {
-  flex: initial;
+  /* flex: initial;
   text-align: left;
   padding-left: 8px;
   margin: 3px;
   width: 300px;
   border: 1px solid rgba(154, 219, 240, .15);
-  border-radius: 25px;
+  border-radius: 25px; */
   background-color: rgba(154, 219, 240, .25);
   box-shadow: 0px 0px 3px 2px rgba(154, 219, 240, .25);
 }
 
 input {
-  width: 100%;
+  width: 80%;
   padding-left: 8px;
   border-radius: 25px;
 }
 
-.topButton {
+button {
   text-align: center;
-  width: 100%;
   border: 1px solid rgb(96, 139, 168);
   border-radius: 25px;
+}
+
+#editButton {
+  width: 15%;
+  height: 22px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+}
+
+#topButton {
+  width: 100%;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0);
 }
 
-.bottomButton {
-  text-align: center;
+#bottomButton {
   width: 100%;
-  border: 1px solid rgb(96, 139, 168);
-  border-radius: 25px;
   background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9898ff);
+}
+
+button:hover,
+button:focus {
+  transform: scaleY(1.2);
+  border: 1px solid rgb(255, 5  0, 255);
 }
 
 /* div[data-minutes='0'] {

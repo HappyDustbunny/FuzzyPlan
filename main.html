@@ -7,15 +7,16 @@
     <script src="main.js" defer></script>
   </head>
   <body>
-    <h1 align=center>One Day Planner</h1>
+    <h1 align=center>Fuzzy Flex Planner</h1>
     <input type="text" id='inputBox' autofocus value="">
+    <button id='editButton' type="button" onclick="clearOrEdit()">Clear</button>
     <br>
     <br>
-    <button class='topButton' type="button" onclick='addTask("afterbegin")'>&#x25BC;</button>
+    <button id='topButton' type="button" onclick='gotClicked("afterbegin")'>&#x25BC;</button>
     <br>
     <span id="day" class="day" data-taskList=[]></span>
     <br>
-    <button class='bottomButton' type="button" onclick='addTask("beforeend")'>&#x25B2;</button>
+    <button id='bottomButton' type="button" onclick='gotClicked("beforeend")'>&#x25B2;</button>
   </body>
 </html>
 
