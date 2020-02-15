@@ -7,16 +7,17 @@
     <script src="main.js" defer></script>
   </head>
   <body>
-    <h1 align=center>Fuzzy Flex Planner</h1>
+    <h1 align=center>FuzzyFlex Planner</h1>
+    <button id='timeButton' type="button" title="Click on a task first" alt='Click to add time to existing tasks'>+Time</button>
     <input type="text" id='inputBox' autofocus value="">
-    <button id='editButton' type="button" onclick="clearOrEdit()">Clear</button>
+    <button id='editButton' tabindex="3" type="button" onclick="clearOrEdit()">Clear</button>
     <br>
     <br>
-    <button id='topButton' type="button" onclick='clickedTop'>&#x25BC;</button>
+    <button id='topButton' tabindex="2" type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button>
     <br>
     <span id="day" class="day" data-taskList=[]></span>
     <br>
-    <button id='bottomButton' type="button" onclick='clickedBottom'>&#x25B2;</button>
+    <button id='bottomButton' tabindex='1' type="button" onclick='clickedBottom()' title="Click to add task at the bottom">&#x25B2;</button>
   </body>
 </html>
 

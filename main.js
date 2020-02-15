@@ -59,10 +59,11 @@ function createTask() {
 
 function clickedTop() {
   addTask('afterbegin');
+  console.log('glyf');
 }
 
 function clickedBottom() {
-  addTask('beforeend')
+  addTask('beforeend');
 }
 
 function addTask(here) {
@@ -84,11 +85,16 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
     document.getElementById('editButton').innerText = 'Clear'
   } else if (contentInputBox == '' && !chosenTask) { // No text in inputBox and no chosenTask
     chosenTask = document.getElementById(myId);
-    document.getElementById('editButton').innerText = 'Edit'
+    chosenTask.className = 'clicked';
+    console.log(chosenTask.getAttribute('class'));
+    document.getElementById('editButton').innerText = 'Edit';
   } else if (contentInputBox == '' && chosenTask) {  // No text in inputBox and a chosenTask
     document.getElementById(myId).insertAdjacentElement('beforebegin', chosenTask);
+    if (chosenTask.hasAttribute('class')) {
+      chosenTask.removeAttribute('class');
+    }
     chosenTask = '';
-    document.getElementById('editButton').innerText = 'Clear'
+    document.getElementById('editButton').innerText = 'Clear';
   }
 
   resetInputBox();
@@ -97,12 +103,12 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
 function clearOrEdit() {
   if (document.getElementById('editButton').innerText == 'Clear') {
     resetInputBox();
+    chosenTask = '';
   } else if (document.getElementById('editButton').innerText == 'Edit') {
     taskText = chosenTask.innerText;  //  Save the text from clickedElement
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
     clickedElement = document.getElementById(chosenTask.id);  //  Identify clickedElement
     clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
-    chosenTask = '';
     document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
   }
 
