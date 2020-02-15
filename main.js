@@ -1,4 +1,3 @@
-// document.getElementById('day').setAttribute('data-taskList', []);
 var taskList = [];
 var chosenTask = '';
 
@@ -18,14 +17,14 @@ function resetInputBox() {
   document.getElementById('inputBox').focus();
 }
 
-function Task(timeH, timeM, duration, text, isProcessed, isFused, gotFocus) {
+function Task(timeH, timeM, duration, text, isProcessed, isFused, isClicked) {
   let today = new Date();
   this.startTime = new Date(today.getFullYear(), today.getMonth(), today.getDay(), timeH, timeM);
   this.duration = duration;  // In seconds
   this.text = text;
   this.isProcessed = isProcessed;
   this.isFused = isFused;
-  this.gotFocus = gotFocus;
+  this.isClicked = isClicked;
 
   this.endTime = function() {
     if (this.isProcessed && this.duration) {
@@ -54,27 +53,47 @@ function createTask() {
   taskList.push(task);
   let textNode = document.createTextNode(clearText);
   newNode.appendChild(textNode);
-  
+
   let node = newNode;
   return node
 }
 
+document.getElementById("topButton").addEventListener("click", function() {addTask('afterbegin');});
+document.getElementById('bottomButton').addEventListener('click', function() {addTask('beforeend');});
+// document.getElementById('editOrClearButton').addEventListener('click', resetInputBox());
+
+function addTask(here) {
+  contentInputBox = document.getElementById('inputBox').value.trim();
+  if (here && contentInputBox) {
+    newNode = createTask();
+    document.getElementById('day').insertAdjacentElement(here, newNode);
+  }
+  resetInputBox();
+}
+
 function gotClicked(myId) {
-  newNode = createTask();
-  if (myId == 'afterbegin' || myId == 'beforeend') {  // The result from top and bottom button.
-    document.getElementById('day').insertAdjacentElement(myId, newNode);
-  } else {  // If a task is clicked 'myId' is its id
+  contentInputBox = document.getElementById('inputBox').value.trim();
+
+  if (contentInputBox !== '') {  // If a task is clicked 'myId' is its id
+    newNode = createTask();
     document.getElementById(myId).insertAdjacentElement("beforebegin", newNode);
+    chosenTask = '';
+  } else if (contentInputBox == '' && !chosenTask) {
+    chosenTask = document.getElementById(myId);
+  } else if (contentInputBox == '' && chosenTask) {
+    document.getElementById(myId).insertAdjacentElement('beforebegin', chosenTask);
+    chosenTask = '';
   }
 
-  resetInputBox()
+  resetInputBox();
 }
 
 function clearOrEdit() {
-  if (document.getElementById('editButton') == 'Clear') {
+  if (document.getElementById('editButton').innerText == 'Clear') {
     resetInputBox();
-  } else if (document.getElementById('editButton') == 'Edit') {
-    document.getElementById('inputBox').value = chosenTask;
+  } else if (document.getElementById('editButton').innerText == 'Edit') {
+    taskText = document.getElementById(chosenTask).innerText
+    document.getElementById('inputBox').value = taskText;
   }
 
 }
