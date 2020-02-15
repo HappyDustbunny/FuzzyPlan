@@ -5,8 +5,6 @@ for (var i = 0; i < 24; i += 1) {
   let node = document.createElement('span');
   node.setAttribute('id', i);  // Time in hours
   j = i + 1;
-  // let textNode = document.createTextNode('\u25B2 ' + i + ':00-' + j + ':00' + ' \u25BC');
-  // node.appendChild(textNode);
   document.getElementById('day').appendChild(node);
 }
 
@@ -38,7 +36,7 @@ function createTask() {
 
   let newNode = document.createElement('div');
   newNode.setAttribute('onClick', 'gotClicked(this.id)');
-  newNode.setAttribute('id', Math.floor(Math.random() * 1000000));  // Set random id in order to be able to pick element later
+  newNode.setAttribute('id', Math.floor(Math.random() * 1000000));  // Set ra-ndom id in order to be able to pick element later
 
   let newText = document.getElementById('inputBox').value;  // Get the text
   if (newText.trim() == '') {  // If no input is found, don't add empty task
@@ -58,9 +56,14 @@ function createTask() {
   return node
 }
 
-document.getElementById("topButton").addEventListener("click", function() {addTask('afterbegin');});
-document.getElementById('bottomButton').addEventListener('click', function() {addTask('beforeend');});
-// document.getElementById('editOrClearButton').addEventListener('click', resetInputBox());
+
+function clickedTop() {
+  addTask('afterbegin');
+}
+
+function clickedBottom() {
+  addTask('beforeend')
+}
 
 function addTask(here) {
   contentInputBox = document.getElementById('inputBox').value.trim();
@@ -71,18 +74,21 @@ function addTask(here) {
   resetInputBox();
 }
 
-function gotClicked(myId) {
+function gotClicked(myId) { // If a task is clicked 'myId' is its id
   contentInputBox = document.getElementById('inputBox').value.trim();
 
-  if (contentInputBox !== '') {  // If a task is clicked 'myId' is its id
+  if (contentInputBox !== '') {  // Text in inputBox
     newNode = createTask();
     document.getElementById(myId).insertAdjacentElement("beforebegin", newNode);
     chosenTask = '';
-  } else if (contentInputBox == '' && !chosenTask) {
+    document.getElementById('editButton').innerText = 'Clear'
+  } else if (contentInputBox == '' && !chosenTask) { // No text in inputBox and no chosenTask
     chosenTask = document.getElementById(myId);
-  } else if (contentInputBox == '' && chosenTask) {
+    document.getElementById('editButton').innerText = 'Edit'
+  } else if (contentInputBox == '' && chosenTask) {  // No text in inputBox and a chosenTask
     document.getElementById(myId).insertAdjacentElement('beforebegin', chosenTask);
     chosenTask = '';
+    document.getElementById('editButton').innerText = 'Clear'
   }
 
   resetInputBox();
@@ -92,8 +98,12 @@ function clearOrEdit() {
   if (document.getElementById('editButton').innerText == 'Clear') {
     resetInputBox();
   } else if (document.getElementById('editButton').innerText == 'Edit') {
-    taskText = document.getElementById(chosenTask).innerText
-    document.getElementById('inputBox').value = taskText;
+    taskText = chosenTask.innerText;  //  Save the text from clickedElement
+    document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+    clickedElement = document.getElementById(chosenTask.id);  //  Identify clickedElement
+    clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
+    chosenTask = '';
+    document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
   }
 
 }
@@ -169,6 +179,10 @@ function parseTask(newItem) {
   parsedList = [timeH, timeM, hours, minutes, drain, text];
   return parsedList;
 }
+
+// document.getElementById("topButton").addEventListener("click", function() {addTask('afterbegin');});
+// document.getElementById('bottomButton').addEventListener('click', function() {addTask('beforeend');});
+// document.getElementById('editOrClearButton').addEventListener('click', resetInputBox());
 
 // var n = 0;
 // function addTask1() {
