@@ -59,7 +59,6 @@ function createTask() {
 
 function clickedTop() {
   addTask('afterbegin');
-  console.log('glyf');
 }
 
 function clickedBottom() {
@@ -68,43 +67,67 @@ function clickedBottom() {
 
 function addTask(here) {
   contentInputBox = document.getElementById('inputBox').value.trim();
+
   if (here && contentInputBox) {
     newNode = createTask();
     document.getElementById('day').insertAdjacentElement(here, newNode);
   }
-  resetInputBox();
+
+  editButton = document.getElementById('editButton');
+  console.log(editButton.editmode);
+  if (!editButton.editmode) {
+    resetInputBox();
+  }
 }
 
 function gotClicked(myId) { // If a task is clicked 'myId' is its id
-  contentInputBox = document.getElementById('inputBox').value.trim();
 
-  if (contentInputBox !== '') {  // Text in inputBox
+  contentInputBox = document.getElementById('inputBox').value.trim();
+  editButton = document.getElementById('editButton');
+
+  if (contentInputBox !== '' && !chosenTask) {
+    // Text in inputBox and no chosenTask. Create new task and insert before clicked element
     newNode = createTask();
     document.getElementById(myId).insertAdjacentElement("beforebegin", newNode);
+    resetInputBox();
     chosenTask = '';
-    document.getElementById('editButton').innerText = 'Clear'
-  } else if (contentInputBox == '' && !chosenTask) { // No text in inputBox and no chosenTask
+    editButton.innerText = 'Clear'
+  } else if (contentInputBox !== '' && chosenTask) {
+    // Text in inputBox and no chosenTask. Shouldn't happen
+    console.log('Text in inputBox and no chosenTask. Should not happen');
+  } else if (contentInputBox == '' && !chosenTask) {
+    // No text in inputBox and no chosenTask: Getting ready to Edit, delet or clone
     chosenTask = document.getElementById(myId);
-    chosenTask.className = 'clicked';
-    console.log(chosenTask.getAttribute('class'));
-    document.getElementById('editButton').innerText = 'Edit';
-  } else if (contentInputBox == '' && chosenTask) {  // No text in inputBox and a chosenTask
+    chosenTask.className = 'clicked';  // Needed for CSS highlighting of clicked task
+    // console.log(chosenTask.getAttribute('class'));
+    editButton.innerText = 'Edit';
+    editButton.editmode = 'true'
+  } else if (contentInputBox == '' && chosenTask) {
+    // No text in inputBox and a chosenTask: Insert element and be ready for edit or clone
     document.getElementById(myId).insertAdjacentElement('beforebegin', chosenTask);
     if (chosenTask.hasAttribute('class')) {
       chosenTask.removeAttribute('class');
     }
+    if (!editButton.editmode) {
+      resetInputBox();
+    }
     chosenTask = '';
-    document.getElementById('editButton').innerText = 'Clear';
+    editButton.innerText = 'Clear';
+    // editButton.editmode = 'false'
   }
 
-  resetInputBox();
+  if (!editButton.editmode) {
+    resetInputBox();
+  }
 }
 
 function clearOrEdit() {
-  if (document.getElementById('editButton').innerText == 'Clear') {
+  editButton = document.getElementById('editButton');
+  if (editButton.innerText == 'Clear') {
     resetInputBox();
     chosenTask = '';
-  } else if (document.getElementById('editButton').innerText == 'Edit') {
+    editButton.editmode = 'false'
+  } else if (editButton.innerText == 'Edit') {
     taskText = chosenTask.innerText;  //  Save the text from clickedElement
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
     clickedElement = document.getElementById(chosenTask.id);  //  Identify clickedElement
@@ -253,3 +276,11 @@ function parseTask(newItem) {
       // function fiddleWithHeight() {
         //   document.getElementById('151').style.height='20px';
         // }
+
+
+
+        // <!-- <div>&#x25B2; 8:00-8:10 Morgenmad &#x25BC;</div>
+        // <div>10:30-10:40 Snack</div>
+        // <div>13:00-13:30 Frokost</div>
+        // <div>15:30-15:40 Snack</div>
+        // <div id='dinner'>18:00-18:30 Aftensmad</div> -->
