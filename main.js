@@ -15,6 +15,22 @@ function resetInputBox() {
   document.getElementById('inputBox').focus();
 }
 
+inputBox = document.getElementById('inputBox');
+inputBox.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      addTask('beforeend');
+    }
+});
+
+// function removeChosen() {
+inputBox.addEventListener('focus', function () {
+  if (chosenTask!='' && chosenTask.hasAttribute('class')) {
+    chosenTask.removeAttribute('class');
+  }
+  chosenTask = '';
+  document.getElementById('editButton').innerText = 'Clear';
+});
+
 function Task(timeH, timeM, duration, text, isProcessed, isFused, isClicked) {
   let today = new Date();
   this.startTime = new Date(today.getFullYear(), today.getMonth(), today.getDay(), timeH, timeM);
@@ -74,8 +90,8 @@ function addTask(here) {
   }
 
   editButton = document.getElementById('editButton');
-  console.log(editButton.editmode);
-  if (!editButton.editmode) {
+  console.log(editButton.dataset.clonemode);
+  if (editButton.dataset.clonemode === 'false') {
     resetInputBox();
   }
 }
@@ -93,30 +109,32 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
     chosenTask = '';
     editButton.innerText = 'Clear'
   } else if (contentInputBox !== '' && chosenTask) {
-    // Text in inputBox and no chosenTask. Shouldn't happen
-    console.log('Text in inputBox and no chosenTask. Should not happen');
+    // Text in inputBox and no chosenTask. Create new task and insert before clicked element
+    newNode = createTask();
+    document.getElementById(myId).insertAdjacentElement("beforebegin", newNode);
   } else if (contentInputBox == '' && !chosenTask) {
     // No text in inputBox and no chosenTask: Getting ready to Edit, delet or clone
     chosenTask = document.getElementById(myId);
     chosenTask.className = 'clicked';  // Needed for CSS highlighting of clicked task
     // console.log(chosenTask.getAttribute('class'));
     editButton.innerText = 'Edit';
-    editButton.editmode = 'true'
+    // editButton.dataset.clonemode = 'true'
   } else if (contentInputBox == '' && chosenTask) {
     // No text in inputBox and a chosenTask: Insert element and be ready for edit or clone
     document.getElementById(myId).insertAdjacentElement('beforebegin', chosenTask);
     if (chosenTask.hasAttribute('class')) {
       chosenTask.removeAttribute('class');
     }
-    if (!editButton.editmode) {
-      resetInputBox();
-    }
+    // if (!editButton.dataset.clonemode) {
+    //   resetInputBox();
+    // }
+    resetInputBox();
     chosenTask = '';
     editButton.innerText = 'Clear';
-    // editButton.editmode = 'false'
+    editButton.dataset.clonemode = 'false'
   }
 
-  if (!editButton.editmode) {
+  if (!editButton.dataset.clonemode) {
     resetInputBox();
   }
 }
@@ -126,13 +144,14 @@ function clearOrEdit() {
   if (editButton.innerText == 'Clear') {
     resetInputBox();
     chosenTask = '';
-    editButton.editmode = 'false'
+    editButton.dataset.clonemode = 'false';
   } else if (editButton.innerText == 'Edit') {
     taskText = chosenTask.innerText;  //  Save the text from clickedElement
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
     clickedElement = document.getElementById(chosenTask.id);  //  Identify clickedElement
     clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
     document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
+    editButton.dataset.clonemode = 'true';
   }
 
 }
@@ -181,10 +200,14 @@ function parseTask(newItem) {
     hours = '0';
   };
 
-  let time = /[0-9][0-9][0-9][0-9]/.exec(newItem);
+  let time = /[0-9]?[0-9][0-9][0-9]/.exec(newItem);
   if (time) {
     time = time[0].toString();
-    timeH = /[0-9][0-9]/.exec(time).toString();
+    if (time.length == 4) {
+      timeH = /[0-9][0-9]/.exec(time).toString();
+    } else if (time.length == 3) {
+      timeH = /[0-9]/.exec(time).toString();
+    }
     time = time.replace(timeH, '')
     timeM = /[0-9][0-9]/.exec(time).toString();
     newItem = newItem.replace(timeH + timeM, '')
