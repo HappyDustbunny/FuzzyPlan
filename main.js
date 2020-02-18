@@ -153,14 +153,17 @@ function clearOrEdit() {
     document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
     editButton.dataset.clonemode = 'true';
   }
-
 }
 
-function generateText(pList) {  // pList: parsedList
+function addTimeAndDuration() {
+  alert('Need popup window to adjust time')
+}
+
+function generateText(pList) {  // pList: parsedList = [timeH, timeM, hours, minutes, drain, text]
   let extraH = 0;
   let endH = 0;
   let endM = 0;
-  if (pList[0] > -1 && (pList[2] > 0 || pList[3] > 0)) {
+  if (pList[0] > -1 && (pList[2] > 0 || pList[3] > 0)) {  // Find end time from start time and duration
     if (pList[3] > -1) {
       endM = parseInt(pList[1]) + parseInt(pList[3]);
       if (endM > 59) {
@@ -175,10 +178,18 @@ function generateText(pList) {  // pList: parsedList
       endH = parseInt(pList[0]) + parseInt(pList[2]) + extraH;
     }
     taskText = pList[0] + ':' + pList[1] + '-' + endH + ':' + endM + ' ' + pList[5]
-  } else if (pList[0] > -1) {
+  } else if (pList[0] > -1) {  // Writes HH:MM plus text
     taskText = pList[0] + ':' + pList[1] + ' ' + pList[5]
   } else {
-    taskText = pList[2] + 'h' + pList[3] + 'm ' + pList[5];
+    if (pList[2]>0 && pList[3]>0) {  // Writes h and m plus text - if there are any h and m
+      taskText = pList[2] + 'h' + pList[3] + 'm ' + pList[5];
+    } else if (pList[2]>0 && pList[3]<=0) {
+      taskText = pList[2] + 'h' + pList[5];
+    } else if (pList[2]<=0 && pList[3]>0) {
+      taskText = pList[3] + 'm ' + pList[5];
+    } else {
+      taskText = pList[5];
+    }
   }
   return taskText;
 }

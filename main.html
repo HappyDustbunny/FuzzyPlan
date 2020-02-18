@@ -8,8 +8,8 @@
   </head>
   <body>
     <h1 align=center>FuzzyFlex Planner</h1>
-    <button id='timeButton' type="button" title="Click on a task first" alt='Click to add time to existing tasks'>+Time</button>
-    <input type="text" id='inputBox' autofocus value="">
+    <button id='timeButton' type="button" title="Click on a task first" onclick="addTimeAndDuration()" alt='Click to add time to existing tasks'>+Time</button>
+    <input type="text" id='inputBox' onfocus="removeChosen" autofocus value="">
     <button id='editButton' type="button" data-clonemode='false' onclick="clearOrEdit()">Clear</button>
     <br>
     <br>
