@@ -22,7 +22,7 @@ inputBox.addEventListener('keypress', function (e) {
     }
 });
 
-// function removeChosen() {
+function removeChosen() {
 inputBox.addEventListener('focus', function () {
   if (chosenTask!='' && chosenTask.hasAttribute('class')) {
     chosenTask.removeAttribute('class');
@@ -30,6 +30,7 @@ inputBox.addEventListener('focus', function () {
   chosenTask = '';
   document.getElementById('editButton').innerText = 'Clear';
 });
+}
 
 function Task(timeH, timeM, duration, text, isProcessed, isFused, isClicked) {
   let today = new Date();
@@ -156,7 +157,57 @@ function clearOrEdit() {
 }
 
 function addTimeAndDuration() {
-  alert('Need popup window to adjust time')
+  if (chosenTask == '') {
+    return
+  }
+  timeButton = document.getElementById('timeButton')
+  text = timeButton.innerText;
+  if (text == '+Time') {
+    showTimeButtons();
+  } else {
+    oldText = chosenTask.innerText;
+    newText = /[0-9]+/.exec(timeButton.innerText) + 'm '+ oldText;
+    chosenTask.innerText = newText;
+    hideTimeButtons();
+  }
+}
+
+function addMinutes(minId, minutes) {
+  let timeButton = document.getElementById('timeButton');
+  let element = document.getElementById(minId);
+  if (element.className == 'time') {
+    let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) + minutes;
+    timeButton.innerText = '+' + value;
+    element.className = 'usedTime';
+    element.style.border = 'inset';
+  } else {
+    let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) - minutes;
+    timeButton.innerText = '+' + value;
+    element.className = 'time';
+    element.style.border = 'outset';
+  }
+
+}
+
+function showTimeButtons() {
+  timeButton = document.getElementById('timeButton');
+  timeButton.innerText = '+0';
+  timeButton.style.width = '17%';
+  document.getElementById('inputBox').style.width = '40px';
+  document.getElementsByClassName('timeAdder')[0].style.display = 'inline-block';
+  for (var i = 0; i<4; i++) {
+    document.getElementsByClassName('time')[i].style.display = 'inline-block';
+  }
+}
+
+function hideTimeButtons() {
+  document.getElementById('timeButton').innerText = '+Time';
+  document.getElementById('inputBox').style.width = '168px';
+  document.getElementsByClassName('timeAdder')[0].style.display = 'none';
+  for (var i = 0; i<4; i++) {
+    document.getElementsByClassName('time')[i].style.display = 'none';
+    // TODO: NEED TO RESET ALL BUTTONS
+  }
 }
 
 function generateText(pList) {  // pList: parsedList = [timeH, timeM, hours, minutes, drain, text]
