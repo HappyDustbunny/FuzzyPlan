@@ -176,22 +176,21 @@ function addMinutes(minId, minutes) {
   let timeButton = document.getElementById('timeButton');
   let element = document.getElementById(minId);
   if (element.className == 'time') {
-    let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) + minutes;
+    let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) + minutes + '\u25BC';
     timeButton.innerText = '+' + value;
     element.className = 'usedTime';
     element.style.border = 'inset';
   } else {
-    let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) - minutes;
+    let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) - minutes + '\u25BC';
     timeButton.innerText = '+' + value;
     element.className = 'time';
     element.style.border = 'outset';
   }
-
 }
 
 function showTimeButtons() {
   timeButton = document.getElementById('timeButton');
-  timeButton.innerText = '+0';
+  timeButton.innerText = '+0\u25BC';
   timeButton.style.width = '17%';
   document.getElementById('inputBox').style.width = '40px';
   document.getElementsByClassName('timeAdder')[0].style.display = 'inline-block';
@@ -204,10 +203,27 @@ function hideTimeButtons() {
   document.getElementById('timeButton').innerText = '+Time';
   document.getElementById('inputBox').style.width = '168px';
   document.getElementsByClassName('timeAdder')[0].style.display = 'none';
-  for (var i = 0; i<4; i++) {
-    document.getElementsByClassName('time')[i].style.display = 'none';
-    // TODO: NEED TO RESET ALL BUTTONS
+  min5 = document.getElementById('5min');
+  min5.className = 'time';
+  min5.style.border = 'outset';
+  min5.style.display = 'none';
+  min10a = document.getElementById('10min1');
+  min10a.className = 'time';
+  min10a.style.border = 'outset';
+  min10a.style.display = 'none';
+  min10b = document.getElementById('10min2');
+  min10b.className = 'time';
+  min10b.style.border = 'outset';
+  min10b.style.display = 'none';
+  min30 = document.getElementById('30min');
+  min30.className = 'time';
+  min30.style.border = 'outset';
+  min30.style.display = 'none';
+  if (chosenTask.hasAttribute('class')) {
+    chosenTask.removeAttribute('class');
   }
+  chosenTask = '';
+  resetInputBox();
 }
 
 function generateText(pList) {  // pList: parsedList = [timeH, timeM, hours, minutes, drain, text]
