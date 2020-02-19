@@ -15,7 +15,7 @@ function resetInputBox() {
   document.getElementById('inputBox').focus();
 }
 
-inputBox = document.getElementById('inputBox');
+inputBox = document.getElementById('inputBox');  // Makes pressing Enter add task
 inputBox.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
       addTask('beforeend');
@@ -23,7 +23,7 @@ inputBox.addEventListener('keypress', function (e) {
 });
 
 function removeChosen() {
-inputBox.addEventListener('focus', function () {
+inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
   if (chosenTask!='' && chosenTask.hasAttribute('class')) {
     chosenTask.removeAttribute('class');
   }
@@ -140,7 +140,7 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
   }
 }
 
-function clearOrEdit() {
+function clearOrEdit() {  // Govern the Edit/Clear button
   editButton = document.getElementById('editButton');
   if (editButton.innerText == 'Clear') {
     resetInputBox();
@@ -160,6 +160,8 @@ function addTimeAndDuration() {
   if (chosenTask == '') {
     return
   }
+  // TODO: If chosenTask has a duration, strip it and get ready for new duration
+  // TODO: Also find a way to abort adding a duration after the button is pressed
   timeButton = document.getElementById('timeButton')
   text = timeButton.innerText;
   if (text == '+Time') {
