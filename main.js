@@ -156,33 +156,51 @@ function clearOrEdit() {  // Govern the Edit/Clear button
   }
 }
 
-function addTimeAndDuration() {
+function addDuration() {
   if (chosenTask == '') {
     return
   }
-  // TODO: If chosenTask has a duration, strip it and get ready for new duration
-  // TODO: Also find a way to abort adding a duration after the button is pressed
-  timeButton = document.getElementById('timeButton')
+  // TODO: If chosenTask has a fixed time, strip it and get ready for new time and duration
+  let text = chosenTask.innerText;
+  let minutes = /[0-9]+m/.exec(text);
+  if (minutes) {
+    minutes = /[0-9]+/.exec(minutes).toString();
+    chosenTask.innerText = text.replace(minutes + 'm', '');
+  }
+  timeButton = document.getElementById('timeButton');
   text = timeButton.innerText;
   if (text == '+Time') {
     showTimeButtons();
   } else {
     oldText = chosenTask.innerText;
-    newText = /[0-9]+/.exec(timeButton.innerText) + 'm '+ oldText;
-    chosenTask.innerText = newText;
+    if (timeButton.innerText !== '+0▼') {
+      newText = /[0-9]+/.exec(timeButton.innerText) + 'm '+ oldText;
+      chosenTask.innerText = newText;
+    }
     hideTimeButtons();
   }
 }
 
-function addMinutes(minId, minutes) {
+// Functionality for +Time button
+elTimeButton = document.getElementById('timeButton');
+elTimeButton.addEventListener('click', addDuration, false);
+
+// Functionality for +5 +10 +10 +30 buttons
+elAddMinutes = document.getElementById('timeAdder');
+elAddMinutes.addEventListener('click', function(e) {addMinutes(e);}, false);
+
+function addMinutes(e) {
+  let element = e.target;
+  console.log(element);
   let timeButton = document.getElementById('timeButton');
-  let element = document.getElementById(minId);
-  if (element.className == 'time') {
+  let minutes = parseInt(element.dataset.time);
+  // let element = document.getElementById(minId);
+  if (element.className == 'time') {  // Adds the time written on button to timeButton
     let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) + minutes + '\u25BC';
     timeButton.innerText = '+' + value;
     element.className = 'usedTime';
     element.style.border = 'inset';
-  } else {
+  } else {  // Subtract time written on button from timeButton
     let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) - minutes + '\u25BC';
     timeButton.innerText = '+' + value;
     element.className = 'time';
@@ -195,7 +213,7 @@ function showTimeButtons() {
   timeButton.innerText = '+0\u25BC';
   timeButton.style.width = '17%';
   document.getElementById('inputBox').style.width = '40px';
-  document.getElementsByClassName('timeAdder')[0].style.display = 'inline-block';
+  document.getElementById('timeAdder').style.display = 'inline-block';
   for (var i = 0; i<4; i++) {
     document.getElementsByClassName('time')[i].style.display = 'inline-block';
   }
@@ -204,7 +222,7 @@ function showTimeButtons() {
 function hideTimeButtons() {
   document.getElementById('timeButton').innerText = '+Time';
   document.getElementById('inputBox').style.width = '168px';
-  document.getElementsByClassName('timeAdder')[0].style.display = 'none';
+  document.getElementById('timeAdder').style.display = 'none';
   min5 = document.getElementById('5min');
   min5.className = 'time';
   min5.style.border = 'outset';
