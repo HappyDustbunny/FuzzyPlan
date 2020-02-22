@@ -32,40 +32,53 @@ inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
 });
 }
 
-function Task(timeH, timeM, duration, text, isProcessed, isFused, isClicked) {
+function Task(timeH, timeM, duration, text, id, fuzzyness, isFused, isClicked) {
   let today = new Date();
   this.startTime = new Date(today.getFullYear(), today.getMonth(), today.getDay(), timeH, timeM);
   this.duration = duration;  // In seconds
   this.text = text;
-  this.isProcessed = isProcessed;
+  this.id = id;
+  this.fuzzyness = fuzzyness;
   this.isFused = isFused;
   this.isClicked = isClicked;
 
   this.endTime = function() {
-    if (this.isProcessed && this.duration) {
+    if (this.startTime && this.duration) {
       return this.startTime + timeH * 3600000 + timeM * 60000;
     }
   }
 }
 
 function createTask() {
-  let task = new Task(0, 0, 30, '', false, false, false);
 
-  let newNode = document.createElement('div');
-  newNode.setAttribute('onClick', 'gotClicked(this.id)');
-  newNode.setAttribute('id', Math.floor(Math.random() * 1000000));  // Set ra-ndom id in order to be able to pick element later
-
-  let newText = document.getElementById('inputBox').value;  // Get the text
+  let newText = document.getElementById('inputBox').value;  // Get the text from the inputBox
   if (newText.trim() == '') {  // If no input is found, don't add empty task
     resetInputBox();
     return
   }
 
-  let parsedText = parseTask(newText);  // Pull out information and store in array
+  let parsedText = parseTask(newText);  // Pull out information and store in array: parsedList = [timeH, timeM, hours, minutes, drain, text]
   let clearText = generateText(parsedText);  // Generate human readable text
 
-  task.text = clearText;
+  let fuzzyness = 0;  // Check level of timewise fuzzyness 0: 1200-1230 1: 30m 2: ''
+  let fuzzyClassName = '';
+  if (parsedText[0] === '-1' && parsedText[1] === '-1' && parsedText[2] === '0' && parsedText[3] === '0') {
+    fuzzyness = 2;
+    fuzzyClassName = 'isFuzzy';
+  } else if (parsedText[0] === '-1' && parsedText[1] === '-1') {
+    fuzzyness = 1;
+    fuzzyClassName = 'isFuzzyish';
+  }
+
+  let taskId =  Math.floor(Math.random() * 1000000);  // Pick random id in order to be able to pick element later
+  let task = new Task(parsedText[0], parsedText[1], parsedText[2], clearText, taskId, fuzzyness, false, false);
   taskList.push(task);
+
+  let newNode = document.createElement('div');
+  newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
+  newNode.setAttribute('id', taskId);
+  newNode.setAttribute('class', fuzzyClassName);
+
   let textNode = document.createTextNode(clearText);
   newNode.appendChild(textNode);
 
@@ -91,7 +104,6 @@ function addTask(here) {
   }
 
   editButton = document.getElementById('editButton');
-  console.log(editButton.dataset.clonemode);
   if (editButton.dataset.clonemode === 'false') {
     resetInputBox();
   }
@@ -116,16 +128,31 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
   } else if (contentInputBox == '' && !chosenTask) {
     // No text in inputBox and no chosenTask: Getting ready to Edit, delet or clone
     chosenTask = document.getElementById(myId);
-    chosenTask.className = 'clicked';  // Needed for CSS highlighting of clicked task
+    chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
+    // chosenTask.style.border = '1px solid rgb(255, 50, 255)';  // Needed for CSS highlighting of clicked task
+    // chosenTask.className = 'clicked';  // Needed for CSS highlighting of clicked task
     // console.log(chosenTask.getAttribute('class'));
     editButton.innerText = 'Edit';
     // editButton.dataset.clonemode = 'true'
   } else if (contentInputBox == '' && chosenTask) {
     // No text in inputBox and a chosenTask: Insert element and be ready for edit or clone
-    document.getElementById(myId).insertAdjacentElement('beforebegin', chosenTask);
-    if (chosenTask.hasAttribute('class')) {
-      chosenTask.removeAttribute('class');
-    }
+    let chosenTask = document.getElementById(myId);
+    chosenTask.insertAdjacentElement('beforebegin', chosenTask);
+
+    chosenTask.style['background-color'] = 'rgba(154, 219, 240, .25)';
+
+    // if (curEl.class === 'isFuzzy') { // TODO: This is a mess...
+    //   curEl.style.border = 'none';
+    //   curEl.style['box-shadow'] = '0px 0px 3px 2px rgba(154, 219, 240, .25)';
+    // } else if (curEl.class === 'isFuzzyish') {
+    //   curEl.style.border = '1px solid rgba(154, 219, 240, 1.0)';
+    //   curEl.style.background-color = 'rgba(154, 219, 240, .25)';
+    //   curEl.style['box-shadow'] = '0px 0px 3px 2px rgba(154, 219, 240, .25)';
+    // }
+    // chosenTask.style.border = 'none'; // TODO: Better, but still no banana
+    // if (chosenTask.hasAttribute('class')) {  // Remove class name 'clicked' in order to let CSS stop highlighting task
+    //   chosenTask.removeAttribute('class');  // TODO: get task from list via id and set fuzzyness
+    // }
     // if (!editButton.dataset.clonemode) {
     //   resetInputBox();
     // }
@@ -156,7 +183,7 @@ function clearOrEdit() {  // Govern the Edit/Clear button
   }
 }
 
-function addDuration() {
+function addDuration() {  // Add duration to a chosen task
   if (chosenTask == '') {
     return
   }
@@ -191,10 +218,8 @@ elAddMinutes.addEventListener('click', function(e) {addMinutes(e);}, false);
 
 function addMinutes(e) {
   let element = e.target;
-  console.log(element);
   let timeButton = document.getElementById('timeButton');
   let minutes = parseInt(element.dataset.time);
-  // let element = document.getElementById(minId);
   if (element.className == 'time') {  // Adds the time written on button to timeButton
     let value = parseInt(/[0-9]+/.exec(timeButton.innerText)) + minutes + '\u25BC';
     timeButton.innerText = '+' + value;
@@ -239,9 +264,10 @@ function hideTimeButtons() {
   min30.className = 'time';
   min30.style.border = 'outset';
   min30.style.display = 'none';
-  if (chosenTask.hasAttribute('class')) {
-    chosenTask.removeAttribute('class');
-  }
+  chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
+  // if (chosenTask.hasAttribute('class')) { // Remove class name 'clicked' in order to let CSS stop highlighting task
+  //   chosenTask.removeAttribute('class');
+  // }
   chosenTask = '';
   resetInputBox();
 }
