@@ -15,7 +15,7 @@ function resetInputBox() {
   document.getElementById('inputBox').focus();
 }
 
-inputBox = document.getElementById('inputBox');  // Makes pressing Enter add task
+let inputBox = document.getElementById('inputBox');  // Makes pressing Enter add task
 inputBox.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
       addTask('beforeend');
@@ -23,28 +23,52 @@ inputBox.addEventListener('keypress', function (e) {
 });
 
 function removeChosen() {
-inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
-  if (chosenTask!='' && chosenTask.hasAttribute('class')) {
-    chosenTask.removeAttribute('class');
-  }
-  chosenTask = '';
-  document.getElementById('editButton').innerText = 'Clear';
-});
+  let inputBox = document.getElementById('inputBox');
+  inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
+    if (chosenTask!='' && chosenTask.hasAttribute('class')) {
+      chosenTask.removeAttribute('class');
+    }
+    chosenTask = '';
+    document.getElementById('editButton').innerText = 'Clear';
+  });
 }
 
-function Task(timeH, timeM, duration, text, id, fuzzyness, isFused, isClicked) {
-  let today = new Date();
-  this.startTime = new Date(today.getFullYear(), today.getMonth(), today.getDay(), timeH, timeM);
-  this.duration = duration;  // In seconds
+function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) {
+  this.timeH = timeH;
+  this.timeM = timeM;
+  this.durationH = durationH;
+  this.durationM = durationM;
   this.text = text;
   this.id = id;
-  this.fuzzyness = fuzzyness;
   this.isFused = isFused;
   this.isClicked = isClicked;
 
+  this.duration = function() {  // In milliseconds
+    return this.durationH * 3600000 + this.durationM * 60000
+  }
+
+
+  this.startTime = function() {
+    if (this.timeH > 0 || this.timeM > 0) {
+      let today = new Date();
+      let starttime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), timeH, timeM);
+      return starttime
+    }
+  }
+
   this.endTime = function() {
-    if (this.startTime && this.duration) {
+    if (this.startTime() && this.duration()) {
       return this.startTime + timeH * 3600000 + timeM * 60000;
+    }
+  }
+
+  this.fuzzyness = function() {
+    if (this.duration() == '0' &&  (this.timeH < 0 || this.timeM < 0)) { // No starttime or duration
+      return 'isFuzzy'
+    } else if (this.duration() != '0' &&  (this.timeH < 0 || this.timeM < 0)) { // No starttime, but duration
+      return 'isFuzzyish'
+    } else {  // Starttime
+      return 'isNotFuzzy'
     }
   }
 }
@@ -56,28 +80,17 @@ function createTask() {
     resetInputBox();
     return
   }
-
-  let parsedText = parseTask(newText);  // Pull out information and store in array: parsedList = [timeH, timeM, hours, minutes, drain, text]
-  let clearText = generateText(parsedText);  // Generate human readable text
-
-  let fuzzyness = 0;  // Check level of timewise fuzzyness 0: 1200-1230 1: 30m 2: ''
-  let fuzzyClassName = '';
-  if (parsedText[0] === '-1' && parsedText[1] === '-1' && parsedText[2] === '0' && parsedText[3] === '0') {
-    fuzzyness = 2;
-    fuzzyClassName = 'isFuzzy';
-  } else if (parsedText[0] === '-1' && parsedText[1] === '-1') {
-    fuzzyness = 1;
-    fuzzyClassName = 'isFuzzyish';
-  }
+  let pText = parseTask(newText);
+  let clearText = generateText(pText);
 
   let taskId =  Math.floor(Math.random() * 1000000);  // Pick random id in order to be able to pick element later
-  let task = new Task(parsedText[0], parsedText[1], parsedText[2], clearText, taskId, fuzzyness, false, false);
+  let task = new Task(pText[0], pText[1], pText[2], pText[3], clearText, taskId, false, false);
   taskList.push(task);
 
   let newNode = document.createElement('div');
   newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
   newNode.setAttribute('id', taskId);
-  newNode.setAttribute('class', fuzzyClassName);
+  newNode.classList.add(task.fuzzyness());
 
   let textNode = document.createTextNode(clearText);
   newNode.appendChild(textNode);
@@ -95,7 +108,7 @@ function clickedBottom() {
   addTask('beforeend');
 }
 
-function addTask(here) {
+function addTask(here) {  // Create and add new task. Services the functions clickedTop and clickedBottom
   contentInputBox = document.getElementById('inputBox').value.trim();
 
   if (here && contentInputBox) {
@@ -128,7 +141,8 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
   } else if (contentInputBox == '' && !chosenTask) {
     // No text in inputBox and no chosenTask: Getting ready to Edit, delet or clone
     chosenTask = document.getElementById(myId);
-    chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
+    chosenTask.classList.add('isClicked');
+    // chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
     // chosenTask.style.border = '1px solid rgb(255, 50, 255)';  // Needed for CSS highlighting of clicked task
     // chosenTask.className = 'clicked';  // Needed for CSS highlighting of clicked task
     // console.log(chosenTask.getAttribute('class'));
