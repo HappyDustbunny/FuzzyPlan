@@ -25,8 +25,8 @@ inputBox.addEventListener('keypress', function (e) {
 function removeChosen() {
   let inputBox = document.getElementById('inputBox');
   inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
-    if (chosenTask!='' && chosenTask.hasAttribute('class')) {
-      chosenTask.removeAttribute('class');
+    if (chosenTask!='' && chosenTask.classList.contains('isClicked')) {
+      chosenTask.classList.remove('isClicked');
     }
     chosenTask = '';
     document.getElementById('editButton').innerText = 'Clear';
@@ -197,22 +197,31 @@ function clearOrEdit() {  // Govern the Edit/Clear button
   }
 }
 
+// Functionality for +Time button
+elTimeButton = document.getElementById('timeButton');
+elTimeButton.addEventListener('click', addDuration, false);
+
+// Functionality for +5 +10 +10 +30 buttons
+elAddMinutes = document.getElementById('timeAdder');
+elAddMinutes.addEventListener('click', function(e) {addMinutes(e);}, false);
+
 function addDuration() {  // Add duration to a chosen task
-  if (chosenTask == '') {
+  if (chosenTask == '') {  // ... but only if one is chosen. Duh.
     return
   }
   // TODO: If chosenTask has a fixed time, strip it and get ready for new time and duration
-  let text = chosenTask.innerText;
+  let text = chosenTask.innerText; // Strip the current duration from task text
   let minutes = /[0-9]+m/.exec(text);
   if (minutes) {
     minutes = /[0-9]+/.exec(minutes).toString();
     chosenTask.innerText = text.replace(minutes + 'm', '');
   }
+
   timeButton = document.getElementById('timeButton');
   text = timeButton.innerText;
-  if (text == '+Time') {
+  if (text == '+Time') { // If a task was chosen and the +Time button was clicked show +5 +10 +10 +30 buttons
     showTimeButtons();
-  } else {
+  } else {  // If the +Time button (showing +0▼) is clicked, add duration to the chosen task
     oldText = chosenTask.innerText;
     if (timeButton.innerText !== '+0▼') {
       newText = /[0-9]+/.exec(timeButton.innerText) + 'm '+ oldText;
@@ -222,13 +231,6 @@ function addDuration() {  // Add duration to a chosen task
   }
 }
 
-// Functionality for +Time button
-elTimeButton = document.getElementById('timeButton');
-elTimeButton.addEventListener('click', addDuration, false);
-
-// Functionality for +5 +10 +10 +30 buttons
-elAddMinutes = document.getElementById('timeAdder');
-elAddMinutes.addEventListener('click', function(e) {addMinutes(e);}, false);
 
 function addMinutes(e) {
   let element = e.target;
@@ -261,7 +263,7 @@ function showTimeButtons() {
 function hideTimeButtons() {
   document.getElementById('timeButton').innerText = '+Time';
   document.getElementById('inputBox').style.width = '168px';
-  document.getElementById('timeAdder').style.display = 'none';
+  document.getElementById('timeAdder').style.display = 'none'; // Make buttons invisible
   min5 = document.getElementById('5min');
   min5.className = 'time';
   min5.style.border = 'outset';
@@ -278,7 +280,9 @@ function hideTimeButtons() {
   min30.className = 'time';
   min30.style.border = 'outset';
   min30.style.display = 'none';
-  chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
+
+  chosenTask.classList.remove('isClicked');
+  // chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
   // if (chosenTask.hasAttribute('class')) { // Remove class name 'clicked' in order to let CSS stop highlighting task
   //   chosenTask.removeAttribute('class');
   // }
