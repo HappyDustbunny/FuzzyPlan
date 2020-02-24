@@ -33,18 +33,25 @@ function removeChosen() {
   });
 }
 
-function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) {
-  this.timeH = timeH;
-  this.timeM = timeM;
-  this.durationH = durationH;
-  this.durationM = durationM;
-  this.text = text;
+// function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) {
+function Task(parsedText, id) {
+  this.timeH = parsedText[0];
+  this.timeM = parsedText[1];
+  this.durationH = parsedText[2];
+  this.durationM = parsedText[3];
+  this.drain = parsedText[4]; // TODO: implement drain
+  this.text = parsedText[5];
   this.id = id;
-  this.isFused = isFused;
-  this.isClicked = isClicked;
+
+  // this.isFused = isFused;
+  // this.isClicked = isClicked;
 
   this.duration = function() {  // In milliseconds
     return this.durationH * 3600000 + this.durationM * 60000
+  }
+
+  this.height = function() { // Pixelheight is 1 minute = 1 px
+    return this.duration() / 60000
   }
 
 
@@ -76,6 +83,41 @@ function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) 
       return 'isNotFuzzy'
     }
   }
+
+  this.displayText = function () {
+    let extraH = 0;
+    let endH = 0;
+    let endM = 0;
+    if (this.timeH > -1 && (this.durationH > 0 || this.durationM > 0)) {  // Find end time from start time and duration
+      if (this.durationM > -1) {
+        endM = parseInt(this.timeM) + parseInt(this.durationM);
+        if (endM > 59) {
+          endM -= 60;
+          extraH = 1;
+        }
+        if (endM < 10) {
+          endM = '0' + endM;
+        }
+      }
+      if (this.durationH > -1) {
+        endH = parseInt(this.timeH) + parseInt(this.durationH) + extraH;
+      }
+      displayText = this.timeH + ':' + this.timeM + '-' + endH + ':' + endM + ' ' + this.text
+    } else if (this.timeH > -1) {  // Writes HH:MM plus text
+      displayText = this.timeH + ':' + this.timeM + ' ' + this.text
+    } else {
+      if (this.durationH>0 && this.durationM>0) {  // Writes h and m plus text - if there are any h and m
+        displayText = this.durationH + 'h' + this.durationM + 'm ' + this.text;
+      } else if (this.durationH>0 && this.durationM<=0) {
+        displayText = this.durationH + 'h' + this.text;
+      } else if (this.durationH<=0 && this.durationM>0) {
+        displayText = this.durationM + 'm ' + this.text;
+      } else {
+        displayText = this.text;
+      }
+    }
+    return displayText;
+  }
 }
 
 function createTask() {
@@ -84,19 +126,21 @@ function createTask() {
     resetInputBox();
     return
   }
-  let pText = parseTask(newText);
-  let clearText = generateText(pText);
+  let parsedText = parseTask(newText);
+  // let clearText = generateText(pText);
 
   let taskId =  Math.floor(Math.random() * 1000000);  // Pick random id in order to be able to pick element later
-  let task = new Task(pText[0], pText[1], pText[2], pText[3], clearText, taskId, false, false);
+  let task = new Task(parsedText, taskId);
+  // let task = new Task(pText[0], pText[1], pText[2], pText[3], clearText, taskId, false, false);
   taskList.push(task);
 
   let newNode = document.createElement('div');
   newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
   newNode.setAttribute('id', taskId);
   newNode.classList.add(task.fuzzyness());
+  newNode.style.height = task.height() + 'px'; 
 
-  let textNode = document.createTextNode(clearText);
+  let textNode = document.createTextNode(task.displayText());
   newNode.appendChild(textNode);
 
   let node = newNode;
@@ -175,7 +219,7 @@ function clearOrEdit() {  // Govern the Edit/Clear button
     chosenTask = '';
     editButton.dataset.clonemode = 'false';
   } else if (editButton.innerText == 'Edit') {
-    taskText = chosenTask.innerText;  //  Save the text from clickedElement
+    taskText = chosenTask.innerText;  //  Save the text from clickedElement // TODO: Change to Task.displayText
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
     clickedElement = document.getElementById(chosenTask.id);  //  Identify clickedElement
     clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
@@ -282,41 +326,41 @@ function hideTimeButtons() {
   resetInputBox();
 }
 
-// TODO: Shoul generateText be part of the Task Object? Does 2200 9h Sleep --> 22:00-23:59 or 22:00-31:00?
-function generateText(pList) {  // pList: parsedList = [timeH, timeM, hours, minutes, drain, text]
-  let extraH = 0;
-  let endH = 0;
-  let endM = 0;
-  if (pList[0] > -1 && (pList[2] > 0 || pList[3] > 0)) {  // Find end time from start time and duration
-    if (pList[3] > -1) {
-      endM = parseInt(pList[1]) + parseInt(pList[3]);
-      if (endM > 59) {
-        endM -= 60;
-        extraH = 1;
-      }
-      if (endM < 10) {
-        endM = '0' + endM;
-      }
-    }
-    if (pList[2] > -1) {
-      endH = parseInt(pList[0]) + parseInt(pList[2]) + extraH;
-    }
-    taskText = pList[0] + ':' + pList[1] + '-' + endH + ':' + endM + ' ' + pList[5]
-  } else if (pList[0] > -1) {  // Writes HH:MM plus text
-    taskText = pList[0] + ':' + pList[1] + ' ' + pList[5]
-  } else {
-    if (pList[2]>0 && pList[3]>0) {  // Writes h and m plus text - if there are any h and m
-      taskText = pList[2] + 'h' + pList[3] + 'm ' + pList[5];
-    } else if (pList[2]>0 && pList[3]<=0) {
-      taskText = pList[2] + 'h' + pList[5];
-    } else if (pList[2]<=0 && pList[3]>0) {
-      taskText = pList[3] + 'm ' + pList[5];
-    } else {
-      taskText = pList[5];
-    }
-  }
-  return taskText;
-}
+// TODO: Should generateText be part of the Task Object? Does 2200 9h Sleep --> 22:00-23:59 or 22:00-31:00?
+// function generateText(pList) {  // pList: parsedList = [timeH, timeM, hours, minutes, drain, text]
+//   let extraH = 0;
+//   let endH = 0;
+//   let endM = 0;
+//   if (pList[0] > -1 && (pList[2] > 0 || pList[3] > 0)) {  // Find end time from start time and duration
+//     if (pList[3] > -1) {
+//       endM = parseInt(pList[1]) + parseInt(pList[3]);
+//       if (endM > 59) {
+//         endM -= 60;
+//         extraH = 1;
+//       }
+//       if (endM < 10) {
+//         endM = '0' + endM;
+//       }
+//     }
+//     if (pList[2] > -1) {
+//       endH = parseInt(pList[0]) + parseInt(pList[2]) + extraH;
+//     }
+//     taskText = pList[0] + ':' + pList[1] + '-' + endH + ':' + endM + ' ' + pList[5]
+//   } else if (pList[0] > -1) {  // Writes HH:MM plus text
+//     taskText = pList[0] + ':' + pList[1] + ' ' + pList[5]
+//   } else {
+//     if (pList[2]>0 && pList[3]>0) {  // Writes h and m plus text - if there are any h and m
+//       taskText = pList[2] + 'h' + pList[3] + 'm ' + pList[5];
+//     } else if (pList[2]>0 && pList[3]<=0) {
+//       taskText = pList[2] + 'h' + pList[5];
+//     } else if (pList[2]<=0 && pList[3]>0) {
+//       taskText = pList[3] + 'm ' + pList[5];
+//     } else {
+//       taskText = pList[5];
+//     }
+//   }
+//   return taskText;
+// }
 
 function parseTask(newItem) {
   let minutes = /[0-9]+m/.exec(newItem);
