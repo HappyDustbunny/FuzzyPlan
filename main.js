@@ -58,7 +58,12 @@ function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) 
 
   this.endTime = function() {
     if (this.startTime() && this.duration()) {
-      return this.startTime + timeH * 3600000 + timeM * 60000;
+      endTime = this.startTime + timeH * 3600000 + timeM * 60000;
+      if (endTime.getHours() < 24) {
+        return endTime
+      } else {
+        return new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59)
+      }
     }
   }
 
@@ -74,7 +79,6 @@ function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) 
 }
 
 function createTask() {
-
   let newText = document.getElementById('inputBox').value;  // Get the text from the inputBox
   if (newText.trim() == '') {  // If no input is found, don't add empty task
     resetInputBox();
@@ -135,41 +139,24 @@ function gotClicked(myId) { // If a task is clicked 'myId' is its id
     chosenTask = '';
     editButton.innerText = 'Clear'
   } else if (contentInputBox !== '' && chosenTask) {
-    // Text in inputBox and no chosenTask. Create new task and insert before clicked element
-    newNode = createTask();
-    document.getElementById(myId).insertAdjacentElement("beforebegin", newNode);
+    // Text in inputBox and a chosenTask. Should not happen.
+    console.log('Text in inputBox and a chosenTask. Should not happen.')
+    // newNode = createTask();
+    // document.getElementById(myId).insertAdjacentElement("beforebegin", newNode);
   } else if (contentInputBox == '' && !chosenTask) {
-    // No text in inputBox and no chosenTask: Getting ready to Edit, delet or clone
+    // No text in inputBox and no chosenTask: Getting ready to Edit, delete or clone
     chosenTask = document.getElementById(myId);
     chosenTask.classList.add('isClicked');
-    // chosenTask.style['background-color'] = 'rgba(240, 182, 154, 0.31)';
-    // chosenTask.style.border = '1px solid rgb(255, 50, 255)';  // Needed for CSS highlighting of clicked task
-    // chosenTask.className = 'clicked';  // Needed for CSS highlighting of clicked task
-    // console.log(chosenTask.getAttribute('class'));
+
     editButton.innerText = 'Edit';
-    // editButton.dataset.clonemode = 'true'
+    editButton.dataset.clonemode = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTask) {
     // No text in inputBox and a chosenTask: Insert element and be ready for edit or clone
-    let chosenTask = document.getElementById(myId);
-    chosenTask.insertAdjacentElement('beforebegin', chosenTask);
+    let secondTask = document.getElementById(myId);
+    secondTask.insertAdjacentElement('beforebegin', chosenTask);
 
-    chosenTask.style['background-color'] = 'rgba(154, 219, 240, .25)';
+    // chosenTask.style['background-color'] = 'rgba(154, 219, 240, .25)';
 
-    // if (curEl.class === 'isFuzzy') { // TODO: This is a mess...
-    //   curEl.style.border = 'none';
-    //   curEl.style['box-shadow'] = '0px 0px 3px 2px rgba(154, 219, 240, .25)';
-    // } else if (curEl.class === 'isFuzzyish') {
-    //   curEl.style.border = '1px solid rgba(154, 219, 240, 1.0)';
-    //   curEl.style.background-color = 'rgba(154, 219, 240, .25)';
-    //   curEl.style['box-shadow'] = '0px 0px 3px 2px rgba(154, 219, 240, .25)';
-    // }
-    // chosenTask.style.border = 'none'; // TODO: Better, but still no banana
-    // if (chosenTask.hasAttribute('class')) {  // Remove class name 'clicked' in order to let CSS stop highlighting task
-    //   chosenTask.removeAttribute('class');  // TODO: get task from list via id and set fuzzyness
-    // }
-    // if (!editButton.dataset.clonemode) {
-    //   resetInputBox();
-    // }
     resetInputBox();
     chosenTask = '';
     editButton.innerText = 'Clear';
@@ -209,7 +196,7 @@ function addDuration() {  // Add duration to a chosen task
   if (chosenTask == '') {  // ... but only if one is chosen. Duh.
     return
   }
-  // TODO: If chosenTask has a fixed time, strip it and get ready for new time and duration
+  // TODO: If chosenTask has a fixed time, it should be edited instead. Refuse to process it.
   let text = chosenTask.innerText; // Strip the current duration from task text
   let minutes = /[0-9]+m/.exec(text);
   if (minutes) {
@@ -226,6 +213,11 @@ function addDuration() {  // Add duration to a chosen task
     if (timeButton.innerText !== '+0▼') {
       newText = /[0-9]+/.exec(timeButton.innerText) + 'm '+ oldText;
       chosenTask.innerText = newText;
+      chosenTask.classList.remove('isFuzzy');
+      chosenTask.classList.add('isFuzzyish');
+    } else {
+      chosenTask.classList.remove('isFuzzyish');
+      chosenTask.classList.add('isFuzzy');
     }
     hideTimeButtons();
   }
@@ -290,6 +282,7 @@ function hideTimeButtons() {
   resetInputBox();
 }
 
+// TODO: Shoul generateText be part of the Task Object? Does 2200 9h Sleep --> 22:00-23:59 or 22:00-31:00?
 function generateText(pList) {  // pList: parsedList = [timeH, timeM, hours, minutes, drain, text]
   let extraH = 0;
   let endH = 0;
