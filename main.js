@@ -4,7 +4,7 @@ var chosenTask = '';
 for (var i = 0; i < 24; i += 1) {
   let node = document.createElement('span');
   node.setAttribute('id', i);  // Time in hours
-  j = i + 1;
+  // j = i + 1;
   document.getElementById('day').appendChild(node);
 }
 
@@ -102,7 +102,7 @@ function Task(parsedText, id) {
       if (this.durationH > -1) {
         endH = parseInt(this.timeH) + parseInt(this.durationH) + extraH;
       }
-      displayText = this.timeH + ':' + this.timeM + '-' + endH + ':' + endM + ' ' + this.text
+      displayText = this.timeH + ':' + this.timeM + '-' + endH + ':' + endM + ' (' + this.duration() / 60000 + 'm) ' + this.text
     } else if (this.timeH > -1) {  // Writes HH:MM plus text
       displayText = this.timeH + ':' + this.timeM + ' ' + this.text
     } else {
@@ -138,7 +138,13 @@ function createTask() {
   newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
   newNode.setAttribute('id', taskId);
   newNode.classList.add(task.fuzzyness());
-  newNode.style.height = task.height() + 'px'; 
+  if (task.fuzzyness() == 'isFuzzy') {
+    newNode.style['line-height'] = '30px';
+    newNode.style.height = '30px'; // TODO: incorporate these two lines whereever a task is modified
+  } else {
+    newNode.style.height = task.height() + 'px'; // TODO: incorporate these two lines whereever a task is modified
+    newNode.style['line-height'] = task.height() + 'px';  // TODO: incorporate these two lines whereever a task is modified
+  }
 
   let textNode = document.createTextNode(task.displayText());
   newNode.appendChild(textNode);
