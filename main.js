@@ -8,29 +8,69 @@ for (var i = 0; i < 24; i += 1) {
   document.getElementById('day').appendChild(node);
 }
 
-resetInputBox();
+function setUpFunc() {
+  // Create 24h nullTime
+  let startNullTime = new Task([0, 1, 23, 59, -1, ''], 1)
+  taskList.push(startNullTime);
+
+  // Create a 15 minutes planning time as a start point
+  let now = new Date();
+  let timeH = now.getHours();
+  let timeM = now.getMinutes();
+  let planTask = new Task([timeH, timeM, 0, 15, -1, 'Planning'], 123456);
+  insertFixTimeTask(planTask);
+
+  taskList.forEach(renderBlocks) // Draws task based on the content of the taskList
+  resetInputBox();
+}
 
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
 }
 
-let inputBox = document.getElementById('inputBox');  // Makes pressing Enter add task
-inputBox.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-      addTask('beforeend');
+function insertFixTimeTask(fixTimeTask) {
+  taskList.forEach((item, i) => {
+    if (item.fuzzyness() == 'isNullTime') { // Find first nullTime slot
+      console.log('Gah', item.endTime() , fixTimeTask.endTime());
+      if ((item.startTime() < fixTimeTask.startTime()) && (fixTimeTask.endTime() < item.endTime())) { // If the task fits in the nullTime
+        // ... make new nullTime before
+        duration1 = fixTimeTask.startTime() - item.startTime();
+        dur1H = Math.floor(duration1 / 3600000);
+        dur1M = (duration1 - dur1H * 3600000) / 60000;
+        console.log(duration1, dur1H, dur1M);
+        let null1 = new Task([item.timeH, item.timeM, dur1H, dur1M, -1, ''], 7234712);
+        // .. and after
+        duration2 = item.endTime() - fixTimeTask.endTime();
+        dur2H = Math.floor(duration2 / 3600000);
+        dur2M = (duration2 - dur2H * 3600000) / 60000;
+        let null2 = new Task([fixTimeTask.endTime().getHours(), fixTimeTask.endTime().getMinutes(), dur2H, dur2M, -1, ''], 1858452);
+        // Exchange the nullTime task with the fixTimeTask sandwiched in between the two new nullTimes
+        taskList.splice(i, 1, null1, fixTimeTask, null2)
+        console.log('tasklist', taskList)
+      }
     }
-});
-
-function removeChosen() {
-  let inputBox = document.getElementById('inputBox');
-  inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
-    if (chosenTask!='' && chosenTask.classList.contains('isClicked')) {
-      chosenTask.classList.remove('isClicked');
-    }
-    chosenTask = '';
-    document.getElementById('editButton').innerText = 'Clear';
   });
+}
+
+function renderBlocks(block) {
+  let taskId =  Math.floor(Math.random() * 1000000);  // Pick random id in order to be able to pick element later
+
+  let newNode = document.createElement('div');
+  newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
+  newNode.setAttribute('id', taskId);
+  newNode.classList.add(block.fuzzyness());
+  if (block.fuzzyness() == 'isFuzzy') {
+    newNode.style['line-height'] = '30px';
+    newNode.style.height = '30px'; // TODO: incorporate these two lines whereever a task is modified
+  } else {
+    newNode.style.height = block.height() + 'px'; // TODO: incorporate these two lines whereever a block is modified
+    newNode.style['line-height'] = block.height() + 'px';  // TODO: incorporate these two lines whereever a task is modified
+  }
+
+  let textNode = document.createTextNode(block.displayText());
+  newNode.appendChild(textNode);
+  document.getElementById('day').insertAdjacentElement('beforeend', newNode);
 }
 
 // function Task(timeH, timeM, durationH, durationM, text, id, isFused, isClicked) {
@@ -58,14 +98,16 @@ function Task(parsedText, id) {
   this.startTime = function() {
     if (this.timeH > 0 || this.timeM > 0) {
       let today = new Date();
-      let starttime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), timeH, timeM);
-      return starttime
+      let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), this.timeH, this.timeM);
+      return startTime
     }
   }
 
   this.endTime = function() {
     if (this.startTime() && this.duration()) {
-      endTime = this.startTime + timeH * 3600000 + timeM * 60000;
+      let today = new Date();
+      endTime = new Date(this.startTime().getTime() + this.duration());
+      // endTime = new Date(this.startTime().getTime() + this.timeH * 3600000 + this.timeM * 60000);
       if (endTime.getHours() < 24) {
         return endTime
       } else {
@@ -75,7 +117,9 @@ function Task(parsedText, id) {
   }
 
   this.fuzzyness = function() {
-    if (this.duration() == '0' &&  (this.timeH < 0 || this.timeM < 0)) { // No starttime or duration
+    if (this.text == '') {
+      return 'isNullTime'
+    } else if (this.duration() == '0' &&  (this.timeH < 0 || this.timeM < 0)) { // No starttime or duration
       return 'isFuzzy'
     } else if (this.duration() != '0' &&  (this.timeH < 0 || this.timeM < 0)) { // No starttime, but duration
       return 'isFuzzyish'
@@ -120,47 +164,12 @@ function Task(parsedText, id) {
   }
 }
 
-function createTask() {
-  let newText = document.getElementById('inputBox').value;  // Get the text from the inputBox
-  if (newText.trim() == '') {  // If no input is found, don't add empty task
-    resetInputBox();
-    return
+let inputBox = document.getElementById('inputBox');  // Makes pressing Enter add task
+inputBox.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    addTask('beforeend');
   }
-  let parsedText = parseTask(newText);
-  // let clearText = generateText(pText);
-
-  let taskId =  Math.floor(Math.random() * 1000000);  // Pick random id in order to be able to pick element later
-  let task = new Task(parsedText, taskId);
-  // let task = new Task(pText[0], pText[1], pText[2], pText[3], clearText, taskId, false, false);
-  taskList.push(task);
-
-  let newNode = document.createElement('div');
-  newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
-  newNode.setAttribute('id', taskId);
-  newNode.classList.add(task.fuzzyness());
-  if (task.fuzzyness() == 'isFuzzy') {
-    newNode.style['line-height'] = '30px';
-    newNode.style.height = '30px'; // TODO: incorporate these two lines whereever a task is modified
-  } else {
-    newNode.style.height = task.height() + 'px'; // TODO: incorporate these two lines whereever a task is modified
-    newNode.style['line-height'] = task.height() + 'px';  // TODO: incorporate these two lines whereever a task is modified
-  }
-
-  let textNode = document.createTextNode(task.displayText());
-  newNode.appendChild(textNode);
-
-  let node = newNode;
-  return node
-}
-
-
-function clickedTop() {
-  addTask('afterbegin');
-}
-
-function clickedBottom() {
-  addTask('beforeend');
-}
+});
 
 function addTask(here) {  // Create and add new task. Services the functions clickedTop and clickedBottom
   contentInputBox = document.getElementById('inputBox').value.trim();
@@ -170,11 +179,64 @@ function addTask(here) {  // Create and add new task. Services the functions cli
     document.getElementById('day').insertAdjacentElement(here, newNode);
   }
 
+  function createTask() {
+    let newText = document.getElementById('inputBox').value;  // Get the text from the inputBox
+    if (newText.trim() == '') {  // If no input is found, don't add empty task
+      resetInputBox();
+      return
+    }
+    let parsedText = parseTask(newText);
+    // let clearText = generateText(pText);
+
+    let taskId =  Math.floor(Math.random() * 1000000);  // Pick random id in order to be able to pick element later
+    let task = new Task(parsedText, taskId);
+    // let task = new Task(pText[0], pText[1], pText[2], pText[3], clearText, taskId, false, false);
+    // taskList.push(task);
+
+    let newNode = document.createElement('div');
+    newNode.setAttribute('onClick', 'gotClicked(this.id)');  // TODO: addEventListener here?
+    newNode.setAttribute('id', taskId);
+    newNode.classList.add(task.fuzzyness());
+    if (task.fuzzyness() == 'isFuzzy') {
+      newNode.style['line-height'] = '30px';
+      newNode.style.height = '30px'; // TODO: incorporate these two lines whereever a task is modified
+    } else {
+      newNode.style.height = task.height() + 'px'; // TODO: incorporate these two lines whereever a task is modified
+      newNode.style['line-height'] = task.height() + 'px';  // TODO: incorporate these two lines whereever a task is modified
+    }
+
+    let textNode = document.createTextNode(task.displayText());
+    newNode.appendChild(textNode);
+
+    let node = newNode;
+    return node
+  }
+
   editButton = document.getElementById('editButton');
   if (editButton.dataset.clonemode === 'false') {
     resetInputBox();
   }
 }
+
+function clickedTop() {
+  addTask('afterbegin');
+}
+
+function clickedBottom() {
+  addTask('beforeend');
+}
+
+function removeChosen() {
+  let inputBox = document.getElementById('inputBox');
+  inputBox.addEventListener('focus', function () {  // TODO: Does this work?? Hmm.
+    if (chosenTask!='' && chosenTask.classList.contains('isClicked')) {
+      chosenTask.classList.remove('isClicked');
+    }
+    chosenTask = '';
+    document.getElementById('editButton').innerText = 'Clear';
+  });
+}
+
 
 function gotClicked(myId) { // If a task is clicked 'myId' is its id
 
