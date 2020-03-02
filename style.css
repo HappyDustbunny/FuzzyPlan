@@ -84,7 +84,8 @@ button {
 .isClicked,
 button:hover,
 button:focus {
-  transform: scaleY(1.2);
+  /* transform: scaleY(1.2); */
+  transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
 }
 
