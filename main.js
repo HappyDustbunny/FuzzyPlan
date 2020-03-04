@@ -1,5 +1,5 @@
 var taskList = [];
-let chosenTask = '';
+let chosenTaskId = '';
 
 function Task(date, duration, text) {
   this.date = date; // Time as Javascript date
@@ -13,9 +13,9 @@ function Task(date, duration, text) {
   this.fuzzyness = function() {
     if (this.text == '') {
       return 'isNullTime'
-    } else if (this.duration == '0' &&  (typeof(this.date) == 'number')) { // No starttime or duration
+    } else if (this.duration == '0' &&  (this.date == '')) { // No starttime or duration
       return 'isFuzzy'
-    } else if (this.duration != '0' &&  (typeof(this.date) == 'number')) { // No starttime, but duration
+    } else if (this.duration != '0' &&  (this.date == '')) { // No starttime, but duration
       return 'isFuzzyish'
     } else {
       return 'isNotFuzzy'
@@ -44,6 +44,16 @@ function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
 }
+
+// Makes pressing Enter add task
+let inputBox = document.getElementById('inputBox');
+inputBox.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    addTaskBeforeId('2');
+    renderTasks();
+  }
+});
+
 
 function insertFixTimeTask(fixTimeTask) {
   taskList.forEach((item, i) => {
@@ -88,9 +98,9 @@ function renderTasks() {
     document.getElementById('day').insertAdjacentElement('beforeend', newNode);
   });
 }
-
+// TODO: textExtractor and renderTasks should add time to not-fixTimeTasks
 function textExtractor(task) {
-  let text = '';
+  let text = task.text;
 
   if (task.duration != '') {
     let hours = Math.floor(task.duration / 3600000);
@@ -129,36 +139,47 @@ function textExtractor(task) {
 }
 
 function taskHasBeenClicked(myId) { // myId is the id of the clicked task. (Duh)
-  contentInputBox = document.getElementById('inputBox').value.trim();
-  editButton = document.getElementById('editButton');
+  let contentInputBox = document.getElementById('inputBox').value.trim();
+  let editButton = document.getElementById('editButton');
 
-  if (contentInputBox !== '' && !chosenTask) {
-    // Text in inputBox and no chosenTask. Create new task and insert before clicked element
-    parsedList = parseText(contentInputBox);
-    newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
-    taskList.splice(myId, 0, newTask);
-  } else if (contentInputBox !== '' && chosenTask){
-    // Text in inputbox and a chosenTask. Should not happen.
-    console.log('Text in inputbox and a chosenTask. Should not happen.');
-  }  else if (contentInputBox == '' && !chosenTask) {
-    // No text in inputBox and no chosenTask: Getting ready to Edit, delete or clone
+  if (contentInputBox !== '' && !chosenTaskId) {
+    // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
+    addTaskBeforeId(myId);
+    renderTasks(); // Draws task based on the content of the taskList
+  } else if (contentInputBox !== '' && chosenTaskId){
+    // Text in inputbox and a chosenTaskId. Should not happen.
+    console.log('Text in inputbox and a chosenTaskId. Should not happen.');
+  }  else if (contentInputBox == '' && !chosenTaskId) {
+    // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
     chosenTask = document.getElementById(myId);
     chosenTask.classList.add('isClicked');
+    console.log(myId, chosenTask.classList);
+    chosenTaskId = chosenTask.id;
 
     editButton.innerText = 'Edit';
     editButton.dataset.clonemode = 'true' // If a task is chosen it can mean swap or edit/clone/delete
-  } else if (contentInputBox == '' && chosenTask) {
-    // No text in inputBox and a chosenTask: Swap elements
-    taskList.splice(myId, 0, chosenTask);
+  } else if (contentInputBox == '' && chosenTaskId) {
+    // No text in inputBox and a chosenTaskId: Swap elements
+     [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]]
 
     resetInputBox();
-    chosenTask = '';
+    chosenTaskId = '';
     editButton.innerText = 'Clear';
-    editButton.dataset.clonemode = 'false'
+    editButton.dataset.clonemode = 'false';
+    renderTasks(); // Draws task based on the content of the taskList
   }
 
-  renderTasks(); // Draws task based on the content of the taskList
   if (!editButton.dataset.clonemode) {
+    resetInputBox();
+  }
+}
+
+function addTaskBeforeId(myId) { // TODO: Make more like insertFixTimeTask
+  let contentInputBox = document.getElementById('inputBox').value.trim();
+  let parsedList = parseText(contentInputBox);
+  let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
+  taskList.splice(myId, 0, newTask);
+  if (editButton.dataset.clonemode === 'false') {
     resetInputBox();
   }
 }
