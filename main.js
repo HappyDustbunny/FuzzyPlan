@@ -49,17 +49,49 @@ function resetInputBox() {
 let inputBox = document.getElementById('inputBox');
 inputBox.addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
-    addTaskBeforeId('2');
+    addTask();
     renderTasks();
   }
 });
 
 
+function addTask() { // TODO: Make more like insertFixTimeTask
+  let contentInputBox = document.getElementById('inputBox').value.trim();
+  let parsedList = parseText(contentInputBox);
+  let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
+  if (newTask.fuzzyness() == 'isNotFuzzy') {
+    insertFixTimeTask(newTask);
+  } else {
+    insertTask(newTask);
+  }
+
+  if (editButton.dataset.clonemode === 'false') {
+    resetInputBox();
+  }
+}
+
+function insertTask(newTask) {
+  let newTaskDuration = newTask.duration;
+  taskList.forEach((task, index) => {  // Find the first nullTime slot
+    if (newTask.duration == 0) {
+      newTaskDuration = 30 * 60000;
+    }
+
+    if (task.fuzzyness() == 'isNullTime' && newTask.duration < task.duration && index > 0) {
+      nullTimeDuration = task.duration - newTask.duration;
+      newTime = new Date(task.date.getTime() + newTaskDuration);
+      let nullTimeTask = new Task(newTime, nullTimeDuration, '');
+
+      taskList.splice(index, 1, newTask, nullTimeTask);
+    }
+  });
+}
+
 function insertFixTimeTask(fixTimeTask) {
   taskList.forEach((item, i) => {
     if (item.fuzzyness() == 'isNullTime') { // Find first nullTime slot
-      if ((item.date <= fixTimeTask.date) && (fixTimeTask.duration < item.duration)) {
-
+      let nullTimeEnd = new Date(item.date.getTime() + item.duration);
+      if ((item.date <= fixTimeTask.date) && (fixTimeTask.duration < item.duration) && (fixTimeTask.date < nullTimeEnd)) {
         null1Duration = fixTimeTask.date - item.date;
         let null1 = new Task(item.date, null1Duration, '')
 
@@ -83,11 +115,11 @@ function renderTasks() {
     let newNode = document.createElement('div');
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());
+    newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
     if (task.fuzzyness() == 'isFuzzy' || index == 0) {
       newNode.style['line-height'] = '30px';
       newNode.style.height = '30px';
     } else {
-      newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
       newNode.style.height = task.height() + 'px';
       newNode.style['line-height'] = task.height() + 'px';
     }
@@ -144,7 +176,7 @@ function taskHasBeenClicked(myId) { // myId is the id of the clicked task. (Duh)
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    addTaskBeforeId(myId);
+    addTask(myId);
     renderTasks(); // Draws task based on the content of the taskList
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
@@ -170,16 +202,6 @@ function taskHasBeenClicked(myId) { // myId is the id of the clicked task. (Duh)
   }
 
   if (!editButton.dataset.clonemode) {
-    resetInputBox();
-  }
-}
-
-function addTaskBeforeId(myId) { // TODO: Make more like insertFixTimeTask
-  let contentInputBox = document.getElementById('inputBox').value.trim();
-  let parsedList = parseText(contentInputBox);
-  let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
-  taskList.splice(myId, 0, newTask);
-  if (editButton.dataset.clonemode === 'false') {
     resetInputBox();
   }
 }
