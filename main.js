@@ -27,13 +27,10 @@ function setUpFunc() {
   // Create 24h nullTime
   let now = new Date();
   let fullNullStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
-  let day24h = 24 * 3600 * 1000;  // Milliseconds in a day
+  let day24h = 24 * 3600 * 1000 - 120000;  // Milliseconds in a day minus two minutes
   let startNullTime = new Task(fullNullStart, day24h, '', blockIdList.pop());
   taskList.push(startNullTime);
 
-  // Create a 15 minute planning time as a starting point
-  // let planningTask = new Task(now, 15 * 60000, 'Planning', startNullTime.blockId);
-  insertFixTimeTask([now, 15 * 60000, 'Planning']);
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -53,6 +50,32 @@ inputBox.addEventListener('keypress', function (e) {
   }
 });
 
+function clearOrEdit() {  // Govern the Edit/Clear button
+  editButton = document.getElementById('editButton');
+  if (editButton.innerText == 'Clear') {
+    resetInputBox();
+    chosenTaskId = '';
+    editButton.dataset.clonemode = 'false';
+  } else if (editButton.innerText == 'Edit') {
+    taskText = taskList[chosenTaskId].text;  //  Save the text from clickedElement // TODO: Change to Task.displayText
+    document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+    clickedElement = document.getElementById(chosenTaskId);  //  Identify clickedElement
+    clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
+    document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
+    editButton.dataset.clonemode = 'true';
+  }
+}
+
+// Insert a 15 min planning task at the current time
+let nowButton = document.getElementById('now');
+nowButton.addEventListener('click', addNow);
+
+function addNow() {
+  let now = new Date();
+  insertFixTimeTask([now, 15 * 60000, 'Planning']);
+  renderTasks();
+  resetInputBox();
+}
 
 function addTask() { // TODO: Make more like insertFixTimeTask
   let contentInputBox = document.getElementById('inputBox').value.trim();
@@ -126,7 +149,6 @@ function insertFixTimeTask(parsedList) {
 
     setTimeout(function() {msg.style.display = 'none';}, 3000)
   }
-  // });
 }
 
 function renderTasks() {
@@ -135,7 +157,8 @@ function renderTasks() {
     dayNode.removeChild(dayNode.lastChild);
   }
 
-  taskList.forEach((task, index) => {  // Refresh view from taskList
+  for (const [index, task] of taskList.entries()) {
+  // taskList.forEach((task, index) => {  // Refresh view from taskList
     let newNode = document.createElement('div');
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());
@@ -153,7 +176,7 @@ function renderTasks() {
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
     document.getElementById('day').insertAdjacentElement('beforeend', newNode);
-  });
+  }
 }
 
 // TODO: textExtractor and renderTasks should add time to not-fixTimeTasks
@@ -163,8 +186,10 @@ function textExtractor(task) {
   if (task.duration != '') {
     let hours = Math.floor(task.duration / 3600000);
     let minutes = Math.floor((task.duration - hours * 3600000) / 60000);
-    if (hours > 0) {
-      text = '(' + hours + 'h' + minutes + 'm)';
+    if (hours > 0 && minutes > 0) {
+      text = '(' + hours + 'h' + minutes + 'm) ' + task.text;
+    } else if (hours > 0) {
+      text = '(' + hours + 'h' + ') ' + task.text;
     } else {
       text = '(' + minutes + 'm) ' + task.text;
     }

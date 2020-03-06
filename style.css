@@ -34,7 +34,7 @@ div {
 }
 
 input {
-  width: 165px;
+  width: 160px;
   padding-left: 8px;
   border-radius: 10px;
 }
@@ -47,9 +47,16 @@ button {
   border-radius: 10px;
 }
 
+#now,
 #timeButton,
 #editButton {
-  width: 17%;
+  width: 14%;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+}
+
+#settings {
+  text-align: left;
+  width: 5%;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 
