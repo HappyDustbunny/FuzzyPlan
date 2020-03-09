@@ -122,7 +122,7 @@ function Task(parsedText, id) {
       return 'isFuzzy'
     } else if (this.duration() != '0' &&  (this.timeH < 0 || this.timeM < 0)) { // No starttime, but duration
       return 'isFuzzyish'
-    } else {  // Starttime
+    } else {
       return 'isNotFuzzy'
     }
   }
@@ -236,7 +236,7 @@ function removeChosen() {
 
 
 function gotClicked(myId) { // If a task is clicked 'myId' is its id
-
+    
   contentInputBox = document.getElementById('inputBox').value.trim();
   editButton = document.getElementById('editButton');
 

@@ -51,6 +51,12 @@ function setUpFunc() {
     document.getElementById('timeDiv').appendChild(halfHourB);
   }
 
+  // Create time marker
+  let nowSpan = document.createElement('span');
+  nowSpan.setAttribute('class', 'nowSpan');
+  nowSpan.style.height = '10px';
+  document.getElementById('container').appendChild(nowSpan);
+// TODO: Make time marker move with setInterval
   // Create 24h nullTime
   let now = new Date();
   let fullNullStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
@@ -61,6 +67,16 @@ function setUpFunc() {
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
+}
+
+// Update time marker
+let timer = setInterval(updateTimeMarker, 60000);
+
+function updateTimeMarker() {
+  let now = new Date();
+  let nowHeight = now.getHours() * 60 + now.getMinutes() + 'px';
+  nowSpanElement = document.getElementsByClassName('nowSpan');
+  nowSpanElement[0].style.height = nowHeight;
 }
 
 function resetInputBox() {

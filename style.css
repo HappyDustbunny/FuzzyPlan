@@ -23,26 +23,31 @@ div {
 .container {
   all: revert;
   display: grid;
-  grid-template-columns: 1% 10% 86% 1%;
+  grid-template-columns: 1% 2% 10% 86% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   justify-items: center;
   grid-template-areas:
-  '. . taskHeader .'
-  '. timeBar taskListing .'
-  '. . taskFooter .';
+  '. . . taskHeader .'
+  '. nowBar timeBar taskListing .'
+  '. . . taskFooter .';
 }
 
 #timeDiv {
+  all: revert;
   display: flex;
   flex-direction: column;
-  all.revert;
   background-color: white;
-  width: 20px;
-  justify-items: center;
+  width: 40px;
+  /* height: 75px; */
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 1.0);
   grid-area: timeBar;
+}
+
+.nowSpan {
+  width: 100%;
+  border-bottom: 3px solid rgba(255, 0, 0, 1.0);
+  grid-area: nowBar;
 }
 
 #taskDiv {
@@ -58,7 +63,7 @@ div {
 
 .halfHours {
   all: revert;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0);
   width: 41px;
   height: 30px;
   font-size: 14px;
