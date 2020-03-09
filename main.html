@@ -25,10 +25,13 @@
     <br>
     <div id='message' style="display:none"> </div>
     <br>
-    <button id='topButton' type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button>
-    <br>
-    <span id="day" class="day" data-taskList=[]></span>
-    <br>
-    <button id='bottomButton' type="button" onclick='clickedBottom()' title="Click to add task at the bottom">&#x25B2;</button>
+    <div id='container' class="container">
+
+      <button id='topButton' class='topButton' type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button>
+
+      <!-- <span id="day" class="day" data-taskList=[]></span> -->
+
+      <button id='bottomButton' class='bottomButton' type="button" onclick='clickedBottom()' title="Click to add task at the bottom">&#x25B2;</button>
+    </div>
   </body>
 </html>

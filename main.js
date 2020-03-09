@@ -24,6 +24,33 @@ function Task(date, duration, text, blockId) {
 }
 
 function setUpFunc() {
+  let taskDiv = document.createElement('div');
+  taskDiv.setAttribute('id', 'taskDiv');
+  document.getElementById('container').appendChild(taskDiv);
+
+  // Make time bar in the left side
+  let timeDiv = document.createElement('div');
+  timeDiv.setAttribute('id', 'timeDiv');
+  document.getElementById('container').appendChild(timeDiv);
+
+  for (let i = 0; i < 24; i += 1) {
+    let halfHourA = document.createElement('div');
+    let halfHourB = document.createElement('div');
+
+    if (i < 10) {
+      halfHourA.innerText = '0' + i + ':00';
+      halfHourB.innerText = '0' + i + ':30';
+    } else {
+      halfHourA.innerText = i + ':00';
+      halfHourB.innerText = i + ':30';
+    }
+
+    halfHourA.setAttribute('class', 'halfHours');
+    halfHourB.setAttribute('class', 'halfHours');
+    document.getElementById('timeDiv').appendChild(halfHourA);
+    document.getElementById('timeDiv').appendChild(halfHourB);
+  }
+
   // Create 24h nullTime
   let now = new Date();
   let fullNullStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
@@ -152,7 +179,8 @@ function insertFixTimeTask(parsedList) {
 }
 
 function renderTasks() {
-  const dayNode = document.getElementById('day');
+  // const dayNode = document.getElementById('day');
+  const dayNode = document.getElementById('taskDiv');
   while (dayNode.firstChild) { // Remove old task from view
     dayNode.removeChild(dayNode.lastChild);
   }
@@ -162,6 +190,7 @@ function renderTasks() {
     let newNode = document.createElement('div');
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());
+    newNode.classList.add('task');
     if (index == 0) { // Collapse the nullTime block before the planning task as it can't be interacted with
       newNode.style['line-height'] = '30px';
       newNode.style.height = '30px';
@@ -175,7 +204,8 @@ function renderTasks() {
     let nodeText = textExtractor(task);
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
-    document.getElementById('day').insertAdjacentElement('beforeend', newNode);
+    document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
+    // document.getElementById('day').insertAdjacentElement('beforeend', newNode);
   }
 }
 
