@@ -1,16 +1,10 @@
-.day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* justify-content: center; */
-}
 
 div {
-  flex: initial;
+  /* flex: initial; */
   text-align: left;
   padding-left: 8px;
   margin: 2px;
-  width: 280px;
+  /* width: 280px; */
   border: 1px solid rgb(96, 139, 168);
   border-radius: 10px;
   background-color: rgba(154, 219, 240, .35);
@@ -21,27 +15,17 @@ div {
 }
 
 .container {
-  all: revert;
   display: grid;
-  grid-template-columns: 1% 2% 10% 86% 1%;
+  grid-template-columns: 1% 10% 1% 1% 86% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
-  justify-items: center;
+  /* justify-items: center; */
+  background-color: transparent;
+  border: none;
   grid-template-areas:
-  '. . . taskHeader .'
-  '. nowBar timeBar taskListing .'
-  '. . . taskFooter .';
-}
-
-#timeDiv {
-  all: revert;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  width: 40px;
-  /* height: 75px; */
-  align-items: center;
-  grid-area: timeBar;
+  '. . . . taskHeader .'
+  '. timeBar nowBar . taskListing .'
+  '. . . . taskFooter .';
 }
 
 .nowSpan {
@@ -50,25 +34,36 @@ div {
   grid-area: nowBar;
 }
 
-#taskDiv {
+#timeDiv {
   display: flex;
   flex-direction: column;
-  all: revert;
-  grid-area: taskListing;
-}
-
-.blank {
-  all: revert;
+  background-color: transparent;
+  border: none;
+  /* width: 40px; */
+  /* height: 75px; */
+  align-items: center;
+  grid-area: timeBar;
 }
 
 .halfHours {
-  all: revert;
-  background-color: rgba(255, 255, 255, 0);
+  background-color: transparent;
+  /* background-color: red; */
+  padding: 0px;
+  border: none;
+  border-radius: 0px;
   width: 41px;
   height: 30px;
   font-size: 14px;
   text-align: center;
   border-top: 1px solid rgba(154, 219, 240, 1.0);
+}
+
+#taskDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  border: none;
+  grid-area: taskListing;
 }
 
 .isNullTime {
@@ -97,6 +92,12 @@ input {
   border-radius: 10px;
 }
 
+.centerWrapper {
+  text-align: center;
+  background-color: transparent;
+  border: none;
+}
+
 button {
   text-align: center;
   width: 20%;
@@ -105,8 +106,7 @@ button {
   border-radius: 10px;
 }
 
-#now,
-#timeButton,
+#nowButton,
 #editButton {
   width: 14%;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
@@ -114,7 +114,7 @@ button {
 
 #settings {
   text-align: left;
-  width: 5%;
+  width: auto;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 
@@ -130,26 +130,8 @@ button {
   grid-area: taskFooter;
 }
 
-.time {
-  text-align: center;
-  width: 27px;
-  height: 19px;
-  border: 2px outset #9898ff;
-  border-radius: 5px;
-  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
-}
-
-.usedTime {
-  text-align: center;
-  width: 27px;
-  height: 19px;
-  border: 2px inset #9898ff;
-  border-radius: 5px;
-  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
-}
 
 .isClicked {
-  /* transform: scaleY(1.2); */
   transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
 }
@@ -160,6 +142,24 @@ button:focus {
   transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
 }
+
+/* .time {
+text-align: center;
+width: 27px;
+height: 19px;
+border: 2px outset #9898ff;
+border-radius: 5px;
+background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+}
+
+.usedTime {
+text-align: center;
+width: 27px;
+height: 19px;
+border: 2px inset #9898ff;
+border-radius: 5px;
+background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+} */
 
 /* div[data-minutes='0'] {
   height: 30px;
@@ -217,4 +217,12 @@ div {
   padding: 10px;
   height: 50px;
   width: 50px;
+} */
+
+
+/* .day {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
 } */

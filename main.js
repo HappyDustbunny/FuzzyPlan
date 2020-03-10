@@ -56,14 +56,14 @@ function setUpFunc() {
   nowSpan.setAttribute('class', 'nowSpan');
   nowSpan.style.height = '10px';
   document.getElementById('container').appendChild(nowSpan);
-// TODO: Make time marker move with setInterval
+
   // Create 24h nullTime
   let now = new Date();
   let fullNullStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
   let day24h = 24 * 3600 * 1000 - 120000;  // Milliseconds in a day minus two minutes
   let startNullTime = new Task(fullNullStart, day24h, '', blockIdList.pop());
   taskList.push(startNullTime);
-
+// TODO: Collapse timeBar and time marker with Now-button
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -110,7 +110,7 @@ function clearOrEdit() {  // Govern the Edit/Clear button
 }
 
 // Insert a 15 min planning task at the current time
-let nowButton = document.getElementById('now');
+let nowButton = document.getElementById('nowButton');
 nowButton.addEventListener('click', addNow);
 
 function addNow() {
@@ -196,9 +196,9 @@ function insertFixTimeTask(parsedList) {
 
 function renderTasks() {
   // const dayNode = document.getElementById('day');
-  const dayNode = document.getElementById('taskDiv');
-  while (dayNode.firstChild) { // Remove old task from view
-    dayNode.removeChild(dayNode.lastChild);
+  const taskNode = document.getElementById('taskDiv');
+  while (taskNode.firstChild) { // Remove old task from view
+    taskNode.removeChild(taskNode.lastChild);
   }
 
   for (const [index, task] of taskList.entries()) {

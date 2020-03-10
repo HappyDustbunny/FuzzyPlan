@@ -9,20 +9,15 @@
   </head>
   <body onload="setUpFunc()">
     <h1 align=center>FuzzyFlex Planner</h1>
-    <span id="timeAdder" style='display:none'>
-      <span class="time" id='5min' data-time='5'>+5</span>
-      <span class="time" id='10min1' data-time='10'>+10</span>
-      <span class="time" id='10min2' data-time='10'>+10</span>
-      <span class="time" id='30min' data-time='30'>+30</span>
-    </span>
-    <button id='settings' type="button" title='Settings'>&#x2699;</button>
-    <button id='timeButton' type="button" title="Click on a task first" alt='Click to add time to existing tasks'>+Time</button>
-    <!-- <span class="time" style='display:none'>5 +</span><span class="time" style='display:none'>10 +</span><span class="time" style='display:none'>10 +</span><span class="time" style='display:none'>30</span> -->
-    <input type="text" id='inputBox' autofocus value="">
-    <!-- <input type="text" id='inputBox' onfocus="removeChosen()" autofocus value=""> -->
-    <button id='editButton' type="button" data-clonemode='false' onclick="clearOrEdit()">Clear</button>
-    <button id='now' type="button" title='Press to insert a 15 min planning period at current time'>Now</button>
-    <br>
+
+    <div class="centerWrapper">
+      <button id='settings' type="button" title='Settings'>&#x2699;</button>
+      <input type="text" id='inputBox' autofocus value="">
+      <button id='editButton' type="button" data-clonemode='false' onclick="clearOrEdit()">Clear</button>
+      <button id='nowButton' type="button" title='Press to insert a 15 min planning period at current time'>Now</button>
+    </div>
+
+    <!-- <br> -->
     <div id='message' style="display:none"> </div>
     <br>
     <div id='container' class="container">
