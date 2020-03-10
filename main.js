@@ -54,8 +54,9 @@ function setUpFunc() {
   // Create time marker
   let nowSpan = document.createElement('span');
   nowSpan.setAttribute('class', 'nowSpan');
-  nowSpan.style.height = '10px';
+  // nowSpan.style.height = '10px';
   document.getElementById('container').appendChild(nowSpan);
+  updateTimeMarker();
 
   // Create 24h nullTime
   let now = new Date();
@@ -74,7 +75,8 @@ let timer = setInterval(updateTimeMarker, 60000);
 
 function updateTimeMarker() {
   let now = new Date();
-  let nowHeight = now.getHours() * 60 + now.getMinutes() + 'px';
+  // The height of the nowSpan is set to the percentage the passed time reprecents of the number of minutes in a day
+  let nowHeight = ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
   nowSpanElement = document.getElementsByClassName('nowSpan');
   nowSpanElement[0].style.height = nowHeight;
 }
@@ -184,11 +186,8 @@ function insertFixTimeTask(parsedList) {
   if (!succes) {
     editButton.dataset.clonemode = 'true' // If there isn't enough room for a fixTimeTask flash a waring
     msg = document.getElementById('message');
-    msg.width = '300px';
     msg.style.display = 'inline-block';
-    msg.style.textAlign = 'center';
-    msg.style.color = 'red';
-    msg.innerText = 'Not enough room\nPlease clear some space';
+    msg.innerText = 'Not enough room\n Please clear some space ';
 
     setTimeout(function() {msg.style.display = 'none';}, 3000)
   }
@@ -209,11 +208,11 @@ function renderTasks() {
     newNode.classList.add('task');
     if (index == 0) { // Collapse the nullTime block before the planning task as it can't be interacted with
       newNode.style['line-height'] = '30px';
-      newNode.style.height = '30px';
+      newNode.style.height = '2.0833%';
       newNode.style.background = '#e3ebf2';  // Make non-interactive nullTime block grey
     } else {
-      newNode.style.height = task.height() + 'px';
       newNode.style['line-height'] = task.height() + 'px';
+      newNode.style.height = (task.height() * 100) / (24 * 60) + '%';
       newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
     }
 

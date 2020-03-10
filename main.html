@@ -12,21 +12,20 @@
 
     <div class="centerWrapper">
       <button id='settings' type="button" title='Settings'>&#x2699;</button>
+      <button id='nowButton' type="button" title='Press to insert a 15 min planning period at current time'>Now</button>
       <input type="text" id='inputBox' autofocus value="">
       <button id='editButton' type="button" data-clonemode='false' onclick="clearOrEdit()">Clear</button>
-      <button id='nowButton' type="button" title='Press to insert a 15 min planning period at current time'>Now</button>
-    </div>
 
-    <!-- <br> -->
-    <div id='message' style="display:none"> </div>
+    </div>
     <br>
     <div id='container' class="container">
+      <div id='message' style="display:none"> </div>
 
-      <button id='topButton' class='topButton' type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button>
+      <!-- <button id='topButton' class='topButton' type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button> -->
 
       <!-- <span id="day" class="day" data-taskList=[]></span> -->
 
-      <button id='bottomButton' class='bottomButton' type="button" onclick='clickedBottom()' title="Click to add task at the bottom">&#x25B2;</button>
+      <!-- <button id='bottomButton' class='bottomButton' type="button" onclick='clickedBottom()' title="Click to add task at the bottom">&#x25B2;</button> -->
     </div>
   </body>
 </html>

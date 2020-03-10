@@ -2,7 +2,7 @@
 div {
   /* flex: initial; */
   text-align: left;
-  padding-left: 8px;
+  /* padding-left: 8px; */
   margin: 2px;
   /* width: 280px; */
   border: 1px solid rgb(96, 139, 168);
@@ -16,45 +16,47 @@ div {
 
 .container {
   display: grid;
-  grid-template-columns: 1% 10% 1% 1% 86% 1%;
+  grid-template-columns: 1% 10% 1% 86% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   /* justify-items: center; */
   background-color: transparent;
   border: none;
   grid-template-areas:
-  '. . . . taskHeader .'
-  '. timeBar nowBar . taskListing .'
-  '. . . . taskFooter .';
+  '. . . taskHeader .'
+  '. timeBar . taskListing .'
+  '. . . taskFooter .';
 }
 
 .nowSpan {
-  width: 100%;
+  /* width: 100%; */
   border-bottom: 3px solid rgba(255, 0, 0, 1.0);
-  grid-area: nowBar;
+  grid-area: timeBar;
+  z-index: -1;
 }
 
 #timeDiv {
   display: flex;
   flex-direction: column;
   background-color: transparent;
+  /* background-color: red; */
   border: none;
   /* width: 40px; */
-  /* height: 75px; */
+  height: 1440px;
   align-items: center;
   grid-area: timeBar;
 }
 
 .halfHours {
   background-color: transparent;
-  /* background-color: red; */
+  /* background-color: blue; */
   padding: 0px;
   border: none;
   border-radius: 0px;
-  width: 41px;
-  height: 30px;
+  /* width: 41px; */
+  height: 2.0833%;
   font-size: 14px;
-  text-align: center;
+  /* text-align: center; */
   border-top: 1px solid rgba(154, 219, 240, 1.0);
 }
 
@@ -63,6 +65,7 @@ div {
   flex-direction: column;
   background-color: transparent;
   border: none;
+  height: 1440px;
   grid-area: taskListing;
 }
 
@@ -104,6 +107,13 @@ button {
   height: 22px;
   border: 1px solid rgb(96, 139, 168);
   border-radius: 10px;
+}
+
+#message {
+  /* display: flex; */
+  text-align: center;
+  color: red;
+  grid-area: taskHeader;
 }
 
 #nowButton,
