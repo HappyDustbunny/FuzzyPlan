@@ -208,15 +208,18 @@ function renderTasks() {
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());
     newNode.classList.add('task');
-    if (index == 100) { // Collapse the nullTime block before the planning task as it can't be interacted with
-      newNode.style['line-height'] = '30px';
-      newNode.style.height = '2.0833%';
-      newNode.style.background = '#e3ebf2';  // Make non-interactive nullTime block grey
-    } else {
-      newNode.style['line-height'] = task.height() + 'px';
-      newNode.style.height = (task.height() * 100) / (24 * 60) + '%';
-      newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
+    // if (index == 100) { // Collapse the nullTime block before the planning task as it can't be interacted with
+    //   newNode.style['line-height'] = '14px';
+    //   newNode.style.height = '2.0833%';
+    //   newNode.style.background = '#e3ebf2';  // Make non-interactive nullTime block grey
+    // } else {
+    if (task.height() < 20) {
+      newNode.style['font-size'] = '12px';
     }
+    newNode.style['line-height'] = task.height() + 'px';
+    newNode.style.height = (task.height() * 100) / (24 * 60) + '%';
+    newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
+    // }
 
     let nodeText = textExtractor(task);
     let textNode = document.createTextNode(nodeText);
