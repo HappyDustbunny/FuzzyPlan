@@ -95,6 +95,9 @@ inputBox.addEventListener('keypress', function (e) {
   }
 });
 
+// let container = document.getElementById('container');  // Testing purposes. Remove when forgotten.
+// container.addEventListener('scroll', function (e) {console.log(container.scrollTop);})
+
 function clearOrEdit() {  // Govern the Edit/Clear button
   editButton = document.getElementById('editButton');
   if (editButton.innerText == 'Clear') {
@@ -200,13 +203,12 @@ function renderTasks() {
     taskNode.removeChild(taskNode.lastChild);
   }
 
-  for (const [index, task] of taskList.entries()) {
-  // taskList.forEach((task, index) => {  // Refresh view from taskList
+  for (const [index, task] of taskList.entries()) {  // Refresh view from taskList
     let newNode = document.createElement('div');
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());
     newNode.classList.add('task');
-    if (index == 0) { // Collapse the nullTime block before the planning task as it can't be interacted with
+    if (index == 100) { // Collapse the nullTime block before the planning task as it can't be interacted with
       newNode.style['line-height'] = '30px';
       newNode.style.height = '2.0833%';
       newNode.style.background = '#e3ebf2';  // Make non-interactive nullTime block grey
@@ -221,6 +223,8 @@ function renderTasks() {
     newNode.appendChild(textNode);
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
     // document.getElementById('day').insertAdjacentElement('beforeend', newNode);
+    container = document.getElementById('container');
+    container.scrollTop = document.getElementById(index).offsetTop - 250;
   }
 }
 

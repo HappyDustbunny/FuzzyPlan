@@ -22,6 +22,8 @@ div {
   /* justify-items: center; */
   background-color: transparent;
   border: none;
+  height: 400px;
+  overflow-y: scroll;
   grid-template-areas:
   '. . . taskHeader .'
   '. timeBar . taskListing .'
