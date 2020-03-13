@@ -29,6 +29,7 @@ function Task(date, duration, text, blockId) {
 // Runs when the page is loaded:
 function setUpFunc() {
   // Makes task area on most of the right side of the screen
+
   let taskDiv = document.createElement('div');
   taskDiv.setAttribute('id', 'taskDiv');
   document.getElementById('container').appendChild(taskDiv);
@@ -57,6 +58,7 @@ function setUpFunc() {
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
+  zoomFunc();
 }
 
 
@@ -102,14 +104,18 @@ function resetInputBox() {
 
 // Toggles zoom
 let zoomButton = document.getElementById('zoom');
-zoomButton.addEventListener('click', function () {
+zoomButton.addEventListener('click', zoomFunc);
+
+function zoomFunc() {
   if (zoom == 1) {
     zoom = 0.5;
+    zoomButton.innerText = '⍐'; //'&#x2357;';
   } else {
     zoom = 1;
+    zoomButton.innerText = '⍗'; // &#x2350;';
   }
   renderTasks();
-});
+}
 
 // Makes pressing Enter add task
 let inputBox = document.getElementById('inputBox');
