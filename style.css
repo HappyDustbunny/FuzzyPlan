@@ -31,7 +31,6 @@ div {
 }
 
 .nowSpan {
-  /* width: 100%; */
   border-bottom: 3px solid rgba(255, 0, 0, 1.0);
   grid-area: timeBar;
   z-index: -1;
@@ -49,7 +48,8 @@ div {
   grid-area: timeBar;
 }
 
-.halfHours {
+.halfHours1,
+.halfHours2 {
   background-color: transparent;
   /* background-color: blue; */
   padding: 0px;
@@ -60,6 +60,10 @@ div {
   font-size: 14px;
   /* text-align: center; */
   border-top: 1px solid rgba(154, 219, 240, 1.0);
+}
+
+.halfHours1 {
+  height: 1.0417%;
 }
 
 #taskDiv {
@@ -122,6 +126,7 @@ button {
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 
+#zoom,
 #settings {
   text-align: left;
   width: auto;

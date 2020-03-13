@@ -1,9 +1,12 @@
-var taskList = [];
-let chosenTaskId = '';
+var taskList = [];  // List to keep track of the order of the tasks
+let chosenTaskId = '';  // When a task is clicked information about that task is stored here
+let zoom = 1;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
+// A list of unique numbers to use as task-ids
 blockIdList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
+// Task-object. Each task will be an object of this type
 function Task(date, duration, text, blockId) {
-  this.date = date; // Time as Javascript date
+  this.date = date; // Start time as Javascript date
   this.duration = duration; // Duration in milliseconds
   this.text = text;
   this.blockId = blockId;
@@ -13,26 +16,52 @@ function Task(date, duration, text, blockId) {
   }
 
   this.fuzzyness = function() {
-    if (this.text == '') {
-      return 'isNullTime'
-    } else if (this.date == '') { // No starttime
+    if (this.text == '') {  // No text
+      return 'isNullTime'  // Tasks without text and start time is used as available time. NullTime sounds funny, hench the name
+    } else if (this.date == '') { // No starttime, but text
       return 'isFuzzy'
-    } else {
+    } else {  // Start time and text, i.e. a fixed appointment
       return 'isNotFuzzy'
     }
   }
 }
 
+// Runs when the page is loaded:
 function setUpFunc() {
+  // Makes task area on most of the right side of the screen
   let taskDiv = document.createElement('div');
   taskDiv.setAttribute('id', 'taskDiv');
   document.getElementById('container').appendChild(taskDiv);
 
-  // Make time bar in the left side
+  // Makes time bar in the left side
+  // First the container...
   let timeDiv = document.createElement('div');
   timeDiv.setAttribute('id', 'timeDiv');
   document.getElementById('container').appendChild(timeDiv);
 
+  // ... and then fill the container
+  fillTimeBar(zoom);
+
+  // Create time marker to show current time on timebar
+  let nowSpan = document.createElement('span');
+  nowSpan.setAttribute('class', 'nowSpan');
+  document.getElementById('container').appendChild(nowSpan);
+  updateTimeMarker();
+
+  // Create 24h nullTime
+  let now = new Date();
+  let fullNullStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
+  let day24h = 24 * 3600 * 1000 - 120000;  // Milliseconds in a day minus two minutes
+  let startNullTime = new Task(fullNullStart, day24h, '', blockIdList.pop());
+  taskList.push(startNullTime);
+
+  renderTasks();  // Draws task based on the content of the taskList
+  resetInputBox();
+}
+
+
+function fillTimeBar(zoom) {
+  // Fill the half hour time slots of the timebar
   for (let i = 0; i < 24; i += 1) {
     let halfHourA = document.createElement('div');
     let halfHourB = document.createElement('div');
@@ -45,52 +74,49 @@ function setUpFunc() {
       halfHourB.innerText = i + ':30';
     }
 
-    halfHourA.setAttribute('class', 'halfHours');
-    halfHourB.setAttribute('class', 'halfHours');
+    halfHourA.setAttribute('class', 'halfHours' + zoom * 2);
+    halfHourB.setAttribute('class', 'halfHours' + zoom * 2);
     document.getElementById('timeDiv').appendChild(halfHourA);
     document.getElementById('timeDiv').appendChild(halfHourB);
   }
-
-  // Create time marker
-  let nowSpan = document.createElement('span');
-  nowSpan.setAttribute('class', 'nowSpan');
-  // nowSpan.style.height = '10px';
-  document.getElementById('container').appendChild(nowSpan);
-  updateTimeMarker();
-
-  // Create 24h nullTime
-  let now = new Date();
-  let fullNullStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
-  let day24h = 24 * 3600 * 1000 - 120000;  // Milliseconds in a day minus two minutes
-  let startNullTime = new Task(fullNullStart, day24h, '', blockIdList.pop());
-  taskList.push(startNullTime);
-// TODO: Collapse timeBar and time marker with Now-button
-
-  renderTasks();  // Draws task based on the content of the taskList
-  resetInputBox();
 }
 
+
 // Update time marker
-let timer = setInterval(updateTimeMarker, 60000);
+let timer = setInterval(updateTimeMarker, 600);
 
 function updateTimeMarker() {
   let now = new Date();
   // The height of the nowSpan is set to the percentage the passed time reprecents of the number of minutes in a day
-  let nowHeight = ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
+  let nowHeight = zoom * ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
   nowSpanElement = document.getElementsByClassName('nowSpan');
   nowSpanElement[0].style.height = nowHeight;
+  console.log(nowHeight);
 }
 
+// Clear input box and give it focus
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
 }
 
+// Toggles zoom
+let zoomButton = document.getElementById('zoom');
+zoomButton.addEventListener('click', function () {
+  if (zoom == 1) {
+    zoom = 0.5;
+  } else {
+    zoom = 1;
+  }
+  renderTasks();
+});
+
 // Makes pressing Enter add task
 let inputBox = document.getElementById('inputBox');
 inputBox.addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
-    addTask();
+    let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
+    addTask(myId);
     renderTasks();
   }
 });
@@ -98,7 +124,8 @@ inputBox.addEventListener('keypress', function (e) {
 // let container = document.getElementById('container');  // Testing purposes. Remove when forgotten.
 // container.addEventListener('scroll', function (e) {console.log(container.scrollTop);})
 
-function clearOrEdit() {  // Govern the Edit/Clear button
+// Govern the Edit/Clear button
+function clearOrEdit() {
   editButton = document.getElementById('editButton');
   if (editButton.innerText == 'Clear') {
     resetInputBox();
@@ -125,11 +152,12 @@ function addNow() {
   resetInputBox();
 }
 
-function addTask() { // TODO: Make more like insertFixTimeTask
+// Add a new task
+function addTask(myId) { // TODO: Make more like insertFixTimeTask
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let parsedList = parseText(contentInputBox);
   if (parsedList[0] == '') {  // No fixed time ...
-    insertTask(parsedList);
+    insertTask(parsedList, myId);
   } else {
     insertFixTimeTask(parsedList);
   }
@@ -139,7 +167,7 @@ function addTask() { // TODO: Make more like insertFixTimeTask
   }
 }
 // TODO: Add task duration to start time for nullTime
-function insertTask(parsedList) {
+function insertTask(parsedList, myId) {
   let newTaskDuration = parsedList[1];
 
   for (const [index, task] of taskList.entries()) {
@@ -149,8 +177,12 @@ function insertTask(parsedList) {
         task.duration -= newTaskDuration;
         // Make the new task ...
         let newTask = new Task(parsedList[0], parsedList[1], parsedList[2], task.blockId);
-        //  And insert the new task before chosen nullTime
-        taskList.splice(index, 0, newTask);
+        if (myId > 0) { //  No id provided: insert the new task before chosen nullTime
+          taskList.splice(myId, 0, newTask);
+        } else {
+          taskList.splice(index, 0, newTask);
+        }
+
         break
       }
   }
@@ -196,30 +228,37 @@ function insertFixTimeTask(parsedList) {
   }
 }
 
-function renderTasks() {
-  // const dayNode = document.getElementById('day');
+function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next to each other
+  // Remove old task from taskDiv
   const taskNode = document.getElementById('taskDiv');
-  while (taskNode.firstChild) { // Remove old task from view
+  while (taskNode.firstChild) {
     taskNode.removeChild(taskNode.lastChild);
   }
+
+  // Remove old time markings from timeBar
+  const timeNode = document.getElementById('timeDiv');
+  while (timeNode.firstChild) { // Remove old task from view
+    timeNode.removeChild(timeNode.lastChild);
+  }
+
+  // Make new time markings in timeBar
+  fillTimeBar(zoom);
 
   for (const [index, task] of taskList.entries()) {  // Refresh view from taskList
     let newNode = document.createElement('div');
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());
     newNode.classList.add('task');
-    // if (index == 100) { // Collapse the nullTime block before the planning task as it can't be interacted with
-    //   newNode.style['line-height'] = '14px';
-    //   newNode.style.height = '2.0833%';
-    //   newNode.style.background = '#e3ebf2';  // Make non-interactive nullTime block grey
-    // } else {
-    if (task.height() < 20) {
+
+    // Set the task height
+    if (zoom * task.height() < 20) {  // Adjust text size for short tasks
       newNode.style['font-size'] = '12px';
+    } else {
+      newNode.style['font-size'] = null;
     }
-    newNode.style['line-height'] = task.height() + 'px';
-    newNode.style.height = (task.height() * 100) / (24 * 60) + '%';
+    newNode.style['line-height'] = zoom * task.height() + 'px';
+    newNode.style.height = (zoom * task.height() * 100) / (24 * 60) + '%';
     newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
-    // }
 
     let nodeText = textExtractor(task);
     let textNode = document.createTextNode(nodeText);
@@ -274,6 +313,7 @@ function textExtractor(task) {
 }
 
 function taskHasBeenClicked(myId) { // myId is the id of the clicked task. (Duh)
+  console.log(myId);
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let editButton = document.getElementById('editButton');
 
@@ -288,7 +328,7 @@ function taskHasBeenClicked(myId) { // myId is the id of the clicked task. (Duh)
     // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
     chosenTask = document.getElementById(myId);
     chosenTask.classList.add('isClicked');
-    console.log(myId, chosenTask.classList);
+    // console.log(myId, chosenTask.classList);
     chosenTaskId = chosenTask.id;
 
     editButton.innerText = 'Edit';

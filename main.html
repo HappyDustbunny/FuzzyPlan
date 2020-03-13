@@ -11,14 +11,15 @@
     <h1 align=center>FuzzyFlex Planner</h1>
 
     <div class="centerWrapper">
+      <button id='zoom' type="button" title='Toggles zoom'>&#8597;</button>
       <button id='settings' type="button" title='Settings'>&#x2699;</button>
       <button id='nowButton' type="button" title='Press to insert a 15 min planning period at current time'>Now</button>
       <input type="text" id='inputBox' autofocus value="">
       <button id='editButton' type="button" data-clonemode='false' onclick="clearOrEdit()">Clear</button>
-
     </div>
     <br>
     <div id='container' class="container">
+
       <div id='message' style="display:none"> </div>
 
       <!-- <button id='topButton' class='topButton' type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button> -->
