@@ -1,6 +1,7 @@
 var taskList = [];  // List to keep track of the order of the tasks
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let zoom = 1;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
+let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 // A list of unique numbers to use as task-ids
 blockIdList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
@@ -28,19 +29,19 @@ function Task(date, duration, text, blockId) {
 
 // Runs when the page is loaded:
 function setUpFunc() {
-  // Makes task area on most of the right side of the screen
+  // // Makes task area on most of the right side of the screen
+  //
+  // let taskDiv = document.createElement('div');
+  // taskDiv.setAttribute('id', 'taskDiv');
+  // document.getElementById('container').appendChild(taskDiv);
+  //
+  // // Makes time bar in the left side
+  // // First the container...
+  // let timeDiv = document.createElement('div');
+  // timeDiv.setAttribute('id', 'timeDiv');
+  // document.getElementById('container').appendChild(timeDiv);
 
-  let taskDiv = document.createElement('div');
-  taskDiv.setAttribute('id', 'taskDiv');
-  document.getElementById('container').appendChild(taskDiv);
-
-  // Makes time bar in the left side
-  // First the container...
-  let timeDiv = document.createElement('div');
-  timeDiv.setAttribute('id', 'timeDiv');
-  document.getElementById('container').appendChild(timeDiv);
-
-  // ... and then fill the container
+  // Fill the timeBar div
   fillTimeBar(zoom);
 
   // Create time marker to show current time on timebar
@@ -93,8 +94,20 @@ function updateTimeMarker() {
   let nowHeight = zoom * ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
   nowSpanElement = document.getElementsByClassName('nowSpan');
   nowSpanElement[0].style.height = nowHeight;
-  console.log(nowHeight);
 }
+
+////// Eventlisteners  //////
+// Tie event to zoom button (⍐ / ⍗). Toggles zoom
+document.getElementById('zoom').addEventListener('click', zoomFunc);  // Remember removeEventListener()
+
+// Makes pressing Enter add task
+document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
+
+// Tie event to Clear or Edit button
+document.getElementById('editButton').addEventListener('click', clearOrEdit);
+
+// Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
+document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
 // Clear input box and give it focus
 function resetInputBox() {
@@ -102,30 +115,40 @@ function resetInputBox() {
   document.getElementById('inputBox').focus();
 }
 
-// Toggles zoom
-let zoomButton = document.getElementById('zoom');
-zoomButton.addEventListener('click', zoomFunc);
-
+// Used by an eventListener. Toggles zoom.
 function zoomFunc() {
-  if (zoom == 1) {
-    zoom = 0.5;
-    zoomButton.innerText = '⍐'; //'&#x2357;';
-  } else {
-    zoom = 1;
-    zoomButton.innerText = '⍗'; // &#x2350;';
-  }
+  let zoomButton = document.getElementById('zoom');
+  zoom = (1 + 0.5) - zoom;
+  zoomSymbolModifyer = 7 - zoomSymbolModifyer;
+  zoomButton.innerText = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
+  // console.log(zoom);
+  // if (zoom == 1) {
+  //   zoom = 0.5;
+  //   zoomButton.innerText = '\u2357'; // ⍐
+  // } else {
+  //   zoom = 1;
+  //   zoomButton.innerText = '\u2350'; // ⍗
+  // }
   renderTasks();
 }
 
-// Makes pressing Enter add task
-let inputBox = document.getElementById('inputBox');
-inputBox.addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') {
+// Used by an eventListener. Makes pressing Enter add task
+function inputAtEnter(event) {
+  if (event.key === 'Enter') {
     let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
     addTask(myId);
     renderTasks();
   }
-});
+}
+
+// let inputBox = document.getElementById('inputBox');
+// inputBox.addEventListener('keypress', function (e) {
+//   if (e.key === 'Enter') {
+//     let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
+//     addTask(myId);
+//     renderTasks();
+//   }
+// });
 
 // let container = document.getElementById('container');  // Testing purposes. Remove when forgotten.
 // container.addEventListener('scroll', function (e) {console.log(container.scrollTop);})
@@ -264,7 +287,7 @@ function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next
     }
     newNode.style['line-height'] = zoom * task.height() + 'px';
     newNode.style.height = (zoom * task.height() * 100) / (24 * 60) + '%';
-    newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
+    // newNode.setAttribute('onClick', 'taskHasBeenClicked(this.id)');  // TODO: addEventListener here?
 
     let nodeText = textExtractor(task);
     let textNode = document.createTextNode(nodeText);
@@ -318,8 +341,8 @@ function textExtractor(task) {
   return text
 }
 
-function taskHasBeenClicked(myId) { // myId is the id of the clicked task. (Duh)
-  console.log(myId);
+function taskHasBeenClicked(event) {
+  myId = event.target.id;  // myId is the id of the clicked task. (Duh) The eventListener is tied to the parent, so the event given is the parents event
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let editButton = document.getElementById('editButton');
 
