@@ -159,14 +159,17 @@ function clearOrEdit() {
   if (editButton.innerText == 'Clear') {
     resetInputBox();
     chosenTaskId = '';
-    editButton.dataset.clonemode = 'false';
+    editButton.dataset.keep_text = 'false';
   } else if (editButton.innerText == 'Edit') {
     taskText = taskList[chosenTaskId].text;  //  Save the text from clickedElement // TODO: Change to Task.displayText
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+    taskList.splice(chosenTaskId, 1);  // Remove the task from taskList. Can be changed and inserted anew.
+    // TODO: give back the time to relevant nullTime taskblock
     clickedElement = document.getElementById(chosenTaskId);  //  Identify clickedElement
     clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
     document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
-    editButton.dataset.clonemode = 'true';
+    chosenTaskId = '';
+    editButton.dataset.keep_text = 'true';
   }
 }
 
@@ -191,12 +194,13 @@ function addTask(myId) { // TODO: Make more like insertFixTimeTask
     insertFixTimeTask(parsedList);
   }
 
-  if (editButton.dataset.clonemode === 'false') {
+  if (editButton.dataset.keep_text === 'false') {
     resetInputBox();
   }
 }
+
 // TODO: Add task duration to start time for nullTime
-function insertTask(parsedList, myId) {
+function insertTask(parsedList, myId) {  // TODO: Is myId ok after refactoring of onClick for taskDiv?
   let newTaskDuration = parsedList[1];
 
   for (const [index, task] of taskList.entries()) {
@@ -237,7 +241,6 @@ function insertFixTimeTask(parsedList) {
         null1Duration = newFixedTimeTask.date - task.date;
         let null1 = new Task(task.date, null1Duration, '', task.blockId)
 
-
         null2Duration = task.date.getTime() + task.duration - newFixedTimeTask.date.getTime() - newFixedTimeTask.duration;
         let endTime = new Date(newFixedTimeTask.date.getTime() + newFixedTimeTask.duration);
         let null2 = new Task(endTime, null2Duration, '', blockIdList.pop());
@@ -247,8 +250,8 @@ function insertFixTimeTask(parsedList) {
       }
     }
   }
-  if (!succes) {
-    editButton.dataset.clonemode = 'true' // If there isn't enough room for a fixTimeTask flash a waring
+  if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
+    editButton.dataset.keep_text = 'true';
     msg = document.getElementById('message');
     msg.style.display = 'inline-block';
     msg.innerText = 'Not enough room\n Please clear some space ';
@@ -293,9 +296,8 @@ function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
-    // document.getElementById('day').insertAdjacentElement('beforeend', newNode);
     container = document.getElementById('container');
-    container.scrollTop = document.getElementById(index).offsetTop - 250;
+    container.scrollTop = document.getElementById(index).offsetTop - 275;
   }
 }
 
@@ -361,7 +363,7 @@ function taskHasBeenClicked(event) {
     chosenTaskId = chosenTask.id;
 
     editButton.innerText = 'Edit';
-    editButton.dataset.clonemode = 'true' // If a task is chosen it can mean swap or edit/clone/delete
+    editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements
      [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]]
@@ -369,11 +371,11 @@ function taskHasBeenClicked(event) {
     resetInputBox();
     chosenTaskId = '';
     editButton.innerText = 'Clear';
-    editButton.dataset.clonemode = 'false';
+    editButton.dataset.keep_text = 'false';
     renderTasks(); // Draws task based on the content of the taskList
   }
 
-  if (!editButton.dataset.clonemode) {
+  if (!editButton.dataset.keep_text) {
     resetInputBox();
   }
 }
