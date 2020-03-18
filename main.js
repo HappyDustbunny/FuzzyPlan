@@ -308,9 +308,13 @@ function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next
 
   // Refresh view from taskList
   for (const [index, task] of taskList.entries()) {
-    let newNode = document.createElement('div');
+    // let newNode = document.createElement('div');
+    let newNode = document.createElement('button');
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());  // Fuzzyness is used for styling tasks
+    if (task.fuzzyness() === 'isNullTime') {
+      newNode.classList.add('dontTouch');  // TODO: Check how cursor: not-allowed and pointer-events: none works
+    }
     newNode.classList.add('task');
 
     // Set the task height
@@ -384,7 +388,8 @@ function textExtractor(task) {
 }
 
 function taskHasBeenClicked(event) {
-  myId = event.target.id;  // myId is the id of the clicked task. (Duh) The eventListener is tied to the parent, so the event given is the parents event
+  myId = event.target.id;  // myId is the id of the clicked task. (Duh)
+  // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let editButton = document.getElementById('editButton');
 
