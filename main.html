@@ -10,6 +10,11 @@
   <body onload="setUpFunc()">
     <h1 align=center>FuzzyFlex Planner</h1>
 
+    <div class="container1">
+    <span id='message' display='none'></span>
+      <br>
+    </div>
+
     <div class="centerWrapper">
       <button id='settings' type="button" title='Settings'>&#x2699;</button>
       <button id='nowButton' type="button" title='Press to insert a 15 min planning period at current time'>Now</button>
@@ -17,19 +22,14 @@
       <button id='editButton' type="button" data-keep_text='false'>Clear</button>
       <button id='zoom' type="button" title='Toggles zoom'>&#x2357;</button>
     </div>
-    <br>
-    <div id='container' class="container">
+
+    <!-- <br> -->
+
+    <div id='container' class="container2">
       <div id='timeDiv'> </div>
       <div id='taskDiv'> </div>
-
-      <div id='message' style="display:none"> </div>
-
-      <!-- <button id='topButton' class='topButton' type="button" onclick='clickedTop()' title="Click to add task at the top">&#x25BC;</button> -->
-
-      <!-- <span id="day" class="day" data-taskList=[]></span> -->
-
-      <!-- <button id='bottomButton' class='bottomButton' type="button" onclick='clickedBottom()' title="Click to add task at the bottom">&#x25B2;</button> -->
     </div>
+
     <p>Supported browsers: Firefox, Vivaldi, Chrome, Ecosia app for Samsung</p>
   </body>
 </html>

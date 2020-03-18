@@ -14,11 +14,28 @@ p {
   font-size: 10px;
 }
 
+h1 {
+  margin: unset;
+}
+
 .task {
   grid-area: taskListing;
 }
 
-.container {
+.container1 {
+  display: grid;
+  grid-template-columns: 10% 80% 10%;
+  grid-template-rows: auto 10px;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. header .'
+  '. body .';
+}
+
+.container2 {
   display: grid;
   grid-template-columns: 1% 10% 1% 86% 1%;
   grid-template-rows: auto auto auto;
@@ -118,16 +135,22 @@ button {
 }
 
 #message {
-  /* display: flex; */
+  display: flex;
   text-align: center;
-  color: red;
-  grid-area: taskHeader;
+  grid-area: header;
 }
 
 #nowButton,
 #editButton {
   width: 14%;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+}
+
+.button-disabled{
+  cursor: not-allowed;
+  pointer-events: none;
+  border: none;
+  background-image: linear-gradient(#c5c5f6, #c2e6f2, #c2e6f2, #c2e6f2,#c5c5f6) !important;
 }
 
 #zoom,

@@ -62,11 +62,16 @@ function setUpFunc() {
   zoomFunc();
 }
 
+// Clear input box and give it focus
+function resetInputBox() {
+  document.getElementById('inputBox').value = '';
+  document.getElementById('inputBox').focus();
+}
 
+// Fill the half hour time slots of the timebar
 function fillTimeBar(zoom) {
-  // Fill the half hour time slots of the timebar
   for (let i = 0; i < 24; i += 1) {
-    let halfHourA = document.createElement('div');
+    let halfHourA = document.createElement('div');  // This IS the most readable and efficient way to make the required text
     let halfHourB = document.createElement('div');
 
     if (i < 10) {
@@ -84,21 +89,24 @@ function fillTimeBar(zoom) {
   }
 }
 
-
 // Update time marker
-let timer = setInterval(updateTimeMarker, 600);
+let timer = setInterval(updateTimeMarker, 1000);
 
 function updateTimeMarker() {
   let now = new Date();
-  // The height of the nowSpan is set to the percentage the passed time reprecents of the number of minutes in a day
+  // The height of the nowSpan is set to the percentage the passed time represents of the number of minutes in a day
   let nowHeight = zoom * ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
   nowSpanElement = document.getElementsByClassName('nowSpan');
   nowSpanElement[0].style.height = nowHeight;
 }
 
-////// Eventlisteners  //////
-// Tie event to zoom button (⍐ / ⍗). Toggles zoom
-document.getElementById('zoom').addEventListener('click', zoomFunc);  // Remember removeEventListener()
+////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
+
+// Unfold settings
+document.getElementById('settings').addEventListener('click', settings);
+
+// Insert a 15 min planning task at the current time
+document.getElementById('nowButton').addEventListener('click', addNow);
 
 // Makes pressing Enter add task
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
@@ -106,30 +114,24 @@ document.getElementById('inputBox').addEventListener('keypress', function () { i
 // Tie event to Clear or Edit button
 document.getElementById('editButton').addEventListener('click', clearOrEdit);
 
+// Tie event to zoom button (⍐ / ⍗). Toggles zoom
+document.getElementById('zoom').addEventListener('click', zoomFunc);
+
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
-// Clear input box and give it focus
-function resetInputBox() {
-  document.getElementById('inputBox').value = '';
-  document.getElementById('inputBox').focus();
+// Used by an eventListener. Display settings.
+function settings() {
+  displayMessage('To do: make settings', 5000)
 }
 
-// Used by an eventListener. Toggles zoom.
-function zoomFunc() {
-  let zoomButton = document.getElementById('zoom');
-  zoom = (1 + 0.5) - zoom;
-  zoomSymbolModifyer = 7 - zoomSymbolModifyer;
-  zoomButton.innerText = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
-  // console.log(zoom);
-  // if (zoom == 1) {
-  //   zoom = 0.5;
-  //   zoomButton.innerText = '\u2357'; // ⍐
-  // } else {
-  //   zoom = 1;
-  //   zoomButton.innerText = '\u2350'; // ⍗
-  // }
+// Used by an eventListener. Inserts a 15 min planning task at the current time
+function addNow() {
+  let now = new Date();
+  insertFixTimeTask([now, 15 * 60000, 'Planning']);
   renderTasks();
+  resetInputBox();
+  document.getElementById('nowButton').classList.add('button-disabled');
 }
 
 // Used by an eventListener. Makes pressing Enter add task
@@ -138,28 +140,17 @@ function inputAtEnter(event) {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     let parsedList = parseText(contentInputBox);
     if (taskList.length == 1 && parsedList[0] == '') {
-      displayMessage('Please start planning with a fixed time \n\n Either press "Now" or add a task at\n 6:00 by typing "600 15m planning" ', 5000);
+      displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
     } else {
       let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
       addTask(myId, parsedList);
       renderTasks();
+      resetInputBox();
     }
   }
 }
 
-// let inputBox = document.getElementById('inputBox');
-// inputBox.addEventListener('keypress', function (e) {
-//   if (e.key === 'Enter') {
-//     let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
-//     addTask(myId);
-//     renderTasks();
-//   }
-// });
-
-// let container = document.getElementById('container');  // Testing purposes. Remove when forgotten.
-// container.addEventListener('scroll', function (e) {console.log(container.scrollTop);})
-
-// Govern the Edit/Clear button
+// Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');
   if (editButton.innerText == 'Clear') {
@@ -191,15 +182,16 @@ function clearOrEdit() {
   }
 }
 
-// Insert a 15 min planning task at the current time
-let nowButton = document.getElementById('nowButton');
-nowButton.addEventListener('click', addNow);
+// Used by an eventListener. Toggles zoom.
+function zoomFunc() {
+  let zoomButton = document.getElementById('zoom');
 
-function addNow() {
-  let now = new Date();
-  insertFixTimeTask([now, 15 * 60000, 'Planning']);
+  zoom = (1 + 0.5) - zoom;
+  zoomSymbolModifyer = 7 - zoomSymbolModifyer;
+
+  zoomButton.innerText = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
+
   renderTasks();
-  resetInputBox();
 }
 
 // Add a new task
@@ -221,6 +213,7 @@ function addTask(myId, parsedList) { // TODO: Make more like insertFixTimeTask
 function insertTask(parsedList, myId) {  // TODO: Is myId ok after refactoring of onClick for taskDiv?
   let newTaskDuration = parsedList[1];
 
+  let succes = false;
   for (const [index, task] of taskList.entries()) {
       // Find the first nullTime slot
       if (task.fuzzyness() == 'isNullTime' && newTaskDuration < task.duration && index > 0) {
@@ -233,20 +226,27 @@ function insertTask(parsedList, myId) {  // TODO: Is myId ok after refactoring o
         } else {
           taskList.splice(index, 0, newTask);
         }
+        succes = true;
 
         break
       }
-  }
+    }
+    if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
+      editButton.dataset.keep_text = 'true';
+      displayMessage('Not enough room\n Please clear some space ', 3000);
 
-  // taskList.forEach((task, index) => {  // Find the first nullTime slot
-  //   if (task.fuzzyness() == 'isNullTime' && newTask.duration < task.duration && index > 0) {
-  //     newTime = new Date(task.date.getTime() + newTaskDuration);  // ..then shrink the nullTime
-  //     nullTimeDuration = task.duration - newTaskDuration;
-  //     let nullTimeTask = new Task(newTime, nullTimeDuration, '');
-  //
-  //     taskList.splice(index, 1, newTask, nullTimeTask);  //  Delete old nullTime and insert new task and new nullTime
-  //   }
-  // });
+
+
+    // taskList.forEach((task, index) => {  // Find the first nullTime slot
+    //   if (task.fuzzyness() == 'isNullTime' && newTask.duration < task.duration && index > 0) {
+    //     newTime = new Date(task.date.getTime() + newTaskDuration);  // ..then shrink the nullTime
+    //     nullTimeDuration = task.duration - newTaskDuration;
+    //     let nullTimeTask = new Task(newTime, nullTimeDuration, '');
+    //
+    //     taskList.splice(index, 1, newTask, nullTimeTask);  //  Delete old nullTime and insert new task and new nullTime
+    //   }
+    // });
+  }
 }
 
 function insertFixTimeTask(parsedList) {
@@ -270,21 +270,20 @@ function insertFixTimeTask(parsedList) {
   }
   if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
     editButton.dataset.keep_text = 'true';
-    displayMessage('Not enough room\n Please clear some space ', 3000);
-    // msg = document.getElementById('message');
-    // msg.style.display = 'inline-block';
-    // msg.innerText = 'Not enough room\n Please clear some space ';
-    //
-    // setTimeout(function() {msg.style.display = 'none';}, 3000)
+    displayMessage('\nNot enough room\n Please clear some space\n', 3000);
   }
 }
-
+// TODO: get messages displayed goddamit
 function displayMessage(text, displayTime) {
   msg = document.getElementById('message');
   msg.style.display = 'inline-block';
+  // msg.style.backgroundColor = 'red';
+  msg.style.color = 'red';
   msg.innerText = text;
 
+
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
+  // msg.innerText = '';
 }
 
 function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next to each other
