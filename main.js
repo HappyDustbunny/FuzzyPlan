@@ -209,18 +209,27 @@ function addTask(myId, parsedList) { // TODO: Make more like insertFixTimeTask
   }
 }
 
-// TODO: Add task duration to start time for nullTime
-function insertTask(parsedList, myId) {  // TODO: Is myId ok after refactoring of onClick for taskDiv?
+// TODO: Fixate fixTimeTask so it can't be swapped
+function insertTask(parsedList, myId) {
   let newTaskDuration = parsedList[1];
 
   let succes = false;
-  for (const [index, task] of taskList.entries()) {
+  if (myId !== '' && taskList[myId].fuzzyness() === 'isNullTime') {  // If a nullTime is clicked ...
+    taskList[myId].date = new Date(taskList[myId].date.getTime() + newTaskDuration);  // ... shrink the nullTime
+    taskList[myId].duration -= newTaskDuration;
+
+    let newTask = new Task(parsedList[0], parsedList[1], parsedList[2], blockIdList.pop());  // Make the new task ...
+    taskList.splice(myId, 0, newTask);  // ..and splice it into taskList before the clicked task
+  } else {
+    for (const [index, task] of taskList.entries()) {
       // Find the first nullTime slot
       if (task.fuzzyness() == 'isNullTime' && newTaskDuration < task.duration && index > 0) {
-        taskList[index].date = new Date(task.date.getTime() + newTaskDuration);  // ..then shrink the nullTime
-        task.duration -= newTaskDuration;
+        if (myId <= index) {  // If new task is to be inserted before the clicked nullTime
+          taskList[index].date = new Date(task.date.getTime() + newTaskDuration);  // Change starting time for nullTime
+        }
+        task.duration -= newTaskDuration;  // Shrink the nullTime
         // Make the new task ...
-        let newTask = new Task(parsedList[0], parsedList[1], parsedList[2], task.blockId);
+        let newTask = new Task(parsedList[0], parsedList[1], parsedList[2], blockIdList.pop());
         if (myId > 0) { //  No id provided: insert the new task before chosen nullTime
           taskList.splice(myId, 0, newTask);
         } else {
@@ -231,21 +240,11 @@ function insertTask(parsedList, myId) {  // TODO: Is myId ok after refactoring o
         break
       }
     }
+
     if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
       editButton.dataset.keep_text = 'true';
-      displayMessage('Not enough room\n Please clear some space ', 3000);
-
-
-
-    // taskList.forEach((task, index) => {  // Find the first nullTime slot
-    //   if (task.fuzzyness() == 'isNullTime' && newTask.duration < task.duration && index > 0) {
-    //     newTime = new Date(task.date.getTime() + newTaskDuration);  // ..then shrink the nullTime
-    //     nullTimeDuration = task.duration - newTaskDuration;
-    //     let nullTimeTask = new Task(newTime, nullTimeDuration, '');
-    //
-    //     taskList.splice(index, 1, newTask, nullTimeTask);  //  Delete old nullTime and insert new task and new nullTime
-    //   }
-    // });
+      displayMessage('Not enough room here\n Please clear some space ', 3000);
+    }
   }
 }
 
@@ -253,7 +252,7 @@ function insertFixTimeTask(parsedList) {
   let succes = false;
   for (const [index, task] of taskList.entries()) {
     if (task.fuzzyness() == 'isNullTime') { // Find first nullTime slot
-      let newFixedTimeTask = new Task(parsedList[0], parsedList[1], parsedList[2], task.blockId);
+      let newFixedTimeTask = new Task(parsedList[0], parsedList[1], parsedList[2], blockIdList.pop());
       let nullTimeEnd = new Date(task.date.getTime() + task.duration);
       if ((task.date <= newFixedTimeTask.date) && (newFixedTimeTask.duration < task.duration) && (newFixedTimeTask.date < nullTimeEnd)) {
         null1Duration = newFixedTimeTask.date - task.date;
@@ -284,6 +283,48 @@ function displayMessage(text, displayTime) {
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
   // msg.innerText = '';
+}
+
+function taskHasBeenClicked(event) {
+  myId = event.target.id;  // myId is the id of the clicked task. (Duh)
+  // The eventListener is tied to the parent, so the event given is the parent event
+  let contentInputBox = document.getElementById('inputBox').value.trim();
+  let editButton = document.getElementById('editButton');
+
+  if (contentInputBox !== '' && !chosenTaskId) {
+    console.log('Text in inputBox and no chosenTaskId.');
+    // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
+    let contentInputBox = document.getElementById('inputBox').value.trim();
+    let parsedList = parseText(contentInputBox);
+    addTask(myId, parsedList);
+    renderTasks(); // Draws task based on the content of the taskList
+  } else if (contentInputBox !== '' && chosenTaskId){
+    // Text in inputbox and a chosenTaskId. Should not happen.
+    console.log('Text in inputbox and a chosenTaskId. Should not happen.');
+  }  else if (contentInputBox == '' && !chosenTaskId) {
+    // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
+    chosenTask = document.getElementById(myId);
+    chosenTask.classList.add('isClicked');
+    // console.log(myId, chosenTask.classList);
+    chosenTaskId = chosenTask.id;
+
+    editButton.innerText = 'Edit';
+    editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
+  } else if (contentInputBox == '' && chosenTaskId) {
+    // No text in inputBox and a chosenTaskId: Swap elements
+    [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]]
+    // TODO: Change time when swapping a nullTime and prevent a nullTime from being clicked first
+
+    resetInputBox();
+    chosenTaskId = '';
+    editButton.innerText = 'Clear';
+    editButton.dataset.keep_text = 'false';
+    renderTasks(); // Draws task based on the content of the taskList
+  }
+
+  if (!editButton.dataset.keep_text) {
+    resetInputBox();
+  }
 }
 
 function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next to each other
@@ -345,6 +386,7 @@ function collapseAdjacentNullTimes() {
   }
 }
 
+
 // TODO: textExtractor and renderTasks should add time to not-fixTimeTasks
 function textExtractor(task) {
   let text = task.text;
@@ -387,45 +429,6 @@ function textExtractor(task) {
   return text
 }
 
-function taskHasBeenClicked(event) {
-  myId = event.target.id;  // myId is the id of the clicked task. (Duh)
-  // The eventListener is tied to the parent, so the event given is the parent event
-  let contentInputBox = document.getElementById('inputBox').value.trim();
-  let editButton = document.getElementById('editButton');
-
-  if (contentInputBox !== '' && !chosenTaskId) {
-    // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    let contentInputBox = document.getElementById('inputBox').value.trim();
-    let parsedList = parseText(contentInputBox);
-    addTask(myId, parsedList);
-    renderTasks(); // Draws task based on the content of the taskList
-  } else if (contentInputBox !== '' && chosenTaskId){
-    // Text in inputbox and a chosenTaskId. Should not happen.
-    console.log('Text in inputbox and a chosenTaskId. Should not happen.');
-  }  else if (contentInputBox == '' && !chosenTaskId) {
-    // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
-    chosenTask = document.getElementById(myId);
-    chosenTask.classList.add('isClicked');
-    // console.log(myId, chosenTask.classList);
-    chosenTaskId = chosenTask.id;
-
-    editButton.innerText = 'Edit';
-    editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
-  } else if (contentInputBox == '' && chosenTaskId) {
-    // No text in inputBox and a chosenTaskId: Swap elements
-     [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]]
-
-    resetInputBox();
-    chosenTaskId = '';
-    editButton.innerText = 'Clear';
-    editButton.dataset.keep_text = 'false';
-    renderTasks(); // Draws task based on the content of the taskList
-  }
-
-  if (!editButton.dataset.keep_text) {
-    resetInputBox();
-  }
-}
 
 function parseText(rawText) {
   let taskStart = '';
@@ -453,7 +456,7 @@ function parseText(rawText) {
   }
 
   let time = /[0-9]?[0-9]:?[0-9][0-9]/.exec(rawText);
-  if (time) { // If 1230 or 12:30 is in rawText store numbers in hours and minutes and remove 1230 from rawText
+  if (time) { // If 1230 or 12:30 is found in rawText store numbers in hours and minutes and remove 1230 from rawText
     time.toString().replace(':', '');
     time = time[0].toString();
     if (time.length == 4) {
