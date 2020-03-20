@@ -2,11 +2,6 @@
   box-sizing: border-box;  /* Include margin, padding and border in box sizes */
 }
 
-/* body {
-  height: 100%;
-  overflow-y: hidden;
-} */
-
 div {
   /* flex: initial; */
   text-align: left;
