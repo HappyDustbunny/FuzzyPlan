@@ -96,7 +96,6 @@ h1 {
   flex-direction: column;
   background-color: transparent;
   border: none;
-  /* font-size: 14px; */
   height: 1440px;
   grid-area: taskListing;
 }
@@ -139,7 +138,7 @@ input {
 
 .controlButton {
   text-align: center;
-  width: 20%;
+  width: 10%;
   height: 22px;
   border: 1px solid rgb(96, 139, 168);
   border-radius: 10px;
@@ -151,9 +150,11 @@ input {
   grid-area: header;
 }
 
+#upButton,
 #nowButton,
 #editButton {
-  width: 14%;
+  width: 10%;
+  font-size: 10px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 

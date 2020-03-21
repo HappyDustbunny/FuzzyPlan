@@ -2,6 +2,8 @@ var taskList = [];  // List to keep track of the order of the tasks
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
+let wakeUpH = 7;  // The hour your day start according to settings (todo)
+let wakeUpM = 0;  // The minutes your day start according to settings
 // A list of unique numbers to use as task-ids
 blockIdList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
@@ -93,8 +95,13 @@ function updateTimeMarker() {
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
 
+// Insert a 15 min planning task at start-your-day time according to settings (todo)
+document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
+document.getElementById('upButton').addEventListener('click', jumpTo(1));
+
 // Insert a 15 min planning task at the current time
-document.getElementById('nowButton').addEventListener('click', addNow);
+document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
+document.getElementById('nowButton').addEventListener('click', updateTimeMarker);
 
 // Makes pressing Enter add task
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
@@ -112,14 +119,21 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 function settings() {
   displayMessage('To do: make settings', 5000)
 }
+// Used by an eventListener. Inserts a 15 min planning task at the start of your day
+function wakeUpButton() {
+  let now = new Date();
+  taskStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
+  insertFixTimeTask([taskStart, 15 * 60000, 'Planning']);
+  let element = document.getElementById('upButton');
+  // element.classList.add('button-disabled');
+  element.innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
+}
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
-function addNow() {
+function nowButton() {
   let now = new Date();
   insertFixTimeTask([now, 15 * 60000, 'Planning']);
-  renderTasks();
-  resetInputBox();
-  document.getElementById('nowButton').classList.add('button-disabled');
+  document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
 }
 
 // Used by an eventListener. Makes pressing Enter add task
@@ -144,7 +158,7 @@ function clearOrEdit() {
   if (editButton.innerText == 'Clear') {
     resetInputBox();
     chosenTaskId = '';
-    editButton.dataset.keep_text = 'false';
+    // editButton.dataset.keep_text = 'false';
   } else if (editButton.innerText == 'Edit') {
     taskText = taskList[chosenTaskId].text;  //  Save the text from clickedElement
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
@@ -160,12 +174,9 @@ function clearOrEdit() {
     }
     taskList[chosenTaskId].date = startTime;
 
-    // taskList.splice(chosenTaskId, 1);  // Remove the task from taskList. Can be changed and inserted anew.
-    // clickedElement = document.getElementById(chosenTaskId);  //  Identify clickedElement
-    // clickedElement.parentNode.removeChild(clickedElement);  //  Remove clickedElement
     document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
     chosenTaskId = '';
-    editButton.dataset.keep_text = 'true';
+    // editButton.dataset.keep_text = 'true';
     renderTasks();
   }
 }
@@ -192,9 +203,10 @@ function addTask(myId, parsedList) { // TODO: Make more like insertFixTimeTask
     insertFixTimeTask(parsedList);
   }
 
-  if (editButton.dataset.keep_text === 'false') {
-    resetInputBox();
-  }
+  // if (editButton.dataset.keep_text === 'false') {
+  //   resetInputBox();
+  // }
+  // resetInputBox();
 }
 
 // TODO: Fixate fixTimeTask so it can't be swapped
@@ -208,6 +220,7 @@ function insertTask(parsedList, myId) {
 
     let newTask = new Task(parsedList[0], parsedList[1], parsedList[2], blockIdList.pop());  // Make the new task ...
     taskList.splice(myId, 0, newTask);  // ..and splice it into taskList before the clicked task
+    jumpTo(myId);
   } else {
     for (const [index, task] of taskList.entries()) {
       // Find the first nullTime slot
@@ -224,20 +237,23 @@ function insertTask(parsedList, myId) {
           taskList.splice(index, 0, newTask);
         }
         succes = true;
-
+        jumpTo(index);
         break
       }
     }
 
     if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
-      editButton.dataset.keep_text = 'true';
+      // editButton.dataset.keep_text = 'true';
       displayMessage('Not enough room here\n Please clear some space ', 3000);
     }
   }
+  renderTasks();
+  resetInputBox();
 }
 
 function insertFixTimeTask(parsedList) {
   let succes = false;
+  let id = 1;
   for (const [index, task] of taskList.entries()) {
     if (task.fuzzyness() == 'isNullTime') { // Find first nullTime slot
       let newFixedTimeTask = new Task(parsedList[0], parsedList[1], parsedList[2], blockIdList.pop());
@@ -251,26 +267,27 @@ function insertFixTimeTask(parsedList) {
         let null2 = new Task(endTime, null2Duration, '', blockIdList.pop());
 
         taskList.splice(index, 1, null1, newFixedTimeTask, null2);
+        id = index + 1;
         succes = true;
       }
     }
   }
   if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
-    editButton.dataset.keep_text = 'true';
+    // editButton.dataset.keep_text = 'true';
     displayMessage('\nNot enough room\n Please clear some space\n', 3000);
   }
+  resetInputBox();
+  renderTasks();
+  jumpTo(id);
 }
-// TODO: get messages displayed goddamit
+
 function displayMessage(text, displayTime) {
   msg = document.getElementById('message');
   msg.style.display = 'inline-block';
-  // msg.style.backgroundColor = 'red';
   msg.style.color = 'red';
   msg.innerText = text;
 
-
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
-  // msg.innerText = '';
 }
 
 function taskHasBeenClicked(event) {
@@ -280,7 +297,6 @@ function taskHasBeenClicked(event) {
   let editButton = document.getElementById('editButton');
 
   if (contentInputBox !== '' && !chosenTaskId) {
-    console.log('Text in inputBox and no chosenTaskId.');
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
     let contentInputBox = document.getElementById('inputBox').value.trim();
     let parsedList = parseText(contentInputBox);
@@ -297,7 +313,7 @@ function taskHasBeenClicked(event) {
     chosenTaskId = chosenTask.id;
 
     editButton.innerText = 'Edit';
-    editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
+    // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements
     let task1 = taskList[chosenTaskId];
@@ -324,16 +340,17 @@ function taskHasBeenClicked(event) {
     // [task2, task1] = [task1, task2]
     // TODO: Change time when swapping a nullTime and prevent a nullTime from being clicked first
 
-    resetInputBox();
     chosenTaskId = '';
     editButton.innerText = 'Clear';
-    editButton.dataset.keep_text = 'false';
-    renderTasks(); // Draws task based on the content of the taskList
+    // editButton.dataset.keep_text = 'false';
+    resetInputBox();  // TODO: Still nescessary?
+    renderTasks();  // TODO: Still nescessary?
   }
 
-  if (!editButton.dataset.keep_text) {
-    resetInputBox();
-  }
+  // if (!editButton.dataset.keep_text) {
+  //   resetInputBox();
+  // }
+  resetInputBox();
 }
 
 function replaceTaskWithNullTime(myId) {
@@ -397,6 +414,15 @@ function renderTasks() {  // TODO: Remove 0m nullTime and combine nullTimes next
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
+
+  // }
+  // jumpTo(index);
+  }
+}
+
+function jumpTo(index) {
+  console.log(index);
+  if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 275;
   }
