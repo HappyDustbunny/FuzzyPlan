@@ -125,9 +125,10 @@ function wakeUpButton() {
   let now = new Date();
   taskStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
   insertFixTimeTask([taskStart, 15 * 60000, 'Planning']);
-  let element = document.getElementById('upButton');
-  // element.classList.add('button-disabled');
-  element.innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
+  document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
+  document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
+  document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
+  resetInputBox();
 }
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
@@ -135,6 +136,8 @@ function nowButton() {
   let now = new Date();
   insertFixTimeTask([now, 15 * 60000, 'Planning']);
   document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
+  document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
+  document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
 }
 
 // Used by an eventListener. Makes pressing Enter add task
@@ -148,7 +151,6 @@ function inputAtEnter(event) {
       let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
       addTask(myId, parsedList);
       renderTasks();
-      resetInputBox();
     }
   }
 }
@@ -420,6 +422,7 @@ function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
+    resetInputBox();
   }
 }
 
@@ -427,6 +430,7 @@ function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
+    resetInputBox();
   }
 }
 
