@@ -55,7 +55,7 @@ h1 {
   '. . . taskFooter .';
 }
 
-.nowSpan {
+#nowSpan {
   border-bottom: 3px solid rgba(255, 0, 0, 1.0);
   grid-area: timeBar;
   z-index: -1;
@@ -169,6 +169,7 @@ input {
 #settings {
   text-align: left;
   width: auto;
+  font-size: 15px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 

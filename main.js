@@ -36,7 +36,7 @@ function setUpFunc() {
 
   // Create time marker to show current time on timebar
   let nowSpan = document.createElement('span');
-  nowSpan.setAttribute('class', 'nowSpan');
+  nowSpan.setAttribute('id', 'nowSpan');
   document.getElementById('container').appendChild(nowSpan);
   updateTimeMarker();
 
@@ -86,8 +86,8 @@ function updateTimeMarker() {
   let now = new Date();
   // The height of the nowSpan is set to the percentage the passed time represents of the number of minutes in a day
   let nowHeight = zoom * ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
-  nowSpanElement = document.getElementsByClassName('nowSpan');
-  nowSpanElement[0].style.height = nowHeight;
+  nowSpanElement = document.getElementById('nowSpan');
+  nowSpanElement.style.height = nowHeight;
 }
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
@@ -97,11 +97,11 @@ document.getElementById('settings').addEventListener('click', settings);
 
 // Insert a 15 min planning task at start-your-day time according to settings (todo)
 document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-document.getElementById('upButton').addEventListener('click', jumpTo(1));
+document.getElementById('upButton').addEventListener('click', function() {jumpTo(1);});
 
 // Insert a 15 min planning task at the current time
 document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
-document.getElementById('nowButton').addEventListener('click', updateTimeMarker);
+document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
@@ -115,6 +115,7 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+// TODO: Make addPause buttons 15m, 30m + ?  Make pauses melt together like nullTime. Remove < 1 min nullTime
 // Used by an eventListener. Display settings.
 function settings() {
   displayMessage('To do: make settings', 5000)
@@ -191,22 +192,16 @@ function zoomFunc() {
   zoomButton.innerText = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
 
   renderTasks();
+  jumpToNow();
 }
 
 // Add a new task
-function addTask(myId, parsedList) { // TODO: Make more like insertFixTimeTask
-  // let contentInputBox = document.getElementById('inputBox').value.trim();
-  // let parsedList = parseText(contentInputBox);
+function addTask(myId, parsedList) {
   if (parsedList[0] == '') {  // No fixed time ...
     insertTask(parsedList, myId);
   } else {
     insertFixTimeTask(parsedList);
   }
-
-  // if (editButton.dataset.keep_text === 'false') {
-  //   resetInputBox();
-  // }
-  // resetInputBox();
 }
 
 // TODO: Fixate fixTimeTask so it can't be swapped
@@ -322,14 +317,14 @@ function taskHasBeenClicked(event) {
     if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isFuzzy') {
       replaceTaskWithNullTime(myId);
       parsedList = [task2.date, task2.duration, task2.text];
-      insertTask(parsedList, chosenTaskId);
+      insertTask(parsedList, (Number(chosenTaskId) + 1).toString());
       // taskList.splice(chosenTaskId, 0, task2);  // Insert task2 after task1
 
       //  ...and before if fixed task is clicked last
     } else if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
       replaceTaskWithNullTime(chosenTaskId);
       parsedList = [task1.date, task1.duration, task1.text];
-      insertTask(parsedList, (Number(myId) + 1).toString());
+      insertTask(parsedList, myId);
       // taskList.splice(chosenTaskId, 0, task2);  // Insert task2 before task1
 
     } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
@@ -424,7 +419,14 @@ function jumpTo(index) {
   console.log(index);
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
-    container.scrollTop = document.getElementById(index).offsetTop - 275;
+    container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
+  }
+}
+
+function jumpToNow() {
+  if (document.getElementById('container') !== null  && taskList.length > 0) {
+    container = document.getElementById('container');
+    container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
   }
 }
 
