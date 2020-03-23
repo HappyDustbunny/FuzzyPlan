@@ -228,11 +228,14 @@ function insertTask(parsedList, myId) {
         task.duration -= newTaskDuration;  // Shrink the nullTime
         // Make the new task ...
         let newTask = new Task(parsedList[0], parsedList[1], parsedList[2], blockIdList.pop());
-        if (myId > 0) { //  Id provided: insert the new task before clicked task
-          taskList.splice(myId, 0, newTask);
-        } else {  //  No id provided: insert the new task before chosen nullTime
-          taskList.splice(index, 0, newTask);
-        }
+        // if (myId > 0) { //  Id provided: insert the new task before clicked task
+        //   taskList.splice(myId, 0, newTask);
+        // } else {  //  No id provided: insert the new task before chosen nullTime
+        //   taskList.splice(index, 0, newTask);
+        // }
+
+        //  Id provided: insert the new task before clicked task
+        taskList.splice(myId || index, 0, newTask);  // No id provided: insert the new task before chosen nullTime
         succes = true;
         jumpTo(index);
         break
@@ -298,7 +301,6 @@ function taskHasBeenClicked(event) {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     let parsedList = parseText(contentInputBox);
     addTask(myId, parsedList);
-    renderTasks(); // Draws task based on the content of the taskList
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
     console.log('Text in inputbox and a chosenTaskId. Should not happen.');
@@ -306,32 +308,13 @@ function taskHasBeenClicked(event) {
     // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
     chosenTask = document.getElementById(myId);
     chosenTask.classList.add('isClicked');
-    // console.log(myId, chosenTask.classList);
     chosenTaskId = chosenTask.id;
 
     editButton.innerText = 'Edit';
     // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements
-    let task1 = taskList[chosenTaskId];
-    let task2 = taskList[myId];
-    // Don't swap if one task is a fixed task. Instead move fuzzy task after fixed task if fixed task is clicked first...
-    if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isFuzzy') {
-      replaceTaskWithNullTime(myId);
-      parsedList = [task2.date, task2.duration, task2.text];
-      insertTask(parsedList, (Number(chosenTaskId) + 1).toString());
-      // taskList.splice(chosenTaskId, 0, task2);  // Insert task2 after task1
-
-      //  ...and before if fixed task is clicked last
-    } else if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
-      replaceTaskWithNullTime(chosenTaskId);
-      parsedList = [task1.date, task1.duration, task1.text];
-      insertTask(parsedList, myId);
-      // taskList.splice(chosenTaskId, 0, task2);  // Insert task2 before task1
-
-    } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
-      displayMessage('Two fixed tasks can not be swapped', 3000);
-    }
+    swapTasks(myId);
 
 
     // [task2, task1] = [task1, task2]
@@ -348,6 +331,33 @@ function taskHasBeenClicked(event) {
   //   resetInputBox();
   // }
   resetInputBox();
+}
+
+function swapTasks(myId) {
+  let task1 = taskList[chosenTaskId];
+  let task2 = taskList[myId];
+  if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isFuzzy') {  // Swap if fuzzy tasks
+    if (task1.duration === task2.duration) {
+      [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]];  // [task1, task2] = [task2, task1] only swaps the copies... Argh.
+    } else {
+      displayMessage('Oups', 2000);
+    }
+
+    // Don't swap if one task is a fixed task. Instead move fuzzy task after fixed task if fixed task is clicked first...
+  } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isFuzzy') {
+    replaceTaskWithNullTime(myId);
+    parsedList = [task2.date, task2.duration, task2.text];
+    insertTask(parsedList, (Number(chosenTaskId) + 1).toString());
+
+    //  ...and before if fixed task is clicked last
+  } else if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
+    replaceTaskWithNullTime(chosenTaskId);
+    parsedList = [task1.date, task1.duration, task1.text];
+    insertTask(parsedList, myId);
+
+  } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
+    displayMessage('Two fixed tasks can not be swapped', 3000);
+  }
 }
 
 function replaceTaskWithNullTime(myId) {
