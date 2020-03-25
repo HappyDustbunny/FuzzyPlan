@@ -21,8 +21,8 @@ h1 {
 .task {
   text-align: left;
   border: 1px solid rgb(96, 139, 168);
-  border-radius: 4px;
-  background-color: rgba(154, 219, 240, .35);
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .6);
   grid-area: taskListing;
 }
 
@@ -106,10 +106,10 @@ h1 {
   border-radius: 10px;
 }
 
-.dontTouch {
-  cursor: not-allowed;
+/* .dontTouch {
+  cursor: not-allowed; */
   /* pointer-events: none; */
-}
+/* } */
 
 .pause {
   border: none;
