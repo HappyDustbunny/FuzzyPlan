@@ -48,7 +48,7 @@ function setUpFunc() {
   taskList.push(startNullTime);
 
   // Make debug example tasks
-  debugExamples();
+  // debugExamples();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -426,7 +426,7 @@ function adjustNullTimeForSwap(myId, deltaDuration, biggest) {   // Biggest is t
   }
 }
 
-function swapTasks(myId) {
+function swapTasks(myId) {   // TODO: Bug when small task is swapped with big task, but not the other way around
   let task1 = taskList[chosenTaskId];
   let task2 = taskList[myId];
   if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isFuzzy') {  // Swap if fuzzy tasks
