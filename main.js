@@ -66,13 +66,13 @@ function debugExamples() {
   exList = [
     '1130 debugging example',
     '1200 1h lunch',
-    '1h long1',
-    '45m medium1',
+    // '1h long1',
+    // '45m medium1',
     '30m short1',
     '1530 1h tea',
-    '1h long2',
-    '45m medium2',
-    '30m short2'
+    // '1h long2' ,
+    // '45m medium2',
+    // '30m short2'
   ]
 
   for (const [index, text] of exList.entries()) {
@@ -199,7 +199,7 @@ function clearOrEdit() {
     taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
 
-    // Give task back the time as nullTime
+    // Give task back the time as nullTime  // TODO: Could replaceTaskWithNullTime(myId) be used here?
     taskList[chosenTaskId].text = '';  // ... by removing the text
     let now = new Date();
     let startTimeMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
@@ -245,14 +245,6 @@ function insertTask(parsedList, myId) {  // If myId = '' add task at first avail
   let newTaskDuration = parsedList[1];
 
   let succes = false;
-  // if (myId !== '' && taskList[myId].fuzzyness() === 'isNullTime') {  // If a nullTime is clicked ...
-  //   taskList[myId].date = new Date(taskList[myId].date.getTime() + newTaskDuration);  // ... shrink the nullTime
-  //   taskList[myId].duration -= newTaskDuration;
-  //
-  //   let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);  // Make the new task ...
-  //   taskList.splice(myId, 0, newTask);  // ..and splice it into taskList before the clicked task
-  //   jumpTo(myId);
-  // } else {
   nullTimeAvailable = 0;
   if (myId === '') {
     for (const [index, task] of taskList.entries()) {
@@ -302,6 +294,7 @@ function insertTask(parsedList, myId) {  // If myId = '' add task at first avail
   if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
     // editButton.dataset.keep_text = 'true';
     displayMessage('Not enough room here\n Please clear some space ', 3000);
+    return succes;
   }
 
   renderTasks();
@@ -375,24 +368,29 @@ function taskHasBeenClicked(event) {
     editButton.innerText = 'Edit';
     // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
-    // No text in inputBox and a chosenTaskId: Swap elements
-    swapTasks(myId);
+    // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
+    if (chosenTaskId === myId) {
+      console.log('rap');
+      taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
+      document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+      document.getElementById('inputBox').focus();
+      replaceTaskWithNullTime(myId);
+    } else {
+      swapTasks(myId);
+    }
 
-
-    // [task2, task1] = [task1, task2]
-    // TODO: Change time when swapping a nullTime and prevent a nullTime from being clicked first
+    // TODO: Make swapping with nullTimes possible for fuzzy tasks? Replace with nullTime and move to start of clicked nullTime
 
     chosenTaskId = '';
     editButton.innerText = 'Clear';
-    // editButton.dataset.keep_text = 'false';
-    resetInputBox();  // TODO: Still nescessary?
+    // resetInputBox();  // TODO: Still nescessary?
     renderTasks();  // TODO: Still nescessary?
   }
 
   // if (!editButton.dataset.keep_text) {
   //   resetInputBox();
   // }
-  resetInputBox();
+  // resetInputBox();
 }
 
 // TODO: Inserting overlapping fixed times should not be possible
@@ -457,40 +455,33 @@ function swapTasks(myId) {   // TODO: Bug when small task is swapped with big ta
   let task1 = taskList[chosenTaskId];
   let task2 = taskList[myId];
   if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isFuzzy') {  // Swap if fuzzy tasks
-    if (task1.duration === task2.duration || task1.blockId === task2.blockId) {
+    if (task1.duration === task2.duration || task1.blockId === task2.blockId) {  // If tasks are same duration or in same block, just swap
       [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]];  // [task1, task2] = [task2, task1] only swaps the copies... Argh.
     } else {
       let deltaDuration = Math.abs(task1.duration - task2.duration);
       chosenTaskId = adjustNullTimeForSwap(chosenTaskId, deltaDuration, task1.duration > task2.duration);
       myId = adjustNullTimeForSwap(myId, deltaDuration, task1.duration < task2.duration);
       [taskList[myId], taskList[chosenTaskId]] = [taskList[chosenTaskId], taskList[myId]];  // [task1, task2] = [task2, task1] only swaps the copies... Argh.
-      // if (deltaDuration > 0) {
-      //   console.log(chosenTaskId, myId, taskList, deltaDuration);
-      //   adjustNullTimeForSwap(chosenTaskId, deltaDuration, true);  // True when the id is for the longest lasting task
-      //   adjustNullTimeForSwap(myId, deltaDuration, false);
-      //   [taskList[myId], taskList[Number(chosenTaskId) + 1]] = [taskList[Number(chosenTaskId) + 1], taskList[myId ]];  // [task1, task2] = [task2, task1] only swaps the copies... Argh.
-      // } else {
-      //   console.log(myId, chosenTaskId, taskList, deltaDuration);
-      //   adjustNullTimeForSwap(myId, -deltaDuration, true);
-      //   adjustNullTimeForSwap(chosenTaskId, -deltaDuration, false);
-      //   [taskList[Number(myId) + 1], taskList[Number(chosenTaskId)]] = [taskList[Number(chosenTaskId)], taskList[Number(myId) + 1]];  // [task1, task2] = [task2, task1] only swaps the copies... Argh.
-      // }
     }
 
-    // Don't swap if one task is a fixed task. Instead move fuzzy task after fixed task if fixed task is clicked first...
-  } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isFuzzy') {
-    replaceTaskWithNullTime(myId);
-    parsedList = [task2.date, task2.duration, task2.text];
-    insertTask(parsedList, (Number(chosenTaskId) + 1).toString());
+  //   // Don't swap if one task is a fixed task. Instead move fuzzy task after fixed task if fixed task is clicked first...
+  // } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isFuzzy') {
+  //   parsedList = [task2.date, task2.duration, task2.text];
+  //   let succes = insertTask(parsedList, (Number(chosenTaskId) + 1).toString());
+  //   if (succes) {
+  //     replaceTaskWithNullTime(myId);
+  //   }
+  //
+  //   //  ...and before the fixed task if the fixed task is clicked last
+  // } else if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
+  //   parsedList = [task1.date, task1.duration, task1.text];
+  //   let succes = insertTask(parsedList, myId);
+  //   if (succes) {
+  //     replaceTaskWithNullTime(chosenTaskId);
+  //   }
 
-    //  ...and before the fixed task if the fixed task is clicked last
-  } else if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
-    replaceTaskWithNullTime(chosenTaskId);
-    parsedList = [task1.date, task1.duration, task1.text];
-    insertTask(parsedList, myId);
-
-  } else if (task1.fuzzyness() === 'isNotFuzzy' && task2.fuzzyness() === 'isNotFuzzy') {
-    displayMessage('Two fixed tasks can not be swapped', 3000);
+} else if (task1.fuzzyness() === 'isNotFuzzy' || task2.fuzzyness() === 'isNotFuzzy') {
+    displayMessage('Fixed tasks can not participate in a swap', 3000);
   }
 }
 
@@ -538,16 +529,7 @@ function collapseAllNullTimes() {
         currentBlockId = taskList[index + 1].blockId;  // and focus on next block
       }
     }
-    // console.log(index, task.fuzzyness(), task.blockId, nullTimeIds, nullTimeIds.length, taskList.length);
   }
-
-  // for (const [index, task] of taskList.entries()) {
-  //   let cumDuration = task.duration;
-  //   if (index > 0 && task.fuzzyness() == 'isNullTime' && taskList[index - 1].fuzzyness() == 'isNullTime') {
-  //     taskList[index - 1].duration += cumDuration;
-  //     taskList.splice(index, 1);
-  //   }
-  // }
 
   for (const [index, task] of taskList.entries()) {
     if (task.duration < 59999) {  // Remove all tasks with duration less than a minute
@@ -577,7 +559,6 @@ function renderTasks() {
 
   // Collapse nullTimes in same block
   collapseAllNullTimes();
-  // collapseAllNullTimes(); // Repeat in case a task with nullTimes on both sides are removed
 
   // Refresh view from taskList
   for (const [index, task] of taskList.entries()) {
