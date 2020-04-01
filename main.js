@@ -2,7 +2,7 @@ var taskList = [];  // List to keep track of the order of the tasks
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
-let wakeUpH = 7;  // The hour your day start according to settings (todo)
+let wakeUpH = 7;  // The hour your day start according to settings // TODO: Settings
 let wakeUpM = 0;  // The minutes your day start according to settings
 
 // console.table(taskList);  // Remember! Shows a table in the console.
@@ -126,7 +126,7 @@ function updateTimeMarker() {
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
 
-// Insert a 15 min planning task at start-your-day time according to settings (todo)
+// Insert a 15 min planning task at start-your-day time according to settings // TODO: Settings
 document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
 document.getElementById('upButton').addEventListener('click', function() {jumpTo(1);});
 
@@ -176,7 +176,7 @@ function nowButton() {
 function inputAtEnter(event) {
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('inputBox').value.trim();
-    if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {  // TODO: Bug if '1200 40m' is entered without text
+    if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
       if (taskList.length == 1 && parsedList[0] == '') {
         displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
@@ -264,24 +264,27 @@ function insertTask(parsedList, myId) {  // If myId = '' add task at first avail
       }
     }
   } else {    // If placement is important (myId is provided) check if there is room enough in block
+
+    // Add up available nullTime in same block or block before
     let myBlockId = taskList[myId].blockId;
     let id = myId;
     while (myBlockId === -1) {
       id -= 1;
       myBlockId = taskList[id].blockId;
     }
-    for (const [index, task] of taskList.entries()) {
+    for (const [index, task] of taskList.entries()) {  // Add up available nullTime
       if (task.fuzzyness() === 'isNullTime' && task.blockId === myBlockId) {
         nullTimeAvailable += task.duration;
       }
     }
-    if (nullTimeAvailable > newTaskDuration) {
+
+    if (nullTimeAvailable >= newTaskDuration) {
       for (const [index, task] of taskList.entries()) {
         // Find the first nullTime slot
-        if (task.fuzzyness() === 'isNullTime' && newTaskDuration > task.duration && index > 0) { // If task duration is bigger than the found nullTime...
+        if (task.fuzzyness() === 'isNullTime' && newTaskDuration > task.duration && task.blockId === myBlockId) { // If task duration is bigger than the found nullTime...
           taskList.splice(index, 1); // ... remove nullTime
           newTaskDuration -= task.duration;  // ... and shrink the chunk to be taken out of the next nullTime
-        } else if (task.fuzzyness() === 'isNullTime' && newTaskDuration <= task.duration && index > 0) {
+        } else if (task.fuzzyness() === 'isNullTime' && newTaskDuration <= task.duration && task.blockId === myBlockId) {
           if (myId <= index) {  // If new task is to be inserted before the clicked nullTime
             taskList[index].date = new Date(task.date.getTime() + newTaskDuration);  // Change starting time for nullTime
           }
@@ -377,7 +380,9 @@ function taskHasBeenClicked(event) {
     // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
-    if (chosenTaskId === myId) {
+    if (chosenTaskId === myId && taskList[myId].fuzzyness() === 'isNullTime') {
+      displayMessage('Unasigned time can not be edited', 3000);
+    } else if (chosenTaskId === myId) {
       taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
       document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
       document.getElementById('inputBox').focus();
@@ -386,7 +391,6 @@ function taskHasBeenClicked(event) {
       swapTasks(myId);
     }
 
-    // TODO: Make swapping with nullTimes possible for fuzzy tasks? Replace with nullTime and move to start of clicked nullTime
 
     chosenTaskId = '';
     editButton.innerText = 'Clear';
@@ -399,9 +403,9 @@ function taskHasBeenClicked(event) {
   // resetInputBox();
 }
 
+// TODO: Make swapping with nullTimes possible for fuzzy tasks? Replace with nullTime and move to start of clicked nullTime
 // TODO: Inserting overlapping fixed times should not be possible
 // TODO: Inserting fixed time tasks ought to move fuzzy tasks out of the way
-// TODO: Inserting with enter works in 30m nulltime, but click on task after don't work
 
 function adjustNullTimeForSwap(myId, deltaDuration, biggest) {   // Biggest is true when the id is for the longest lasting task
   // console.log('adjustNullTimeForSwap', myId, deltaDuration, biggest);
@@ -429,7 +433,7 @@ function adjustNullTimeForSwap(myId, deltaDuration, biggest) {   // Biggest is t
         let replacementNullTime = new Task(nullStart, deltaDuration, '');
         taskList.splice(myId, 0, replacementNullTime);  // Insert replacementNullTime before task
         succes = true;
-        myId = Number(myId) + 1; // TODO: This needs fixing with an if
+        myId = Number(myId) + 1; // TODO: This needs fixing with an if.   Edit: Or does it?
         break;
       }
     }
@@ -459,7 +463,7 @@ function adjustNullTimeForSwap(myId, deltaDuration, biggest) {   // Biggest is t
   return myId;
 }
 
-function swapTasks(myId) {   // TODO: Bug when small task is swapped with big task, but not the other way around
+function swapTasks(myId) {
   let task1 = taskList[chosenTaskId];
   let task2 = taskList[myId];
   if (task1.fuzzyness() === 'isFuzzy' && task2.fuzzyness() === 'isFuzzy') {  // Swap if fuzzy tasks
@@ -561,7 +565,7 @@ function renderTasks() {
     newNode.setAttribute('id', index);
     newNode.classList.add(task.fuzzyness());  // Fuzzyness is used for styling tasks
     if (task.fuzzyness() === 'isNullTime') {
-      newNode.classList.add('dontTouch');  // TODO: Check how cursor: not-allowed and pointer-events: none works
+      newNode.classList.add('dontTouch');
     }
     newNode.classList.add('task');
 
@@ -612,7 +616,6 @@ function jumpToNow() {
   }
 }
 
-// TODO: textExtractor and renderTasks should add time to not-fixTimeTasks
 function textExtractor(task) {
   let text = task.text;
 
