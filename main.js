@@ -5,6 +5,9 @@ let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \
 let wakeUpH = 7;  // The hour your day start according to settings (todo)
 let wakeUpM = 0;  // The minutes your day start according to settings
 
+// console.table(taskList);  // Remember! Shows a table in the console.
+// debugger;  // Remember! Stops execution in order to glean the current value of variable
+
 // Daylight saving time shenanigans
 let today = new Date();
 let january = new Date(today.getFullYear(), 0, 1);
@@ -48,7 +51,7 @@ function setUpFunc() {
 
   // Create 24h nullTime
   let now = new Date();
-  let fullNullStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
+  let fullNullStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0);
   let fullNullStart = new Date(fullNullStartMinusDst.getTime() + 0 * dstOffset)
   let day24h = 24 * 3600 * 1000 - 120000;  // Milliseconds in a day minus two minutes
   let startNullTime = new Task(fullNullStart, day24h, '');
@@ -369,8 +372,7 @@ function taskHasBeenClicked(event) {
     // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
-    if (chosenTaskId === myId) {
-      console.log('rap');
+    if (chosenTaskId === myId) {  // TODO: Bug when last fixed task is double clicked for edit
       taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
       document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
       document.getElementById('inputBox').focus();
@@ -486,21 +488,22 @@ function swapTasks(myId) {   // TODO: Bug when small task is swapped with big ta
 }
 
 function replaceTaskWithNullTime(myId) {
-  let cumDuration = 0;
-  for (const [index, task] of taskList.entries()) {
+  let cumulatedDuaration = 0;
+  for (const [index, task] of taskList.entries()) {  // Find the total time before the clicked task
     if (index < myId) {
-      cumDuration += task.duration;
+      cumulatedDuaration += task.duration;
     }
   }
-  let hours = Math.floor(cumDuration / 3600000);
-  let minutes = Math.floor((cumDuration - hours * 3600000) / 60000);
+  let hours = Math.floor(cumulatedDuaration / 3600000);
+  let minutes = Math.floor((cumulatedDuaration - hours * 3600000) / 60000);
   // Create new nullTime to replace task
   let now = new Date();
   let nullStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
-  let nullStart = new Date(nullStartMinusDst.getTime() + dstOffset);
+  let nullStart = new Date(nullStartMinusDst.getTime() + 0 * dstOffset);
   let replacementNullTime = new Task(nullStart, taskList[myId].duration, '');
 
   taskList.splice(myId, 1, replacementNullTime);  // Insert replacementNullTime before task and remove task
+  assignBlock();
 }
 
 function collapseAllNullTimes() {
@@ -518,8 +521,10 @@ function collapseAllNullTimes() {
         let lastId = nullTimeIds.pop();  // Get the id of the last nullTime in the block ...
         taskList[lastId].date = new Date(taskList[lastId].date.getTime() + taskList[lastId].duration - nullTimeAvailable);
         taskList[lastId].duration = nullTimeAvailable;  // ... and set its duration equal to the available nullTime
-        for (const [index, id] of nullTimeIds.entries()) {
-          taskList.splice(id, 1);  // Delete the collected nullTimes
+
+        removeId = nullTimeIds[0];  // The ids will change, so fix the lower one ...
+        for (const [foo, bar] of nullTimeIds.entries()) {
+          taskList.splice(removeId, 1);  // ... and delete the collected nullTimes
         }
       }
       nullTimeAvailable = 0;  // ... restart available nullTime count
