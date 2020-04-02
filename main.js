@@ -56,6 +56,7 @@ function setUpFunc() {
   let day24h = 24 * 3600 * 1000 - 120000;  // Milliseconds in a day minus two minutes
   let startNullTime = new Task(fullNullStart, day24h, '');
   taskList.push(startNullTime);
+  assignBlock();
 
   // Make debug example tasks
   debugExamples();
@@ -66,7 +67,7 @@ function setUpFunc() {
 }
 
 function debugExamples() {
-  exList = [
+  exampleList = [
     '1130 debugging example',
     '1200 1h lunch',
     // '1h long1',
@@ -74,12 +75,14 @@ function debugExamples() {
     '30m short1',
     '1530 1h tea',
     // '1h long2' ,
-    // '45m medium2',
+    '45m medium2',
     // '30m short2'
   ]
 
-  for (const [index, text] of exList.entries()) {
-    addTask('', parseText(text.trim()));
+  for (const [index, text] of exampleList.entries()) {
+    let parsedList = parseText(text.trim());
+    let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
+    addTask('', newTask);
   }
 }
 
@@ -182,7 +185,8 @@ function inputAtEnter(event) {
         displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
       } else {
         let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
-        addTask(myId, parsedList);
+        let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
+        addTask(myId, newTask);
         renderTasks();
       }
     } else {
@@ -235,26 +239,23 @@ function zoomFunc() {
 }
 
 // Add a new task
-function addTask(myId, parsedList) {
-  if (parsedList[0] == '') {  // No fixed time ...
-    insertTask(parsedList, myId);
+function addTask(myId, task) {
+  if (task.date == '') {  // No fixed time ...
+    insertTask(myId, task);
   } else {
-    insertFixTimeTask(parsedList);
+    insertFixTimeTask(task);
   }
 }
 
-function insertTask(parsedList, myId) {  // If myId = '' add task at first available nullTime
-  let newTaskDuration = parsedList[1];
+function insertTask(myId, newTask) {  // If myId = '' add task at first available nullTime
 
   let succes = false;
   nullTimeAvailable = 0;
   if (myId === '') {
     for (const [index, task] of taskList.entries()) {
-      if (task.fuzzyness() === 'isNullTime' && newTaskDuration <= task.duration && index > 0) {
-        taskList[index].date = new Date(task.date.getTime() + newTaskDuration);  // Change starting time for nullTime
-        task.duration -= newTaskDuration;  // Shrink the nullTime
-        // Make the new task ...
-        let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
+      if (task.fuzzyness() === 'isNullTime' && newTask.duration <= task.duration && index > 0) {
+        taskList[index].date = new Date(task.date.getTime() + newTask.duration);  // Change starting time for nullTime
+        task.duration -= newTask.duration;  // Shrink the nullTime
 
         //  Id provided: insert the new task before clicked task
         taskList.splice(index, 0, newTask);  // Insert the new task before chosen nullTime
@@ -278,17 +279,17 @@ function insertTask(parsedList, myId) {  // If myId = '' add task at first avail
       }
     }
 
-    if (nullTimeAvailable >= newTaskDuration) {
+    if (nullTimeAvailable >= newTask.duration) {
       for (const [index, task] of taskList.entries()) {
         // Find the first nullTime slot
-        if (task.fuzzyness() === 'isNullTime' && newTaskDuration > task.duration && task.blockId === myBlockId) { // If task duration is bigger than the found nullTime...
+        if (task.fuzzyness() === 'isNullTime' && newTask.duration > task.duration && task.blockId === myBlockId) { // If task duration is bigger than the found nullTime...
           taskList.splice(index, 1); // ... remove nullTime
-          newTaskDuration -= task.duration;  // ... and shrink the chunk to be taken out of the next nullTime
-        } else if (task.fuzzyness() === 'isNullTime' && newTaskDuration <= task.duration && task.blockId === myBlockId) {
+          newTask.duration -= task.duration;  // ... and shrink the chunk to be taken out of the next nullTime
+        } else if (task.fuzzyness() === 'isNullTime' && newTask.duration <= task.duration && task.blockId === myBlockId) {
           if (myId <= index) {  // If new task is to be inserted before the clicked nullTime
-            taskList[index].date = new Date(task.date.getTime() + newTaskDuration);  // Change starting time for nullTime
+            taskList[index].date = new Date(task.date.getTime() + newTask.duration);  // Change starting time for nullTime
           }
-          task.duration -= newTaskDuration;  // Shrink the nullTime
+          task.duration -= newTask.duration;  // Shrink the nullTime
           // Make the new task ...
           let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
 
@@ -312,38 +313,78 @@ function insertTask(parsedList, myId) {  // If myId = '' add task at first avail
   resetInputBox();
 }
 
-function insertFixTimeTask(parsedList) {
+function insertFixTimeTask(newFixedTimeTask) {
   let succes = false;
+  let relevantBlockId = -1;
   let id = 1;
-  for (const [index, task] of taskList.entries()) {
-    if (task.fuzzyness() == 'isNullTime') { // Find first nullTime slot
-      let newFixedTimeTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
-      let nullTimeEnd = new Date(task.date.getTime() + task.duration);
-      if ((task.date <= newFixedTimeTask.date) && (newFixedTimeTask.duration <= task.duration) && (newFixedTimeTask.date < nullTimeEnd)) {
-        null1Duration = newFixedTimeTask.date - task.date;
-        let null1 = new Task(task.date, null1Duration, '');  //, task.blockId)
-
-        null2Duration = task.date.getTime() + task.duration - newFixedTimeTask.date.getTime() - newFixedTimeTask.duration;
-        let endTime = new Date(newFixedTimeTask.date.getTime() + newFixedTimeTask.duration);
-        let null2 = new Task(endTime, null2Duration, '');
-
-        taskList.splice(index, 1, null1, newFixedTimeTask, null2);
-        id = index + 1;
-        succes = true;
+  // Find relevant block
+  if (taskList.length === 1) {  // When there is just the blank day
+    relevantBlockId = 0;
+  } else {  // Find a block after a fixTimeTask and check if the new fixTimeTask fits
+    let taskEnd = new Date();
+    for (const [index, task] of taskList.entries()) {
+      if (task.blockId !== -1) {  // Ignore fuzzytasks and nullTime
+        continue;
+      }
+      taskEnd = new Date(task.date.getTime() + task.duration);
+      if (task.blockId === -1 && taskEnd <= newFixedTimeTask.date) {  // If the fixTimeTask ends before the new fixTimeTask starts...
+        if (taskList[index + 1]) {
+          relevantBlockId = taskList[index + 1].blockId;
+        }
       }
     }
   }
+  // Check if block has enough nullTime
+  for (const [index, task] of taskList.entries()) {
+    if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && newFixedTimeTask.duration < task.duration) {
+      // Empty block of other tasks and store them
+      let taskStore = [];
+      for (const [index, blockTask] of taskList.entries()) {
+        if (blockTask.blockId === relevantBlockId && task.fuzzyness() === 'isFuzzy') {
+          taskStore.push(blockTask);
+        }
+      }
+
+      // Insert new fixTimeTask
+      null1Duration = newFixedTimeTask.date.getTime() - task.date.getTime();
+      let null1 = new Task(task.date, null1Duration, '');
+
+      null2Duration = task.date.getTime() + task.duration - newFixedTimeTask.date.getTime() - newFixedTimeTask.duration;
+      let endTime = new Date(newFixedTimeTask.date.getTime() + newFixedTimeTask.duration);
+      let null2 = new Task(endTime, null2Duration, '');
+
+      taskList.splice(index, 1, null1, newFixedTimeTask, null2);
+      id = index + 1;
+
+      // Distribute other tasks in the block
+      for (const [foo, blockTask] of taskStore.entries()) {
+        for (const [index, task] of taskList.entries()) {
+          if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && blockTask.duration < task.duration ) {
+            addTask(index, blockTask);
+          }
+        }
+      }
+
+      // id = index + 1;
+      succes = true;
+    }
+  }
+
+
   if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
     // editButton.dataset.keep_text = 'true';
     displayMessage('\nNot enough room\n Please clear some space\n', 3000);
   }
   resetInputBox();
   renderTasks();
-  jumpTo(id);
+  console.log(id);
+  jumpTo(id);  // TODO: Fix this
 }
+
 
 function displayMessage(text, displayTime) {
   console.log(text);
+  // debugger;
   msg = document.getElementById('message');
   msg.style.display = 'inline-block';
   msg.style.color = 'red';
@@ -363,7 +404,8 @@ function taskHasBeenClicked(event) {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
-      addTask(myId, parsedList);
+      let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
+      addTask(myId, newTask);
     } else {
       displayMessage('A task needs text ', 3000);
     }
@@ -403,7 +445,6 @@ function taskHasBeenClicked(event) {
   // resetInputBox();
 }
 
-// TODO: Make swapping with nullTimes possible for fuzzy tasks? Replace with nullTime and move to start of clicked nullTime
 // TODO: Inserting overlapping fixed times should not be possible
 // TODO: Inserting fixed time tasks ought to move fuzzy tasks out of the way
 
@@ -603,6 +644,7 @@ function assignBlock() {
 function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
+    console.log(container.scrollTop, document.getElementById(index).offsetTop, document.getElementById(index));
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
     resetInputBox();
   }
