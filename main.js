@@ -72,8 +72,8 @@ function debugExamples() {
     '1200 1h lunch',
     // '1h long1',
     // '45m medium1',
-    '30m short1',
     '1530 1h tea',
+    '30m short1',
     // '1h long2' ,
     '45m medium2',
     // '30m short2'
@@ -248,7 +248,6 @@ function addTask(myId, task) {
 }
 
 function insertTask(myId, newTask) {  // If myId = '' add task at first available nullTime
-
   let succes = false;
   nullTimeAvailable = 0;
   if (myId === '') {
@@ -278,6 +277,7 @@ function insertTask(myId, newTask) {  // If myId = '' add task at first availabl
         nullTimeAvailable += task.duration;
       }
     }
+    console.log('hop', newTask, newTask.duration);
 
     if (nullTimeAvailable >= newTask.duration) {
       for (const [index, task] of taskList.entries()) {
@@ -331,45 +331,68 @@ function insertFixTimeTask(newFixedTimeTask) {
         if (taskList[index + 1]) {
           relevantBlockId = taskList[index + 1].blockId;
         }
+        // TODO: Do all stuff here? If not it will be possible to insert overlapping fixedTimeTasks
       }
     }
   }
   // Check if block has enough nullTime
+  let enoughNullTime = false;
+  let nullId = 0;
+  // console.table(taskList);
   for (const [index, task] of taskList.entries()) {
-    if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && newFixedTimeTask.duration < task.duration) {
+    if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && newFixedTimeTask.duration <= task.duration) {
+      enoughNullTime = true;
+      nullId = index;
+      break;
+    }
+  }
+  if (enoughNullTime) {
       // Empty block of other tasks and store them
       let taskStore = [];
+      let blockTasksDuration = 0;
+      // debugger;
       for (const [index, blockTask] of taskList.entries()) {
-        if (blockTask.blockId === relevantBlockId && task.fuzzyness() === 'isFuzzy') {
+        // console.log(index, blockTask.blockId, blockTask);
+        if (blockTask.blockId === relevantBlockId && blockTask.fuzzyness() === 'isFuzzy') {
+          blockTasksDuration += blockTask.duration;
+          console.log('blockTask', blockTask);
           taskStore.push(blockTask);
+          replaceTaskWithNullTime(index);
+          nullId -= 1;
         }
       }
+      collapseAllNullTimes();
+      console.log('taskStore', taskStore);
 
       // Insert new fixTimeTask
-      null1Duration = newFixedTimeTask.date.getTime() - task.date.getTime();
-      let null1 = new Task(task.date, null1Duration, '');
+      // null1Duration = newFixedTimeTask.date.getTime() - (taskList[nullId].date.getTime() - blockTasksDuration);
+      null1Duration = newFixedTimeTask.date.getTime() - (taskList[nullId].date.getTime()); // + taskList[nullId].duration);
+      console.log(blockTasksDuration, taskList[nullId].duration);
+      let null1 = new Task(taskList[nullId].date, null1Duration, '');
 
-      null2Duration = task.date.getTime() + task.duration - newFixedTimeTask.date.getTime() - newFixedTimeTask.duration;
-      let endTime = new Date(newFixedTimeTask.date.getTime() + newFixedTimeTask.duration);
-      let null2 = new Task(endTime, null2Duration, '');
+      null2Duration = taskList[nullId].date.getTime() + taskList[nullId].duration - newFixedTimeTask.date.getTime() - newFixedTimeTask.duration;
+      let null2StartTime = new Date(newFixedTimeTask.date.getTime() + newFixedTimeTask.duration);
+      let null2 = new Task(null2StartTime, null2Duration, '');
 
-      taskList.splice(index, 1, null1, newFixedTimeTask, null2);
-      id = index + 1;
+      taskList.splice(nullId, 1, null1, newFixedTimeTask, null2);
+      id = nullId + 1;
 
+      assignBlock();
+
+      console.log(nullId, taskList, taskStore);
       // Distribute other tasks in the block
       for (const [foo, blockTask] of taskStore.entries()) {
         for (const [index, task] of taskList.entries()) {
-          if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && blockTask.duration < task.duration ) {
+          console.log(index, task.blockId,  blockTask.duration, task.duration, task.fuzzyness());
+          if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && blockTask.duration <= task.duration ) {
+            console.log('bzz', index, blockTask.duration, taskList);
             addTask(index, blockTask);
           }
         }
       }
-
       // id = index + 1;
       succes = true;
     }
-  }
-
 
   if (!succes) {  // If there isn't enough room for a fixTimeTask flash a waring
     // editButton.dataset.keep_text = 'true';
@@ -377,7 +400,6 @@ function insertFixTimeTask(newFixedTimeTask) {
   }
   resetInputBox();
   renderTasks();
-  console.log(id);
   jumpTo(id);  // TODO: Fix this
 }
 
@@ -644,7 +666,7 @@ function assignBlock() {
 function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
-    console.log(container.scrollTop, document.getElementById(index).offsetTop, document.getElementById(index));
+    // console.log(container.scrollTop, document.getElementById(index).offsetTop, document.getElementById(index));
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
     resetInputBox();
   }
