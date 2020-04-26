@@ -154,6 +154,7 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 function settings() {
   displayMessage('To do: make settings', 5000)
 }
+
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
 function wakeUpButton() {
   let now = new Date();
@@ -182,7 +183,7 @@ function inputAtEnter(event) {
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
       if (taskList.length == 1 && parsedList[0] == '') {
-        displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
+        displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n, say, 6:00 by typing "600 15m planning"\n', 5000);
       } else {
         let myId = '';  // By leaving myId empty the task will be added at the beginning of first available nullTime
         let newTask = new Task(parsedList[0], parsedList[1], parsedList[2]);
@@ -277,7 +278,6 @@ function insertTask(myId, newTask) {  // If myId = '' add task at first availabl
         nullTimeAvailable += task.duration;
       }
     }
-    console.log('hop', newTask, newTask.duration);
 
     if (nullTimeAvailable >= newTask.duration) {
       for (const [index, task] of taskList.entries()) {
@@ -335,6 +335,7 @@ function insertFixTimeTask(newFixedTimeTask) {
       }
     }
   }
+
   // Check if block has enough nullTime
   let enoughNullTime = false;
   let nullId = 0;
@@ -355,19 +356,16 @@ function insertFixTimeTask(newFixedTimeTask) {
         // console.log(index, blockTask.blockId, blockTask);
         if (blockTask.blockId === relevantBlockId && blockTask.fuzzyness() === 'isFuzzy') {
           blockTasksDuration += blockTask.duration;
-          console.log('blockTask', blockTask);
           taskStore.push(blockTask);
           replaceTaskWithNullTime(index);
           nullId -= 1;
         }
       }
       collapseAllNullTimes();
-      console.log('taskStore', taskStore);
 
       // Insert new fixTimeTask
       // null1Duration = newFixedTimeTask.date.getTime() - (taskList[nullId].date.getTime() - blockTasksDuration);
       null1Duration = newFixedTimeTask.date.getTime() - (taskList[nullId].date.getTime()); // + taskList[nullId].duration);
-      console.log(blockTasksDuration, taskList[nullId].duration);
       let null1 = new Task(taskList[nullId].date, null1Duration, '');
 
       null2Duration = taskList[nullId].date.getTime() + taskList[nullId].duration - newFixedTimeTask.date.getTime() - newFixedTimeTask.duration;
@@ -379,13 +377,10 @@ function insertFixTimeTask(newFixedTimeTask) {
 
       assignBlock();
 
-      console.log(nullId, taskList, taskStore);
       // Distribute other tasks in the block
       for (const [foo, blockTask] of taskStore.entries()) {
         for (const [index, task] of taskList.entries()) {
-          console.log(index, task.blockId,  blockTask.duration, task.duration, task.fuzzyness());
           if (task.blockId === relevantBlockId && task.fuzzyness() === 'isNullTime' && blockTask.duration <= task.duration ) {
-            console.log('bzz', index, blockTask.duration, taskList);
             addTask(index, blockTask);
           }
         }
@@ -632,8 +627,10 @@ function renderTasks() {
     }
     newNode.classList.add('task');
 
+    let nodeText = textExtractor(task);
+
     // Set the task height
-    if (zoom * task.height() < 20) {  // Adjust text size for short tasks
+    if (zoom * task.height() < 20 || nodeText.length > 27) {  // Adjust text size for short tasks
       newNode.style['font-size'] = '12px';
     } else {
       newNode.style['font-size'] = null;
@@ -641,7 +638,6 @@ function renderTasks() {
     newNode.style['line-height'] = zoom * task.height() + 'px';
     newNode.style.height = (zoom * task.height() * 100) / (24 * 60) + '%';
 
-    let nodeText = textExtractor(task);
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
