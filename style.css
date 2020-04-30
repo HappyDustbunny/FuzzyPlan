@@ -75,7 +75,7 @@ h1 {
 #nowSpan {
   border-bottom: 3px solid rgba(255, 0, 0, 1.0);
   grid-area: timeBar;
-  z-index: -1;
+  z-index: 999;
 }
 
 #timeDiv {
