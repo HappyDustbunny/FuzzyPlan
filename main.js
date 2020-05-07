@@ -1,11 +1,14 @@
 var taskList = [];  // List to keep track of the order of the tasks
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
+let uniqueIdOfLastTouched = 0;
+let uniqueIdList = [];
+let nullTimeClicked = false;
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 let wakeUpH = 7;  // The hour your day start according to settings // TODO: Settings
 let wakeUpM = 0;  // The minutes your day start according to settings
 // A list of unique numbers to use as task-ids
-randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
+// randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
 
 // console.table(taskList);  // Remember! Shows a table in the console.
@@ -18,17 +21,42 @@ let july = new Date(today.getFullYear(), 6, 1);
 const dstOffset = (july.getTimezoneOffset() - january.getTimezoneOffset()) * 60000; // Daylight saving time offset in ms
 
 // Task-object. Each task will be an object of this type
-function Task(date, duration, text) {
-  this.date = date; // Start time as Javascript date
-  this.duration = duration; // Duration in milliseconds
-  this.text = text;
-  this.uniqueId = randomList.pop()
-
-  this.end = function() { // End time as Javascript date
-    return new Date(this.date.getTime() + this.duration)
+class Task {
+  constructor(date, duration, text) {
+    this.date = date; // Start time as Javascript date
+    this.duration = duration; // Duration in milliseconds
+    this.text = text;
+    this.uniqueId = this.giveAUniqueId();
+    this.end();
+    this.height = this.height();
   }
 
-  this.height = function() { // Pixelheight is 1 minute = 1 px
+  giveAUniqueId() {
+    let tryAgain = false;
+    let uniqueId = 0;
+    do {
+      uniqueId = Math.floor(Math.random() * 10000);
+      for (const [index, id] of uniqueIdList.entries()) {
+        if (uniqueId === id) {
+          tryAgain = true;
+          break;
+        }
+      }
+    }
+    while (tryAgain);
+
+    uniqueIdList.push(uniqueId);
+    uniqueIdOfLastTouched = uniqueId;
+    return uniqueId;
+  }
+
+  end() { // End time as Javascript date
+    if (this.date != '') {
+      return new Date(this.date.getTime() + this.duration)
+    }
+  }
+
+  height() { // Pixelheight is 1 minute = 1 px
     return this.duration / 60000
   }
 }
@@ -55,7 +83,7 @@ function setUpFunc() {
   // Make debug example tasks
   debugExamples();
 
-  createNullTimes();
+  // createNullTimes();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -78,15 +106,17 @@ function debugExamples() {
   let succes = false;
   for (const [index, text] of exList.entries()) {
     let parsedList = parseText(text.trim());
+    let id = uniqueIdOfLastTouched;
     let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-    if (parsedList[0] === '') {
-      succes = addWhereverAfter(1, task);
-    } else {
-      succes = addFixedTask(task);
-    }
+    console.log(task.text, [].concat(taskList));
+    succes = addTask(id, task);
+    // if (parsedList[0] === '') {
+    //   succes = addWhereverAfter(1, task);
+    // } else {
+    //   succes = addFixedTask(task);
+    // }
   }
   if (!succes) {console.log('Fix your example');}
-console.log(taskList);
 }
 
 // Clear input box and give it focus
@@ -194,7 +224,7 @@ function inputAtEnter(event) {
       if (taskList.length == 1 && parsedList[0] == '') {
         displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
       } else {
-        let succes = addTask(1, task);
+        let succes = addTask(uniqueIdList[2], task);  // The two first in uniqueIdList is start and end
 
         if (!succes) {
           displayMessage('Not enough room. \nPlease clear some space', 3000);
@@ -210,87 +240,121 @@ function inputAtEnter(event) {
 function addTask(myId, task) {
   let succes = false;
   if (task.date == '') {  // No fixed time ...
-    succes = addWhereverAfter(1, task);
+    succes = addWhereverAfter(myId, task);
   } else {
     succes = addFixedTask(task);
   }
-  return succes
+  resetInputBox();
+  return succes;
 }
 
-function addFixedTask(task) {
-  // let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-  for (var n=0; n<taskList.length - 1; n++) {
-    // debugger;
-    if (taskList[n].end() <= task.date && task.end() <= taskList[n+1].date) {
-      taskList.splice(n + 1, 0, task);
-      resetInputBox();
-      return true
-    }
-  }
-  return false
-}
-
-function addTaskAfter(id, task) {
+function addTaskAfter(uniqueId, task) {
+  let id = getIndexFromUniqueId(uniqueId);
   task.date = taskList[id].end();
+  task.end();
   task.fuzzyness = 'isFuzzy';
   if (task.end() <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
     resetInputBox();
-    return true
+    return true;
   } else {
-    return false
+    return false;
   }
 }
 
 function addTaskBefore(id, task) {
-  // let task = new Task(parsedList[0]), parsedList[1], parsedList[2]);
-  task.date = date(taskList[id].date.getTime() - task.duration);
+  // console.log(id, myId, taskList[id].date.getTime(), task.duration, new Date(taskList[id].date.getTime() - task.duration));
+  task.date = new Date(taskList[id].date.getTime() - task.duration); // TODO: Somethings fishy here(?)
   task.fuzzyness = 'isFuzzy';
-  if (taskList[id - 1].end() <= task.date) {
-    return false
+  if (taskList[id - 1].end() >= task.date) {
+    displayMessage('Not enough rooom here', 3000);
+    return false;
   } else {
     taskList.splice(id, 0, task);
     resetInputBox();
-    return true
+    return true;
   }
 }
 
-function addWhereverAfter(myId, task) {
+function addWhereverAfter(uniqueId, task) {
   // let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
   // debugger;
   let succes = false;
+  let myId = getIndexFromUniqueId(uniqueId);
   for (var id=myId; id<taskList.length - 1; id++) {
-    succes = addTaskAfter(id, task);
+    succes = addTaskAfter(taskList[id].uniqueId, task);
     resetInputBox();
     if (succes) {
-      break
+      break;
     }
   }
+  return succes;
+}
+
+function addFixedTask(task) {
+  let succes = false;
+  let backUpTaskList = [].concat(taskList); // Make a deep copy
+  let len = taskList.length;
+  for (var n=0; n<len - 1; n++) {
+    if (taskList[n].end() <= task.date && task.end() <= taskList[n+1].date) {
+      taskList.splice(n + 1, 0, task);
+      break;
+    }
+  }
+  overlappingTasks = isThereOverlap();
+  if (overlappingTasks.length > 0) {
+    for (const [index, task] of taskList.entries()) {
+      succes = addWhereverAfter(task[0], task[1]);
+    }
+  } else {
+    succes = true;
+  }
+  if (!succes) {
+    taskList = [].concat(backUpTaskList);
+  }
+  resetInputBox();
   return succes
+}
+
+function isThereOverlap() {
+  let overlappingTasks = [];
+  let len = taskList.length;
+  // debugger;
+  for (var n=1; n<len - 1; n++) {
+    // console.log('ner', n, len);
+    // if (n>4) {debugger;}
+    if (taskList[n-1].end() < taskList[n].date && taskList[n].fuzzyness === 'isFuzzy') {
+      console.log('hyp', taskList[n-1].end(), taskList[n].date, taskList[n].fuzzyness);
+      overlappingTasks.push([n, taskList.splice(n, 1)]);
+      }
+    }
+  return overlappingTasks
 }
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');
+  let id = getIndexFromUniqueId(chosenTaskId);
   if (editButton.innerText == 'Clear') {
     resetInputBox();
-    chosenTaskId = '';
+    id = '';
     // editButton.dataset.keep_text = 'false';
   } else if (editButton.innerText == 'Edit') {
-    taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
+    taskText = taskList[id].text + ' ' + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
     document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+    taskList.splice(id, 1);
 
-    // Give task back the time as nullTime  // TODO: Could replaceTaskWithNullTime(myId) be used here?
-    taskList[chosenTaskId].text = '';  // ... by removing the text
-    let now = new Date();
-    let startTimeMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
-    let startTime = new Date(startTimeMinusDst.getTime() + dstOffset);
-    for (const [index, task] of taskList.entries()) {
-      if (index < chosenTaskId) {
-        startTime = new Date(startTime.getTime() + task.duration);
-      }
-    }
-    taskList[chosenTaskId].date = startTime;
+    // // Give task back the time as nullTime  // TODO: Could replaceTaskWithNullTime(myId) be used here?
+    // taskList[id].text = '';  // ... by removing the text
+    // let now = new Date();
+    // let startTimeMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
+    // let startTime = new Date(startTimeMinusDst.getTime() + dstOffset);
+    // for (const [index, task] of taskList.entries()) {
+    //   if (index < id) {
+    //     startTime = new Date(startTime.getTime() + task.duration);
+    //   }
+    // }
+    // taskList[id].date = startTime;
 
     document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
     chosenTaskId = '';
@@ -313,6 +377,8 @@ function zoomFunc() {
 }
 
 function createNullTimes() {
+  let jumpToId = uniqueIdOfLastTouched;
+
   displayList = [];
   let duration = 0;
   displayList.push(taskList[0]);
@@ -321,6 +387,8 @@ function createNullTimes() {
     duration = taskList[n].date.getTime() - taskList[n-1].end().getTime();
     if (duration > 0) {
       let nullTime = new Task(taskList[n-1].end(), duration, '');
+      nullTime.uniqueId = taskList[n-1].uniqueId;  // Yeah, so the id's only unique to tasks, ok?! This hack is necessarty in order to click on nulltimes and insert tasks before them.
+      nullTimeClicked = true;
       nullTime.fuzzyness = 'isNullTime';
       displayList.push(nullTime);
       duration = 0;
@@ -328,7 +396,11 @@ function createNullTimes() {
     }
     displayList.push(taskList[n]);
   }
-  displayList.push(taskList[len - 1]);
+  // displayList.push(taskList[len - 1]);
+  // console.log([].concat(displayList));
+
+
+  uniqueIdOfLastTouched = jumpToId;
   return displayList
 }
 
@@ -344,18 +416,24 @@ function displayMessage(text, displayTime) {
 }
 
 function taskHasBeenClicked(event) {
-  let myId = event.target.id;  // myId is the id of the clicked task. (Duh)
+  let myUniqueId = event.target.id;
+  myId = getIndexFromUniqueId(myUniqueId)
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let editButton = document.getElementById('editButton');
-
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-      addTask(myId, task);
+      if (nullTimeClicked) {
+        nullTimeClicked = false;
+        addTaskAfter(myUniqueId, task);
+      } else {
+        addTaskBefore(myUniqueId, task);
+      }
+
     } else {
       displayMessage('A task needs text ', 3000);
     }
@@ -364,7 +442,7 @@ function taskHasBeenClicked(event) {
     console.log('Text in inputbox and a chosenTaskId. Should not happen.');
   }  else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
-    chosenTask = document.getElementById(myId);
+    chosenTask = document.getElementById(myUniqueId);
     chosenTask.classList.add('isClicked');
     chosenTaskId = chosenTask.id;
 
@@ -372,26 +450,28 @@ function taskHasBeenClicked(event) {
     // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
-    if (chosenTaskId === myId && taskList[myId].fuzzyness === 'isNullTime') {
+    if (chosenTaskId === myUniqueId && taskList[myId].fuzzyness === 'isNullTime') {
       displayMessage('Unasigned time can not be edited', 3000);
-    } else if (chosenTaskId === myId) {
+    } else if (chosenTaskId === myUniqueId) {
       taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
       document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
       document.getElementById('inputBox').focus();
-      replaceTaskWithNullTime(myId);
+      // replaceTaskWithNullTime(myId);
     } else {
-      swapTasks(myId);
+      swapTasks(myUniqueId);
     }
+    chosenTaskId = '';
+    editButton.innerText = 'Clear';
   }
-
-  chosenTaskId = '';
-  editButton.innerText = 'Clear';
   renderTasks();
+
 }
 
 function getIndexFromUniqueId(uniqueId) {
     for (const [index, task] of taskList.entries()) {
+      // console.log('bzz', uniqueId);
       if (task.uniqueId == uniqueId) {
+        // console.log(uniqueId, index);
         return index
       }
     }
@@ -402,9 +482,10 @@ function swapTasks(myId) {
     let id2 = getIndexFromUniqueId(myId);
     let task1 = taskList.splice(Math.min(id1, id2), 1);
     let task2 = taskList.splice(Math.max(id1, id2) - 1, 1);
-    console.log(chosenTaskId, myId, id1, id2, task1, task2);
-    addTaskAfter(Math.min(id1, id2) - 1, task2[0]);
-    addTaskAfter(Math.max(id1, id2) - 1, task1[0]);
+    addTaskAfter(taskList[Math.min(id1, id2) - 1].uniqueId, task2[0]); // TODO: Is checking for room a good idea here?
+    addTaskAfter(taskList[Math.max(id1, id2) - 1].uniqueId, task1[0]);
+    uniqueIdOfLastTouched = taskList[id1].uniqueId;
+    console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
 
 function renderTasks() {
@@ -423,13 +504,7 @@ function renderTasks() {
   // Make new time markings in timeBar
   fillTimeBar(zoom);
 
-  // // Assing block number to each task
-  // assignBlock();
-
   let displayList = createNullTimes();
-
-  // // Collapse nullTimes in same block
-  // collapseAllNullTimes();
 
   // Refresh view from taskList
   for (const [index, task] of displayList.entries()) {
@@ -440,39 +515,38 @@ function renderTasks() {
     newNode.classList.add('task');
 
     // Set the task height
-    if (zoom * task.height() < 20) {  // Adjust text size for short tasks
+    if (zoom * task.height < 20) {  // Adjust text size for short tasks
       newNode.style['font-size'] = '12px';
     } else {
       newNode.style['font-size'] = null;
     }
-    newNode.style['line-height'] = zoom * task.height() + 'px';
-    newNode.style.height = (zoom * task.height() * 100) / (24 * 60) + '%';
+    newNode.style['line-height'] = zoom * task.height + 'px';
+    newNode.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
 
     let nodeText = textExtractor(task);
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
 
-  // }
-  // jumpTo(index);
   }
+  jumpTo(uniqueIdOfLastTouched);
 }
 
-function assignBlock() {
-  let blockId = 0;
-  for (const [index, task] of taskList.entries()) {
-    if (task.fuzzyness === 'isNotFuzzy') {
-      blockId += 1;
-    }
-    task.blockId = blockId;
-  }
-}
+// function assignBlock() {
+//   let blockId = 0;
+//   for (const [index, task] of taskList.entries()) {
+//     if (task.fuzzyness === 'isNotFuzzy') {
+//       blockId += 1;
+//     }
+//     task.blockId = blockId;
+//   }
+// }
 
 function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
-    resetInputBox();
+    // resetInputBox();
   }
 }
 
@@ -480,7 +554,7 @@ function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
-    resetInputBox();
+    // resetInputBox();
   }
 }
 
