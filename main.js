@@ -46,7 +46,7 @@ class Task {
     while (tryAgain);
 
     uniqueIdList.push(uniqueId);
-    uniqueIdOfLastTouched = uniqueId;
+    // uniqueIdOfLastTouched = uniqueId;
     return uniqueId;
   }
 
@@ -63,6 +63,7 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
+  nullTimeClicked = false;
   // Fill the timeBar div
   fillTimeBar(zoom);
 
@@ -77,13 +78,9 @@ function setUpFunc() {
 
   taskList.push(new Task(startDay[0], startDay[1], startDay[2]));
   taskList.push(new Task(endDay[0], endDay[1], endDay[2]));
-  // assignBlock()
-  console.log('Start and end added:', taskList);
 
   // Make debug example tasks
-  debugExamples();
-
-  // createNullTimes();
+  // debugExamples();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -164,7 +161,7 @@ document.getElementById('settings').addEventListener('click', settings);
 
 // Insert a 15 min planning task at start-your-day time according to settings // TODO: Settings
 document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-document.getElementById('upButton').addEventListener('click', function() {jumpTo(8836);});
+document.getElementById('upButton').addEventListener('click', function() {jumpTo(uniqueIdOfLastTouched);});
 
 // Insert a 15 min planning task at the current time
 document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
@@ -224,7 +221,7 @@ function inputAtEnter(event) {
       if (taskList.length == 1 && parsedList[0] == '') {
         displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
       } else {
-        let succes = addTask(uniqueIdList[2], task);  // The two first in uniqueIdList is start and end
+        let succes = addTask(uniqueIdOfLastTouched, task);  // The two first in uniqueIdList is start and end
 
         if (!succes) {
           displayMessage('Not enough room. \nPlease clear some space', 3000);
@@ -255,6 +252,7 @@ function addTaskAfter(uniqueId, task) {
   task.fuzzyness = 'isFuzzy';
   if (task.end() <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
+    uniqueIdOfLastTouched = task.uniqueId;
     resetInputBox();
     return true;
   } else {
@@ -262,15 +260,17 @@ function addTaskAfter(uniqueId, task) {
   }
 }
 
-function addTaskBefore(id, task) {
+function addTaskBefore(myId, task) {
   // console.log(id, myId, taskList[id].date.getTime(), task.duration, new Date(taskList[id].date.getTime() - task.duration));
-  task.date = new Date(taskList[id].date.getTime() - task.duration); // TODO: Somethings fishy here(?)
+  let id = getIndexFromUniqueId(myId);
+  task.date = new Date(taskList[id].date.getTime() - task.duration);
   task.fuzzyness = 'isFuzzy';
   if (taskList[id - 1].end() >= task.date) {
     displayMessage('Not enough rooom here', 3000);
     return false;
   } else {
     taskList.splice(id, 0, task);
+    uniqueIdOfLastTouched = task.uniqueId;
     resetInputBox();
     return true;
   }
@@ -295,9 +295,10 @@ function addFixedTask(task) {
   let succes = false;
   let backUpTaskList = [].concat(taskList); // Make a deep copy
   let len = taskList.length;
-  for (var n=0; n<len - 1; n++) {
+  for (var n=0; n<len - 1; n++) { // TODO: Only inserts a fixed task if no task is in the desired space
     if (taskList[n].end() <= task.date && task.end() <= taskList[n+1].date) {
       taskList.splice(n + 1, 0, task);
+      uniqueIdOfLastTouched = task.uniqueId;
       break;
     }
   }
@@ -387,8 +388,7 @@ function createNullTimes() {
     duration = taskList[n].date.getTime() - taskList[n-1].end().getTime();
     if (duration > 0) {
       let nullTime = new Task(taskList[n-1].end(), duration, '');
-      nullTime.uniqueId = taskList[n-1].uniqueId;  // Yeah, so the id's only unique to tasks, ok?! This hack is necessarty in order to click on nulltimes and insert tasks before them.
-      nullTimeClicked = true;
+      nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
       displayList.push(nullTime);
       duration = 0;
@@ -418,6 +418,7 @@ function displayMessage(text, displayTime) {
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
   myId = getIndexFromUniqueId(myUniqueId)
+
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let editButton = document.getElementById('editButton');
@@ -468,14 +469,16 @@ function taskHasBeenClicked(event) {
 }
 
 function getIndexFromUniqueId(uniqueId) {
-    for (const [index, task] of taskList.entries()) {
-      // console.log('bzz', uniqueId);
-      if (task.uniqueId == uniqueId) {
-        // console.log(uniqueId, index);
-        return index
-      }
+  if (/[n]/.exec(uniqueId) != null) {  // Nulltimes have the same unique id as the task before them, but with an 'n' attached
+    nullTimeClicked = true;
+    uniqueId = /[0-9]*/.exec(uniqueId)[0];
+  }
+  for (const [index, task] of taskList.entries()) {
+    if (task.uniqueId == uniqueId) {
+      return index
     }
   }
+}
 
 function swapTasks(myId) {
     let id1 = getIndexFromUniqueId(chosenTaskId);
@@ -529,7 +532,11 @@ function renderTasks() {
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
 
   }
-  jumpTo(uniqueIdOfLastTouched);
+  if (uniqueIdOfLastTouched === 0) {
+    jumpToNow();
+  } else {
+    jumpTo(uniqueIdOfLastTouched);
+  }
 }
 
 // function assignBlock() {
