@@ -29,6 +29,7 @@ class Task {
     this.uniqueId = this.giveAUniqueId();
     this.end();
     this.height = this.height();
+    this.isClicked = 'isNotClicked'
   }
 
   giveAUniqueId() {
@@ -73,14 +74,17 @@ function setUpFunc() {
   document.getElementById('container').appendChild(nowSpan);
   updateTimeMarker();
 
-  let startDay = parseText('000 1m Day start'.trim());
-  let endDay = parseText('2359 1m Day end'.trim());
-
-  taskList.push(new Task(startDay[0], startDay[1], startDay[2]));
-  taskList.push(new Task(endDay[0], endDay[1], endDay[2]));
+  // Make the first tasks. Necessary for adding new tasks
+  let startList = ['000 1m Day start', '2359 1m Day end'];
+  for (const [index, text] of startList.entries()) {
+    parsedText = parseText(text.trim());
+    let task = new Task(parsedText[0], parsedText[1], parsedText[2]);
+    task.fuzzyness = 'isNotFuzzy';
+    taskList.push(task);
+  }
 
   // Make debug example tasks
-  // debugExamples();
+  debugExamples();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -89,12 +93,12 @@ function setUpFunc() {
 
 function debugExamples() {
   exList = [
-    '1130 debugging example',
-    '1200 1h lunch',
+    '700 debugging example',
     // '1h long1',
-    '45m medium1',
     '30m short1',
-    '1530 1h tea',
+    '45m medium1',
+    '1200 1h lunch',
+    // '1530 1h tea',
     // '1h long2' ,
     // '45m medium2',
     // '30m short2'
@@ -107,11 +111,6 @@ function debugExamples() {
     let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
     console.log(task.text, [].concat(taskList));
     succes = addTask(id, task);
-    // if (parsedList[0] === '') {
-    //   succes = addWhereverAfter(1, task);
-    // } else {
-    //   succes = addFixedTask(task);
-    // }
   }
   if (!succes) {console.log('Fix your example');}
 }
@@ -245,6 +244,21 @@ function addTask(myId, task) {
   return succes;
 }
 
+function addWhereverAfter(uniqueId, task) {
+  // let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
+  // debugger;
+  let succes = false;
+  let myId = getIndexFromUniqueId(uniqueId);
+  for (var id=myId; id<taskList.length - 1; id++) {
+    succes = addTaskAfter(taskList[id].uniqueId, task);
+    resetInputBox();
+    if (succes) {
+      break;
+    }
+  }
+  return succes;
+}
+
 function addTaskAfter(uniqueId, task) {
   let id = getIndexFromUniqueId(uniqueId);
   task.date = taskList[id].end();
@@ -276,45 +290,53 @@ function addTaskBefore(myId, task) {
   }
 }
 
-function addWhereverAfter(uniqueId, task) {
-  // let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-  // debugger;
-  let succes = false;
-  let myId = getIndexFromUniqueId(uniqueId);
-  for (var id=myId; id<taskList.length - 1; id++) {
-    succes = addTaskAfter(taskList[id].uniqueId, task);
-    resetInputBox();
-    if (succes) {
-      break;
-    }
-  }
-  return succes;
-}
-
 function addFixedTask(task) {
   let succes = false;
   let backUpTaskList = [].concat(taskList); // Make a deep copy
   let len = taskList.length;
-  for (var n=0; n<len - 1; n++) { // TODO: Only inserts a fixed task if no task is in the desired space
-    if (taskList[n].end() <= task.date && task.end() <= taskList[n+1].date) {
-      taskList.splice(n + 1, 0, task);
-      uniqueIdOfLastTouched = task.uniqueId;
-      break;
-    }
+
+  for (var n=0; n<len - 1; n++) {
+    insertIfThereIsRoomAmongFixedTasks(n, task);
   }
+
   overlappingTasks = isThereOverlap();
+
   if (overlappingTasks.length > 0) {
+    console.log(overlappingTasks);
     for (const [index, task] of taskList.entries()) {
       succes = addWhereverAfter(task[0], task[1]);
     }
   } else {
     succes = true;
   }
+
   if (!succes) {
     taskList = [].concat(backUpTaskList);
   }
+
   resetInputBox();
   return succes
+}
+
+function insertIfThereIsRoomAmongFixedTasks(n, task) { // TODO: Echo on fixed task. The logic is shady here.
+  if (taskList[n].fuzzyness === 'isNotFuzzy' && task.date <= taskList[n].end()) {
+    console.log(n, 'aaa');
+    return;
+  }
+
+  if (taskList[n + 1].fuzzyness === 'isNotFuzzy' && taskList[n + 1].date <= task.end()) {
+    console.log(n, 'bbb');
+    return;
+  }
+
+  if (taskList[n + 1].end() <= task.date) {
+    console.log(n, 'ccc');
+    return;
+  }
+
+  task.fuzzyness = 'isNotFuzzy';
+  taskList.splice(n + 1, 0, task);
+  uniqueIdOfLastTouched = task.uniqueId;
 }
 
 function isThereOverlap() {
@@ -324,8 +346,8 @@ function isThereOverlap() {
   for (var n=1; n<len - 1; n++) {
     // console.log('ner', n, len);
     // if (n>4) {debugger;}
-    if (taskList[n-1].end() < taskList[n].date && taskList[n].fuzzyness === 'isFuzzy') {
-      console.log('hyp', taskList[n-1].end(), taskList[n].date, taskList[n].fuzzyness);
+    if (taskList[n-1].end() > taskList[n].date && taskList[n].fuzzyness === 'isFuzzy') {
+      console.log('hyp', taskList[n-1], taskList[n], taskList[n].fuzzyness);
       overlappingTasks.push([n, taskList.splice(n, 1)]);
       }
     }
@@ -335,33 +357,23 @@ function isThereOverlap() {
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');
-  let id = getIndexFromUniqueId(chosenTaskId);
   if (editButton.innerText == 'Clear') {
     resetInputBox();
     id = '';
-    // editButton.dataset.keep_text = 'false';
   } else if (editButton.innerText == 'Edit') {
-    taskText = taskList[id].text + ' ' + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
-    document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
-    taskList.splice(id, 1);
-
-    // // Give task back the time as nullTime  // TODO: Could replaceTaskWithNullTime(myId) be used here?
-    // taskList[id].text = '';  // ... by removing the text
-    // let now = new Date();
-    // let startTimeMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 1);
-    // let startTime = new Date(startTimeMinusDst.getTime() + dstOffset);
-    // for (const [index, task] of taskList.entries()) {
-    //   if (index < id) {
-    //     startTime = new Date(startTime.getTime() + task.duration);
-    //   }
-    // }
-    // taskList[id].date = startTime;
-
-    document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
-    chosenTaskId = '';
-    // editButton.dataset.keep_text = 'true';
-    renderTasks();
+    editTask();
   }
+}
+
+function editTask() {
+  let id = getIndexFromUniqueId(chosenTaskId);
+  taskText = taskList[id].text + ' ' + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
+  document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+  taskList.splice(id, 1);
+
+  document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
+  chosenTaskId = '';
+  renderTasks();
 }
 
 // Used by an eventListener. Toggles zoom.
@@ -417,11 +429,11 @@ function displayMessage(text, displayTime) {
 
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
-  myId = getIndexFromUniqueId(myUniqueId)
 
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
   let editButton = document.getElementById('editButton');
+
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
     let contentInputBox = document.getElementById('inputBox').value.trim();
@@ -438,26 +450,29 @@ function taskHasBeenClicked(event) {
     } else {
       displayMessage('A task needs text ', 3000);
     }
+
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
     console.log('Text in inputbox and a chosenTaskId. Should not happen.');
+
   }  else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
     chosenTask = document.getElementById(myUniqueId);
-    chosenTask.classList.add('isClicked');
-    chosenTaskId = chosenTask.id;
-
+    // chosenTask.classList.add('isClicked'); // TODO: Affects only DOM. Make it a part of Task
+    let myId = getIndexFromUniqueId(myUniqueId);
+    taskList[myId].isClicked = 'isClicked'; // TODO: Unclick later
     editButton.innerText = 'Edit';
-    // editButton.dataset.keep_text = 'true' // If a task is chosen it can mean swap or edit/clone/delete
+    chosenTaskId = chosenTask.id;
+    uniqueIdOfLastTouched = chosenTaskId;
+
+    jumpTo(chosenTaskId);
+
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
-    if (chosenTaskId === myUniqueId && taskList[myId].fuzzyness === 'isNullTime') {
+    if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
       displayMessage('Unasigned time can not be edited', 3000);
     } else if (chosenTaskId === myUniqueId) {
-      taskText = taskList[chosenTaskId].text + ' ' + taskList[chosenTaskId].duration / 60000 + 'm';  //  Save the text from clickedElement
-      document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
-      document.getElementById('inputBox').focus();
-      // replaceTaskWithNullTime(myId);
+      editTask();
     } else {
       swapTasks(myUniqueId);
     }
@@ -488,6 +503,8 @@ function swapTasks(myId) {
     addTaskAfter(taskList[Math.min(id1, id2) - 1].uniqueId, task2[0]); // TODO: Is checking for room a good idea here?
     addTaskAfter(taskList[Math.max(id1, id2) - 1].uniqueId, task1[0]);
     uniqueIdOfLastTouched = taskList[id1].uniqueId;
+    taskList[id1].isClicked = 'isNotClicked';
+    taskList[id2].isClicked = 'isNotClicked'; 
     console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
 
@@ -515,6 +532,7 @@ function renderTasks() {
     let newNode = document.createElement('button');
     newNode.setAttribute('id', task.uniqueId);
     newNode.classList.add(task.fuzzyness);  // Fuzzyness is used for styling tasks
+    newNode.classList.add(task.isClicked);
     newNode.classList.add('task');
 
     // Set the task height
