@@ -62,6 +62,7 @@ class Task {
   }
 }
 
+
 // Runs when the page is loaded:
 function setUpFunc() {
   nullTimeClicked = false;
@@ -91,6 +92,7 @@ function setUpFunc() {
   zoomFunc();
 }
 
+
 function debugExamples() {
   exList = [
     '700 debugging example',
@@ -105,6 +107,7 @@ function debugExamples() {
   ];
 
   let succes = false;
+  uniqueIdOfLastTouched = taskList[0].uniqueId;
   for (const [index, text] of exList.entries()) {
     let parsedList = parseText(text.trim());
     let id = uniqueIdOfLastTouched;
@@ -115,11 +118,13 @@ function debugExamples() {
   if (!succes) {console.log('Fix your example');}
 }
 
+
 // Clear input box and give it focus
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
 }
+
 
 // Fill the half hour time slots of the timebar
 function fillTimeBar(zoom) {
@@ -141,6 +146,7 @@ function fillTimeBar(zoom) {
     document.getElementById('timeDiv').appendChild(halfHourB);
   }
 }
+
 
 // Update time marker
 let timer = setInterval(updateTimeMarker, 1000);
@@ -178,18 +184,25 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+
 // TODO: Make addPause buttons 15m, 30m + ?  Make pauses melt together like nullTime. Remove < 1 min nullTime
 // Used by an eventListener. Display settings.
 function settings() {
   displayMessage('To do: make settings', 5000)
 }
+
+
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
 function wakeUpButton() {
+  let succes = false;
   let now = new Date();
   let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
   let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
   let task = new Task(taskStart, 15 * 60000, 'Planning');
-  addFixedTask(task);
+  succes = addFixedTask(task);
+  if (!succes) {
+    console.log('wakeUpButton failed to insert a task');
+  }
   document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
   document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
   document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
@@ -197,6 +210,7 @@ function wakeUpButton() {
   document.getElementById('nowButton').title = 'Jump to 7:00';
   renderTasks();
 }
+
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
 function nowButton() {
@@ -209,6 +223,7 @@ function nowButton() {
   document.getElementById('upButton').title = 'Jump to now';
   renderTasks();
 }
+
 
 // Used by an eventListener. Makes pressing Enter add task
 function inputAtEnter(event) {
@@ -233,6 +248,7 @@ function inputAtEnter(event) {
   }
 }
 
+
 function addTask(myId, task) {
   let succes = false;
   if (task.date == '') {  // No fixed time ...
@@ -243,6 +259,7 @@ function addTask(myId, task) {
   resetInputBox();
   return succes;
 }
+
 
 function addWhereverAfter(uniqueId, task) {
   // let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
@@ -259,6 +276,7 @@ function addWhereverAfter(uniqueId, task) {
   return succes;
 }
 
+
 function addTaskAfter(uniqueId, task) {
   let id = getIndexFromUniqueId(uniqueId);
   task.date = taskList[id].end();
@@ -273,6 +291,7 @@ function addTaskAfter(uniqueId, task) {
     return false;
   }
 }
+
 
 function addTaskBefore(myId, task) {
   // console.log(id, myId, taskList[id].date.getTime(), task.duration, new Date(taskList[id].date.getTime() - task.duration));
@@ -290,54 +309,60 @@ function addTaskBefore(myId, task) {
   }
 }
 
+
 function addFixedTask(task) {
   let succes = false;
   let backUpTaskList = [].concat(taskList); // Make a deep copy
   let len = taskList.length;
 
-  for (var n=0; n<len - 1; n++) {
-    insertIfThereIsRoomAmongFixedTasks(n, task);
-  }
-
-  overlappingTasks = isThereOverlap();
-
-  if (overlappingTasks.length > 0) {
-    console.log(overlappingTasks);
-    for (const [index, task] of taskList.entries()) {
-      succes = addWhereverAfter(task[0], task[1]);
+  succes = insertBetweenFixedTasks(task);
+  if (succes) {
+    overlappingTasks = isThereOverlap();
+    if (overlappingTasks.length > 0) {
+      console.log(overlappingTasks);
+      for (const [index, task] of overlappingTasks.entries()) {
+        succes = addWhereverAfter(task[0], task[1]);
+      }
     }
+    return succes;
   } else {
-    succes = true;
-  }
-
-  if (!succes) {
+    displayMessage('Not possible. \nMost probably your fixed time task overlap anoter fixed time task')
     taskList = [].concat(backUpTaskList);
   }
-
-  resetInputBox();
-  return succes
 }
 
-function insertIfThereIsRoomAmongFixedTasks(n, task) { // TODO: Echo on fixed task. The logic is shady here.
-  if (taskList[n].fuzzyness === 'isNotFuzzy' && task.date <= taskList[n].end()) {
-    console.log(n, 'aaa');
-    return;
+
+function insertBetweenFixedTasks(myTask) {
+  let fixedTaskList = [];
+
+  for (const [index, task] of taskList.entries()) {
+    if (task.fuzzyness === 'isNotFuzzy') {
+      fixedTaskList.push(task);
+    }
   }
 
-  if (taskList[n + 1].fuzzyness === 'isNotFuzzy' && taskList[n + 1].date <= task.end()) {
-    console.log(n, 'bbb');
-    return;
+  let len = fixedTaskList.length;
+  for (var n=0; n<len; n++) {
+    if ((fixedTaskList[n].end() <= myTask.date)
+      && (myTask.end() <= fixedTaskList[n + 1].date)) {
+        let k = 0
+        let id = fixedTaskList[n].uniqueId;
+        for (const [index, task] of taskList.entries()) {
+          if (task.uniqueId === id) {
+            k = index;
+            break
+          }
+        }
+        taskList.splice(k + 1, 0, myTask);
+        myTask.fuzzyness = 'isNotFuzzy';
+        uniqueIdOfLastTouched = myTask.uniqueId;
+        return true;
+      }
   }
 
-  if (taskList[n + 1].end() <= task.date) {
-    console.log(n, 'ccc');
-    return;
-  }
-
-  task.fuzzyness = 'isNotFuzzy';
-  taskList.splice(n + 1, 0, task);
-  uniqueIdOfLastTouched = task.uniqueId;
+  return false;
 }
+
 
 function isThereOverlap() {
   let overlappingTasks = [];
@@ -354,6 +379,7 @@ function isThereOverlap() {
   return overlappingTasks
 }
 
+
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');
@@ -364,6 +390,7 @@ function clearOrEdit() {
     editTask();
   }
 }
+
 
 function editTask() {
   let id = getIndexFromUniqueId(chosenTaskId);
@@ -388,6 +415,7 @@ function zoomFunc() {
   renderTasks();
   jumpToNow();
 }
+
 
 function createNullTimes() {
   let jumpToId = uniqueIdOfLastTouched;
@@ -426,6 +454,7 @@ function displayMessage(text, displayTime) {
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
 }
+
 
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
@@ -483,6 +512,7 @@ function taskHasBeenClicked(event) {
 
 }
 
+
 function getIndexFromUniqueId(uniqueId) {
   if (/[n]/.exec(uniqueId) != null) {  // Nulltimes have the same unique id as the task before them, but with an 'n' attached
     nullTimeClicked = true;
@@ -495,6 +525,7 @@ function getIndexFromUniqueId(uniqueId) {
   }
 }
 
+
 function swapTasks(myId) {
     let id1 = getIndexFromUniqueId(chosenTaskId);
     let id2 = getIndexFromUniqueId(myId);
@@ -504,9 +535,10 @@ function swapTasks(myId) {
     addTaskAfter(taskList[Math.max(id1, id2) - 1].uniqueId, task1[0]);
     uniqueIdOfLastTouched = taskList[id1].uniqueId;
     taskList[id1].isClicked = 'isNotClicked';
-    taskList[id2].isClicked = 'isNotClicked'; 
+    taskList[id2].isClicked = 'isNotClicked';
     console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
+
 
 function renderTasks() {
   // Remove old task from taskDiv
@@ -567,13 +599,16 @@ function renderTasks() {
 //   }
 // }
 
+
 function jumpTo(index) {
+  console.log('jumpTo index', index);
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
     // resetInputBox();
   }
 }
+
 
 function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
@@ -582,6 +617,7 @@ function jumpToNow() {
     // resetInputBox();
   }
 }
+
 
 function textExtractor(task) {
   let text = task.text;
@@ -623,6 +659,7 @@ function textExtractor(task) {
 
   return text
 }
+
 
 function parseText(rawText) {
   let taskStart = '';
