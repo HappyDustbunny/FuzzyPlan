@@ -85,7 +85,7 @@ function setUpFunc() {
   }
 
   // Make debug example tasks
-  debugExamples();
+  // debugExamples();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -312,72 +312,122 @@ function addTaskBefore(myId, task) {
 
 function addFixedTask(task) {
   let succes = false;
+  let overlap = '';
   let backUpTaskList = [].concat(taskList); // Make a deep copy
   let len = taskList.length;
 
-  succes = insertBetweenFixedTasks(task);
-  if (succes) {
-    overlappingTasks = isThereOverlap();
+  overlap = isThereASoftOverlap(task);
+  if (overlap === 'hardOverlap') {
+    displayMessage('There is an overlap with another fixed time', 3000);
+    return false;
+  } else if (overlap === 'softOverlap') {
+    overlappingTasks = removeFuzzyOverlap(task);
+    let id = getIndexFromUniqueId(overlappingTasks[0][0]);
+    taskList.splice(id + 1, 0, task);
+    uniqueIdOfLastTouched = task.uniqueId;
+    succes = true;
+    // succes = addTaskAfter(overlappingTasks[0][0], task);
     if (overlappingTasks.length > 0) {
-      console.log(overlappingTasks);
       for (const [index, task] of overlappingTasks.entries()) {
         succes = addWhereverAfter(task[0], task[1]);
       }
     }
-    return succes;
-  } else {
-    displayMessage('Not possible. \nMost probably your fixed time task overlap anoter fixed time task')
-    taskList = [].concat(backUpTaskList);
-  }
-}
-
-
-function insertBetweenFixedTasks(myTask) {
-  let fixedTaskList = [];
-
-  for (const [index, task] of taskList.entries()) {
-    if (task.fuzzyness === 'isNotFuzzy') {
-      fixedTaskList.push(task);
-    }
-  }
-
-  let len = fixedTaskList.length;
-  for (var n=0; n<len; n++) {
-    if ((fixedTaskList[n].end() <= myTask.date)
-      && (myTask.end() <= fixedTaskList[n + 1].date)) {
-        let k = 0
-        let id = fixedTaskList[n].uniqueId;
-        for (const [index, task] of taskList.entries()) {
-          if (task.uniqueId === id) {
-            k = index;
-            break
-          }
+  } else if (overlap === 'noOverlap') {
+    for (var n=0; n<len; n++) {
+      if (task.end() < taskList[n].date) {
+        taskList.splice(n, 0, task);
+        uniqueIdOfLastTouched = task.uniqueId;
+        succes = true;
         }
-        taskList.splice(k + 1, 0, myTask);
-        myTask.fuzzyness = 'isNotFuzzy';
-        uniqueIdOfLastTouched = myTask.uniqueId;
-        return true;
       }
   }
 
-  return false;
+  if (!succes) {
+    taskList = [].concat(backUpTaskList);
+  }
+  return succes;
 }
 
 
-function isThereOverlap() {
+function isThereASoftOverlap(task) {
+  let overlap = '';
+  let len = taskList.length;
+
+  for (var n=0; n<len; n++) {
+    if ((taskList[n].date < task.date && task.date < taskList[n].end())
+      || (taskList[n].date < task.end() && task.end() < taskList[n].end())) {
+        if (taskList[n].fuzzyness === 'isNotFuzzy') {
+          overlap = 'hardOverlap';
+          return overlap;
+        } else {
+          overlap = 'softOverlap';
+        }
+      }
+      if (n === len - 1 && overlap === 'softOverlap') {
+        return overlap
+      }
+  }
+
+  overlap = 'noOverlap';
+  return overlap;
+}
+
+
+function removeFuzzyOverlap(task) {
   let overlappingTasks = [];
   let len = taskList.length;
   // debugger;
   for (var n=1; n<len - 1; n++) {
-    // console.log('ner', n, len);
-    // if (n>4) {debugger;}
-    if (taskList[n-1].end() > taskList[n].date && taskList[n].fuzzyness === 'isFuzzy') {
-      console.log('hyp', taskList[n-1], taskList[n], taskList[n].fuzzyness);
-      overlappingTasks.push([n, taskList.splice(n, 1)]);
+    if ((taskList[n].date < task.date && task.date < taskList[n].end())
+    || (taskList[n].date < task.end() && task.end() < taskList[n].end())) {
+      if (taskList[n].fuzzyness === 'isNotFuzzy') {
+        console.log('Bugger. Logic broke.', taskList[n]);
+      };
+      overlappingTasks.push([taskList[n - 1].uniqueId, taskList[n]]);
+    }
+  }
+  for (const [index, overlappingTask] of overlappingTasks.entries()) {
+    let uniqueId = overlappingTask[1].uniqueId;
+    for (const [index, task] of taskList.entries()) {
+      if (uniqueId === task.uniqueId) {
+        taskList.splice(index, 1);
       }
     }
+  }
   return overlappingTasks
 }
+
+// function insertBetweenFixedTasks(myTask) {
+//   let fixedTaskList = [];
+//
+//   for (const [index, task] of taskList.entries()) {
+//     if (task.fuzzyness === 'isNotFuzzy') {
+//       fixedTaskList.push(task);
+//     }
+//   }
+//
+//   let len = fixedTaskList.length;
+//   for (var n=0; n<len; n++) {
+//     if ((fixedTaskList[n].end() <= myTask.date)
+//       && (myTask.end() <= fixedTaskList[n + 1].date)) {
+//         let k = 0
+//         let id = fixedTaskList[n].uniqueId;
+//         for (const [index, task] of taskList.entries()) {
+//           if (task.uniqueId === id) {
+//             k = index;
+//             break
+//           }
+//         }
+//         taskList.splice(k + 1, 0, myTask);
+//         myTask.fuzzyness = 'isNotFuzzy';
+//         uniqueIdOfLastTouched = myTask.uniqueId;
+//         return true;
+//       }
+//   }
+//
+//   return false;
+// }
+
 
 
 // Used by an eventListener. Govern the Edit/Clear button
@@ -458,6 +508,7 @@ function displayMessage(text, displayTime) {
 
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
+  let id = getIndexFromUniqueId(myUniqueId); // Mostly to check for nulltimes being clicked
 
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
@@ -471,7 +522,7 @@ function taskHasBeenClicked(event) {
       let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
       if (nullTimeClicked) {
         nullTimeClicked = false;
-        addTaskAfter(myUniqueId, task);
+        addTaskAfter(myUniqueId, task);  // Nulltimes shares id with the task before the nulltime
       } else {
         addTaskBefore(myUniqueId, task);
       }
