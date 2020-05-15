@@ -141,7 +141,11 @@ function fillTimeBar(zoom) {
     }
 
     halfHourA.setAttribute('class', 'halfHours' + zoom * 2);
+    halfHourA.setAttribute('id', i + '00');
+    // halfHourA.classList.add(i + '00');
     halfHourB.setAttribute('class', 'halfHours' + zoom * 2);
+    halfHourB.setAttribute('id', i + '30');
+    // halfHourB.classList.add(i + '30');
     document.getElementById('timeDiv').appendChild(halfHourA);
     document.getElementById('timeDiv').appendChild(halfHourB);
   }
@@ -166,7 +170,7 @@ document.getElementById('settings').addEventListener('click', settings);
 
 // Insert a 15 min planning task at start-your-day time according to settings // TODO: Settings
 document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-document.getElementById('upButton').addEventListener('click', function() {jumpTo(uniqueIdOfLastTouched);});
+document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700);}); // // TODO: connect to wakeup time
 
 // Insert a 15 min planning task at the current time
 document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
@@ -206,9 +210,10 @@ function wakeUpButton() {
   document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
   document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
   document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
-  document.getElementById('upButton').title = 'Jump to now';
-  document.getElementById('nowButton').title = 'Jump to 7:00';
+  document.getElementById('upButton').title = 'Jump to 7:00';
+  document.getElementById('nowButton').title = 'Jump to now';
   renderTasks();
+  document.getElementById('inputBox').focus();
 }
 
 
@@ -219,9 +224,10 @@ function nowButton() {
   document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
   document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
-  document.getElementById('nowButton').title = 'Jump to 7:00';
-  document.getElementById('upButton').title = 'Jump to now';
+  document.getElementById('upButton').title = 'Jump to 7:00';
+  document.getElementById('nowButton').title = 'Jump to now';
   renderTasks();
+  document.getElementById('inputBox').focus();
 }
 
 
@@ -243,7 +249,9 @@ function inputAtEnter(event) {
         renderTasks();
       }
     } else {
-      displayMessage('A task needs text ', 3000);
+      resetInputBox();
+      jumpToTime(contentInputBox);
+      // displayMessage('A task needs text ', 3000);
     }
   }
 }
@@ -652,11 +660,10 @@ function renderTasks() {
 
 
 function jumpTo(index) {
-  console.log('jumpTo index', index);
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
-    // resetInputBox();
+    document.getElementById('inputBox').focus();
   }
 }
 
@@ -665,7 +672,17 @@ function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
-    // resetInputBox();
+    document.getElementById('inputBox').focus();
+  }
+}
+
+
+function jumpToTime(time) {
+  if (document.getElementById('container') !== null  && taskList.length > 0) {
+    container = document.getElementById('container');
+    timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
+    container.scrollTop = timeDiv.offsetTop - 180 * zoom;
+    document.getElementById('inputBox').focus();
   }
 }
 
