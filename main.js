@@ -247,6 +247,7 @@ function inputAtEnter(event) {
           displayMessage('Not enough room. \nPlease clear some space', 3000);
         }
         renderTasks();
+        jumpTo(uniqueIdOfLastTouched)
       }
     } else {
       resetInputBox();
@@ -318,7 +319,7 @@ function addTaskBefore(myId, task) {
 }
 
 
-function addFixedTask(task) {
+function addFixedTask(task) {  // TODO: Hikker når der indsættes mellem tasks
   let succes = false;
   let overlap = '';
   let backUpTaskList = [].concat(taskList); // Make a deep copy
@@ -455,6 +456,7 @@ function editTask() {
   taskText = taskList[id].text + ' ' + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
   document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
   taskList.splice(id, 1);
+  uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
   document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
   chosenTaskId = '';
@@ -553,7 +555,7 @@ function taskHasBeenClicked(event) {
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
 
-    jumpTo(chosenTaskId);
+    // jumpTo(chosenTaskId);
 
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
@@ -641,11 +643,12 @@ function renderTasks() {
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
 
   }
-  if (uniqueIdOfLastTouched === 0) {
-    jumpToNow();
-  } else {
-    jumpTo(uniqueIdOfLastTouched);
-  }
+
+  // if (uniqueIdOfLastTouched === 0) {
+  //   jumpToNow();
+  // } else {
+  //   jumpTo(uniqueIdOfLastTouched);
+  // }
 }
 
 // function assignBlock() {
@@ -671,7 +674,7 @@ function jumpTo(index) {
 function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
-    container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
+    container.scrollTop = document.getElementById('nowSpan').offsetTop + 600 * zoom;
     document.getElementById('inputBox').focus();
   }
 }
