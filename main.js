@@ -251,6 +251,7 @@ function inputAtEnter(event) {
       }
     } else {
       resetInputBox();
+      chosenTaskId = '';
       jumpToTime(contentInputBox);
       // displayMessage('A task needs text ', 3000);
     }
@@ -303,10 +304,8 @@ function addTaskAfter(uniqueId, task) {
 
 
 function addTaskBefore(myId, task) {
-  // console.log(id, myId, taskList[id].date.getTime(), task.duration, new Date(taskList[id].date.getTime() - task.duration));
   let id = getIndexFromUniqueId(myId);
   task.date = new Date(taskList[id].date.getTime() - task.duration);
-  task.fuzzyness = 'isFuzzy';
   if (taskList[id - 1].end() >= task.date) {
     displayMessage('Not enough rooom here', 3000);
     return false;
@@ -319,7 +318,7 @@ function addTaskBefore(myId, task) {
 }
 
 
-function addFixedTask(task) {  // TODO: Hikker når der indsættes mellem tasks
+function addFixedTask(task) {
   let succes = false;
   let overlap = '';
   let backUpTaskList = [].concat(taskList); // Make a deep copy
@@ -333,6 +332,7 @@ function addFixedTask(task) {  // TODO: Hikker når der indsættes mellem tasks
     overlappingTasks = removeFuzzyOverlap(task);
     let id = getIndexFromUniqueId(overlappingTasks[0][0]);
     taskList.splice(id + 1, 0, task);
+    task.fuzzyness = 'isNotFuzzy';
     uniqueIdOfLastTouched = task.uniqueId;
     succes = true;
     // succes = addTaskAfter(overlappingTasks[0][0], task);
@@ -345,8 +345,10 @@ function addFixedTask(task) {  // TODO: Hikker når der indsættes mellem tasks
     for (var n=0; n<len; n++) {
       if (task.end() < taskList[n].date) {
         taskList.splice(n, 0, task);
+        task.fuzzyness = 'isNotFuzzy';
         uniqueIdOfLastTouched = task.uniqueId;
         succes = true;
+        break;
         }
       }
   }
@@ -519,6 +521,7 @@ function displayMessage(text, displayTime) {
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
   let id = getIndexFromUniqueId(myUniqueId); // Mostly to check for nulltimes being clicked
+  let chosenId = getIndexFromUniqueId(chosenTaskId);
 
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
@@ -562,8 +565,10 @@ function taskHasBeenClicked(event) {
     if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
       displayMessage('Unasigned time can not be edited', 3000);
     } else if (chosenTaskId === myUniqueId) {
-      editTask();
-    } else {
+      editTask(); // TODO: Edit eats task
+    } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
+      displayMessage('A fixed task can not be swapped. \nPlease edit before swap.', 3000)
+    } else if (taskList[chosenId].fuzzyness === 'isFuzzy' && taskList[id].fuzzyness === 'isFuzzy') {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
@@ -643,23 +648,9 @@ function renderTasks() {
     document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
 
   }
+  // resetInputBox(); // NO reset input box needs to be elsewhere
 
-  // if (uniqueIdOfLastTouched === 0) {
-  //   jumpToNow();
-  // } else {
-  //   jumpTo(uniqueIdOfLastTouched);
-  // }
 }
-
-// function assignBlock() {
-//   let blockId = 0;
-//   for (const [index, task] of taskList.entries()) {
-//     if (task.fuzzyness === 'isNotFuzzy') {
-//       blockId += 1;
-//     }
-//     task.blockId = blockId;
-//   }
-// }
 
 
 function jumpTo(index) {
@@ -686,6 +677,9 @@ function jumpToTime(time) {
     timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
     container.scrollTop = timeDiv.offsetTop - 180 * zoom;
     document.getElementById('inputBox').focus();
+    let min = /[0-9][0-9]$/.exec(time);
+    let hours = time.toString().replace(min, '')
+    displayMessage('Jumped to ' + hours + ':' + min, 700);
   }
 }
 
