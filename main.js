@@ -1,4 +1,5 @@
 var taskList = [];  // List to keep track of the order of the tasks
+let chosenTask = '';
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let uniqueIdOfLastTouched = 0;
 let uniqueIdList = [];
@@ -36,9 +37,11 @@ class Task {
     let tryAgain = false;
     let uniqueId = 0;
     do {
+      tryAgain = false;
       uniqueId = Math.floor(Math.random() * 10000);
       for (const [index, id] of uniqueIdList.entries()) {
-        if (uniqueId === id) {
+        if (uniqueId.toString() === id.toString()) {
+          console.log('giveAUniqueId', uniqueId);
           tryAgain = true;
           break;
         }
@@ -65,7 +68,7 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
-  nullTimeClicked = false;
+  // nullTimeClicked = false;
   // Fill the timeBar div
   fillTimeBar(zoom);
 
@@ -85,7 +88,7 @@ function setUpFunc() {
   }
 
   // Make debug example tasks
-  // debugExamples();
+  debugExamples();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -96,14 +99,15 @@ function setUpFunc() {
 function debugExamples() {
   exList = [
     '700 debugging example',
-    // '1h long1',
+    '1h long1',
     '30m short1',
+    '30m short2',
     '45m medium1',
     '1200 1h lunch',
     // '1530 1h tea',
-    // '1h long2' ,
-    // '45m medium2',
-    // '30m short2'
+    '1h long2' ,
+    '45m medium2',
+    '30m short3'
   ];
 
   let succes = false;
@@ -112,7 +116,7 @@ function debugExamples() {
     let parsedList = parseText(text.trim());
     let id = uniqueIdOfLastTouched;
     let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-    console.log(task.text, [].concat(taskList));
+    // console.log(task.text, [].concat(taskList));
     succes = addTask(id, task);
   }
   if (!succes) {console.log('Fix your example');}
@@ -520,8 +524,11 @@ function displayMessage(text, displayTime) {
 
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
+  let chosenId = '';
   let id = getIndexFromUniqueId(myUniqueId); // Mostly to check for nulltimes being clicked
-  let chosenId = getIndexFromUniqueId(chosenTaskId);
+  if (chosenTaskId != '') {
+    chosenId = getIndexFromUniqueId(chosenTaskId);
+  }
 
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
@@ -583,9 +590,13 @@ function getIndexFromUniqueId(uniqueId) {
   if (/[n]/.exec(uniqueId) != null) {  // Nulltimes have the same unique id as the task before them, but with an 'n' attached
     nullTimeClicked = true;
     uniqueId = /[0-9]*/.exec(uniqueId)[0];
+  } else {
+    nullTimeClicked = false;
   }
   for (const [index, task] of taskList.entries()) {
-    if (task.uniqueId == uniqueId) {
+    // console.log('get', index, task, task.uniqueId, uniqueId);
+    if (task.uniqueId.toString() === uniqueId.toString()) {
+      console.log(index);
       return index
     }
   }
