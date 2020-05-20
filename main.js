@@ -310,13 +310,20 @@ function addTaskAfter(uniqueId, task) {
 function addTaskBefore(myId, task) {
   let id = getIndexFromUniqueId(myId);
   task.date = new Date(taskList[id].date.getTime() - task.duration);
-  if (taskList[id - 1].end() >= task.date) {
+  if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end() > task.date) {
     displayMessage('Not enough rooom here', 3000);
     return false;
   } else {
+    if (taskList[id].fuzzyness === 'isNotFuzzy') {
+      task.fuzzyness = 'isNotFuzzy';
+    } else {
+      task.date = new Date(taskList[id - 1].end());
+      task.fuzzyness = 'isFuzzy';
+    }
     taskList.splice(id, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     resetInputBox();
+    anneal();
     return true;
   }
 }
@@ -542,7 +549,7 @@ function taskHasBeenClicked(event) {
       let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
       if (nullTimeClicked) {
         nullTimeClicked = false;
-        addTaskAfter(myUniqueId, task);  // Nulltimes shares id with the task before the nulltime
+        addWhereverAfter(myUniqueId, task);  // Nulltimes shares id with the task before the nulltime
       } else {
         addTaskBefore(myUniqueId, task);
       }
@@ -596,14 +603,13 @@ function getIndexFromUniqueId(uniqueId) {
   for (const [index, task] of taskList.entries()) {
     // console.log('get', index, task, task.uniqueId, uniqueId);
     if (task.uniqueId.toString() === uniqueId.toString()) {
-      console.log(index);
       return index
     }
   }
 }
 
 
-function swapTasks(myId) {
+function swapTasks(myId) { // TODO: Fix swap by allowing inserting task by moving fuzzy tasks
     let id1 = getIndexFromUniqueId(chosenTaskId);
     let id2 = getIndexFromUniqueId(myId);
     let task1 = taskList.splice(Math.min(id1, id2), 1);
@@ -616,6 +622,33 @@ function swapTasks(myId) {
     console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
 
+
+function anneal() {
+  fixTimes();
+  let len = taskList.length;
+  for (var n=1; n<len - 1; n++) {
+    // console.log(taskList[n].date, taskList[n].end());
+    if (taskList[n + 1].date < taskList[n].end()) {
+      [taskList[n], taskList[n + 1]] = [taskList[n + 1], taskList[n]];
+      fixTimes();
+    }
+  }
+  fixTimes();
+}
+
+function fixTimes() {
+  let len = taskList.length;
+  for (var n=1; n<len - 1; n++) {
+    // console.log(taskList[n].date, taskList[n].end());
+    if (taskList[n].end() <= taskList[n + 1].date) {
+      continue;
+    } else if (taskList[n + 1].fuzzyness === 'isFuzzy') {
+      taskList[n + 1].date = taskList[n].end();
+    } else {
+      console.log(n, 'Overlapping a fixed task');
+    }
+  }
+}
 
 function renderTasks() {
   // Remove old task from taskDiv
