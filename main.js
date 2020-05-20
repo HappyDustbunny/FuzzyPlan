@@ -612,13 +612,18 @@ function getIndexFromUniqueId(uniqueId) {
 function swapTasks(myId) { // TODO: Fix swap by allowing inserting task by moving fuzzy tasks
     let id1 = getIndexFromUniqueId(chosenTaskId);
     let id2 = getIndexFromUniqueId(myId);
-    let task1 = taskList.splice(Math.min(id1, id2), 1);
-    let task2 = taskList.splice(Math.max(id1, id2) - 1, 1);
-    addTaskAfter(taskList[Math.min(id1, id2) - 1].uniqueId, task2[0]); // TODO: Is checking for room a good idea here?
-    addTaskAfter(taskList[Math.max(id1, id2) - 1].uniqueId, task1[0]);
-    uniqueIdOfLastTouched = taskList[id1].uniqueId;
     taskList[id1].isClicked = 'isNotClicked';
     taskList[id2].isClicked = 'isNotClicked';
+    tempDate = taskList[id1].date;
+    taskList[id1].date = taskList[id2].date;
+    taskList[id2].date = tempDate;
+    [taskList[id2], taskList[id1]] = [taskList[id1], taskList[id2]];
+    fixTimes();
+    // let task1 = taskList.splice(Math.min(id1, id2), 1);
+    // let task2 = taskList.splice(Math.max(id1, id2) - 1, 1);
+    // addTaskAfter(taskList[Math.min(id1, id2) - 1].uniqueId, task2[0]); // TODO: Is checking for room a good idea here?
+    // addTaskAfter(taskList[Math.max(id1, id2) - 1].uniqueId, task1[0]);
+    uniqueIdOfLastTouched = taskList[id1].uniqueId;
     console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
 
