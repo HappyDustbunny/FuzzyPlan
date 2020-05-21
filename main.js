@@ -1,4 +1,4 @@
-var taskList = [];  // List to keep track of the order of the tasks
+let taskList = [];  // List to keep track of the order of the tasks
 let chosenTask = '';
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let uniqueIdOfLastTouched = 0;
@@ -68,7 +68,10 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
-  // nullTimeClicked = false;
+  // Get stored taskList from previous session if any
+  if (localStorage.getItem('taskList')) {
+    taskList = localStorage.getItem('taskList');
+  }
   // Fill the timeBar div
   fillTimeBar(zoom);
 
@@ -88,7 +91,7 @@ function setUpFunc() {
   }
 
   // Make debug example tasks
-  debugExamples();
+  // debugExamples();
 
   renderTasks();  // Draws task based on the content of the taskList
   resetInputBox();
@@ -193,10 +196,15 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
 
-// TODO: Make addPause buttons 15m, 30m + ?  Make pauses melt together like nullTime. Remove < 1 min nullTime
+// TODO: Make addPause buttons 15m, 30m + ?
 // Used by an eventListener. Display settings.
 function settings() {
-  displayMessage('To do: make settings', 5000)
+  displayMessage('To do: make settings', 5000);
+  // Store a day from one session to another
+  // Store multiple days? One pr. calender day?
+  // Store wake up time (wakeUpH and wakeUpM)
+  // Ligth/Dark theme?
+  // Store variables descriping stress sensitivity (tHalf stressStart, ...)
 }
 
 
@@ -211,13 +219,8 @@ function wakeUpButton() {
   if (!succes) {
     console.log('wakeUpButton failed to insert a task');
   }
-  document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
   document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
-  document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
-  document.getElementById('upButton').title = 'Jump to 7:00';
-  document.getElementById('nowButton').title = 'Jump to now';
-  renderTasks();
-  document.getElementById('inputBox').focus();
+  adjustNowAndWakeUpButtons();
 }
 
 
@@ -225,9 +228,19 @@ function wakeUpButton() {
 function nowButton() {
   let task = new Task(new Date(), 15 * 60000, 'Planning');
   addFixedTask(task);
-  document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
-  document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + wakeUpM;
+  adjustNowAndWakeUpButtons();
+}
+
+function adjustNowAndWakeUpButtons() {
+  let min = '';
+  if (wakeUpM <= 9) {
+    min = '0' + wakeUpM;
+  } else {
+    min = wakeUpM;
+  }
+  document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + min;
+  document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
   document.getElementById('upButton').title = 'Jump to 7:00';
   document.getElementById('nowButton').title = 'Jump to now';
   renderTasks();
@@ -416,39 +429,6 @@ function removeFuzzyOverlap(task) {
   }
   return overlappingTasks
 }
-
-// function insertBetweenFixedTasks(myTask) {
-//   let fixedTaskList = [];
-//
-//   for (const [index, task] of taskList.entries()) {
-//     if (task.fuzzyness === 'isNotFuzzy') {
-//       fixedTaskList.push(task);
-//     }
-//   }
-//
-//   let len = fixedTaskList.length;
-//   for (var n=0; n<len; n++) {
-//     if ((fixedTaskList[n].end() <= myTask.date)
-//       && (myTask.end() <= fixedTaskList[n + 1].date)) {
-//         let k = 0
-//         let id = fixedTaskList[n].uniqueId;
-//         for (const [index, task] of taskList.entries()) {
-//           if (task.uniqueId === id) {
-//             k = index;
-//             break
-//           }
-//         }
-//         taskList.splice(k + 1, 0, myTask);
-//         myTask.fuzzyness = 'isNotFuzzy';
-//         uniqueIdOfLastTouched = myTask.uniqueId;
-//         return true;
-//       }
-//   }
-//
-//   return false;
-// }
-
-
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
