@@ -276,8 +276,6 @@ function addTask(myId, task) {
 
 
 function addWhereverAfter(uniqueId, task) {
-  // let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-  // debugger;
   let succes = false;
   let myId = getIndexFromUniqueId(uniqueId);
   for (var id=myId; id<taskList.length - 1; id++) {
@@ -296,10 +294,11 @@ function addTaskAfter(uniqueId, task) {
   task.date = taskList[id].end();
   task.end();
   task.fuzzyness = 'isFuzzy';
-  if (task.end() <= taskList[id + 1].date) {
+  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end() <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     resetInputBox();
+    anneal();
     return true;
   } else {
     return false;
@@ -346,7 +345,6 @@ function addFixedTask(task) {
     task.fuzzyness = 'isNotFuzzy';
     uniqueIdOfLastTouched = task.uniqueId;
     succes = true;
-    // succes = addTaskAfter(overlappingTasks[0][0], task);
     if (overlappingTasks.length > 0) {
       for (const [index, task] of overlappingTasks.entries()) {
         succes = addWhereverAfter(task[0], task[1]);
@@ -614,26 +612,19 @@ function swapTasks(myId) { // TODO: Fix swap by allowing inserting task by movin
     let id2 = getIndexFromUniqueId(myId);
     taskList[id1].isClicked = 'isNotClicked';
     taskList[id2].isClicked = 'isNotClicked';
-    // tempDate = taskList[id1].date;
-    taskList[id1].date = ''; // taskList[id2].date;
-    taskList[id2].date = ''; // tempDate;
+    taskList[id1].date = '';
+    taskList[id2].date = '';
     [taskList[id2], taskList[id1]] = [taskList[id1], taskList[id2]];
     anneal();
-    // fixTimes();
-    // let task1 = taskList.splice(Math.min(id1, id2), 1);
-    // let task2 = taskList.splice(Math.max(id1, id2) - 1, 1);
-    // addTaskAfter(taskList[Math.min(id1, id2) - 1].uniqueId, task2[0]); // TODO: Is checking for room a good idea here?
-    // addTaskAfter(taskList[Math.max(id1, id2) - 1].uniqueId, task1[0]);
     uniqueIdOfLastTouched = taskList[id1].uniqueId;
     console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
 
 
-function anneal() {
+function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is needed(?)
   fixTimes();
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
-    // console.log(taskList[n].date, taskList[n].end());
     if (taskList[n + 1].date < taskList[n].end()) {
       [taskList[n], taskList[n + 1]] = [taskList[n + 1], taskList[n]];
       fixTimes();
@@ -648,13 +639,12 @@ function anneal() {
 function fixTimes() {
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
-    // console.log(taskList[n].date, taskList[n].end());
     if (taskList[n].end() <= taskList[n + 1].date) {
       continue;
     } else if (taskList[n + 1].fuzzyness === 'isFuzzy') {
       taskList[n + 1].date = taskList[n].end();
     } else {
-      console.log(n, 'Overlapping a fixed task');
+      // console.log(n, 'Overlapping a fixed task');
     }
   }
 }
