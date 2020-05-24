@@ -252,7 +252,7 @@ function adjustNowAndWakeUpButtons() {
 function inputAtEnter(event) {
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('inputBox').value.trim();
-    if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
+    if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
       if (taskList.length == 1 && parsedList[0] == '') {
@@ -267,14 +267,25 @@ function inputAtEnter(event) {
         jumpTo(uniqueIdOfLastTouched)
       }
     } else {
-      resetInputBox();
-      chosenTaskId = '';
-      jumpToTime(contentInputBox);
+      if (/[^0-9]/.exec(contentInputBox) != null) { // If there is a chosen task AND text it must be an error
+        nullifyClick();
+      } else if (/\d{3, 4}/.exec(contentInputBox) != null) { // If there is 3-4 numbers, jump to the time indicated
+        resetInputBox();
+        jumpToTime(contentInputBox);
+      } else { // Give up. Something stupid happened.
+        displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
+        resetInputBox();
+      }
       // displayMessage('A task needs text ', 3000);
     }
   }
 }
 
+function nullifyClick() {
+  let myId = getIndexFromUniqueId(chosenTaskId);
+  taskList[myId].isClicked = 'isNotClicked';
+  chosenTaskId = '';
+}
 
 function addTask(myId, task) {
   let succes = false;
@@ -534,15 +545,12 @@ function taskHasBeenClicked(event) {
       }
 
     } else {
-      displayMessage('A task needs text ', 3000);
+      displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
     }
 
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
-    console.log('Text in inputbox and a chosenTaskId. Should not happen.', chosenTaskId);
-    let myId = getIndexFromUniqueId(chosenTaskId);
-    taskList[myId].isClicked = 'isNotClicked';
-    chosenTaskId = '';
+    nullifyClick();
 
   }  else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
