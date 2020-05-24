@@ -452,6 +452,7 @@ function editTask() {
   document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
   chosenTaskId = '';
   renderTasks();
+  document.getElementById('inputBox').focus();
 }
 
 // Used by an eventListener. Toggles zoom.
@@ -538,7 +539,10 @@ function taskHasBeenClicked(event) {
 
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
-    console.log('Text in inputbox and a chosenTaskId. Should not happen.');
+    console.log('Text in inputbox and a chosenTaskId. Should not happen.', chosenTaskId);
+    let myId = getIndexFromUniqueId(chosenTaskId);
+    taskList[myId].isClicked = 'isNotClicked';
+    chosenTaskId = '';
 
   }  else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
@@ -680,7 +684,7 @@ function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
-    document.getElementById('inputBox').focus();
+    // document.getElementById('inputBox').focus();
   }
 }
 
@@ -689,7 +693,7 @@ function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById('nowSpan').offsetTop + 600 * zoom;
-    document.getElementById('inputBox').focus();
+    // document.getElementById('inputBox').focus();
   }
 }
 
@@ -699,7 +703,7 @@ function jumpToTime(time) {
     container = document.getElementById('container');
     timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
     container.scrollTop = timeDiv.offsetTop - 180 * zoom;
-    document.getElementById('inputBox').focus();
+    // document.getElementById('inputBox').focus();
     let min = /[0-9][0-9]$/.exec(time);
     let hours = time.toString().replace(min, '')
     displayMessage('Jumped to ' + hours + ':' + min, 700);

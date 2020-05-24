@@ -64,7 +64,7 @@ h1 {
   /* justify-items: center; */
   background-color: transparent;
   border: none;
-  height: 430px;
+  height: 480px;
   overflow-y: scroll;
   grid-template-areas:
   '. . . taskHeader .'
