@@ -464,6 +464,8 @@ function editTask() {
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
+  let nextLast = taskText.length - 1;
+  inputBox.setSelectionRange(nextLast, nextLast); // Makes changing task time easier by focusing just before m in 45m
 }
 
 // Used by an eventListener. Toggles zoom.
