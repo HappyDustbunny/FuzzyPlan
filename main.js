@@ -6,11 +6,14 @@ let uniqueIdList = [];
 let nullTimeClicked = false;
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
-let wakeUpH = 7;  // The hour your day start according to settings // TODO: Settings
+let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
 let wakeUpM = 0;  // The minutes your day start according to settings
+let wakeUpOrNowClickedOnce = false;
+let alarmOn = false;
 // A list of unique numbers to use as task-ids
 // randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
+// TODO: Inserting at the same time as a fixed task does not generate an error
 
 // console.table(taskList);  // Remember! Shows a table in the console.
 // debugger;  // Remember! Stops execution in order to glean the current value of variable
@@ -68,19 +71,37 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
-  // Get stored taskList from previous session if any
-  if (localStorage.getItem('taskList')) {
-    taskList = localStorage.getItem('taskList');
-  }
-  // Fill the timeBar div
+  retrieveLocallyStoredStuff();
+
   fillTimeBar(zoom);
 
+  createTimeMarker();
+
+  updateTimeMarker();
+
+  makeFirstTasks();
+
+  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
+
+  debugExamples(); // Make debug example tasks. Comment out when not testing.
+
+  renderTasks();
+
+  resetInputBox();
+
+  zoomFunc();
+}
+
+
+function createTimeMarker() {
   // Create time marker to show current time on timebar
   let nowSpan = document.createElement('span');
   nowSpan.setAttribute('id', 'nowSpan');
   document.getElementById('container').appendChild(nowSpan);
-  updateTimeMarker();
+}
 
+
+function makeFirstTasks() {
   // Make the first tasks. Necessary for adding new tasks
   let startList = ['000 1m Day start', '2359 1m Day end'];
   for (const [index, text] of startList.entries()) {
@@ -89,18 +110,63 @@ function setUpFunc() {
     task.fuzzyness = 'isNotFuzzy';
     taskList.push(task);
   }
+}
 
-  // Make debug example tasks
-  // debugExamples();
 
-  renderTasks();  // Draws task based on the content of the taskList
-  resetInputBox();
-  zoomFunc();
+function storeLocally() {
+  localStorage.textList = JSON.stringify(taskListExtractor(taskList));
+  // localStorage.wakeUpH = wakeUpH;
+  // localStorage.wakeUpM = wakeUpM;
+  sessionStorage.chosenTask = '';
+  // sessionStorage.chosenTaskId = chosenTaskId;
+  sessionStorage.uniqueIdOfLastTouched = uniqueIdOfLastTouched;
+  sessionStorage.uniqueIdList = JSON.stringify(uniqueIdList);
+  sessionStorage.nullTimeClicked = '';
+  sessionStorage.zoom = zoom;
+  sessionStorage.zoomSymbolModifyer = zoomSymbolModifyer;
+}
+
+
+function retrieveLocallyStoredStuff() {
+  taskList = [];
+  makeFirstTasks();
+
+  if (localStorage.getItem('textList')) {
+    textList = JSON.parse(localStorage.textList);
+    textListToTaskList(textList);
+  }
+  if (localStorage.getItem('wakeUpH')) {
+    wakeUpH = localStorage.wakeUpH;
+  }
+  if (localStorage.getItem('wakeUpM')) {
+    wakeUpM = localStorage.wakeUpM;
+  }
+  if (sessionStorage.getItem('chosenTask')) {
+    chosenTask = sessionStorage.chosenTask;
+  }
+  if (sessionStorage.getItem('chosenTaskId')) {
+    chosenTaskId = sessionStorage.chosenTaskId;
+  }
+  if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
+    uniqueIdOfLastTouched = sessionStorage.uniqueIdOfLastTouched;
+  }
+  if (sessionStorage.getItem('uniqueIdList')) {
+    uniqueIdList = JSON.parse(sessionStorage.uniqueIdList);
+  }
+  if (sessionStorage.getItem('')) {
+    nullTimeClicked = sessionStorage.nullTimeClicked;
+  }
+  if (sessionStorage.getItem('zoom')) {
+    zoom = sessionStorage.zoom;
+  }
+  if (sessionStorage.getItem('zoomSymbolModifyer')) {
+    zoomSymbolModifyer = sessionStorage.zoomSymbolModifyer;
+  }
 }
 
 
 function debugExamples() {
-  exList = [
+  let exList = [
     '700 debugging example',
     '1h long1',
     '30m short1',
@@ -113,18 +179,24 @@ function debugExamples() {
     '30m short3'
   ];
 
-  let succes = false;
+  console.log(exList);
+
   uniqueIdOfLastTouched = taskList[0].uniqueId;
-  for (const [index, text] of exList.entries()) {
+  textListToTaskList(exList);
+}
+
+
+function textListToTaskList(textList) {
+  let succes = false;
+  for (const [index, text] of textList.entries()) {
     let parsedList = parseText(text.trim());
     let id = uniqueIdOfLastTouched;
     let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
     // console.log(task.text, [].concat(taskList));
     succes = addTask(id, task);
+    if (!succes) {console.log('Retrieval got wrong at index ', index);}
   }
-  if (!succes) {console.log('Fix your example');}
 }
-
 
 // Clear input box and give it focus
 function resetInputBox() {
@@ -164,10 +236,19 @@ let timer = setInterval(updateTimeMarker, 1000);
 
 function updateTimeMarker() {
   let now = new Date();
+  let hours = now.getHours();
+  let min = now.getMinutes();
+  let sec = now.getSeconds();
   // The height of the nowSpan is set to the percentage the passed time represents of the number of minutes in a day
-  let nowHeight = zoom * ((now.getHours() * 60 + now.getMinutes()) * 100 ) / (24*60) + '%';
+  let nowHeight = zoom * ((hours * 60 + min) * 100 ) / (24*60) + '%';
   nowSpanElement = document.getElementById('nowSpan');
   nowSpanElement.style.height = nowHeight;
+
+  if (alarmOn && hours === 10 && min === 20 && sec === 0) { // TODO: Check for start/end of tasks
+    let sound = new Audio('429721__fellur__tic-alt.wav');
+    sound.play();
+    console.log('Lyd?');
+  }
 }
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
@@ -199,14 +280,15 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 // TODO: Make addPause buttons 15m, 30m + ?
 // Used by an eventListener. Display settings.
 function settings() {
-  displayMessage('To do: make settings', 5000);
+  storeLocally();
+  window.location.assign('settings.html')
+  // displayMessage('To do: make settings', 5000);
   // Store a day from one session to another
   // Store multiple days? One pr. calender day?
   // Store wake up time (wakeUpH and wakeUpM)
   // Ligth/Dark theme?
   // Store variables descriping stress sensitivity (tHalf stressStart, ...)
 }
-
 
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
 function wakeUpButton() {
@@ -220,6 +302,7 @@ function wakeUpButton() {
     console.log('wakeUpButton failed to insert a task');
   }
   document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
+  wakeUpOrNowClickedOnce = true;
   adjustNowAndWakeUpButtons();
 }
 
@@ -229,20 +312,31 @@ function nowButton() {
   let task = new Task(new Date(), 15 * 60000, 'Planning');
   addFixedTask(task);
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
+  wakeUpOrNowClickedOnce = true;
   adjustNowAndWakeUpButtons();
 }
 
+
 function adjustNowAndWakeUpButtons() {
   let min = '';
-  if (wakeUpM <= 9) {
-    min = '0' + wakeUpM;
+  let upBtn = document.getElementById('upButton');
+  let nowBtn = document.getElementById('nowButton');
+
+  if (parseInt(wakeUpM) <= 9) {
+    min = '0' + parseInt(wakeUpM);
   } else {
-    min = wakeUpM;
+    min = parseInt(wakeUpM);
   }
-  document.getElementById('upButton').innerText = '\u25B8' + wakeUpH + ':' + min;
-  document.getElementById('nowButton').innerText = '\u25B8' + 'Now';
-  document.getElementById('upButton').title = 'Jump to 7:00';
-  document.getElementById('nowButton').title = 'Jump to now';
+
+  if (!wakeUpOrNowClickedOnce) {
+    upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
+    upBtn.innerText = wakeUpH + ':' + min + '\u25B8';
+  } else {
+    upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
+    upBtn.innerText = '\u25B8' + wakeUpH + ':' + min;
+    nowBtn.title = 'Jump to now';
+    nowBtn.innerText = '\u25B8' + 'Now';
+  }
   renderTasks();
   document.getElementById('inputBox').focus();
 }
@@ -644,6 +738,8 @@ function fixTimes() {
 }
 
 function renderTasks() {
+  localStorage.textList = JSON.stringify(taskListExtractor(taskList));  // Store a backup of taskList
+
   // Remove old task from taskDiv
   const taskNode = document.getElementById('taskDiv');
   while (taskNode.firstChild) {
@@ -760,6 +856,43 @@ function textExtractor(task) {
   }
 
   return text
+}
+
+
+function taskListExtractor(taskList) {
+  let textList = [];
+  for (const [index, task] of taskList.entries()) {
+    if ((task.date.getHours() === 0 && task.date.getMinutes() === 0)
+        || (task.date.getHours() === 23 && task.date.getMinutes() === 59)) {
+      continue;
+    }
+    let text = task.text;
+
+    if (task.duration != '') {
+      let hours = Math.floor(task.duration / 3600000);
+      let minutes = Math.floor((task.duration - hours * 3600000) / 60000);
+      if (hours > 0 && minutes > 0) {
+        text = hours + 'h' + minutes + 'm ' + task.text;
+      } else if (hours > 0) {
+        text = hours + 'h '  + task.text;
+      } else {
+        text = minutes + 'm ' + task.text;
+      }
+    }
+
+    if (task.fuzzyness === 'isNotFuzzy' && task.date != '') {
+      let timeH = task.date.getHours();
+      let timeM = task.date.getMinutes();
+      let nils = '';
+      if (timeM < 10) {
+        nils = '0';
+      }
+      text = timeH + nils + timeM + ' ' + text;
+    }
+    textList.push(text);
+
+  }
+  return textList;
 }
 
 

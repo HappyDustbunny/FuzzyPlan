@@ -73,7 +73,7 @@ h1 {
 }
 
 #nowSpan {
-  border-bottom: 3px solid rgba(255, 0, 0, 1.0);
+  border-bottom: 3px solid rgba(255, 0, 255, 1.0);
   grid-area: timeBar;
   z-index: 999;
 }
@@ -172,7 +172,7 @@ input {
 #nowButton,
 #editButton {
   width: 10%;
-  font-size: 10px;
+  font-size: 14px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 

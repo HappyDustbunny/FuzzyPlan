@@ -3,14 +3,34 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FuzzyFlexx Planner</title>
-    <link rel="stylesheet" href="style.css">
+    <title>FuzzyPlan</title>
+    <link rel="stylesheet" href="settings.css">
     <script src="settings.js" defer></script>
   </head>
-  <body>
+  <body onload="setUpFunc()">
   <!-- <body onload="setUpFunc()"> -->
-    <h1 align=center>FuzzyFlexx Planner</h1>
-    Rap rap rap
-    <button type="button" id="back">Go back</button>
+    <h1 align=center>FuzzyPlan</h1>
+
+    <span id='message' display='none'></span>
+
+    <h3>Settings</h3>
+    <br>
+    When do your day start?
+    <input type="text" id='inputBoxH' autofocus value="7"> :
+    <input type="text" id='inputBoxM' autofocus value="00">
+    <br> <br>
+    Play 'toc' sound
+    <br>
+    <input type="radio" id='off' name="alarm" value="off" checked='checked'>
+    <label for=off"">Off</label> <br>
+    <input type="radio" id='beginning' name="alarm" value="beginning">
+    <label for="beginning">At the beginning of tasks (toc)</label> <br>
+    <input type="radio" id='end' name="alarm" value="end">
+    <label for="end">At the end of tasks (toc toc)</label> <br>
+    <input type="radio" id='both' name="alarm" value="both">
+    <label for="both">Both at beginning and end of tasks</label> <br>
+    <br>
+    <button type="button" id="apply">Apply</button>
+    <button type="button" id="cancel">Cancel</button>
   </body>
 </html>
