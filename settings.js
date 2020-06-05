@@ -23,6 +23,14 @@ function apply() {
    return;
  }
 
+ let radioButtonResult = document.getElementsByClassName('alarm');
+ for (var i = 0; i < 4; i++) {
+   if (radioButtonResult[i].type === 'radio' && radioButtonResult[i].checked) {
+     localStorage.radioButtonResult = radioButtonResult[i].value;
+   }
+ }
+
+
   localStorage.wakeUpH = hours;
   localStorage.wakeUpM = min;
   window.location.assign('main.html')

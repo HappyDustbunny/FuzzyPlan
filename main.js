@@ -114,7 +114,7 @@ function makeFirstTasks() {
 
 
 function storeLocally() {
-  localStorage.textList = JSON.stringify(taskListExtractor(taskList));
+  localStorage.textList = JSON.stringify(taskListExtractor());
   // localStorage.wakeUpH = wakeUpH;
   // localStorage.wakeUpM = wakeUpM;
   sessionStorage.chosenTask = '';
@@ -244,11 +244,21 @@ function updateTimeMarker() {
   nowSpanElement = document.getElementById('nowSpan');
   nowSpanElement.style.height = nowHeight;
 
-  if (alarmOn && hours === 10 && min === 20 && sec === 0) { // TODO: Check for start/end of tasks
-    let sound = new Audio('429721__fellur__tic-alt.wav');
-    sound.play();
-    console.log('Lyd?');
+  let taskAlarms = localStorage.radioButtonResult;
+  if (taskAlarms != 'off') {
+    if (taskAlarms === 'beginning' || taskAlarms === 'both') {
+      sayToc();
+    }
+    if (taskAlarms === 'end' || taskAlarms === 'both') {
+      sayToc();
+      setTimeout(sayToc, 300);
+   }
   }
+}
+
+function sayToc() {
+  let sound = new Audio('429721__fellur__tic-alt.wav');
+  sound.play();
 }
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
@@ -738,7 +748,10 @@ function fixTimes() {
 }
 
 function renderTasks() {
-  localStorage.textList = JSON.stringify(taskListExtractor(taskList));  // Store a backup of taskList
+  let textList = taskListExtractor();
+  if (JSON.stringify(textList)) {
+    localStorage.textList = JSON.stringify(textList);  // Store a backup of taskList
+  }
 
   // Remove old task from taskDiv
   const taskNode = document.getElementById('taskDiv');
@@ -859,7 +872,7 @@ function textExtractor(task) {
 }
 
 
-function taskListExtractor(taskList) {
+function taskListExtractor() {
   let textList = [];
   for (const [index, task] of taskList.entries()) {
     if ((task.date.getHours() === 0 && task.date.getMinutes() === 0)
