@@ -1,11 +1,15 @@
 
 document.getElementById('apply').addEventListener('click', apply);
 document.getElementById('cancel').addEventListener('click', cancel);
+document.getElementById('clearDay').addEventListener('click', clearDay);
+document.getElementById('goBack').addEventListener('click', goBack);
+
 
 function setUpFunc() {
   let inputBox = document.getElementById('inputBoxH');
   inputBox.select();
 }
+
 
 function apply() {
   let hours = document.getElementById('inputBoxH').value.trim();
@@ -33,12 +37,28 @@ function apply() {
 
   localStorage.wakeUpH = hours;
   localStorage.wakeUpM = min;
-  window.location.assign('main.html')
+  window.location.assign('main.html');
 }
 
 
 function cancel() {
-  window.location.assign('main.html')
+  window.location.assign('main.html');
+}
+
+
+function clearDay() {
+  let answer = confirm('Do you want to remove all tasks and start planning a new day?');
+  if (answer == true) {
+    localStorage.taskListAsText = [];
+    window.location.assign('main.html');
+  } else {
+    displayMessage('Nothing was changed', 3000);
+  }
+}
+
+
+function goBack() {
+  window.location.assign('main.html');
 }
 
 function displayMessage(text, displayTime) {

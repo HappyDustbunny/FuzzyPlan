@@ -12,24 +12,47 @@
 
     <span id='message' display='none'></span>
 
-    <h3>Settings</h3>
-    <br>
-    When do your day start?
-    <input type="text" id='inputBoxH' autofocus value="7"> :
-    <input type="text" id='inputBoxM' autofocus value="00">
-    <br> <br>
-    Play 'toc' sound
-    <br>
-    <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
-    <label for=off"">Off</label> <br>
-    <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
-    <label for="beginning">At the beginning of tasks (toc)</label> <br>
-    <input type="radio" id='end' class="alarm" name='alarm' value="end">
-    <label for="end">At the end of tasks (toc toc)</label> <br>
-    <input type="radio" id='both' class="alarm" name='alarm' value="both">
-    <label for="both">Both at beginning and end of tasks</label> <br>
-    <br>
-    <button type="button" id="apply">Apply</button>
-    <button type="button" id="cancel">Cancel</button>
+    <div class="container">
+      <h3>Settings</h3>
+      <br>
+      <span>
+        <p>
+          When do your day start?
+        </p>
+        <input type="text" id='inputBoxH' autofocus value="7"> :
+        <input type="text" id='inputBoxM' autofocus value="00">
+      </span>
+      <span>   <br>   </span>  <!-- Inelegant hack -->
+      <span>
+        <p>
+          Play 'toc' sound
+        </p>
+        <br>
+        <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
+        <label for=off"">Off</label> <br>
+        <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
+        <label for="beginning">At the beginning of tasks (toc)</label> <br>
+        <input type="radio" id='end' class="alarm" name='alarm' value="end">
+        <label for="end">At the end of tasks (toc toc)</label> <br>
+        <input type="radio" id='both' class="alarm" name='alarm' value="both">
+        <label for="both">Both at beginning and end of tasks</label> <br>
+      </span>
+      <span>   <br>   </span>
+      <span>
+        <button type="button" id="apply">Apply</button>
+        <button type="button" id="cancel">Cancel</button>
+      </span>
+      <span>   <br>   </span>
+      <span>
+        <p>
+          Clear tasks from current day
+        </p>
+        <button type="button" id="clearDay">Clear tasks</button>
+      </span>
+      <span>   <br>   </span>
+      <span>
+        <button type="button" id='goBack'>Go back</button>
+      </span>
+    </div>
   </body>
 </html>

@@ -1,4 +1,5 @@
 let taskList = [];  // List to keep track of the order of the tasks
+let lastTaskList = [];
 let chosenTask = '';
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let uniqueIdOfLastTouched = 0;
@@ -79,11 +80,11 @@ function setUpFunc() {
 
   updateTimeMarker();
 
-  makeFirstTasks();
+  // makeFirstTasks(); // Moved to retrieveLocallyStoredStuff()
 
   adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
 
-  debugExamples(); // Make debug example tasks. Comment out when not testing.
+  // debugExamples(); // Make debug example tasks. Run from commandline if needed. DO NOT UNCOMMENT
 
   renderTasks();
 
@@ -114,7 +115,7 @@ function makeFirstTasks() {
 
 
 function storeLocally() {
-  localStorage.textList = JSON.stringify(taskListExtractor());
+  localStorage.taskListAsText = JSON.stringify(taskListExtractor());
   // localStorage.wakeUpH = wakeUpH;
   // localStorage.wakeUpM = wakeUpM;
   sessionStorage.chosenTask = '';
@@ -131,9 +132,11 @@ function retrieveLocallyStoredStuff() {
   taskList = [];
   makeFirstTasks();
 
-  if (localStorage.getItem('textList')) {
-    textList = JSON.parse(localStorage.textList);
-    textListToTaskList(textList);
+  if (localStorage.getItem('taskListAsText')) {
+    lastTaskList = taskList;
+    localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor());
+    taskListAsText = JSON.parse(localStorage.taskListAsText);
+    textListToTaskList(taskListAsText);
   }
   if (localStorage.getItem('wakeUpH')) {
     wakeUpH = localStorage.wakeUpH;
@@ -183,12 +186,13 @@ function debugExamples() {
 
   uniqueIdOfLastTouched = taskList[0].uniqueId;
   textListToTaskList(exList);
+  renderTasks();
 }
 
 
-function textListToTaskList(textList) {
+function textListToTaskList(taskListAsText) {
   let succes = false;
-  for (const [index, text] of textList.entries()) {
+  for (const [index, text] of taskListAsText.entries()) {
     let parsedList = parseText(text.trim());
     let id = uniqueIdOfLastTouched;
     let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
@@ -748,9 +752,9 @@ function fixTimes() {
 }
 
 function renderTasks() {
-  let textList = taskListExtractor();
-  if (JSON.stringify(textList)) {
-    localStorage.textList = JSON.stringify(textList);  // Store a backup of taskList
+  let taskListAsText = taskListExtractor();
+  if (JSON.stringify(taskListAsText)) {
+    localStorage.taskListAsText = JSON.stringify(taskListAsText);  // Store a backup of taskList
   }
 
   // Remove old task from taskDiv
@@ -873,7 +877,7 @@ function textExtractor(task) {
 
 
 function taskListExtractor() {
-  let textList = [];
+  let taskListAsText = [];
   for (const [index, task] of taskList.entries()) {
     if ((task.date.getHours() === 0 && task.date.getMinutes() === 0)
         || (task.date.getHours() === 23 && task.date.getMinutes() === 59)) {
@@ -902,10 +906,10 @@ function taskListExtractor() {
       }
       text = timeH + nils + timeM + ' ' + text;
     }
-    textList.push(text);
+    taskListAsText.push(text);
 
   }
-  return textList;
+  return taskListAsText;
 }
 
 
