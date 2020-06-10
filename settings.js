@@ -50,6 +50,7 @@ function clearDay() {
   let answer = confirm('Do you want to remove all tasks and start planning a new day?');
   if (answer == true) {
     localStorage.taskListAsText = [];
+    localStorage.wakeUpOrNowClickedOnce = false;
     window.location.assign('main.html');
   } else {
     displayMessage('Nothing was changed', 3000);

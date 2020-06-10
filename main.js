@@ -90,7 +90,7 @@ function setUpFunc() {
 
   resetInputBox();
 
-  zoomFunc();
+  // zoomFunc();
 }
 
 
@@ -116,6 +116,7 @@ function makeFirstTasks() {
 
 function storeLocally() {
   localStorage.taskListAsText = JSON.stringify(taskListExtractor());
+  localStorage.wakeUpOrNowClickedOnce = false;
   // localStorage.wakeUpH = wakeUpH;
   // localStorage.wakeUpM = wakeUpM;
   sessionStorage.chosenTask = '';
@@ -137,6 +138,9 @@ function retrieveLocallyStoredStuff() {
     localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor());
     taskListAsText = JSON.parse(localStorage.taskListAsText);
     textListToTaskList(taskListAsText);
+  }
+  if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
+    wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
   }
   if (localStorage.getItem('wakeUpH')) {
     wakeUpH = localStorage.wakeUpH;
@@ -345,6 +349,7 @@ function adjustNowAndWakeUpButtons() {
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
     upBtn.innerText = wakeUpH + ':' + min + '\u25B8';
+    nowBtn.innerText = 'Now' + '\u25B8';
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
     upBtn.innerText = '\u25B8' + wakeUpH + ':' + min;
@@ -552,11 +557,32 @@ function removeFuzzyOverlap(task) {
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');
-  if (editButton.innerText == 'Clear') {
-    resetInputBox();
-    id = '';
-  } else if (editButton.innerText == 'Edit') {
+  if (editButton.innerText == 'Edit') {
     editTask();
+    editButton.innerText = 'Clear\u25B8';
+  } else if (document.getElementById('inputBox').value != '' ) {
+    resetInputBox();
+    editButton.innerText = '\u25BEClear';
+    id = '';
+  } else {
+    clearDay();
+  }
+}
+
+
+function clearDay() {
+  let answer = confirm('Do you want to remove all tasks and start planning a new day?');
+  if (answer == true) {
+    taskList = [];
+    makeFirstTasks();
+    wakeUpOrNowClickedOnce = false;
+    document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
+    document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
+    storeLocally();
+    adjustNowAndWakeUpButtons();
+    setUpFunc();
+  } else {
+    displayMessage('Nothing was changed', 3000);
   }
 }
 
@@ -568,7 +594,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('editButton').innerText = 'Clear';  // Prepare Edit/Clear button for cloning
+  document.getElementById('editButton').innerText = '\u23F7Clear';  // \u23F5
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -686,7 +712,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    editButton.innerText = 'Clear';
+    editButton.innerText = 'Clear\u25B8';  // \u25b8 for small triangle
   }
   renderTasks();
 

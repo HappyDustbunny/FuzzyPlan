@@ -172,7 +172,7 @@ input {
 #nowButton,
 #editButton {
   width: 10%;
-  font-size: 14px;
+  font-size: 12px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 
