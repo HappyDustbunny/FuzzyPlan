@@ -1,5 +1,13 @@
 let taskList = [];  // List to keep track of the order of the tasks
 let lastTaskList = [];
+// let storedTasksList = [['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end'],
+//                        ['000 1m Day start', '2359 1m Day end']];
 let chosenTask = '';
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let uniqueIdOfLastTouched = 0;
@@ -7,10 +15,13 @@ let uniqueIdList = [];
 let nullTimeClicked = false;
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
+let defaultTaskDuration = 30;
 let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
 let wakeUpM = 0;  // The minutes your day start according to settings
 let wakeUpOrNowClickedOnce = false;
 let alarmOn = false;
+
+let storage = window.localStorage;
 // A list of unique numbers to use as task-ids
 // randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
@@ -116,6 +127,9 @@ function makeFirstTasks() {
 
 function storeLocally() {
   localStorage.taskListAsText = JSON.stringify(taskListExtractor());
+  // if (!localStorage.storedTasksList) {
+  //   localStorage.storedTasksList = JSON.stringify(storedTasksList);
+  // }
   localStorage.wakeUpOrNowClickedOnce = false;
   // localStorage.wakeUpH = wakeUpH;
   // localStorage.wakeUpM = wakeUpM;
@@ -135,19 +149,25 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('taskListAsText')) {
     lastTaskList = taskList;
-    localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor());
+    // localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor()); // TODO: Is this line doing anything??
     taskListAsText = JSON.parse(localStorage.taskListAsText);
-    textListToTaskList(taskListAsText);
+    textListToTaskList(taskListAsText);  // TODO: atm the code cant handle a taskListAsText being []
   }
+  // if (localStorage.getItem('storedTasksList')) {
+  //   storedTasksList = JSON.parse(localStorage.storedTasksList);
+  // }
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
     wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
   }
-  if (localStorage.getItem('wakeUpH')) {
-    wakeUpH = localStorage.wakeUpH;
+  if (localStorage.getItem('defaultTaskDuration')) {
+    defaultTaskDuration = localStorage.defaultTaskDuration;
   }
-  if (localStorage.getItem('wakeUpM')) {
-    wakeUpM = localStorage.wakeUpM;
-  }
+  // if (localStorage.getItem('wakeUpH')) {
+  //   wakeUpH = localStorage.wakeUpH;
+  // }
+  // if (localStorage.getItem('wakeUpM')) {
+  //   wakeUpM = localStorage.wakeUpM;
+  // }
   if (sessionStorage.getItem('chosenTask')) {
     chosenTask = sessionStorage.chosenTask;
   }
@@ -196,13 +216,17 @@ function debugExamples() {
 
 function textListToTaskList(taskListAsText) {
   let succes = false;
-  for (const [index, text] of taskListAsText.entries()) {
-    let parsedList = parseText(text.trim());
-    let id = uniqueIdOfLastTouched;
-    let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
-    // console.log(task.text, [].concat(taskList));
-    succes = addTask(id, task);
-    if (!succes) {console.log('Retrieval got wrong at index ', index);}
+  if (taskListAsText === []) {
+    makeFirstTasks();
+  } else {
+    for (const [index, text] of taskListAsText.entries()) {
+      let parsedList = parseText(text.trim());
+      let id = uniqueIdOfLastTouched;
+      let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
+      // console.log(task.text, [].concat(taskList));
+      succes = addTask(id, task);
+      if (!succes) {console.log('Retrieval got wrong at index ', index);}
+    }
   }
 }
 
@@ -270,6 +294,10 @@ function sayToc() {
 }
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
+
+window.addEventListener('storage', function(e) {
+  localStorage.setItem(e.key, e.newValue);
+});
 
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
@@ -382,11 +410,12 @@ function inputAtEnter(event) {
     } else {
       if (/[^0-9]/.exec(contentInputBox) != null) { // If there is a chosen task AND text it must be an error
         nullifyClick();
-      } else if (/\d{3, 4}/.exec(contentInputBox) != null) { // If there is 3-4 numbers, jump to the time indicated
+      } else if (/\d[0,3][0]/.exec(contentInputBox) != null || /[1-2]\d[0,3][0]/.exec(contentInputBox) != null) {
+        // If there is 3-4 numbers, jump to the time indicated
         resetInputBox();
         jumpToTime(contentInputBox);
       } else { // Give up. Something stupid happened.
-        displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
+        displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000)
         resetInputBox();
       }
       // displayMessage('A task needs text ', 3000);
@@ -556,13 +585,13 @@ function removeFuzzyOverlap(task) {
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
-  editButton = document.getElementById('editButton');
+  editButton = document.getElementById('editButton');  // TODO: Get ridt of edit? Double click is more natural
   if (editButton.innerText == 'Edit') {
     editTask();
     editButton.innerText = 'Clear\u25B8';
   } else if (document.getElementById('inputBox').value != '' ) {
     resetInputBox();
-    editButton.innerText = '\u25BEClear';
+    editButton.innerText = '\u25BEClear'; // TODO: Fix clear button after an edited task is inserted
     id = '';
   } else {
     clearDay();
@@ -851,11 +880,15 @@ function jumpToTime(time) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
-    container.scrollTop = timeDiv.offsetTop - 180 * zoom;
-    // document.getElementById('inputBox').focus();
-    let min = /[0-9][0-9]$/.exec(time);
-    let hours = time.toString().replace(min, '')
-    displayMessage('Jumped to ' + hours + ':' + min, 700);
+    if (timeDiv) {
+      container.scrollTop = timeDiv.offsetTop - 180 * zoom;
+      // document.getElementById('inputBox').focus();
+      let min = /[0-9][0-9]$/.exec(time);
+      let hours = time.toString().replace(min, '')
+      displayMessage('Jumped to ' + hours + ':' + min, 700);
+    } else {
+      displayMessage('Number not recognised as a time', 1000)
+    }
   }
 }
 
@@ -961,7 +994,7 @@ function parseText(rawText) {
   // Make duration in milliseconds form hours and minutes
   let duration = hours * 3600000 + minutes * 60000;
   if (duration == 0) {
-    duration = 30 * 60000; // If no duration is provided the task is assigned 30 minutes as default
+    duration = defaultTaskDuration * 60000; // If no duration is provided use the default task duration
   }
 
   let time = /[0-9]?[0-9]:?[0-9][0-9]/.exec(rawText);

@@ -1,28 +1,99 @@
+let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+// window.addEventListener('storage', function(e) {
+//   localStorage.setItem(e.key, e.newValue);
+// });
 
 document.getElementById('apply').addEventListener('click', apply);
 document.getElementById('cancel').addEventListener('click', cancel);
-document.getElementById('clearDay').addEventListener('click', clearDay);
 document.getElementById('goBack').addEventListener('click', goBack);
+document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
+document.getElementById('storeList').addEventListener('click', storeList);
+document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
+
+function storeList() {
+  let storeButtons = document.getElementsByClassName('store');
+  for (const button of storeButtons) {
+    if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
+      button.classList.add('highLighted');
+    }
+  }
+}
+
+function storeHasBeenClicked(event) {
+  let id = event.target.id;
+  let clickedButton = document.getElementById(id);
+
+  if (id === 'lastTaskList') {
+    // Restore stuff from trashBin
+    let trash = JSON.parse(localStorage.getItem(id));
+    localStorage.setItem('lastTaskList', JSON.stringify(localStorage.taskListAsText)); // Move current tasklist to trash bin
+    localStorage.taskListAsText = trash;
+    window.location.assign('main.html');
+  }
+
+  if (clickedButton.classList.contains('highLighted')) {
+    if (clickedButton.classList[0] === 'notInUse') {
+      clickedButton.classList.remove('notInUse');
+    }
+    let text = prompt('Change label of the stored list?')
+    if (text === '' || text === null) {
+      localStorage.setItem(id + 'label', clickedButton.innerText);
+    }
+    else if (/^[A-Za-z0-9]+$/.exec(text)) { // Sanitize input: only alpha numericals
+      text = text.slice(0, 1).toUpperCase() + text.slice(1, );
+      clickedButton.innerText = text;
+      localStorage.setItem(id + 'label', text);
+    } else if (text != '') {
+      alert('Limit your charcters to letters and numbers, please.');
+      return;
+    }
+    // Store stuff
+    localStorage.setItem(id, JSON.stringify(localStorage.taskListAsText));
+    window.location.assign('main.html');
+  } else { // Get stuff
+    localStorage.setItem('lastTaskList', JSON.stringify(localStorage.taskListAsText)); // Move current tasklist to trash bin
+    localStorage.taskListAsText = JSON.parse(localStorage.getItem(id)); // Let current tasklist be chosen stored tasklist
+    window.location.assign('main.html');
+  }
+
+  // Remove highlights
+  let storeButtons = document.getElementsByClassName('store');
+  for (const button of storeButtons) {
+    if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
+      button.classList.remove('highLighted');
+    }
+  }
+
+}
 
 
 function setUpFunc() {
-  let inputBox = document.getElementById('inputBoxH');
-  inputBox.select();
+  let storeButtons = document.getElementsByClassName('store');
+  console.log(storeButtons.length);
+  for (const button of storeButtons) {
+    console.log(button.id, localStorage.getItem(button.id));
+    if ((localStorage.getItem(button.id) === null) || JSON.parse(localStorage.getItem(button.id)) === "[]") {
+      button.classList.add('notInUse');
+      button.innerText = weekDays[/\d/.exec(button.id) - 1]
+    } else {
+      button.classList.remove('notInUse');
+      button.classList.add('inUse');
+      button.innerText = localStorage.getItem(button.id + 'label');
+    }
+  }
+}
+
+function inputBoxMGotFocus() {
+  document.getElementById('inputBoxM').select();
 }
 
 
 function apply() {
-  let hours = document.getElementById('inputBoxH').value.trim();
   let min = document.getElementById('inputBoxM').value.trim();
 
-  if (isNaN(hours) || hours < 0 || 23 < hours) {
-    displayMessage('Please use only numbers between 0 and 23', 3000);
-    document.getElementById('inputBoxH').select();
-    return;
-  }
-
-  if (isNaN(min) || min < 0 || 60 < min) {
-   displayMessage('Please use only numbers between 0 and 60', 3000);
+  if (isNaN(min) || min < 0 || 24*60 - 2 < min) {
+   displayMessage('Use only numbers between 0 and 1438, please.', 3000);
    document.getElementById('inputBoxM').select();
    return;
  }
@@ -35,8 +106,7 @@ function apply() {
  }
 
 
-  localStorage.wakeUpH = hours;
-  localStorage.wakeUpM = min;
+  localStorage.defaultTaskDuration = min;
   window.location.assign('main.html');
 }
 

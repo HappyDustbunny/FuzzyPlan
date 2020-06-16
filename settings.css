@@ -30,3 +30,21 @@ button:focus {
   flex-direction: column;
   /* justify-content: space-between; */
 }
+
+.notInUse {
+  background-image: linear-gradient(#c0c0f1,  #d8eaf1, #d8eaf1, #d8eaf1, #c3c3f7);
+  border: none;
+}
+
+.highLighted {
+  border: 1px solid rgb(255, 50, 255);
+}
+
+#stores {
+  display: flex;
+  flex-direction: column;
+}
+
+button[id*='memory'] {
+  width: 300px;
+}

@@ -8,26 +8,47 @@
     <script src="settings.js" defer></script>
   </head>
   <body onload="setUpFunc()">
+
     <h1 align=center>FuzzyPlan</h1>
 
     <span id='message' display='none'></span>
 
     <div class="container">
-      <h3>Settings</h3>
-      <br>
       <span>
-        <p>
-          When do your day start?
-        </p>
-        <input type="text" id='inputBoxH' autofocus value="7"> :
-        <input type="text" id='inputBoxM' autofocus value="00">
+        <h3>
+          Retrive or store tasklists
+        </h3>
+        <button type="button" id="storeList" class=' storeList'>Store list in</button>
+        <span>   <br>   </span>
+        <span>   <br>   </span>
+        <div id="stores">
+          <span>1 <button type="button" id="memory1" class='notInUse store'>Monday</button></span>
+          <span>2 <button type="button" id="memory2" class='notInUse store'>Tuesday</button></span>
+          <span>3 <button type="button" id="memory3" class='notInUse store'>Wednesday</button></span>
+          <span>4 <button type="button" id="memory4" class='notInUse store'>Thursday</button></span>
+          <span>5 <button type="button" id="memory5" class='notInUse store'>Friday</button></span>
+          <span>6 <button type="button" id="memory6" class='notInUse store'>Saturday</button></span>
+          <span>7 <button type="button" id="memory7" class='notInUse store'>Sunday</button></span>
+          <span>   <br>   </span>
+          <button type="button" id="lastTaskList" class='trashBin'>Last discarded task list</button>
+        </div>
+        <span>   <br>   </span>
+        <button type="button" id='goBack'>Go back</button>
       </span>
-      <span>   <br>   </span>  <!-- Inelegant hack -->
+
       <span>
+      <h3>
+        Settings
+      </h3>
         <p>
-          Play 'toc' sound
+          Set default task duration in minutes:
+          <input type="text" id='inputBoxM' value="30">
         </p>
-        <br>
+      </span>
+      <span>
+        <h5>
+          Play 'toc' sound
+        </h5>
         <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
         <label for=off"">Off</label> <br>
         <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
@@ -37,22 +58,13 @@
         <input type="radio" id='both' class="alarm" name='alarm' value="both">
         <label for="both">Both at beginning and end of tasks</label> <br>
       </span>
-      <span>   <br>   </span>
+      <span>   <br>   </span> <!-- Inelegant hack -->
       <span>
         <button type="button" id="apply">Apply</button>
         <button type="button" id="cancel">Cancel</button>
       </span>
       <span>   <br>   </span>
-      <span>
-        <p>
-          Clear tasks from current day
-        </p>
-        <button type="button" id="clearDay">Clear tasks</button>
-      </span>
       <span>   <br>   </span>
-      <span>
-        <button type="button" id='goBack'>Go back</button>
-      </span>
     </div>
   </body>
 </html>
