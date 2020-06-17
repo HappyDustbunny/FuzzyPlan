@@ -1,13 +1,6 @@
 let taskList = [];  // List to keep track of the order of the tasks
 let lastTaskList = [];
-// let storedTasksList = [['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end'],
-//                        ['000 1m Day start', '2359 1m Day end']];
+let startAndEndTimes = [];
 let chosenTask = '';
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
 let uniqueIdOfLastTouched = 0;
@@ -277,14 +270,19 @@ function updateTimeMarker() {
   nowSpanElement.style.height = nowHeight;
 
   let taskAlarms = localStorage.radioButtonResult;
+  let nowTime = hours.toString() + min.toString() + sec.toString();
   if (taskAlarms != 'off') {
     if (taskAlarms === 'beginning' || taskAlarms === 'both') {
-      sayToc();
+      if (startAndEndTimes.includes('beginning' + nowTime)) {
+        sayToc();
+      }
     }
     if (taskAlarms === 'end' || taskAlarms === 'both') {
-      sayToc();
-      setTimeout(sayToc, 300);
-   }
+      if (startAndEndTimes.includes('end' + nowTime)) {
+        sayToc();
+        setTimeout(sayToc, 300);
+      }
+    }
   }
 }
 
@@ -793,6 +791,7 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
   fixTimes();
 }
 
+
 function fixTimes() {
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
@@ -805,6 +804,7 @@ function fixTimes() {
     }
   }
 }
+
 
 function renderTasks() {
   let taskListAsText = taskListExtractor();
@@ -936,10 +936,12 @@ function textExtractor(task) {
 
 
 function taskListExtractor() {
+  startAndEndTimes = [];
   let taskListAsText = [];
   for (const [index, task] of taskList.entries()) {
-    if ((task.date.getHours() === 0 && task.date.getMinutes() === 0)
-        || (task.date.getHours() === 23 && task.date.getMinutes() === 59)) {
+    let timeH = task.date.getHours();
+    let timeM = task.date.getMinutes();
+    if ((timeH === 0 && timeM === 0) || (timeH === 23 && timeM === 59)) {
       continue;
     }
     let text = task.text;
@@ -954,11 +956,12 @@ function taskListExtractor() {
       } else {
         text = minutes + 'm ' + task.text;
       }
+      updateStartAndEndTimes(timeH, timeM, hours, minutes); // Makes alarm list for toc
+    } else {
+      updateStartAndEndTimes(timeH, timeM, 0, 30);
     }
 
     if (task.fuzzyness === 'isNotFuzzy' && task.date != '') {
-      let timeH = task.date.getHours();
-      let timeM = task.date.getMinutes();
       let nils = '';
       if (timeM < 10) {
         nils = '0';
@@ -969,6 +972,22 @@ function taskListExtractor() {
 
   }
   return taskListAsText;
+}
+
+
+function updateStartAndEndTimes(timeH, timeM, hours, minutes) { // Makes a list of start and end times for sayToc
+  var time = '';
+  time = 'beginning' + timeH.toString() + timeM.toString() + '0';
+  startAndEndTimes.push(time);
+  let endH = timeH + hours;
+  let endM = timeM + minutes;
+  if (59 < endM) {
+    endM -= 60;
+    endH += 1;
+  }
+  time = 'end' + endH.toString() + endM.toString() + '0';
+  startAndEndTimes.push(time);
+  console.log(timeH, timeM, hours, minutes, endH, endM, time);
 }
 
 

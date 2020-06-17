@@ -22,6 +22,19 @@ button:focus {
   border: 1px solid rgb(255, 50, 255);
 }
 
+.container1 {
+  display: grid;
+  grid-template-columns: 10% 80% 10%;
+  grid-template-rows: auto 10px;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. header .'
+  '. body .';
+}
+
 .container {
   /* width: 400px; */
   display: flex;
@@ -38,6 +51,12 @@ button:focus {
 
 .highLighted {
   border: 1px solid rgb(255, 50, 255);
+}
+
+#message {
+  display: flex;
+  text-align: center;
+  grid-area: header;
 }
 
 #stores {

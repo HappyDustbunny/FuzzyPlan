@@ -36,11 +36,12 @@ function storeHasBeenClicked(event) {
     if (clickedButton.classList[0] === 'notInUse') {
       clickedButton.classList.remove('notInUse');
     }
-    let text = prompt('Change label of the stored list?')
+    let text = prompt('Change label of the stored list?', clickedButton.innerText);
     if (text === '' || text === null) {
       localStorage.setItem(id + 'label', clickedButton.innerText);
     }
-    else if (/^[A-Za-z0-9]+$/.exec(text)) { // Sanitize input: only alpha numericals
+    else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
+    // else if (/^[A-Za-z0-9 æøåöä]+$/.exec(text)) { // Sanitize input: only alpha numericals
       text = text.slice(0, 1).toUpperCase() + text.slice(1, );
       clickedButton.innerText = text;
       localStorage.setItem(id + 'label', text);
@@ -50,7 +51,9 @@ function storeHasBeenClicked(event) {
     }
     // Store stuff
     localStorage.setItem(id, JSON.stringify(localStorage.taskListAsText));
-    window.location.assign('main.html');
+    displayMessage('Current task list stored in ' + clickedButton.innerText, 3000);
+    setTimeout(function () {window.location.assign('main.html');}, 3500);
+    // window.location.assign('main.html');
   } else { // Get stuff
     localStorage.setItem('lastTaskList', JSON.stringify(localStorage.taskListAsText)); // Move current tasklist to trash bin
     localStorage.taskListAsText = JSON.parse(localStorage.getItem(id)); // Let current tasklist be chosen stored tasklist
