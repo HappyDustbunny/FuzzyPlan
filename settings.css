@@ -22,10 +22,10 @@ button:focus {
   border: 1px solid rgb(255, 50, 255);
 }
 
-.container1 {
+.container1, .container2 {
   display: grid;
   grid-template-columns: 10% 80% 10%;
-  grid-template-rows: auto 10px;
+  grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;

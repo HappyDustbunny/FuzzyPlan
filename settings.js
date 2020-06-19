@@ -22,6 +22,7 @@ function storeList() {
 
 function storeHasBeenClicked(event) {
   let id = event.target.id;
+  let text = '';
   let clickedButton = document.getElementById(id);
 
   if (id === 'lastTaskList') {
@@ -36,12 +37,13 @@ function storeHasBeenClicked(event) {
     if (clickedButton.classList[0] === 'notInUse') {
       clickedButton.classList.remove('notInUse');
     }
-    let text = prompt('Change label of the stored list?', clickedButton.innerText);
+    if (localStorage.taskListAsText != '[]') {
+      text = prompt('Change label of the stored list?', clickedButton.innerText);
+    }
     if (text === '' || text === null) {
       localStorage.setItem(id + 'label', clickedButton.innerText);
     }
     else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
-    // else if (/^[A-Za-z0-9 æøåöä]+$/.exec(text)) { // Sanitize input: only alpha numericals
       text = text.slice(0, 1).toUpperCase() + text.slice(1, );
       clickedButton.innerText = text;
       localStorage.setItem(id + 'label', text);
@@ -51,7 +53,14 @@ function storeHasBeenClicked(event) {
     }
     // Store stuff
     localStorage.setItem(id, JSON.stringify(localStorage.taskListAsText));
-    displayMessage('Current task list stored in ' + clickedButton.innerText, 3000);
+    if (localStorage.taskListAsText === '[]') {
+      clickedButton.classList.remove('inUse');
+      clickedButton.classList.add('notInUse');
+      clickedButton.innerText = weekDays[/\d/.exec(clickedButton.id) - 1]
+      displayMessage('Stored list is cleared', 3000)
+    } else {
+      displayMessage('Current task list stored in ' + clickedButton.innerText, 3000);
+    }
     setTimeout(function () {window.location.assign('main.html');}, 3500);
     // window.location.assign('main.html');
   } else { // Get stuff
@@ -73,9 +82,7 @@ function storeHasBeenClicked(event) {
 
 function setUpFunc() {
   let storeButtons = document.getElementsByClassName('store');
-  console.log(storeButtons.length);
   for (const button of storeButtons) {
-    console.log(button.id, localStorage.getItem(button.id));
     if ((localStorage.getItem(button.id) === null) || JSON.parse(localStorage.getItem(button.id)) === "[]") {
       button.classList.add('notInUse');
       button.innerText = weekDays[/\d/.exec(button.id) - 1]
@@ -84,6 +91,9 @@ function setUpFunc() {
       button.classList.add('inUse');
       button.innerText = localStorage.getItem(button.id + 'label');
     }
+  }
+  if (localStorage.defaultTaskDuration) {
+    document.getElementById('inputBoxM').value = localStorage.defaultTaskDuration;
   }
 }
 

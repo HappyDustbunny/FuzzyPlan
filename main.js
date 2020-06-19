@@ -94,7 +94,7 @@ function setUpFunc() {
 
   resetInputBox();
 
-  // zoomFunc();
+  jumpToNow()
 }
 
 
@@ -124,11 +124,16 @@ function storeLocally() {
   //   localStorage.storedTasksList = JSON.stringify(storedTasksList);
   // }
   localStorage.wakeUpOrNowClickedOnce = false;
+  for (const [index, task] of taskList.entries()) {
+    if (task.uniqueId === uniqueIdOfLastTouched) {
+      localStorage.indexOfLastTouched = index;
+      break;
+    }
+  }
   // localStorage.wakeUpH = wakeUpH;
   // localStorage.wakeUpM = wakeUpM;
   sessionStorage.chosenTask = '';
   // sessionStorage.chosenTaskId = chosenTaskId;
-  sessionStorage.uniqueIdOfLastTouched = uniqueIdOfLastTouched;
   sessionStorage.uniqueIdList = JSON.stringify(uniqueIdList);
   sessionStorage.nullTimeClicked = '';
   sessionStorage.zoom = zoom;
@@ -144,7 +149,7 @@ function retrieveLocallyStoredStuff() {
     lastTaskList = taskList;
     // localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor()); // TODO: Is this line doing anything??
     taskListAsText = JSON.parse(localStorage.taskListAsText);
-    textListToTaskList(taskListAsText);  // TODO: atm the code cant handle a taskListAsText being []
+    textListToTaskList(taskListAsText);
   }
   // if (localStorage.getItem('storedTasksList')) {
   //   storedTasksList = JSON.parse(localStorage.storedTasksList);
@@ -152,6 +157,9 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
     wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
   }
+  // if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
+  //   uniqueIdOfLastTouched = localStorage.uniqueIdOfLastTouched;
+  // }
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
   }
@@ -166,9 +174,6 @@ function retrieveLocallyStoredStuff() {
   }
   if (sessionStorage.getItem('chosenTaskId')) {
     chosenTaskId = sessionStorage.chosenTaskId;
-  }
-  if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
-    uniqueIdOfLastTouched = sessionStorage.uniqueIdOfLastTouched;
   }
   if (sessionStorage.getItem('uniqueIdList')) {
     uniqueIdList = JSON.parse(sessionStorage.uniqueIdList);
@@ -221,6 +226,7 @@ function textListToTaskList(taskListAsText) {
       if (!succes) {console.log('Retrieval got wrong at index ', index);}
     }
   }
+  uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
 }
 
 // Clear input box and give it focus
@@ -397,7 +403,7 @@ function inputAtEnter(event) {
       if (taskList.length == 1 && parsedList[0] == '') {
         displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
       } else {
-        let succes = addTask(uniqueIdOfLastTouched, task);  // The two first in uniqueIdList is start and end
+        let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
 
         if (!succes) {
           displayMessage('Not enough room. \nPlease clear some space', 3000);
@@ -584,10 +590,11 @@ function removeFuzzyOverlap(task) {
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');  // TODO: Get ridt of edit? Double click is more natural
-  if (editButton.innerText == 'Edit') {
-    editTask();
-    editButton.innerText = 'Clear\u25B8';
-  } else if (document.getElementById('inputBox').value != '' ) {
+  // if (editButton.innerText == 'Edit') {
+  //   editTask();
+  //   editButton.innerText = 'Clear\u25B8';
+  // } else
+  if (document.getElementById('inputBox').value != '' ) {
     resetInputBox();
     editButton.innerText = '\u25BEClear'; // TODO: Fix clear button after an edited task is inserted
     id = '';
@@ -621,7 +628,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('editButton').innerText = '\u23F7Clear';  // \u23F5
+  document.getElementById('editButton').innerText = 'Clear\u25B8';  // \u23F5
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -652,7 +659,7 @@ function createNullTimes() {
   let len = taskList.length;
   for (var n=1; n<len; n++) {
     duration = taskList[n].date.getTime() - taskList[n-1].end().getTime();
-    if (duration > 0) {
+    if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
       let nullTime = new Task(taskList[n-1].end(), duration, '');
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
@@ -706,6 +713,7 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
+      editButton.innerText = '\u25BEClear';
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
@@ -721,7 +729,7 @@ function taskHasBeenClicked(event) {
     // chosenTask.classList.add('isClicked'); // TODO: Affects only DOM. Make it a part of Task
     let myId = getIndexFromUniqueId(myUniqueId);
     taskList[myId].isClicked = 'isClicked'; // TODO: Unclick later
-    editButton.innerText = 'Edit';
+    // editButton.innerText = 'Clear\u25B8';
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
 
@@ -739,7 +747,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    editButton.innerText = 'Clear\u25B8';  // \u25b8 for small triangle
+    // editButton.innerText = 'Clear\u25B8';  // \u25b8 for small triangle
   }
   renderTasks();
 
@@ -772,7 +780,6 @@ function swapTasks(myId) { // TODO: Fix swap by allowing inserting task by movin
     [taskList[id2], taskList[id1]] = [taskList[id1], taskList[id2]];
     anneal();
     uniqueIdOfLastTouched = taskList[id1].uniqueId;
-    console.log(chosenTaskId, myId, id1, id2, uniqueIdOfLastTouched);
 }
 
 
@@ -987,7 +994,6 @@ function updateStartAndEndTimes(timeH, timeM, hours, minutes) { // Makes a list 
   }
   time = 'end' + endH.toString() + endM.toString() + '0';
   startAndEndTimes.push(time);
-  console.log(timeH, timeM, hours, minutes, endH, endM, time);
 }
 
 
