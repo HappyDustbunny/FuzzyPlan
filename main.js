@@ -80,7 +80,7 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
-  retrieveLocallyStoredStuff(zoom);
+  retrieveLocallyStoredStuff();
 
   // fillStressBar();
 
@@ -136,14 +136,15 @@ function storeLocally() {
       break;
     }
   }
-  // localStorage.wakeUpH = wakeUpH;
-  // localStorage.wakeUpM = wakeUpM;
-  sessionStorage.chosenTask = '';
-  // sessionStorage.chosenTaskId = chosenTaskId;
-  sessionStorage.uniqueIdList = JSON.stringify(uniqueIdList);
-  sessionStorage.nullTimeClicked = '';
-  sessionStorage.zoom = zoom;
-  sessionStorage.zoomSymbolModifyer = zoomSymbolModifyer;
+
+  localStorage.zoom = zoom;
+  // // localStorage.wakeUpH = wakeUpH;
+  // // localStorage.wakeUpM = wakeUpM;
+  // sessionStorage.chosenTask = '';
+  // // sessionStorage.chosenTaskId = chosenTaskId;
+  // sessionStorage.uniqueIdList = JSON.stringify(uniqueIdList);
+  // sessionStorage.nullTimeClicked = '';
+  // sessionStorage.zoomSymbolModifyer = zoomSymbolModifyer;
 }
 
 
@@ -169,30 +170,34 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
   }
-  // if (localStorage.getItem('wakeUpH')) {
-  //   wakeUpH = localStorage.wakeUpH;
+
+  if (localStorage.getItem('zoom')) {
+    zoom = localStorage.zoom;
+  }
+  // // if (localStorage.getItem('wakeUpH')) {
+  // //   wakeUpH = localStorage.wakeUpH;
+  // // }
+  // // if (localStorage.getItem('wakeUpM')) {
+  // //   wakeUpM = localStorage.wakeUpM;
+  // // }
+  // if (sessionStorage.getItem('chosenTask')) {
+  //   chosenTask = sessionStorage.chosenTask;
   // }
-  // if (localStorage.getItem('wakeUpM')) {
-  //   wakeUpM = localStorage.wakeUpM;
+  // if (sessionStorage.getItem('chosenTaskId')) {
+  //   chosenTaskId = sessionStorage.chosenTaskId;
   // }
-  if (sessionStorage.getItem('chosenTask')) {
-    chosenTask = sessionStorage.chosenTask;
-  }
-  if (sessionStorage.getItem('chosenTaskId')) {
-    chosenTaskId = sessionStorage.chosenTaskId;
-  }
-  if (sessionStorage.getItem('uniqueIdList')) {
-    uniqueIdList = JSON.parse(sessionStorage.uniqueIdList);
-  }
-  if (sessionStorage.getItem('')) {
-    nullTimeClicked = sessionStorage.nullTimeClicked;
-  }
-  if (sessionStorage.getItem('zoom')) {
-    zoom = sessionStorage.zoom;
-  }
-  if (sessionStorage.getItem('zoomSymbolModifyer')) {
-    zoomSymbolModifyer = sessionStorage.zoomSymbolModifyer;
-  }
+  // if (sessionStorage.getItem('uniqueIdList')) {
+  //   uniqueIdList = JSON.parse(sessionStorage.uniqueIdList);
+  // }
+  // if (sessionStorage.getItem('')) {
+  //   nullTimeClicked = sessionStorage.nullTimeClicked;
+  // }
+  // if (sessionStorage.getItem('zoom')) {
+  //   zoom = sessionStorage.zoom;
+  // }
+  // if (sessionStorage.getItem('zoomSymbolModifyer')) {
+  //   zoomSymbolModifyer = sessionStorage.zoomSymbolModifyer;
+  // }
 }
 
 
@@ -871,6 +876,9 @@ function renderTasks() {
     newNode.classList.add(task.fuzzyness);  // Fuzzyness is used for styling tasks
     newNode.classList.add(task.isClicked);
     newNode.classList.add('task');
+    if (Number(task.drain) < 0 && task.fuzzyness != 'isNullTime') {
+      newNode.classList.add('isGain');
+    }
 
     // Create stress indicators as divs
     let stressMarker = document.createElement('div');
@@ -959,7 +967,7 @@ function jumpToTime(time) {
 }
 
 
-function textExtractor(task) {
+function textExtractor(task) {  // Extract the text to be written on screen
   let text = task.text;
 
   if (task.duration != '') {
@@ -1001,7 +1009,7 @@ function textExtractor(task) {
 }
 
 
-function taskListExtractor() {
+function taskListExtractor() {  // Make a list of strings that can generate the current taskList
   startAndEndTimes = [];
   let taskListAsText = [];
   for (const [index, task] of taskList.entries()) {
@@ -1034,6 +1042,9 @@ function taskListExtractor() {
       }
       text = timeH + nils + timeM + ' ' + text;
     }
+
+    text += ' d' + task.drain;
+
     taskListAsText.push(text);
 
   }
@@ -1103,18 +1114,18 @@ function parseText(rawText) {
   };
 
 
-  let drain = /d+[-]*[1-5]+/.exec(rawText);
-  if (/d+[-]*[1-5]+/.exec(drain)) {
-    drain = /[-]*[1-5]/.exec(drain).toString();
+  let drain = /d+[-]*[1-9]+/.exec(rawText); // TODO: Limit drain to 1-5?
+  if (/d+[-]*[1-9]+/.exec(drain)) {
+    drain = /[-]*[1-9]/.exec(drain).toString();
     rawText = rawText.replace('d' + drain, '');
   } else {
     drain = '1';
     // rawText = rawText.replace('d', '');
   };
 
-  let gain = /g+[-]*[1-5]+/.exec(rawText);
-  if (/g+[-]*[1-5]+/.exec(gain)) {
-    gain = /[-]*[1-5]/.exec(gain).toString();
+  let gain = /g+[-]*[1-9]+/.exec(rawText); // TODO: Should gain count double?
+  if (/g+[-]*[1-9]+/.exec(gain)) {
+    gain = /[-]*[1-9]/.exec(gain).toString();
     drain = '-' + gain;
     rawText = rawText.replace('g' + gain, '');
   };
