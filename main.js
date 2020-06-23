@@ -1103,13 +1103,20 @@ function parseText(rawText) {
   };
 
 
-  let drain = /d+[1-5]./.exec(rawText);
-  if (/d+[1-5]./.exec(drain)) {
-    drain = /[1-5]/.exec(drain).toString();
+  let drain = /d+[-]*[1-5]+/.exec(rawText);
+  if (/d+[-]*[1-5]+/.exec(drain)) {
+    drain = /[-]*[1-5]/.exec(drain).toString();
     rawText = rawText.replace('d' + drain, '');
   } else {
     drain = '1';
     // rawText = rawText.replace('d', '');
+  };
+
+  let gain = /g+[-]*[1-5]+/.exec(rawText);
+  if (/g+[-]*[1-5]+/.exec(gain)) {
+    gain = /[-]*[1-5]/.exec(gain).toString();
+    drain = '-' + gain;
+    rawText = rawText.replace('g' + gain, '');
   };
 
   let text = rawText.trim();
