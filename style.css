@@ -26,6 +26,24 @@ h1 {
   grid-area: taskListing;
 }
 
+@media only screen and (min-width: 450px) {
+  html {
+    background-color: black;
+  }
+
+  body {
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+  }
+
+  /* Why doesn't this work? */
+  .container2 {
+    height: 430px;
+  }
+}
+
 .container1 {
   display: grid;
   grid-template-columns: 10% 80% 10%;
@@ -39,22 +57,6 @@ h1 {
   '. body .';
 }
 
-@media only screen and (min-width: 450px) {
-  html {
-    background-color: black;
-  }
-
-  body {
-    max-width: 550px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
-  }
-
-  .container2 {
-    height: 430px;  // Why doesn't this work?
-  }
-}
 
 .container2 {
   display: grid;
@@ -68,7 +70,7 @@ h1 {
   overflow-y: scroll;
   grid-template-areas:
   '. . . taskHeader .'
-  '. timeBar . taskListing .'
+  'stressBar timeBar . taskListing .'
   '. . . taskFooter .';
 }
 
@@ -76,6 +78,16 @@ h1 {
   border-bottom: 3px solid rgba(255, 0, 255, 1.0);
   grid-area: timeBar;
   z-index: 999;
+}
+
+#stressDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  border: none;
+  height: 1440px;
+  align-items: center;
+  grid-area: stressBar;
 }
 
 #timeDiv {
@@ -88,6 +100,24 @@ h1 {
   height: 1440px;
   align-items: center;
   grid-area: timeBar;
+}
+
+#taskDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  border: none;
+  height: 1440px;
+  width: 100%;
+  grid-area: taskListing;
+}
+
+.stressDiv {
+  font-size: 14px;
+  height: 1.0417%;
+  color: hsl(255, 100%, 85%);
+  border: none;
+  border-radius: 0px;
 }
 
 .halfHours1,
@@ -106,16 +136,6 @@ h1 {
 
 .halfHours1 {
   height: 1.0417%;
-}
-
-#taskDiv {
-  display: flex;
-  flex-direction: column;
-  background-color: transparent;
-  border: none;
-  height: 1440px;
-  width: 100%;
-  grid-area: taskListing;
 }
 
 .isNullTime {

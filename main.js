@@ -12,6 +12,9 @@ let defaultTaskDuration = 30;
 let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
 let wakeUpM = 0;  // The minutes your day start according to settings
 let wakeUpOrNowClickedOnce = false;
+let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
+let stressLevel = wakeUpStress;
+let tDouble = 240;  // Doubling time for stress level in minutes
 let alarmOn = false;
 
 let storage = window.localStorage;
@@ -31,9 +34,10 @@ const dstOffset = (july.getTimezoneOffset() - january.getTimezoneOffset()) * 600
 
 // Task-object. Each task will be an object of this type
 class Task {
-  constructor(date, duration, text) {
+  constructor(date, duration, text, drain) {
     this.date = date; // Start time as Javascript date
     this.duration = duration; // Duration in milliseconds
+    this.drain = drain;
     this.text = text;
     this.uniqueId = this.giveAUniqueId();
     this.end();
@@ -76,7 +80,9 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
-  retrieveLocallyStoredStuff();
+  retrieveLocallyStoredStuff(zoom);
+
+  // fillStressBar();
 
   fillTimeBar(zoom);
 
@@ -110,8 +116,8 @@ function makeFirstTasks() {
   // Make the first tasks. Necessary for adding new tasks
   let startList = ['000 1m Day start', '2359 1m Day end'];
   for (const [index, text] of startList.entries()) {
-    parsedText = parseText(text.trim());
-    let task = new Task(parsedText[0], parsedText[1], parsedText[2]);
+    parsedList = parseText(text.trim());
+    let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
     task.fuzzyness = 'isNotFuzzy';
     taskList.push(task);
   }
@@ -220,7 +226,7 @@ function textListToTaskList(taskListAsText) {
     for (const [index, text] of taskListAsText.entries()) {
       let parsedList = parseText(text.trim());
       let id = uniqueIdOfLastTouched;
-      let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
+      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       // console.log(task.text, [].concat(taskList));
       succes = addTask(id, task);
       if (!succes) {console.log('Retrieval got wrong at index ', index);}
@@ -234,7 +240,6 @@ function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
 }
-
 
 // Fill the half hour time slots of the timebar
 function fillTimeBar(zoom) {
@@ -346,7 +351,7 @@ function wakeUpButton() {
   let now = new Date();
   let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
   let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
-  let task = new Task(taskStart, 15 * 60000, 'Planning');
+  let task = new Task(taskStart, 15 * 60000, 'Planning', 1);
   succes = addFixedTask(task);
   if (!succes) {
     console.log('wakeUpButton failed to insert a task');
@@ -359,7 +364,7 @@ function wakeUpButton() {
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
 function nowButton() {
-  let task = new Task(new Date(), 15 * 60000, 'Planning');
+  let task = new Task(new Date(), 15 * 60000, 'Planning', 1);
   addFixedTask(task);
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
   wakeUpOrNowClickedOnce = true;
@@ -399,7 +404,7 @@ function inputAtEnter(event) {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
       let parsedList = parseText(contentInputBox);
-      let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
+      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       if (taskList.length == 1 && parsedList[0] == '') {
         displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
       } else {
@@ -652,29 +657,58 @@ function zoomFunc() {
 
 function createNullTimes() {
   let jumpToId = uniqueIdOfLastTouched;
+  stressLevel = wakeUpStress; // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
 
   displayList = [];
   let duration = 0;
+
   displayList.push(taskList[0]);
+  taskList[0].stressGradient = stressLevel;// TODO: Fix this: stressGradient needs to be a list of 2+ elements
+
   let len = taskList.length;
   for (var n=1; n<len; n++) {
     duration = taskList[n].date.getTime() - taskList[n-1].end().getTime();
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
-      let nullTime = new Task(taskList[n-1].end(), duration, '');
+      let nullTime = new Task(taskList[n-1].end(), duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
+      // nullTime.drain = -1;
+      if (n === 1) {
+        let colour = 'hsl(255, 100%, ' + (100 - Math.floor(stressLevel*10)).toString() + '%)';
+        nullTime.stressGradient = [colour, colour];
+      } else {
+        nullTime.stressGradient = getStress(nullTime);
+      }
       displayList.push(nullTime);
       duration = 0;
-      // taskList.splice(n, 0, nullTime);
     }
+    taskList[n].stressGradient = getStress(taskList[n]);
     displayList.push(taskList[n]);
   }
-  // displayList.push(taskList[len - 1]);
-  // console.log([].concat(displayList));
-
 
   uniqueIdOfLastTouched = jumpToId;
   return displayList
+}
+
+
+function getStress(task) {
+  console.log(task.text, stressLevel);
+  let gradient = ['hsl(255, 100%, ' + (100 - Math.floor(stressLevel * 10)).toString() + '%)'];
+
+  let durationM = Math.floor(task.duration / 60000);
+  let stress = 0;
+  for (var i = 0; i < durationM; i += 5) {
+    stress = stressLevel * Math.pow(2, i/(tDouble/task.drain)); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
+    // console.log(durationM, i, stressLevel, stress, 100 - Math.floor(stress * 10));
+    colourBit = 'hsl(255, 100%, ' + (100 - Math.floor(stress * 10)).toString() + '%)';
+    gradient.push(colourBit);
+  }
+
+  stressLevel = stress;
+  // console.log(gradient);
+  console.log(task.text, stressLevel);
+
+  return gradient;
 }
 
 
@@ -706,7 +740,7 @@ function taskHasBeenClicked(event) {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
-      let task = new Task(parsedList[0], parsedList[1], parsedList[2]);
+      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       if (nullTimeClicked) {
         nullTimeClicked = false;
         addWhereverAfter(myUniqueId, task);  // Nulltimes shares id with the task before the nulltime
@@ -814,15 +848,66 @@ function fixTimes() {
 
 
 function renderTasks() {
+  let displayList = createNullTimes();
+
   let taskListAsText = taskListExtractor();
   if (JSON.stringify(taskListAsText)) {
     localStorage.taskListAsText = JSON.stringify(taskListAsText);  // Store a backup of taskList
   }
 
-  // Remove old task from taskDiv
-  const taskNode = document.getElementById('taskDiv');
-  while (taskNode.firstChild) {
-    taskNode.removeChild(taskNode.lastChild);
+  clearOldTasksEtc();
+
+  // fillStressBar(zoom);
+
+  // Make new time markings in timeBar
+  fillTimeBar(zoom);
+
+
+  // Refresh view from taskList
+  for (const [index, task] of displayList.entries()) {
+    // Create tasks as buttons
+    let newNode = document.createElement('button');
+    newNode.setAttribute('id', task.uniqueId);
+    newNode.classList.add(task.fuzzyness);  // Fuzzyness is used for styling tasks
+    newNode.classList.add(task.isClicked);
+    newNode.classList.add('task');
+
+    // Create stress indicators as divs
+    let stressMarker = document.createElement('div');
+    stressMarker.innerText = ' ! ';
+    stressMarker.classList.add('stressDiv');
+    stressMarker.setAttribute('style', 'background-image: linear-gradient(' + task.stressGradient + ')');
+
+    // Set the task height
+    if (zoom * task.height < 20) {  // Adjust text size for short tasks
+      newNode.style['font-size'] = '12px';
+      stressMarker.style['font-size'] = '12px';
+    } else {
+      newNode.style['font-size'] = null;
+      stressMarker.style['font-size'] = null;
+    }
+    newNode.style['line-height'] = zoom * task.height + 'px';
+    stressMarker.style['line-height'] = zoom * task.height + 'px';
+    newNode.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
+    stressMarker.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
+
+    // Write text in task
+    let nodeText = textExtractor(task);
+    let textNode = document.createTextNode(nodeText);
+    newNode.appendChild(textNode);
+
+    // Create the elements
+    document.getElementById('stressDiv').appendChild(stressMarker);
+    document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
+  }
+}
+
+
+function clearOldTasksEtc() {
+  // Remove old task from stressDiv
+  const stressNode = document.getElementById('stressDiv');
+  while (stressNode.firstChild) {
+    stressNode.removeChild(stressNode.lastChild);
   }
 
   // Remove old time markings from timeBar
@@ -831,37 +916,11 @@ function renderTasks() {
     timeNode.removeChild(timeNode.lastChild);
   }
 
-  // Make new time markings in timeBar
-  fillTimeBar(zoom);
-
-  let displayList = createNullTimes();
-
-  // Refresh view from taskList
-  for (const [index, task] of displayList.entries()) {
-    // let newNode = document.createElement('div');
-    let newNode = document.createElement('button');
-    newNode.setAttribute('id', task.uniqueId);
-    newNode.classList.add(task.fuzzyness);  // Fuzzyness is used for styling tasks
-    newNode.classList.add(task.isClicked);
-    newNode.classList.add('task');
-
-    // Set the task height
-    if (zoom * task.height < 20) {  // Adjust text size for short tasks
-      newNode.style['font-size'] = '12px';
-    } else {
-      newNode.style['font-size'] = null;
-    }
-    newNode.style['line-height'] = zoom * task.height + 'px';
-    newNode.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
-
-    let nodeText = textExtractor(task);
-    let textNode = document.createTextNode(nodeText);
-    newNode.appendChild(textNode);
-    document.getElementById('taskDiv').insertAdjacentElement('beforeend', newNode);
-
+  // Remove old task from taskDiv
+  const taskNode = document.getElementById('taskDiv');
+  while (taskNode.firstChild) {
+    taskNode.removeChild(taskNode.lastChild);
   }
-  // resetInputBox(); // NO reset input box needs to be elsewhere
-
 }
 
 
@@ -1044,18 +1103,18 @@ function parseText(rawText) {
   };
 
 
-  // let drain = /d[1-5]./.exec(rawText);
-  // if (/d[1-5]./.exec(drain)) {
-  //   drain = /[1-5]/.exec(drain).toString();
-  //   rawText = rawText.replace('d' + drain, '');
-  // } else {
-  //   drain = '-1';
-  //   // rawText = rawText.replace('d', '');
-  // };
+  let drain = /d+[1-5]./.exec(rawText);
+  if (/d+[1-5]./.exec(drain)) {
+    drain = /[1-5]/.exec(drain).toString();
+    rawText = rawText.replace('d' + drain, '');
+  } else {
+    drain = '1';
+    // rawText = rawText.replace('d', '');
+  };
 
   let text = rawText.trim();
   text = text.slice(0, 1).toUpperCase() + text.slice(1, );
 
-  parsedList = [taskStart, duration, text];
+  parsedList = [taskStart, duration, text, drain];
   return parsedList;
 }
