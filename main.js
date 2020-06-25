@@ -121,6 +121,7 @@ function makeFirstTasks() {
     task.fuzzyness = 'isNotFuzzy';
     taskList.push(task);
   }
+  localStorage.indexOfLastTouched = 0;
 }
 
 
@@ -227,6 +228,7 @@ function textListToTaskList(taskListAsText) {
   let succes = false;
   if (taskListAsText === []) {
     makeFirstTasks();
+    // storeLocally();
   } else {
     for (const [index, text] of taskListAsText.entries()) {
       let parsedList = parseText(text.trim());

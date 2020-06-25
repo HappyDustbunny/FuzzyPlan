@@ -1,15 +1,18 @@
-let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Extra store 1', 'Extra store 2', 'Extra store 3'];
 
 // window.addEventListener('storage', function(e) {
 //   localStorage.setItem(e.key, e.newValue);
 // });
 
-document.getElementById('apply').addEventListener('click', apply);
-document.getElementById('cancel').addEventListener('click', cancel);
+document.getElementById('apply1').addEventListener('click', apply1);
+document.getElementById('apply2').addEventListener('click', apply2);
+document.getElementById('apply3').addEventListener('click', applyStressModel);
 document.getElementById('goBack').addEventListener('click', goBack);
 document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
 document.getElementById('storeList').addEventListener('click', storeList);
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
+// document.getElementById('stressLevel').addEventListener('click', setStressLevel);
+// document.getElementById('tDouble').addEventListener('click', setTDouble);
 
 function storeList() {
   let storeButtons = document.getElementsByClassName('store');
@@ -33,6 +36,7 @@ function storeHasBeenClicked(event) {
     window.location.assign('main.html');
   }
 
+  // Ask for new label and tidy button up
   if (clickedButton.classList.contains('highLighted')) {
     if (clickedButton.classList[0] === 'notInUse') {
       clickedButton.classList.remove('notInUse');
@@ -61,12 +65,14 @@ function storeHasBeenClicked(event) {
     } else {
       displayMessage('Current task list stored in ' + clickedButton.innerText, 3000);
     }
-    setTimeout(function () {window.location.assign('main.html');}, 3500);
+    setTimeout(function() {window.location.assign('main.html');}, 3500);
     // window.location.assign('main.html');
-  } else { // Get stuff
+  } else if (localStorage.getItem(id)) { // Get stuff
     localStorage.setItem('lastTaskList', JSON.stringify(localStorage.taskListAsText)); // Move current tasklist to trash bin
     localStorage.taskListAsText = JSON.parse(localStorage.getItem(id)); // Let current tasklist be chosen stored tasklist
     window.location.assign('main.html');
+  } else {
+    displayMessage('This store is empty', 3000);
   }
 
   // Remove highlights
@@ -85,7 +91,7 @@ function setUpFunc() {
   for (const button of storeButtons) {
     if ((localStorage.getItem(button.id) === null) || JSON.parse(localStorage.getItem(button.id)) === "[]") {
       button.classList.add('notInUse');
-      button.innerText = weekDays[/\d/.exec(button.id) - 1]
+      button.innerText = weekDays[/\d+/.exec(button.id) - 1]
     } else {
       button.classList.remove('notInUse');
       button.classList.add('inUse');
@@ -102,14 +108,21 @@ function inputBoxMGotFocus() {
 }
 
 
-function apply() {
+function applyTaskDuration() {
+
   let min = document.getElementById('inputBoxM').value.trim();
 
   if (isNaN(min) || min < 0 || 24*60 - 2 < min) {
-   displayMessage('Use only numbers between 0 and 1438, please.', 3000);
-   document.getElementById('inputBoxM').select();
-   return;
- }
+    displayMessage('Use only numbers between 0 and 1438, please.', 3000);
+    document.getElementById('inputBoxM').select();
+    return;
+  }
+
+  window.location.assign('main.html');
+}
+
+
+function applyToc() {
 
  let radioButtonResult = document.getElementsByClassName('alarm');
  for (var i = 0; i < 4; i++) {
@@ -118,27 +131,22 @@ function apply() {
    }
  }
 
-
   localStorage.defaultTaskDuration = min;
+
   window.location.assign('main.html');
 }
 
 
-function cancel() {
-  window.location.assign('main.html');
-}
-
-
-function clearDay() {
-  let answer = confirm('Do you want to remove all tasks and start planning a new day?');
-  if (answer == true) {
-    localStorage.taskListAsText = [];
-    localStorage.wakeUpOrNowClickedOnce = false;
-    window.location.assign('main.html');
-  } else {
-    displayMessage('Nothing was changed', 3000);
-  }
-}
+// function clearDay() {
+//   let answer = confirm('Do you want to remove all tasks and start planning a new day?');
+//   if (answer == true) {
+//     localStorage.taskListAsText = [];
+//     localStorage.wakeUpOrNowClickedOnce = false;
+//     window.location.assign('main.html');
+//   } else {
+//     displayMessage('Nothing was changed', 3000);
+//   }
+// }
 
 
 function goBack() {
@@ -153,4 +161,27 @@ function displayMessage(text, displayTime) {
   msg.innerText = text;
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
+}
+
+
+function applyStressModel() {
+  // Set wakeup stress level
+  let value = document.getElementById('stressLevel').value.trim();
+  if (isNaN(value) || value < 0 || 9 < value) {
+    displayMessage('Use only numbers between 0 and 9, please', 3000);
+    document.getElementById('stressLevel').select();
+  } else {
+    localStorage.wakeUpStress = value;
+  }
+
+  // Set tDouble
+  let min = document.getElementById('tDouble').value.trim();
+  if (isNaN(min) || min < 0 || 24*60 < min) {
+    displayMessage('Use only numbers between 0 and 1438, please', 3000);
+    document.getElementById('stressLevel').select();
+  } else {
+    localStorage.tDouble = min;
+  }
+
+  window.location.assign('main.html');
 }

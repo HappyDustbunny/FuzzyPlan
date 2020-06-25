@@ -67,3 +67,11 @@ button:focus {
 button[id*='memory'] {
   width: 300px;
 }
+
+.topic {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .25);
+}
