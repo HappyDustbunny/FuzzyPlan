@@ -101,6 +101,12 @@ function setUpFunc() {
   if (localStorage.defaultTaskDuration) {
     document.getElementById('inputBoxM').value = localStorage.defaultTaskDuration;
   }
+  if (localStorage.wakeUpStress) {
+    document.getElementById('stressLevel').value = localStorage.wakeUpStress;
+  }
+  if (localStorage.tDouble) {
+    document.getElementById('tDouble').value = localStorage.tDouble;
+  }
 }
 
 function inputBoxMGotFocus() {

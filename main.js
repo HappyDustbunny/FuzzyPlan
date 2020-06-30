@@ -175,6 +175,14 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('zoom')) {
     zoom = localStorage.zoom;
   }
+
+  if (localStorage.getItem('wakeUpStress')) {
+    wakeUpStress = localStorage.wakeUpStress;
+  }
+
+  if (localStorage.getItem('tDouble')) {
+    tDouble = localStorage.tDouble;
+  }
   // // if (localStorage.getItem('wakeUpH')) {
   // //   wakeUpH = localStorage.wakeUpH;
   // // }
@@ -635,7 +643,13 @@ function clearDay() {
 
 function editTask() {
   let id = getIndexFromUniqueId(chosenTaskId);
-  taskText = taskList[id].text + ' ' + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
+  let drain = '';
+  if (1 < taskList[id].drain) {
+    drain = ' d' + taskList[id].drain + ' ';
+  } else if (taskList[id].drain < 0) {
+    drain = ' g' + (-taskList[id].drain) + ' ';
+  }
+  taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
   document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
@@ -971,16 +985,26 @@ function jumpToTime(time) {
 
 function textExtractor(task) {  // Extract the text to be written on screen
   let text = task.text;
+  let drain = '';
+
+  if (task.drain != '') {
+    if (task.drain > 1) {
+      drain = ' d' + task.drain;
+    } else if (task.drain < 0) {
+      drain = ' g' + (-task.drain);
+    }
+
+  }
 
   if (task.duration != '') {
     let hours = Math.floor(task.duration / 3600000);
     let minutes = Math.floor((task.duration - hours * 3600000) / 60000);
     if (hours > 0 && minutes > 0) {
-      text = '(' + hours + 'h' + minutes + 'm) ' + task.text;
+      text = '(' + hours + 'h' + minutes + 'm' + drain + ') ' + task.text;
     } else if (hours > 0) {
-      text = '(' + hours + 'h' + ') ' + task.text;
+      text = '(' + hours + 'h' + drain + ') ' + task.text;
     } else {
-      text = '(' + minutes + 'm) ' + task.text;
+      text = '(' + minutes + 'm' + drain + ') ' + task.text;
     }
   }
 
