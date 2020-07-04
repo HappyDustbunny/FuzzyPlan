@@ -6,13 +6,46 @@ let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturda
 
 document.getElementById('apply1').addEventListener('click', apply1);
 document.getElementById('apply2').addEventListener('click', apply2);
+document.getElementById('info').addEventListener('click', info);
 document.getElementById('apply3').addEventListener('click', applyStressModel);
-document.getElementById('goBack').addEventListener('click', goBack);
+document.getElementById('goBack1').addEventListener('click', goBack);
+document.getElementById('goBack2').addEventListener('click', goBack);
 document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
 document.getElementById('storeList').addEventListener('click', storeList);
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
 // document.getElementById('stressLevel').addEventListener('click', setStressLevel);
 // document.getElementById('tDouble').addEventListener('click', setTDouble);
+
+
+function info() {
+  alert('The stress model assume your stress level ' +
+         'will double after working a fixed time without ' +
+         'pause and show the stress level as a colour in ' +
+         'the vertical bar in the left side. \n' +
+         'Level 1 (No stress) is a light lavender and ' +
+         'level 10 (Near breakdown) is nearly black. \n' +
+         '\n' +
+         'You can reflect that some tasks are more stressing ' +
+         'by setting it\'s drain level between 2 and 5 (default is 1). ' +
+         'This is done by wrting d3 or d5 in the text. \n' +
+         'Pauses will bring your stress level down and can ' +
+         'be adjusted by setting the "gain" between 1 and 9 ' +
+         '(g1 or g8). \nGain can be seen as negative drain, ' +
+         'so d-3 is the same as g3. \n' +
+         '\n' +
+         'Here you can adjust basic stress level (at wake up) ' +
+         'between 1 and 9 and the length of the interval ' +
+         'before your stress level doubles (in minutes).\n ' +
+         'If you are easily stressed the interval will ' +
+         'be shorter, say 30 minutes.\n' +
+         '\n' +
+         'Fiddle with the values until the stress bar gives' +
+         'useful information.\n' +
+         'The goal is to remember to schedule pauses before you' +
+         'reach a high stress level.'
+         );
+}
+
 
 function storeList() {
   let storeButtons = document.getElementsByClassName('store');

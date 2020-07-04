@@ -187,9 +187,23 @@ input {
   border-radius: 10px;
 }
 
+#info {
+  background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #9898ff);
+  border-radius: 20px;
+}
+
 #message {
   display: flex;
   text-align: center;
+  grid-area: header;
+}
+
+#heart {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  background-color: white;
+  font-size: 14px;
   grid-area: header;
 }
 

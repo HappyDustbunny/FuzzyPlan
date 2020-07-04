@@ -13,7 +13,7 @@ let wakeUpH = 7;  // The hour your day start according to settings. This is defa
 let wakeUpM = 0;  // The minutes your day start according to settings
 let wakeUpOrNowClickedOnce = false;
 let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
-let stressLevel = wakeUpStress;
+// let stressLevel = wakeUpStress;
 let tDouble = 240;  // Doubling time for stress level in minutes
 let alarmOn = false;
 
@@ -295,6 +295,9 @@ function updateTimeMarker() {
   nowSpanElement = document.getElementById('nowSpan');
   nowSpanElement.style.height = nowHeight;
 
+  updateHearts(now);
+
+
   let taskAlarms = localStorage.radioButtonResult;
   let nowTime = hours.toString() + min.toString() + sec.toString();
   if (taskAlarms != 'off') {
@@ -312,6 +315,28 @@ function updateTimeMarker() {
   }
 }
 
+function updateHearts(now) {
+  // Remove old hearts from heart span
+  const heartNode = document.getElementById('heart');
+  while (heartNode.firstChild) {
+    heartNode.removeChild(heartNode.lastChild);
+  }
+
+  let currentTask = taskList[0];
+
+  for (const [index,  task] of taskList.entries()) {
+    if (task.date < now && now < task.end()) {
+      currentTask = task;
+      break;
+    }
+  }
+
+  let time = (now - currentTask.date) / 60000;
+  let result = currentTask.startStressLevel * Math.pow(2, time/(tDouble/currentTask.drain));
+
+  fillHearths(Math.round(10 - result)); // TODO: Fix hearts during nullTime
+}
+
 function sayToc() {
   let sound = new Audio('429721__fellur__tic-alt.wav');
   sound.play();
@@ -322,6 +347,9 @@ function sayToc() {
 window.addEventListener('storage', function(e) {
   localStorage.setItem(e.key, e.newValue);
 });
+
+
+document.getElementById('info').addEventListener('click', info);
 
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
@@ -346,7 +374,73 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+function  fillHearths(currentStressLevel) {
+  const heartSpan = document.getElementById('heart');
+  let max = currentStressLevel;
+  if (10 < max) {
+    max = 10;
+  }
 
+  for (var i = 0; i < max; i++) {
+    let newHeart = document.createElement('img');
+    newHeart.src="200px-A_SVG_semicircle_heart.svg.png";
+    newHeart.style.width = '14px';
+    newHeart.style.height = '14px';
+    newHeart.style.alt="heart symbol";
+
+    heartSpan.appendChild(newHeart);
+  }
+
+  for (var i = 0; i < 10 - max; i++) {
+    let newHalfHeart = document.createElement('img');
+    newHalfHeart.src="200px-A_SVG_semicircle_heart_empty.svg.png";
+    newHalfHeart.style.width = '14px';
+    newHalfHeart.style.height = '14px';
+    newHalfHeart.style.alt="empty heart symbol";
+
+    heartSpan.appendChild(newHalfHeart);
+  }
+}
+
+function info() {
+  alert('INSTRUCTIONS\n' +
+        'To add a task just write a few word in the inputBox.\n' +
+        'The default task duration is 30 minutes, but writing 1h15m ' +
+        'will make the task 1 hour and 15 minutes long.\n' +
+        'If you know when a task is supposed to take place just ' +
+        'write 1205 if your appointment is at 12:05 or 745 for 7:45.\n' +
+        '(AM and PM is not supported as this is the twentyfirst century...)\n' +
+        'Jump to a different part of the task list by writing the time, ' +
+        'say 700 or 1800 without text.\n' +
+        'NOTE: The first task MUST have a fixed time. You can insert a '+
+        '15 minute planning period by pressing the "Now" button.\n' +
+        '\n' +
+        'Press enter to input a task, og click on the task you ' +
+        'want to insert the new task before.\n' +
+        'Clickin on a white area insert the task in the beginning of ' +
+        'the empty area.\n' +
+        '\n' +
+        'To swap two tasks, just click them one after another. Fixed tasks' +
+        'can not be swapped.\n' +
+        'Double click to edit a task.\n' +
+        '\n' +
+        'Clear will clear the textbox or the entire task list as ' +
+        'indicated by the arrow triangles.\n' +
+        '\n' +
+        '' +
+        '' +
+        'To use the stress level guide to the left assign a ' +
+        'drain level (1-5) by writing d3 or d4. Defalult is 1. \n' +
+        'When the bar to the left turn from lavender to dark blue ' +
+        'you are supposed to add pauses with a gain level from 1-9 ' +
+        'by writing g3 or g8. This will bring the stess level down.\n' +
+        'In the settings (\u2699) you can find additional controls for the ' +
+        'stress model. \n' +
+        '' +
+        '' +
+        ''
+  );
+}
 // TODO: Make addPause buttons 15m, 30m + ?
 // Used by an eventListener. Display settings.
 function settings() {
@@ -678,13 +772,13 @@ function zoomFunc() {
 
 function createNullTimes() {
   let jumpToId = uniqueIdOfLastTouched;
-  stressLevel = wakeUpStress; // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
+  let currentStressLevel = wakeUpStress;
 
   displayList = [];
   let duration = 0;
 
   displayList.push(taskList[0]);
-  taskList[0].stressGradient = stressLevel;// TODO: Fix this: stressGradient needs to be a list of 2+ elements
+  taskList[0].stressGradient = currentStressLevel;
 
   let len = taskList.length;
   for (var n=1; n<len; n++) {
@@ -693,17 +787,23 @@ function createNullTimes() {
       let nullTime = new Task(taskList[n-1].end(), duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
+      nullTime.startStressLevel = currentStressLevel;
       // nullTime.drain = -1;
       if (n === 1) {
-        let colour = 'hsl(255, 100%, ' + (100 - Math.floor(stressLevel*10)).toString() + '%)';
+        let colour = 'hsl(255, 100%, ' + (100 - Math.floor(currentStressLevel*10)).toString() + '%)';
         nullTime.stressGradient = [colour, colour];
       } else {
-        nullTime.stressGradient = getStress(nullTime);
+        let result = getStress(nullTime);
+        nullTime.stressGradient = result[0];
+        currentStressLevel = result[1];
       }
       displayList.push(nullTime);
       duration = 0;
     }
-    taskList[n].stressGradient = getStress(taskList[n]);
+    taskList[n].startStressLevel = currentStressLevel;
+    let result = getStress(taskList[n]);
+    taskList[n].stressGradient = result[0];
+    currentStressLevel = result[1];
     displayList.push(taskList[n]);
   }
 
@@ -713,23 +813,22 @@ function createNullTimes() {
 
 
 function getStress(task) {
-  console.log(task.text, stressLevel);
-  let gradient = ['hsl(255, 100%, ' + (100 - Math.floor(stressLevel * 10)).toString() + '%)'];
+  let currentStressLevel = task.startStressLevel;
+  console.log(task.text, currentStressLevel);
+  let gradient = ['hsl(255, 100%, ' + (100 - Math.floor(currentStressLevel * 10)).toString() + '%)'];
 
   let durationM = Math.floor(task.duration / 60000);
   let stress = 0;
   for (var i = 0; i < durationM; i += 5) {
-    stress = stressLevel * Math.pow(2, i/(tDouble/task.drain)); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
-    // console.log(durationM, i, stressLevel, stress, 100 - Math.floor(stress * 10));
+    stress = currentStressLevel * Math.pow(2, i/(tDouble/task.drain)); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
     colourBit = 'hsl(255, 100%, ' + (100 - Math.floor(stress * 10)).toString() + '%)';
     gradient.push(colourBit);
   }
 
-  stressLevel = stress;
-  // console.log(gradient);
-  console.log(task.text, stressLevel);
+  // stressLevel = stress;
+  console.log(task.text, currentStressLevel);
 
-  return gradient;
+  return [gradient, stress];
 }
 
 
@@ -879,6 +978,7 @@ function renderTasks() {
   clearOldTasksEtc();
 
   // fillStressBar(zoom);
+  // fillHearths(10);
 
   // Make new time markings in timeBar
   fillTimeBar(zoom);
@@ -898,7 +998,8 @@ function renderTasks() {
 
     // Create stress indicators as divs
     let stressMarker = document.createElement('div');
-    stressMarker.innerText = ' ! ';
+    stressMarker.innerText = '-';
+
     stressMarker.classList.add('stressDiv');
     stressMarker.setAttribute('style', 'background-image: linear-gradient(' + task.stressGradient + ')');
 
@@ -928,6 +1029,12 @@ function renderTasks() {
 
 
 function clearOldTasksEtc() {
+  // // Remove old hearts from heartSpan
+  // const heartNode = document.getElementById('heart');
+  // while (heartNode.firstChild) {
+  //   heartNode.removeChild(heartNode.lastChild);
+  // }
+
   // Remove old task from stressDiv
   const stressNode = document.getElementById('stressDiv');
   while (stressNode.firstChild) {
