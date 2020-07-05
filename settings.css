@@ -58,6 +58,12 @@ button:focus {
   border-radius: 20px;
 }
 
+#info img {
+   display: block;
+   height: 13px;
+   width: 13px;
+}
+
 #message {
   display: flex;
   text-align: center;

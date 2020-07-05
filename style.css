@@ -46,15 +46,16 @@ h1 {
 
 .container1 {
   display: grid;
-  grid-template-columns: 10% 80% 10%;
+  grid-template-columns: 20% 60% 20%;
   grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. header .'
-  '. body .';
+  '. header info'
+  '. hearts .'
+  '. messages .';
 }
 
 
@@ -174,28 +175,38 @@ input {
 }
 
 .centerWrapper {
-  text-align: center;
+  /* text-align: center; */
   background-color: transparent;
   border: none;
 }
 
 .controlButton {
+  /* display: inline-block; */
   text-align: center;
-  width: 10%;
+  width: 30px;
   height: 22px;
   border: 1px solid rgb(96, 139, 168);
   border-radius: 10px;
 }
 
-#info {
-  background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #9898ff);
-  border-radius: 20px;
+#name {
+  display: flex;
+  /* text-align: center; */
+  justify-content: center;
+  grid-area: header;
 }
 
-#message {
-  display: flex;
-  text-align: center;
-  grid-area: body;
+#info {
+  align-self: center;
+  background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #9898ff);
+  border-radius: 20px;
+  grid-area: info;
+}
+
+#info img {
+   display: block;
+   height: 13px;
+   width: 13px;
 }
 
 #heart {
@@ -204,14 +215,21 @@ input {
   justify-content: center;
   background-color: white;
   font-size: 14px;
-  grid-area: header;
+  grid-area: hearts;
+}
+
+#message {
+  display: flex;
+  text-align: center;
+  grid-area: messages;
 }
 
 #upButton,
 #nowButton,
 #editButton {
   width: 10%;
-  font-size: 12px;
+  font-size: 10px;
+  padding: 0px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 
@@ -222,9 +240,15 @@ input {
   background-image: linear-gradient(#c5c5f6, #c2e6f2, #c2e6f2, #c2e6f2,#c5c5f6) !important;
 }
 
-#zoom,
-#settings {
+#zoom {
   text-align: left;
+  width: auto;
+  font-size: 15px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+}
+
+#settings {
+  /* display: block; */
   width: auto;
   font-size: 15px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);

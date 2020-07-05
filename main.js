@@ -429,15 +429,21 @@ function info() {
         '\n' +
         '' +
         '' +
-        'To use the stress level guide to the left assign a ' +
+        'In the left side is a narrow vertical bar that change colour based' +
+        'on a stress model. Black denotes stresslevel 10 and lavender is relaxed.' +
+        '(stresslevel 1).\n' +
+        'The model assumes that tasks drains you at drain level 1 and that ' +
+        'unscheduled time makes you relax at gain level 1.' +
+        'To use the stress model more actively assign a ' +
         'drain level (1-5) by writing d3 or d4. Defalult is 1. \n' +
         'When the bar to the left turn from lavender to dark blue ' +
         'you are supposed to add pauses with a gain level from 1-9 ' +
         'by writing g3 or g8. This will bring the stess level down.\n' +
         'In the settings (\u2699) you can find additional controls for the ' +
-        'stress model. \n' +
-        '' +
-        '' +
+        'stress model. You will need to experiment to get settings that' +
+        'reflects your actual stress level.\n' +
+        'The hearts shows your current stresslevel according to the model.\n' +
+        '10 hearts is relaxed, zero hearts is stressed out.\n' +
         ''
   );
 }
