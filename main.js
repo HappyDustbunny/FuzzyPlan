@@ -1,5 +1,6 @@
 let taskList = [];  // List to keep track of the order of the tasks
 let lastTaskList = [];
+let displayList = [];
 let startAndEndTimes = [];
 let chosenTask = '';
 let chosenTaskId = '';  // When a task is clicked information about that task is stored here
@@ -53,7 +54,6 @@ class Task {
       uniqueId = Math.floor(Math.random() * 10000);
       for (const [index, id] of uniqueIdList.entries()) {
         if (uniqueId.toString() === id.toString()) {
-          console.log('giveAUniqueId', uniqueId);
           tryAgain = true;
           break;
         }
@@ -224,7 +224,7 @@ function debugExamples() {
     '30m short3'
   ];
 
-  console.log(exList);
+  console.log('Debugging example list ', exList);
 
   uniqueIdOfLastTouched = taskList[0].uniqueId;
   textListToTaskList(exList);
@@ -316,16 +316,16 @@ function updateTimeMarker() {
 }
 
 function updateHearts(now) {
-  // Remove old hearts from heart span
-  const heartNode = document.getElementById('heart');
-  while (heartNode.firstChild) {
-    heartNode.removeChild(heartNode.lastChild);
-  }
-
   let currentTask = taskList[0];
 
-  for (const [index,  task] of taskList.entries()) {
+  for (const [index,  task] of displayList.entries()) {
     if (task.date < now && now < task.end()) {
+      // Remove old hearts from heart span
+      const heartNode = document.getElementById('heart');
+      while (heartNode.firstChild) {
+        heartNode.removeChild(heartNode.lastChild);
+      }
+
       currentTask = task;
       break;
     }
@@ -826,7 +826,7 @@ function getStress(task) {
   }
 
   // stressLevel = stress;
-  console.log(task.text, currentStressLevel);
+  console.log(task.text, stress);
 
   return [gradient, stress];
 }
@@ -968,7 +968,7 @@ function fixTimes() {
 
 
 function renderTasks() {
-  let displayList = createNullTimes();
+  displayList = createNullTimes();
 
   let taskListAsText = taskListExtractor();
   if (JSON.stringify(taskListAsText)) {
@@ -1097,7 +1097,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
   if (task.drain != '') {
     if (task.drain > 1) {
       drain = ' d' + task.drain;
-    } else if (task.drain < 0) {
+    } else if (task.drain < -1) {
       drain = ' g' + (-task.drain);
     }
 
