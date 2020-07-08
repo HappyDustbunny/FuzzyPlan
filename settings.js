@@ -4,13 +4,14 @@ let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturda
 //   localStorage.setItem(e.key, e.newValue);
 // });
 
-document.getElementById('apply1').addEventListener('click', apply1);
-document.getElementById('apply2').addEventListener('click', apply2);
+document.getElementById('apply1').addEventListener('click', applyTaskDuration);
+document.getElementById('apply2').addEventListener('click', applyToc);
 document.getElementById('info').addEventListener('click', info);
 document.getElementById('apply3').addEventListener('click', applyStressModel);
 document.getElementById('goBack1').addEventListener('click', goBack);
 document.getElementById('goBack2').addEventListener('click', goBack);
 document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
+document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
 document.getElementById('storeList').addEventListener('click', storeList);
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
 // document.getElementById('stressLevel').addEventListener('click', setStressLevel);
@@ -18,32 +19,7 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 
 
 function info() {
-  alert('The stress model assume your stress level ' +
-         'will double after working a fixed time without ' +
-         'pause and show the stress level as a colour in ' +
-         'the vertical bar in the left side. \n' +
-         'Level 1 (No stress) is a light lavender and ' +
-         'level 10 (Near breakdown) is nearly black. \n' +
-         '\n' +
-         'You can reflect that some tasks are more stressing ' +
-         'by setting it\'s drain level between 2 and 5 (default is 1). ' +
-         'This is done by wrting d3 or d5 in the text. \n' +
-         'Pauses will bring your stress level down and can ' +
-         'be adjusted by setting the "gain" between 1 and 9 ' +
-         '(g1 or g8). \nGain can be seen as negative drain, ' +
-         'so d-3 is the same as g3. \n' +
-         '\n' +
-         'Here you can adjust basic stress level (at wake up) ' +
-         'between 1 and 9 and the length of the interval ' +
-         'before your stress level doubles (in minutes).\n ' +
-         'If you are easily stressed the interval will ' +
-         'be shorter, say 30 minutes.\n' +
-         '\n' +
-         'Fiddle with the values until the stress bar gives' +
-         'useful information.\n' +
-         'The goal is to remember to schedule pauses before you' +
-         'reach a high stress level.'
-         );
+  window.location.assign('instructions.html#stressModel');
 }
 
 
@@ -134,6 +110,15 @@ function setUpFunc() {
   if (localStorage.defaultTaskDuration) {
     document.getElementById('inputBoxM').value = localStorage.defaultTaskDuration;
   }
+  if (localStorage.ticInterval) {
+    document.getElementById('inputBoxX').value = localStorage.ticInterval;
+  }
+  if (localStorage.radioButtonResultAlarm) {
+    document.getElementById(localStorage.radioButtonResultAlarm).checked = 'checked';
+  }
+  if (localStorage.radioButtonResultReminder) {
+    document.getElementById(localStorage.radioButtonResultReminder).checked = 'checked';
+  }
   if (localStorage.wakeUpStress) {
     document.getElementById('stressLevel').value = localStorage.wakeUpStress;
   }
@@ -146,6 +131,9 @@ function inputBoxMGotFocus() {
   document.getElementById('inputBoxM').select();
 }
 
+function inputBoxXGotFocus() {
+  document.getElementById('inputBoxX').select();
+}
 
 function applyTaskDuration() {
 
@@ -157,22 +145,38 @@ function applyTaskDuration() {
     return;
   }
 
+  localStorage.defaultTaskDuration = min;
+
   window.location.assign('main.html');
 }
 
 
 function applyToc() {
+  let min = document.getElementById('inputBoxX').value.trim();
 
- let radioButtonResult = document.getElementsByClassName('alarm');
- for (var i = 0; i < 4; i++) {
-   if (radioButtonResult[i].type === 'radio' && radioButtonResult[i].checked) {
-     localStorage.radioButtonResult = radioButtonResult[i].value;
+  if (isNaN(min) || min < 0 || 59 < min) {
+    displayMessage('Use only numbers between 0 and 59, please.', 3000);
+    document.getElementById('inputBoxX').select();
+    return;
+  }
+
+  localStorage.ticInterval = min;
+
+   let radioButtonResult1 = document.getElementsByClassName('alarm');
+   for (var i = 0; i < 4; i++) {
+     if (radioButtonResult1[i].type === 'radio' && radioButtonResult1[i].checked) {
+       localStorage.radioButtonResultAlarm = radioButtonResult1[i].value;
+     }
    }
- }
 
-  localStorage.defaultTaskDuration = min;
+   let radioButtonResult2 = document.getElementsByClassName('reminder');
+   for (var i = 0; i < 3; i++) {
+     if (radioButtonResult2[i].type === 'radio' && radioButtonResult2[i].checked) {
+       localStorage.radioButtonResultReminder = radioButtonResult2[i].value;
+     }
+   }
 
-  window.location.assign('main.html');
+   window.location.assign('main.html');
 }
 
 

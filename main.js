@@ -100,7 +100,11 @@ function setUpFunc() {
 
   resetInputBox();
 
-  jumpToNow()
+  let now = new Date()
+  let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
+  console.log(nowMinusOneHour);
+  jumpToTime(nowMinusOneHour);
+  // jumpToNow()
 }
 
 
@@ -130,7 +134,7 @@ function storeLocally() {
   // if (!localStorage.storedTasksList) {
   //   localStorage.storedTasksList = JSON.stringify(storedTasksList);
   // }
-  localStorage.wakeUpOrNowClickedOnce = false;
+  localStorage.wakeUpOrNowClickedOnce = wakeUpOrNowClickedOnce;
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId === uniqueIdOfLastTouched) {
       localStorage.indexOfLastTouched = index;
@@ -298,8 +302,9 @@ function updateTimeMarker() {
   updateHearts(now);
 
 
-  let taskAlarms = localStorage.radioButtonResult;
+  let taskAlarms = localStorage.radioButtonResultAlarm;
   let nowTime = hours.toString() + min.toString() + sec.toString();
+  let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
   if (taskAlarms != 'off') {
     if (taskAlarms === 'beginning' || taskAlarms === 'both') {
       if (startAndEndTimes.includes('beginning' + nowTime)) {
@@ -307,9 +312,24 @@ function updateTimeMarker() {
       }
     }
     if (taskAlarms === 'end' || taskAlarms === 'both') {
-      if (startAndEndTimes.includes('end' + nowTime)) {
-        sayToc();
+      if (startAndEndTimes.includes('end' + nowMinusFiveTime)) {
+        sayTic();
         setTimeout(sayToc, 300);
+      }
+    }
+  }
+
+  let reminder = localStorage.radioButtonResultReminder;
+  if (reminder != 'off') {
+    if (reminder === 'regularly') {
+      if (min % localStorage.ticInterval === 0 && sec === 0) {
+        sayTic();
+      }
+    }
+    if (reminder === 'rand') {
+      let randTime = Math.random() * (localStorage.ticInterval - 1) + 1;
+      if (min % randTime === 0 && sec === 0) {
+        sayTic();
       }
     }
   }
@@ -342,6 +362,11 @@ function sayToc() {
   sound.play();
 }
 
+function sayTic() {
+  let sound = new Audio('448081__breviceps__tic-toc-click.wav');
+  sound.play();
+}
+
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
 window.addEventListener('storage', function(e) {
@@ -355,11 +380,11 @@ document.getElementById('info').addEventListener('click', info);
 document.getElementById('settings').addEventListener('click', settings);
 
 // Insert a 15 min planning task at start-your-day time according to settings // TODO: Settings
-document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
+// document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
 document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700);}); // // TODO: connect to wakeup time
 
 // Insert a 15 min planning task at the current time
-document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
+// document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
 document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
@@ -403,56 +428,15 @@ function  fillHearths(currentStressLevel) {
 }
 
 function info() {
-  alert('INSTRUCTIONS\n' +
-        'To add a task just write a few word in the inputBox.\n' +
-        'The default task duration is 30 minutes, but writing 1h15m ' +
-        'will make the task 1 hour and 15 minutes long.\n' +
-        'If you know when a task is supposed to take place just ' +
-        'write 1205 if your appointment is at 12:05 or 745 for 7:45.\n' +
-        '(AM and PM is not supported as this is the twentyfirst century...)\n' +
-        'Jump to a different part of the task list by writing the time, ' +
-        'say 700 or 1800 without text.\n' +
-        'NOTE: The first task MUST have a fixed time. You can insert a '+
-        '15 minute planning period by pressing the "Now" button.\n' +
-        '\n' +
-        'Press enter to input a task, og click on the task you ' +
-        'want to insert the new task before.\n' +
-        'Clickin on a white area insert the task in the beginning of ' +
-        'the empty area.\n' +
-        '\n' +
-        'To swap two tasks, just click them one after another. Fixed tasks' +
-        'can not be swapped.\n' +
-        'Double click to edit a task.\n' +
-        '\n' +
-        'Clear will clear the textbox or the entire task list as ' +
-        'indicated by the arrow triangles.\n' +
-        '\n' +
-        '' +
-        '' +
-        'In the left side is a narrow vertical bar that change colour based' +
-        'on a stress model. Black denotes stresslevel 10 and lavender is relaxed.' +
-        '(stresslevel 1).\n' +
-        'The model assumes that tasks drains you at drain level 1 and that ' +
-        'unscheduled time makes you relax at gain level 1.' +
-        'To use the stress model more actively assign a ' +
-        'drain level (1-5) by writing d3 or d4. Defalult is 1. \n' +
-        'When the bar to the left turn from lavender to dark blue ' +
-        'you are supposed to add pauses with a gain level from 1-9 ' +
-        'by writing g3 or g8. This will bring the stess level down.\n' +
-        'In the settings (\u2699) you can find additional controls for the ' +
-        'stress model. You will need to experiment to get settings that' +
-        'reflects your actual stress level.\n' +
-        'The hearts shows your current stresslevel according to the model.\n' +
-        '10 hearts is relaxed, zero hearts is stressed out.\n' +
-        ''
-  );
+  window.location.assign('instructions.html')
 }
 // TODO: Make addPause buttons 15m, 30m + ?
+// TODO: Move alert-box instructions to html pages.
+
 // Used by an eventListener. Display settings.
 function settings() {
   storeLocally();
   window.location.assign('settings.html')
-  // displayMessage('To do: make settings', 5000);
   // Store a day from one session to another
   // Store multiple days? One pr. calender day?
   // Store wake up time (wakeUpH and wakeUpM)
@@ -501,7 +485,10 @@ function adjustNowAndWakeUpButtons() {
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
     upBtn.innerText = wakeUpH + ':' + min + '\u25B8';
+    nowBtn.title = 'Press to insert a 15 min planning period now';
     nowBtn.innerText = 'Now' + '\u25B8';
+    document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
+    document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
     upBtn.innerText = '\u25B8' + wakeUpH + ':' + min;
@@ -534,7 +521,7 @@ function inputAtEnter(event) {
     } else {
       if (/[^0-9]/.exec(contentInputBox) != null) { // If there is a chosen task AND text it must be an error
         nullifyClick();
-      } else if (/\d[0,3][0]/.exec(contentInputBox) != null || /[1-2]\d[0,3][0]/.exec(contentInputBox) != null) {
+      } else if (/\d[0-5][0-9]/.exec(contentInputBox) != null || /[1-2]\d[0-5][0-9]/.exec(contentInputBox) != null) {
         // If there is 3-4 numbers, jump to the time indicated
         resetInputBox();
         jumpToTime(contentInputBox);
@@ -1080,14 +1067,20 @@ function jumpToNow() {
 
 
 function jumpToTime(time) {
+  let min = /[0-9][0-9]$/.exec(time);
+  let hours = time.toString().replace(min, '');
+  if (Number(min) < 30) { // The time-divs are at half hour intervals and we can only jump to time-divs
+    min = '00';
+    time = hours + min;
+  } else {
+    min = '30';
+    time = hours + min;
+  }
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
     if (timeDiv) {
       container.scrollTop = timeDiv.offsetTop - 180 * zoom;
-      // document.getElementById('inputBox').focus();
-      let min = /[0-9][0-9]$/.exec(time);
-      let hours = time.toString().replace(min, '')
       displayMessage('Jumped to ' + hours + ':' + min, 700);
     } else {
       displayMessage('Number not recognised as a time', 1000)

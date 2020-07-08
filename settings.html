@@ -42,24 +42,23 @@
       <span>   <br>   </span>
       <button type="button" id='goBack1'>Go back</button>
 
-      <span>
       <h2>
         Settings
       </h2>
       <span class='topic'>
-        <p>
+        <span>
           Set default task duration in minutes:
           <input type="text" id='inputBoxM' value="30">
           <button type="button" id="apply1">Apply</button>
-        </p>
+        </span>
       </span>
-      </span>
+
+      <span>   <br>   </span> <!-- Inelegant hack -->
 
       <span class='topic'>
         <span>
-          <h4>
-            Play 'toc' sound
-          </h4>
+          <h4>Play 'toc' sound</h4>
+
           <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
           <label for=off"">Off</label> <br>
           <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
@@ -68,6 +67,19 @@
           <label for="end">At the end of tasks (toc toc)</label> <br>
           <input type="radio" id='both' class="alarm" name='alarm' value="both">
           <label for="both">Both at beginning and end of tasks</label> <br>
+
+          <h4>Play 'tic' sound</h4>
+          <input type="radio" id='off' class="reminder" name='reminder' value="off" checked='checked'>
+          <label for=off"">Off</label> <br>
+          <input type="radio" id='regularly' class="reminder" name='reminder' value="regularly">
+          <label for="regularly">Every X minutes</label> <br>
+          <input type="radio" id='rand' class="reminder" name='reminder' value="rand">
+          <label for="rand">Randomly within every X minutes</label> <br>
+          <br>
+          Time interval X in minutes:
+          <input type="text" id='inputBoxX' value="10">
+          <br>
+
         </span>
         <span>   <br>   </span> <!-- Inelegant hack -->
         <span>
