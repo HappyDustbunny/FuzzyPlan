@@ -8,7 +8,7 @@ let uniqueIdOfLastTouched = 0;
 let uniqueIdList = [];
 let nullTimeClicked = false;
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
-let zoomSymbolModifyer = 7; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
+let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 let defaultTaskDuration = 30;
 let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
 let wakeUpM = 0;  // The minutes your day start according to settings
@@ -299,8 +299,14 @@ function updateTimeMarker() {
   nowSpanElement = document.getElementById('nowSpan');
   nowSpanElement.style.height = nowHeight;
 
-  updateHearts(now);
+  if (taskList.length === 2) {
+    document.getElementById("info").style.animationPlayState = "running";
+  } else {
+    document.getElementById("info").style.animationPlayState = "paused";
+    // TODO: Fix hanging border if animation is paused mid cycle
+  }
 
+  updateHearts(now);
 
   let taskAlarms = localStorage.radioButtonResultAlarm;
   let nowTime = hours.toString() + min.toString() + sec.toString();
@@ -327,7 +333,7 @@ function updateTimeMarker() {
       }
     }
     if (reminder === 'rand') {
-      let randTime = Math.random() * (localStorage.ticInterval - 1) + 1;
+      let randTime = Math.floor(Math.random() * (localStorage.ticInterval - 1) + 1);
       if (min % randTime === 0 && sec === 0) {
         sayTic();
       }

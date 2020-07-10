@@ -198,15 +198,28 @@ input {
 
 #info {
   align-self: center;
-  background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #9898ff);
+  background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #bbbbf2);
   border-radius: 20px;
   grid-area: info;
+  animation-name: infoAnimation;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+  /* animation-delay: 1s; */
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-play-state: paused;
 }
 
 #info img {
    display: block;
    height: 13px;
    width: 13px;
+}
+
+@keyframes infoAnimation {
+  0% {border: 1px solid rgb(96, 139, 168);}
+  50% {border: 1px solid rgb(255, 0, 0);}
+  100% {border: 1px solid rgb(96, 139, 168);}
 }
 
 #heart {
