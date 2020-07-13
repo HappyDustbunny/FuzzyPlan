@@ -405,6 +405,13 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+document.addEventListener('touchmove', function() {jump(event);});
+
+function jump(event) {
+  if (event.touches.length > 1)
+  window.location.assign('instructions_dk.html');
+}
+
 function  fillHearths(currentStressLevel) {
   const heartSpan = document.getElementById('heart');
   let max = currentStressLevel;

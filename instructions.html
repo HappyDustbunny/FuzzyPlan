@@ -121,13 +121,13 @@
         document.getElementById('danish').addEventListener('click', goDK);
         document.getElementById('english').addEventListener('click', goUK);
         function goBack() {
-          window.location.assign(document.referrer);
+          window.location.assign(document.referrer); // TODO: Fix cycling between DK and UK
         }
         function goDK() {
-          window.location.assign('instructions_dk.html')
+          window.location.assign('instructions_dk.html');
         }
         function goUK() {
-          window.location.assign('instructions.html')
+          window.location.assign('instructions.html');
         }
 
       </script>
