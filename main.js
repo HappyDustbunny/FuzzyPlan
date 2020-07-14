@@ -405,6 +405,13 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+
+function twoFingerNavigation(event) {
+  if (event.touches.length > 1  )
+  window.location.assign('instructions_dk.html');
+}
+
 function  fillHearths(currentStressLevel) {
   const heartSpan = document.getElementById('heart');
   let max = currentStressLevel;
@@ -1003,15 +1010,18 @@ function renderTasks() {
     stressMarker.setAttribute('style', 'background-image: linear-gradient(' + task.stressGradient + ')');
 
     // Set the task height
-    if (zoom * task.height < 20) {  // Adjust text size for short tasks
-      newNode.style['font-size'] = '12px';
-      stressMarker.style['font-size'] = '12px';
+    if (zoom * task.height < 12) {  // Adjust text size for short tasks
+      newNode.style['font-size'] = 4 + 4 * zoom + 'px';
+      stressMarker.style['font-size'] = 4 + 4 * zoom + 'px';
+    } else if (zoom * task.height < 22) {
+      newNode.style['font-size'] = 6 + 6 * zoom + 'px';
+      stressMarker.style['font-size'] = 6 + 6 * zoom + 'px';
     } else {
       newNode.style['font-size'] = null;
       stressMarker.style['font-size'] = null;
     }
-    newNode.style['line-height'] = zoom * task.height + 'px';
-    stressMarker.style['line-height'] = zoom * task.height + 'px';
+    // newNode.style['line-height'] = zoom * task.height + 'px';
+    // stressMarker.style['line-height'] = zoom * task.height + 'px';
     newNode.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
     stressMarker.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
 
