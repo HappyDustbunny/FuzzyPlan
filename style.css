@@ -267,7 +267,7 @@ input {
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
 }
 
-#topButton {
+/* #topButton {
   width: 80%;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0);
   grid-area: taskHeader;
@@ -277,7 +277,7 @@ input {
   width: 80%;
   background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9898ff);
   grid-area: taskFooter;
-}
+} */
 
 
 .isClicked {

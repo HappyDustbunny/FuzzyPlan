@@ -408,8 +408,18 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
 function twoFingerNavigation(event) {
-  if (event.touches.length > 1  )
-  window.location.assign('instructions_dk.html');
+  if (sessionStorage.touchX && event.touches.length === 1) {
+    sessionStorage.touchX = '';
+  }
+  if (event.touches.length > 1) {
+    if (!sessionStorage.touchX) {
+      sessionStorage.touchX = event.touches[0].screenX;
+    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
+      window.location.assign('instructions_dk.html');
+    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
+      window.location.assign('instructions.html');
+    }
+  }
 }
 
 function  fillHearths(currentStressLevel) {
