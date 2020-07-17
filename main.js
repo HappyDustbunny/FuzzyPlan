@@ -267,11 +267,11 @@ function fillTimeBar(zoom) {
     let halfHourB = document.createElement('div');
 
     if (i < 10) {
-      halfHourA.innerText = '0' + i + ':00';
-      halfHourB.innerText = '0' + i + ':30';
+      halfHourA.textContent = '0' + i + ':00';
+      halfHourB.textContent = '0' + i + ':30';
     } else {
-      halfHourA.innerText = i + ':00';
-      halfHourB.innerText = i + ':30';
+      halfHourA.textContent = i + ':00';
+      halfHourB.textContent = i + ':30';
     }
 
     halfHourA.setAttribute('class', 'halfHours' + zoom * 2);
@@ -380,7 +380,9 @@ window.addEventListener('storage', function(e) {
 });
 
 
-document.getElementById('info').addEventListener('click', info);
+document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
+document.getElementById('month').addEventListener('click', function() {goToPage('month.html');});
 
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
@@ -415,9 +417,9 @@ function twoFingerNavigation(event) {
     if (!sessionStorage.touchX) {
       sessionStorage.touchX = event.touches[0].screenX;
     } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
-      window.location.assign('instructions_dk.html');
+      goToPage('store.html');
     } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
-      window.location.assign('instructions.html');
+      goToPage('instructions.html');
     }
   }
 }
@@ -450,16 +452,20 @@ function  fillHearths(currentStressLevel) {
   }
 }
 
-function info() {
-  window.location.assign('instructions.html')
+function goToPage(page) {
+  storeLocally();
+  window.location.assign(page);
 }
+
+// function info() {
+//   goToPage('instructions.html')
+// }
 // TODO: Make addPause buttons 15m, 30m + ?
 // TODO: Move alert-box instructions to html pages.
 
 // Used by an eventListener. Display settings.
 function settings() {
-  storeLocally();
-  window.location.assign('settings.html')
+  goToPage('settings.html')
   // Store a day from one session to another
   // Store multiple days? One pr. calender day?
   // Store wake up time (wakeUpH and wakeUpM)
@@ -507,16 +513,16 @@ function adjustNowAndWakeUpButtons() {
 
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-    upBtn.innerText = wakeUpH + ':' + min + '\u25B8';
+    upBtn.textContent = wakeUpH + ':' + min + '\u25B8';
     nowBtn.title = 'Press to insert a 15 min planning period now';
-    nowBtn.innerText = 'Now' + '\u25B8';
+    nowBtn.textContent = 'Now' + '\u25B8';
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
-    upBtn.innerText = '\u25B8' + wakeUpH + ':' + min;
+    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;
     nowBtn.title = 'Jump to now';
-    nowBtn.innerText = '\u25B8' + 'Now';
+    nowBtn.textContent = '\u25B8' + 'Now';
   }
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -720,13 +726,13 @@ function removeFuzzyOverlap(task) {
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
   editButton = document.getElementById('editButton');  // TODO: Get ridt of edit? Double click is more natural
-  // if (editButton.innerText == 'Edit') {
+  // if (editButton.textContent == 'Edit') {
   //   editTask();
-  //   editButton.innerText = 'Clear\u25B8';
+  //   editButton.textContent = 'Clear\u25B8';
   // } else
   if (document.getElementById('inputBox').value != '' ) {
     resetInputBox();
-    editButton.innerText = '\u25BEClear'; // TODO: Fix clear button after an edited task is inserted
+    editButton.textContent = '\u25BEClear'; // TODO: Fix clear button after an edited task is inserted
     id = '';
   } else {
     clearDay();
@@ -764,7 +770,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('editButton').innerText = 'Clear\u25B8';  // \u23F5
+  document.getElementById('editButton').textContent = 'Clear\u25B8';  // \u23F5
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -779,7 +785,7 @@ function zoomFunc() {
   zoom = (1 + 0.5) - zoom;
   zoomSymbolModifyer = 7 - zoomSymbolModifyer;
 
-  zoomButton.innerText = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
+  zoomButton.textContent = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
 
   renderTasks();
   jumpToNow();
@@ -853,7 +859,7 @@ function displayMessage(text, displayTime) {
   msg = document.getElementById('message');
   msg.style.display = 'inline-block';
   msg.style.color = 'red';
-  msg.innerText = text;
+  msg.textContent = text;
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
 }
@@ -883,7 +889,7 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
-      editButton.innerText = '\u25BEClear';
+      editButton.textContent = '\u25BEClear';
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
@@ -899,7 +905,7 @@ function taskHasBeenClicked(event) {
     // chosenTask.classList.add('isClicked'); // TODO: Affects only DOM. Make it a part of Task
     let myId = getIndexFromUniqueId(myUniqueId);
     taskList[myId].isClicked = 'isClicked'; // TODO: Unclick later
-    // editButton.innerText = 'Clear\u25B8';
+    // editButton.textContent = 'Clear\u25B8';
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
 
@@ -917,7 +923,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    // editButton.innerText = 'Clear\u25B8';  // \u25b8 for small triangle
+    // editButton.textContent = 'Clear\u25B8';  // \u25b8 for small triangle
   }
   renderTasks();
 
@@ -1014,7 +1020,7 @@ function renderTasks() {
 
     // Create stress indicators as divs
     let stressMarker = document.createElement('div');
-    stressMarker.innerText = '-';
+    stressMarker.textContent = '-';
 
     stressMarker.classList.add('stressDiv');
     stressMarker.setAttribute('style', 'background-image: linear-gradient(' + task.stressGradient + ')');
