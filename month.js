@@ -5,11 +5,6 @@ let displayList = [];
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 
-document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
-
-document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
-
-document.getElementById('day').addEventListener('click', function() {goToPage('main.html');});
 
 class Task {
   constructor(date, text) {
@@ -36,6 +31,16 @@ function setUpFunc() {
   resetInputBox();
 }
 
+
+document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
+
+document.getElementById('day').addEventListener('click', function() {goToPage('main.html');});
+
+document.getElementById('taskDiv').addEventListener('click', function () {taskHasBeenClicked(event); }, true);
+
+
 function storeLocally() {
   localStorage.monthListAsText = JSON.stringify(taskListExtractor());
 
@@ -49,6 +54,7 @@ function storeLocally() {
 
       localStorage.zoom = zoom;
     }
+
 
 function retrieveLocallyStoredStuff() {
   taskList = [];
@@ -85,8 +91,8 @@ function fillDateBar(zoom) {
 }
 
 
-function makeFirstTasks() {
-  console.log('makeFirstTasks called'); // Is this necessary?
+function makeFirstTasks() {  // Is this necessary?
+  console.log('makeFirstTasks called');
   // Make the first tasks. Necessary for adding new tasks
   // let startList = ['000 1m Day start', '2359 1m Day end'];
   // for (const [index, text] of startList.entries()) {
@@ -96,6 +102,24 @@ function makeFirstTasks() {
   //   taskList.push(task);
   // }
   // localStorage.indexOfLastTouched = 0;
+}
+
+function taskHasBeenClicked(event) {
+  let myId = event.target.id;
+  console.log(myId);
+  if (myId === '') {
+    myId = event.target.closest('button').id;
+    console.log('bzz', myId);
+  }
+
+  let contentInputBox = document.getElementById('inputBox').value.trim();
+
+  if (contentInputBox != '') {
+    let children = document.getElementById(myId).childNodes;
+    let len = children.length
+    children[len - 1].textContent += ' ' + contentInputBox;
+    children[len - 2].innerHTML += ' ' + contentInputBox + '<br>';
+  }
 }
 
 
@@ -119,21 +143,33 @@ function renderTasks() {
       document.getElementById('taskDiv').appendChild(monthNameNode);
     }
 
-
     let newNode = document.createElement('button');
-    // newNode.setAttribute('id', task.dateId)
-    newNode.classList.add('dateButton');
 
+    let id = i.getDate().toString() + i.getMonth().toString();
+
+    newNode.setAttribute('id', id)
+    newNode.classList.add('dateButton');
     if (i.getDay() > 4) { // Weekday 5 and 6 are Saturday and Sunday
       newNode.classList.add('weekend');
     }
 
-    newNode.textContent = i.getDate() + '/' + i.getMonth();
-    newNode.textContent += ' Rap';
+    datePart = document.createElement('span');
+    datePart.classList.add('datePart');
+    datePart.textContent = i.getDate() + '/' + i.getMonth() +  '\u00a0\u00a0\u00a0';
+    newNode.appendChild(datePart);
+
+    toolTipSpan = document.createElement('span');
+    toolTipSpan.classList.add('toolTip');
+    toolTipSpan.innerHTML =  'Rap <br> Rappelap'; // newNode.textContent;
+    newNode.appendChild(toolTipSpan);
+
+    textPart = document.createElement('span');
+    textPart.textContent = 'Raap';
+    newNode.appendChild(textPart);
 
     // newNode.setAttribute('class', 'halfHours' + zoom * 2);
-    // newNode.setAttribute('id', i + '00');
     document.getElementById('taskDiv').appendChild(newNode);
+    // document.getElementById(id).appendChild(toolTipSpan);
   }
 }
 

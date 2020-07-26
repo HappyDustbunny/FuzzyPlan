@@ -32,6 +32,40 @@ input {
   border-radius: 10px;
 }
 
+button:hover,
+button:focus {
+  /* transform: scaleY(1.2); */
+  transform: rotateX(10deg);
+  border: 1px solid rgb(255, 50, 255);
+}
+
+.dateButton .toolTip {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -100px;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.dateButton .toolTip::after {
+  content: '';
+  position: absolute;
+  top: 99%;
+  left: 50%;
+  margin-left: -5px;
+  border: solid;
+  border-width: 7px;
+  border-color: rgba(154, 219, 240, 1) transparent transparent transparent;
+}
+
+.dateButton:hover .toolTip {
+  visibility: visible;
+  background-color: rgba(154, 219, 240, 1);
+}
+
 .task {
   text-align: left;
   border: 1px solid rgb(96, 139, 168);
@@ -105,6 +139,7 @@ input {
 
 
 .dateButton {
+  position: relative;
   text-align: left;
   border: 1px solid rgba(154, 219, 240, 1.0);
   border-radius: 10px;
@@ -205,9 +240,9 @@ input {
   border: 1px solid rgb(255, 50, 255);
 }
 
-button:hover,
+/* button:hover,
 button:focus {
   /* transform: scaleY(1.2); */
   transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
-}
+} */
