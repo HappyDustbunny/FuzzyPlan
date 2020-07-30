@@ -1,7 +1,6 @@
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-let monthTaskList = [];
-
-let displayList = [];
+let monthTaskDict = {};  // JS object usable much like a Python dictionary
+let displayDict = {};    // JS object usable much like a Python dictionary
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 
@@ -22,12 +21,6 @@ function setUpFunc() {
 
   fillDateBar(zoom);
 
-  // createTimeMarker();
-  //
-  // updateTimeMarker();
-
-  renderTasks();
-
   resetInputBox();
 }
 
@@ -39,6 +32,7 @@ document.getElementById('info').addEventListener('click', function() {goToPage('
 document.getElementById('day').addEventListener('click', function() {goToPage('main.html');});
 
 document.getElementById('taskDiv').addEventListener('click', function () {taskHasBeenClicked(event); }, true);
+document.getElementById('taskDiv').addEventListener('dblclick', function () {taskHasBeenDoubleClicked(event); }, true);
 
 
 function storeLocally() {
@@ -58,7 +52,6 @@ function storeLocally() {
 
 function retrieveLocallyStoredStuff() {
   taskList = [];
-  makeFirstTasks();
 
   if (localStorage.getItem('monthListAsText')) {
     lastTaskList = taskList;
@@ -73,68 +66,19 @@ function retrieveLocallyStoredStuff() {
 
 
 function fillDateBar(zoom) {
-  console.log('fillDateBar called');
-  // let now = new Date();
-  // let nowPlus3Month =  new Date();
-  // nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
-  // console.log(nowPlus3Month);
-  //
-  // for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
-  //   let dateDiv = document.createElement('div');
-  //
-  //   dateDiv.textContent = i.getDate() + '/' + i.getMonth();
-  //
-  //   dateDiv.setAttribute('class', 'halfHours' + zoom * 2);
-  //   // dateDiv.setAttribute('id', i + '00');
-  //   document.getElementById('dateDiv').appendChild(dateDiv);
-  // }
-}
-
-
-function makeFirstTasks() {  // Is this necessary?
-  console.log('makeFirstTasks called');
-  // Make the first tasks. Necessary for adding new tasks
-  // let startList = ['000 1m Day start', '2359 1m Day end'];
-  // for (const [index, text] of startList.entries()) {
-  //   parsedList = parseText(text.trim());
-  //   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-  //   task.fuzzyness = 'isNotFuzzy';
-  //   taskList.push(task);
-  // }
-  // localStorage.indexOfLastTouched = 0;
-}
-
-function taskHasBeenClicked(event) {
-  let myId = event.target.id;
-  console.log(myId);
-  if (myId === '') {
-    myId = event.target.closest('button').id;
-    console.log('bzz', myId);
-  }
-
-  let contentInputBox = document.getElementById('inputBox').value.trim();
-
-  if (contentInputBox != '') {
-    let children = document.getElementById(myId).childNodes;
-    let len = children.length
-    children[len - 1].textContent += ' ' + contentInputBox;
-    children[len - 2].innerHTML += ' ' + contentInputBox + '<br>';
-  }
-}
-
-
-function renderTasks() {
   let now = new Date();
   let nowPlus3Month =  new Date();
   nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
-  console.log(nowPlus3Month);
 
+  // Make a button with monthname
   let thisMonth = now.getMonth();
   monthNameNode = document.createElement('button');
   monthNameNode.classList.add('monthName');
   monthNameNode.textContent = months[now.getMonth()];
   document.getElementById('taskDiv').appendChild(monthNameNode);
+
   for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
+    // Insert monthnames before each the 1th
     if (thisMonth < i.getMonth()) {
       thisMonth = i.getMonth();
       monthNameNode = document.createElement('button');
@@ -147,6 +91,8 @@ function renderTasks() {
 
     let id = i.getDate().toString() + i.getMonth().toString();
 
+    monthTaskDict[id] = '';
+
     newNode.setAttribute('id', id)
     newNode.classList.add('dateButton');
     if (i.getDay() > 4) { // Weekday 5 and 6 are Saturday and Sunday
@@ -155,21 +101,85 @@ function renderTasks() {
 
     datePart = document.createElement('span');
     datePart.classList.add('datePart');
-    datePart.textContent = i.getDate() + '/' + i.getMonth() +  '\u00a0\u00a0\u00a0';
+    if (i.getDate() < 10) {
+      datePart.textContent = '\u00a0\u00a0' + i.getDate() + '/' + i.getMonth() +  '\u00a0\u00a0\u00a0';
+    } else {
+      datePart.textContent = i.getDate() + '/' + i.getMonth() +  '\u00a0\u00a0\u00a0';
+    }
     newNode.appendChild(datePart);
 
     toolTipSpan = document.createElement('span');
     toolTipSpan.classList.add('toolTip');
-    toolTipSpan.innerHTML =  'Rap <br> Rappelap'; // newNode.textContent;
+    // toolTipSpan.innerHTML =  'Rap <br> Rappelap'; // newNode.textContent;
     newNode.appendChild(toolTipSpan);
 
     textPart = document.createElement('span');
-    textPart.textContent = 'Raap';
+    // textPart.textContent = 'Raap';
     newNode.appendChild(textPart);
 
     // newNode.setAttribute('class', 'halfHours' + zoom * 2);
     document.getElementById('taskDiv').appendChild(newNode);
     // document.getElementById(id).appendChild(toolTipSpan);
+  }
+}
+
+
+function taskHasBeenClicked(event) {
+  let myId = event.target.id;
+  if (myId === '') {
+    myId = event.target.closest('button').id;
+  }
+
+  let contentInputBox = document.getElementById('inputBox').value.trim();
+
+  if (contentInputBox != '') {
+    monthTaskDict[myId] += '\u00a0' + contentInputBox;
+  }
+  renderTasks();
+
+  resetInputBox();
+}
+
+
+function taskHasBeenDoubleClicked() {
+  let myId = event.target.id;
+  if (myId === '') {
+    myId = event.target.closest('button').id;
+  }
+
+  let day =  document.getElementById(myId).children;
+
+  document.getElementById('inputBox').value = day[2].textContent.replace(/\u25CF /g, '').trim();
+  monthTaskDict[myId] = '';
+  day[2].textContent = '';
+  day[1].innerHTML = '';
+}
+
+
+function renderTasks() {
+  // Remove old text from buttons and tooltips
+  const days = document.getElementById('taskDiv').children;
+  const len = days.length;
+  for (var i = 0; i < len; i++) {
+    if (days[i].children.length > 0) {
+      days[i].children[2].textContent = '';
+      days[i].children[1].innerHTML = '';
+    }
+  }
+
+  // Write new text into buttons and tooltips
+  for (var myId in monthTaskDict) {
+    let children = document.getElementById(myId).childNodes;
+
+    // children[2].textContent += monthTaskDict[myId] + '\u00a0';
+    // Write to tooltip
+    let tasks = monthTaskDict[myId].trim().split("\u00a0");
+    if (tasks != '') {
+      for (var task of tasks) {
+        children[1].innerHTML += task + '&nbsp;' + '<br>';
+        children[2].textContent +=  ' \u25CF ' + task + '\u00a0';
+      }
+    }
   }
 }
 
