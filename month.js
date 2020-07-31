@@ -27,13 +27,16 @@ function setUpFunc() {
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
-document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
-
 document.getElementById('day').addEventListener('click', function() {goToPage('main.html');});
+
+document.getElementById('clearButton').addEventListener('click', resetInputBox);
+
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
 
 document.getElementById('taskDiv').addEventListener('click', function () {taskHasBeenClicked(event); }, true);
 document.getElementById('taskDiv').addEventListener('dblclick', function () {taskHasBeenDoubleClicked(event); }, true);
 
+document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
 function storeLocally() {
   localStorage.monthListAsText = JSON.stringify(taskListExtractor());
@@ -133,7 +136,7 @@ function taskHasBeenClicked(event) {
   let contentInputBox = document.getElementById('inputBox').value.trim();
 
   if (contentInputBox != '') {
-    monthTaskDict[myId] += '\u00a0' + contentInputBox;
+    monthTaskDict[myId] += '\u00a0' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
   }
   renderTasks();
 
@@ -156,6 +159,46 @@ function taskHasBeenDoubleClicked() {
 }
 
 
+function inputAtEnter(event) {
+  if (event.key === 'Enter') {
+    let contentInputBox = document.getElementById('inputBox').value.trim();
+    if (contentInputBox != '') {
+
+      let dateArray = /\d+\/\d+/.exec(contentInputBox);
+
+      if ( dateArray != null ) {
+        if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
+          /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
+
+            let myId = dateArray[0].replace('\/', '');
+
+            let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
+
+            monthTaskDict[myId] += '\u00a0' + textInputBox[0].toUpperCase() + textInputBox.slice(1);
+
+        } else {
+          displayMessage('Not a date. Please fix date or remove the back-slash', 4000);
+          return;
+        }
+
+      } else {
+        let now = new Date();
+        let nowPlusOneDay = new Date();
+        nowPlusOneDay = new Date(nowPlusOneDay.setDate(nowPlusOneDay.getDate() + 1));
+        let myId = nowPlusOneDay.getDate().toString() + nowPlusOneDay.getMonth().toString();
+
+        monthTaskDict[myId] += '\u00a0' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
+      }
+
+      renderTasks();
+
+      resetInputBox();
+
+    }
+  }
+}
+
+
 function renderTasks() {
   // Remove old text from buttons and tooltips
   const days = document.getElementById('taskDiv').children;
@@ -173,6 +216,7 @@ function renderTasks() {
 
     // children[2].textContent += monthTaskDict[myId] + '\u00a0';
     // Write to tooltip
+    // Clear input box and give it focus
     let tasks = monthTaskDict[myId].trim().split("\u00a0");
     if (tasks != '') {
       for (var task of tasks) {
@@ -183,7 +227,6 @@ function renderTasks() {
   }
 }
 
-// Clear input box and give it focus
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
@@ -219,4 +262,15 @@ function taskListExtractor() {
 
 function textListToTaskList() {
   console.log('textListToTaskList called');
+}
+
+
+function displayMessage(text, displayTime) {
+  console.log(text);
+  msg = document.getElementById('message');
+  msg.style.display = 'inline-block';
+  msg.style.color = 'red';
+  msg.textContent = text;
+
+  setTimeout(function() {msg.style.display = 'none';}, displayTime)
 }
