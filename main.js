@@ -98,7 +98,7 @@ function setUpFunc() {
 
   renderTasks();
 
-  resetInputBox();
+  document.getElementById('inputBox').focus();
 
   let now = new Date()
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
@@ -186,6 +186,11 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('tDouble')) {
     tDouble = localStorage.tDouble;
+  }
+
+  if (localStorage.getItem('inputBoxContent') != '') {
+    document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
+    localStorage.removeItem('inputBoxContent');
   }
 }
 
@@ -430,6 +435,12 @@ function  fillHearths(currentStressLevel) {
 
 function goToPage(page) {
   storeLocally();
+
+  let inputBoxContent = document.getElementById('inputBox').value;
+  if (inputBoxContent != '') {
+    localStorage.inputBoxContent = inputBoxContent;
+  }
+
   window.location.assign(page);
 }
 
@@ -701,14 +712,14 @@ function removeFuzzyOverlap(task) {
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
-  editButton = document.getElementById('editButton');  // TODO: Get ridt of edit? Double click is more natural
+  editButton = document.getElementById('editButton');
   // if (editButton.textContent == 'Edit') {
   //   editTask();
   //   editButton.textContent = 'Clear\u25B8';
   // } else
   if (document.getElementById('inputBox').value != '' ) {
     resetInputBox();
-    editButton.textContent = '\u25BEClear'; // TODO: Fix clear button after an edited task is inserted
+    editButton.textContent = '\u25BEClear';
     id = '';
   } else {
     clearDay();

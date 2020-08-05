@@ -21,7 +21,10 @@ function setUpFunc() {
 
   fillDateBar(zoom);
 
-  resetInputBox();
+  renderTasks();
+
+  // resetInputBox();
+  document.getElementById('inputBox').focus();
 }
 
 
@@ -39,31 +42,24 @@ document.getElementById('taskDiv').addEventListener('dblclick', function () {tas
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
 function storeLocally() {
-  localStorage.monthListAsText = JSON.stringify(taskListExtractor());
+  localStorage.monthListAsText = JSON.stringify(monthTaskDict);
 
-  // localStorage.wakeUpOrNowClickedOnce = wakeUpOrNowClickedOnce;
-  // for (const [index, task] of taskList.entries()) {
-    //   if (task.uniqueId === uniqueIdOfLastTouched) {
-      //     localStorage.indexOfLastTouched = index;
-      //     break;
-      //   }
-      // }
-
-      localStorage.zoom = zoom;
-    }
+  localStorage.zoom = zoom;
+}
 
 
 function retrieveLocallyStoredStuff() {
-  taskList = [];
-
-  if (localStorage.getItem('monthListAsText')) {
-    lastTaskList = taskList;
-    taskListAsText = JSON.parse(localStorage.taskListAsText);
-    textListToTaskList(taskListAsText);
+  if (localStorage.getItem('monthListAsText') != '') {
+    monthTaskDict = JSON.parse(localStorage.monthListAsText);
   }
 
   if (localStorage.getItem('zoom')) {
     zoom = localStorage.zoom;
+  }
+
+  if (localStorage.getItem('inputBoxContent') != '') {
+    document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
+    localStorage.removeItem('inputBoxContent');
   }
 }
 
@@ -94,7 +90,7 @@ function fillDateBar(zoom) {
 
     let id = i.getDate().toString() + i.getMonth().toString();
 
-    monthTaskDict[id] = '';
+    // monthTaskDict[id] = '';
 
     newNode.setAttribute('id', id)
     newNode.classList.add('dateButton');
@@ -105,10 +101,9 @@ function fillDateBar(zoom) {
     datePart = document.createElement('span');
     datePart.classList.add('datePart');
     if (i.getDate() < 10) {
-      datePart.textContent = '\u00a0\u00a0' + i.getDate() + '/' + i.getMonth() +  '\u00a0\u00a0\u00a0';
-    } else {
-      datePart.textContent = i.getDate() + '/' + i.getMonth() +  '\u00a0\u00a0\u00a0';
+      datePart.textContent = '\u00a0\u00a0'; // Adjust all dates to align right
     }
+    datePart.textContent += i.getDate() + '/' + (i.getMonth() + 1) +  '\u00a0\u00a0\u00a0';
     newNode.appendChild(datePart);
 
     toolTipSpan = document.createElement('span');
@@ -136,7 +131,7 @@ function taskHasBeenClicked(event) {
   let contentInputBox = document.getElementById('inputBox').value.trim();
 
   if (contentInputBox != '') {
-    monthTaskDict[myId] += '\u00a0' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
+    monthTaskDict[myId] += '|' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
   }
   renderTasks();
 
@@ -159,7 +154,7 @@ function taskHasBeenDoubleClicked() {
 }
 
 
-function inputAtEnter(event) {
+function inputAtEnter(event) { // TODO: Month is of by one month
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (contentInputBox != '') {
@@ -170,11 +165,17 @@ function inputAtEnter(event) {
         if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
           /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
 
-            let myId = dateArray[0].replace('\/', '');
+            // let myId = dateArray[0].replace('\/', '');
+            let myId = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString() +
+              (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString()
 
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
 
-            monthTaskDict[myId] += '\u00a0' + textInputBox[0].toUpperCase() + textInputBox.slice(1);
+            if (textInputBox === '') {
+              gotoDate(myId); // TODO: Make gotoDate()
+            }
+
+            monthTaskDict[myId] += '|' + textInputBox[0].toUpperCase() + textInputBox.slice(1);
 
         } else {
           displayMessage('Not a date. Please fix date or remove the back-slash', 4000);
@@ -187,7 +188,7 @@ function inputAtEnter(event) {
         nowPlusOneDay = new Date(nowPlusOneDay.setDate(nowPlusOneDay.getDate() + 1));
         let myId = nowPlusOneDay.getDate().toString() + nowPlusOneDay.getMonth().toString();
 
-        monthTaskDict[myId] += '\u00a0' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
+        monthTaskDict[myId] += '|' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
       }
 
       renderTasks();
@@ -214,10 +215,9 @@ function renderTasks() {
   for (var myId in monthTaskDict) {
     let children = document.getElementById(myId).childNodes;
 
-    // children[2].textContent += monthTaskDict[myId] + '\u00a0';
-    // Write to tooltip
-    // Clear input box and give it focus
-    let tasks = monthTaskDict[myId].trim().split("\u00a0");
+    let tasks = monthTaskDict[myId].trim().split("|");
+    tasks.shift();  // Remove empty "" stemming from first |
+
     if (tasks != '') {
       for (var task of tasks) {
         children[1].innerHTML += task + '&nbsp;' + '<br>';
@@ -230,12 +230,6 @@ function renderTasks() {
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
-}
-
-
-function goToPage(page) {
-  storeLocally();
-  window.location.assign(page);
 }
 
 
@@ -255,13 +249,20 @@ function twoFingerNavigation(event) {
 }
 
 
-function taskListExtractor() {
-  console.log('taskListExtractor called');
+function goToPage(page) { // TODO: What if you go to a page where inputBoxContent isn't needed?
+  storeLocally();
+
+  let inputBoxContent = document.getElementById('inputBox').value;
+  if (inputBoxContent != '') {
+    localStorage.inputBoxContent = inputBoxContent;
+  }
+
+  window.location.assign(page);
 }
 
 
-function textListToTaskList() {
-  console.log('textListToTaskList called');
+function gotoDate() {
+  console.log('To do: make jumping to date possible');
 }
 
 
