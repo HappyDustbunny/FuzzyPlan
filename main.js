@@ -400,9 +400,9 @@ function twoFingerNavigation(event) {
   if (event.touches.length > 1) {
     if (!sessionStorage.touchX) {
       sessionStorage.touchX = event.touches[0].screenX;
-    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
-      goToPage('store.html');
-    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
+    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Left swipe
+      goToPage('storage.html');
+    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Right swipe
       goToPage('month.html');
     }
   }

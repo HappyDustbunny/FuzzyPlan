@@ -3,6 +3,8 @@ let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturda
 document.getElementById('storeList').addEventListener('click', storeList);
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
 document.getElementById('goBack1').addEventListener('click', goBack);
+document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+
 
 function storeList() {
   let storeButtons = document.getElementsByClassName('store');
@@ -12,6 +14,7 @@ function storeList() {
     }
   }
 }
+
 
 function storeHasBeenClicked(event) {
   let id = event.target.id;
@@ -75,6 +78,7 @@ function storeHasBeenClicked(event) {
 
 }
 
+
 function setUpFunc() {
   let storeButtons = document.getElementsByClassName('store');
   for (const button of storeButtons) {
@@ -89,9 +93,11 @@ function setUpFunc() {
   }
 }
 
+
 function goBack() {
   window.location.assign('main.html');
 }
+
 
 function displayMessage(text, displayTime) {
   console.log(text);
@@ -101,4 +107,25 @@ function displayMessage(text, displayTime) {
   msg.innerText = text;
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
+}
+
+
+function twoFingerNavigation(event) {
+  if (sessionStorage.touchXmonth && event.touches.length === 1) {
+    sessionStorage.touchXmonth = '';
+  }
+  if (event.touches.length > 1) {
+    if (!sessionStorage.touchXmonth) {
+      sessionStorage.touchXmonth = event.touches[0].screenX;
+    } else if (event.touches[0].screenX - sessionStorage.touchXmonth < 50) { // Left swipe
+      goToPage('main.html');
+    // } else if (event.touches[0].screenX - sessionStorage.touchXmonth > 50) { // Right swipe
+    //   goToPage('month.html');
+    }
+  }
+}
+
+
+function goToPage(page) {
+  window.location.assign(page);
 }
