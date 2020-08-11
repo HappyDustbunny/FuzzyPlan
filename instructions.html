@@ -20,6 +20,10 @@
         border: 1px solid rgb(96, 139, 168);
         border-radius: 5px;
       }
+      #english  {
+        transform: rotateX(10deg);
+        border: 2px solid rgb(255, 50, 255);
+      }
     </style>
   </head>
   <body>
@@ -120,6 +124,24 @@
         document.getElementById('goBack2').addEventListener('click', goBack);
         document.getElementById('danish').addEventListener('click', goDK);
         document.getElementById('english').addEventListener('click', goUK);
+
+        document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+
+        function twoFingerNavigation(event) {
+          if (sessionStorage.touchX && event.touches.length === 1) {
+            sessionStorage.touchX = '';
+          }
+          if (event.touches.length > 1) {
+            if (!sessionStorage.touchX) {
+              sessionStorage.touchX = event.touches[0].screenX;
+            } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
+              window.location.assign('main.html');
+            } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
+              window.location.assign('main.html');
+            }
+          }
+        }
+
         function goBack() {
           window.location.assign(document.referrer);
         }

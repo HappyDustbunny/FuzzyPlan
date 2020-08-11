@@ -2,6 +2,13 @@
   box-sizing: border-box;  /* Include margin, padding and border in box sizes */
 }
 
+body {
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+}
+
 div {
   /* flex: initial; */
   text-align: left;
@@ -18,6 +25,12 @@ h1 {
   margin: unset;
 }
 
+input {
+  width: auto;
+  padding-left: 8px;
+  border-radius: 10px;
+}
+
 .task {
   text-align: left;
   border: 1px solid rgb(96, 139, 168);
@@ -31,13 +44,6 @@ h1 {
     background-color: black;
   }
 
-  body {
-    max-width: 550px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
-  }
-
   /* Why doesn't this work? */
   .container2 {
     height: 430px;
@@ -46,18 +52,26 @@ h1 {
 
 .container1 {
   display: grid;
-  grid-template-columns: 20% 60% 20%;
-  grid-template-rows: auto auto;
+  grid-template-columns: 40px auto 25px 40px;
+  grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. header info'
-  '. hearts .'
-  '. messages .';
+  'storage header info month'
+  '. hearts . .'
+  '. messages . .';
 }
 
+.centerWrapper {
+  display: grid;
+  grid-template-columns: 20px 40px auto 40px 40px 20px;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+}
 
 .container2 {
   display: grid;
@@ -73,6 +87,19 @@ h1 {
   '. . . taskHeader .'
   'stressBar timeBar . taskListing .'
   '. . . taskFooter .';
+}
+
+
+.controlButton {
+  /* display: inline-block; */
+  text-align: center;
+  width: auto;
+  height: 22px;
+  border: 1px solid rgb(96, 139, 168);
+  border-radius: 10px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  font-size: 10px;
+  padding-left: 3px;
 }
 
 #nowSpan {
@@ -168,50 +195,37 @@ h1 {
   background-color: rgba(123, 217, 71, .25);
 }
 
-input {
-  width: 160px;
-  padding-left: 8px;
-  border-radius: 10px;
-}
-
-.centerWrapper {
-  /* text-align: center; */
-  background-color: transparent;
-  border: none;
-}
-
-.controlButton {
-  /* display: inline-block; */
-  text-align: center;
-  width: 30px;
-  height: 22px;
-  border: 1px solid rgb(96, 139, 168);
-  border-radius: 10px;
+#storage {
+  grid-area: storage;
 }
 
 #name {
-  display: flex;
-  /* text-align: center; */
   justify-content: center;
   grid-area: header;
 }
 
+#month {
+  grid-area: month;
+  justify-self: end;
+}
+
 #info {
-  align-self: center;
+  width: 24px;
   background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #bbbbf2);
   border-radius: 20px;
+  justify-content: center;
   grid-area: info;
+  padding-left: 5px;
+
   animation-name: infoAnimation;
   animation-duration: 2s;
   animation-timing-function: ease-in-out;
-  /* animation-delay: 1s; */
   animation-iteration-count: infinite;
   animation-direction: alternate;
   animation-play-state: paused;
 }
 
 #info img {
-   display: block;
    height: 13px;
    width: 13px;
 }
@@ -240,34 +254,34 @@ input {
 #upButton,
 #nowButton,
 #editButton {
-  width: 10%;
+  /* width: auto;
   font-size: 10px;
-  padding: 0px;
-  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  padding: 0px; */
+  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
 }
 
 .button-disabled{
   cursor: not-allowed;
   /* pointer-events: none; */
   border: none;
-  background-image: linear-gradient(#c5c5f6, #c2e6f2, #c2e6f2, #c2e6f2,#c5c5f6) !important;
+  /* background-image: linear-gradient(#c5c5f6, #c2e6f2, #c2e6f2, #c2e6f2,#c5c5f6) !important; */
 }
 
 #zoom {
   text-align: left;
   width: auto;
   font-size: 15px;
-  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
 }
 
 #settings {
   /* display: block; */
   width: auto;
   font-size: 15px;
-  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
 }
 
-#topButton {
+/* #topButton {
   width: 80%;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0);
   grid-area: taskHeader;
@@ -277,7 +291,7 @@ input {
   width: 80%;
   background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9898ff);
   grid-area: taskFooter;
-}
+} */
 
 
 .isClicked {

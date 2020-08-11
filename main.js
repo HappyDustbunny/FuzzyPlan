@@ -1,9 +1,9 @@
-let taskList = [];  // List to keep track of the order of the tasks
+let taskList = [];
 let lastTaskList = [];
 let displayList = [];
 let startAndEndTimes = [];
 let chosenTask = '';
-let chosenTaskId = '';  // When a task is clicked information about that task is stored here
+let chosenTaskId = '';
 let uniqueIdOfLastTouched = 0;
 let uniqueIdList = [];
 let nullTimeClicked = false;
@@ -18,7 +18,7 @@ let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting pe
 let tDouble = 240;  // Doubling time for stress level in minutes
 let alarmOn = false;
 
-let storage = window.localStorage;
+let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
 // randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
@@ -68,12 +68,12 @@ class Task {
 
   end() { // End time as Javascript date
     if (this.date != '') {
-      return new Date(this.date.getTime() + this.duration)
+      return new Date(this.date.getTime() + this.duration);
     }
   }
 
   height() { // Pixelheight is 1 minute = 1 px
-    return this.duration / 60000
+    return this.duration / 60000;
   }
 }
 
@@ -98,7 +98,7 @@ function setUpFunc() {
 
   renderTasks();
 
-  resetInputBox();
+  document.getElementById('inputBox').focus();
 
   let now = new Date()
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
@@ -125,7 +125,6 @@ function makeFirstTasks() {
     task.fuzzyness = 'isNotFuzzy';
     taskList.push(task);
   }
-  localStorage.indexOfLastTouched = 0;
 }
 
 
@@ -138,6 +137,8 @@ function storeLocally() {
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId === uniqueIdOfLastTouched) {
       localStorage.indexOfLastTouched = index;
+      console.log('Store locally stored index', index);
+      displayMessage('Waiting', 4000);
       break;
     }
   }
@@ -167,7 +168,8 @@ function retrieveLocallyStoredStuff() {
   //   storedTasksList = JSON.parse(localStorage.storedTasksList);
   // }
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
-    wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
+    wakeUpOrNowClickedOnce = localStorage.wakeUpOrNowClickedOnce;
+    // wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
   }
   // if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
   //   uniqueIdOfLastTouched = localStorage.uniqueIdOfLastTouched;
@@ -187,30 +189,11 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('tDouble')) {
     tDouble = localStorage.tDouble;
   }
-  // // if (localStorage.getItem('wakeUpH')) {
-  // //   wakeUpH = localStorage.wakeUpH;
-  // // }
-  // // if (localStorage.getItem('wakeUpM')) {
-  // //   wakeUpM = localStorage.wakeUpM;
-  // // }
-  // if (sessionStorage.getItem('chosenTask')) {
-  //   chosenTask = sessionStorage.chosenTask;
-  // }
-  // if (sessionStorage.getItem('chosenTaskId')) {
-  //   chosenTaskId = sessionStorage.chosenTaskId;
-  // }
-  // if (sessionStorage.getItem('uniqueIdList')) {
-  //   uniqueIdList = JSON.parse(sessionStorage.uniqueIdList);
-  // }
-  // if (sessionStorage.getItem('')) {
-  //   nullTimeClicked = sessionStorage.nullTimeClicked;
-  // }
-  // if (sessionStorage.getItem('zoom')) {
-  //   zoom = sessionStorage.zoom;
-  // }
-  // if (sessionStorage.getItem('zoomSymbolModifyer')) {
-  //   zoomSymbolModifyer = sessionStorage.zoomSymbolModifyer;
-  // }
+
+  if (localStorage.getItem('inputBoxContent') != '') {
+    document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
+    localStorage.removeItem('inputBoxContent');
+  }
 }
 
 
@@ -251,6 +234,7 @@ function textListToTaskList(taskListAsText) {
       if (!succes) {console.log('Retrieval got wrong at index ', index);}
     }
   }
+  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
   uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
 }
 
@@ -267,11 +251,11 @@ function fillTimeBar(zoom) {
     let halfHourB = document.createElement('div');
 
     if (i < 10) {
-      halfHourA.innerText = '0' + i + ':00';
-      halfHourB.innerText = '0' + i + ':30';
+      halfHourA.textContent = '0' + i + ':00';
+      halfHourB.textContent = '0' + i + ':30';
     } else {
-      halfHourA.innerText = i + ':00';
-      halfHourB.innerText = i + ':30';
+      halfHourA.textContent = i + ':00';
+      halfHourB.textContent = i + ':30';
     }
 
     halfHourA.setAttribute('class', 'halfHours' + zoom * 2);
@@ -380,7 +364,9 @@ window.addEventListener('storage', function(e) {
 });
 
 
-document.getElementById('info').addEventListener('click', info);
+document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
+document.getElementById('month').addEventListener('click', function() {goToPage('month.html');});
 
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
@@ -408,8 +394,18 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
 function twoFingerNavigation(event) {
-  if (event.touches.length > 1)
-  window.location.assign('instructions_dk.html');
+  if (sessionStorage.touchX && event.touches.length === 1) {
+    sessionStorage.touchX = '';
+  }
+  if (event.touches.length > 1) {
+    if (!sessionStorage.touchX) {
+      sessionStorage.touchX = event.touches[0].screenX;
+    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
+      goToPage('store.html');
+    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
+      goToPage('month.html');
+    }
+  }
 }
 
 function  fillHearths(currentStressLevel) {
@@ -440,16 +436,26 @@ function  fillHearths(currentStressLevel) {
   }
 }
 
-function info() {
-  window.location.assign('instructions.html')
+function goToPage(page) {
+  storeLocally();
+
+  let inputBoxContent = document.getElementById('inputBox').value;
+  if (inputBoxContent != '') {
+    localStorage.inputBoxContent = inputBoxContent;
+  }
+
+  window.location.assign(page);
 }
+
+// function info() {
+//   goToPage('instructions.html')
+// }
 // TODO: Make addPause buttons 15m, 30m + ?
 // TODO: Move alert-box instructions to html pages.
 
 // Used by an eventListener. Display settings.
 function settings() {
-  storeLocally();
-  window.location.assign('settings.html')
+  goToPage('settings.html')
   // Store a day from one session to another
   // Store multiple days? One pr. calender day?
   // Store wake up time (wakeUpH and wakeUpM)
@@ -497,16 +503,16 @@ function adjustNowAndWakeUpButtons() {
 
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-    upBtn.innerText = wakeUpH + ':' + min + '\u25B8';
+    upBtn.textContent = wakeUpH + ':' + min + '\u25B8';
     nowBtn.title = 'Press to insert a 15 min planning period now';
-    nowBtn.innerText = 'Now' + '\u25B8';
+    nowBtn.textContent = 'Now' + '\u25B8';
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
-    upBtn.innerText = '\u25B8' + wakeUpH + ':' + min;
+    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;
     nowBtn.title = 'Jump to now';
-    nowBtn.innerText = '\u25B8' + 'Now';
+    nowBtn.textContent = '\u25B8' + 'Now';
   }
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -709,14 +715,14 @@ function removeFuzzyOverlap(task) {
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearOrEdit() {
-  editButton = document.getElementById('editButton');  // TODO: Get ridt of edit? Double click is more natural
-  // if (editButton.innerText == 'Edit') {
+  editButton = document.getElementById('editButton');
+  // if (editButton.textContent == 'Edit') {
   //   editTask();
-  //   editButton.innerText = 'Clear\u25B8';
+  //   editButton.textContent = 'Clear\u25B8';
   // } else
   if (document.getElementById('inputBox').value != '' ) {
     resetInputBox();
-    editButton.innerText = '\u25BEClear'; // TODO: Fix clear button after an edited task is inserted
+    editButton.textContent = '\u25BEClear';
     id = '';
   } else {
     clearDay();
@@ -730,6 +736,7 @@ function clearDay() {
     taskList = [];
     makeFirstTasks();
     wakeUpOrNowClickedOnce = false;
+    localStorage.indexOfLastTouched = 0;
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     storeLocally();
@@ -754,7 +761,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('editButton').innerText = 'Clear\u25B8';  // \u23F5
+  document.getElementById('editButton').textContent = 'Clear\u25B8';  // \u23F5
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -769,7 +776,7 @@ function zoomFunc() {
   zoom = (1 + 0.5) - zoom;
   zoomSymbolModifyer = 7 - zoomSymbolModifyer;
 
-  zoomButton.innerText = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
+  zoomButton.textContent = String.fromCharCode(9040 + zoomSymbolModifyer); // Toggles between \u2357 ⍐ and \u2350 ⍗
 
   renderTasks();
   jumpToNow();
@@ -843,7 +850,7 @@ function displayMessage(text, displayTime) {
   msg = document.getElementById('message');
   msg.style.display = 'inline-block';
   msg.style.color = 'red';
-  msg.innerText = text;
+  msg.textContent = text;
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
 }
@@ -873,7 +880,7 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
-      editButton.innerText = '\u25BEClear';
+      editButton.textContent = '\u25BEClear';
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
@@ -889,7 +896,7 @@ function taskHasBeenClicked(event) {
     // chosenTask.classList.add('isClicked'); // TODO: Affects only DOM. Make it a part of Task
     let myId = getIndexFromUniqueId(myUniqueId);
     taskList[myId].isClicked = 'isClicked'; // TODO: Unclick later
-    // editButton.innerText = 'Clear\u25B8';
+    // editButton.textContent = 'Clear\u25B8';
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
 
@@ -907,7 +914,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    // editButton.innerText = 'Clear\u25B8';  // \u25b8 for small triangle
+    // editButton.textContent = 'Clear\u25B8';  // \u25b8 for small triangle
   }
   renderTasks();
 
@@ -1004,7 +1011,7 @@ function renderTasks() {
 
     // Create stress indicators as divs
     let stressMarker = document.createElement('div');
-    stressMarker.innerText = '-';
+    stressMarker.textContent = '-';
 
     stressMarker.classList.add('stressDiv');
     stressMarker.setAttribute('style', 'background-image: linear-gradient(' + task.stressGradient + ')');

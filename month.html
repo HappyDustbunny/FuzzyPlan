@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FuzzyPlan Month</title>
+    <link rel="stylesheet" href="month.css">
+    <script src='month.js' defer></script>
+  </head>
+
+  <body onload="setUpFunc()">
+
+    <div class="container1">
+       <button type="button" class='controlButton' id="day" title='       Click to get back to day-view
+       (or just swipe left with two fingers anywhere)'>Day</button>
+      <h1 id='name' align=center>
+        FuzzyPlan
+      </h1>
+      <button type="button" class='controlButton' id="info" title="info">
+        <img src="Info_Simple_bw.svg.png" alt="Information and user manual"></button>
+      <span id='heart'></span>
+      <span id='message' display='none'></span>
+      <br>
+    </div>
+
+    <div class="centerWrapper">
+      <button id='settings' class="controlButton" type="button" title='Settings'>&#x2699;</button>
+      <button id='clearButton' class="controlButton" type="button">Clear&#x25B8;</button>
+      <input type="text" id='inputBox' autofocus value="">
+      <!-- <button id='upButton' class="controlButton" type="button">7:00&#9656;</button>
+      <button id='nowButton' class="controlButton" type="button" title='Press to insert a 15 min planning period at current time'>Now&#9656;</button> -->
+      <button id='zoom' class="controlButton" type="button" title='Toggles zoom'>&#x2350;</button>
+    </div>
+
+    <div class="container2">
+      <div id='dateDiv'> </div>
+      <div id='taskDiv'> </div>
+    </div>
+
+
+  </body>
+</html>
