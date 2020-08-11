@@ -137,8 +137,6 @@ function storeLocally() {
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId === uniqueIdOfLastTouched) {
       localStorage.indexOfLastTouched = index;
-      console.log('Store locally stored index', index);
-      displayMessage('Waiting', 4000);
       break;
     }
   }
