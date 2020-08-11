@@ -49,7 +49,7 @@ function storeLocally() {
 
 
 function retrieveLocallyStoredStuff() {
-  if (localStorage.getItem('monthListAsText') != '') {
+  if (localStorage.getItem('monthListAsText') != null) {
     monthTaskDict = JSON.parse(localStorage.monthListAsText);
   }
 
@@ -213,15 +213,19 @@ function renderTasks() {
 
   // Write new text into buttons and tooltips
   for (var myId in monthTaskDict) {
-    let children = document.getElementById(myId).childNodes;
+    let button = document.getElementById(myId);
 
-    let tasks = monthTaskDict[myId].trim().split("|");
-    tasks.shift();  // Remove empty "" stemming from first |
+    if (button != null && button.class != 'weekend') {
+      let children = button.childNodes;
 
-    if (tasks != '') {
-      for (var task of tasks) {
-        children[1].innerHTML += task + '&nbsp;' + '<br>';
-        children[2].textContent +=  ' \u25CF ' + task + '\u00a0';
+      let tasks = monthTaskDict[myId].trim().split("|");
+      tasks.shift();  // Remove empty "" stemming from first |
+
+      if (tasks != '') {
+        for (var task of tasks) {
+          children[1].innerHTML += task + '&nbsp;' + '<br>';
+          children[2].textContent +=  ' \u25CF ' + task + '\u00a0';
+        }
       }
     }
   }

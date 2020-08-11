@@ -125,7 +125,6 @@ function makeFirstTasks() {
     task.fuzzyness = 'isNotFuzzy';
     taskList.push(task);
   }
-  localStorage.indexOfLastTouched = 0;
 }
 
 
@@ -138,6 +137,8 @@ function storeLocally() {
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId === uniqueIdOfLastTouched) {
       localStorage.indexOfLastTouched = index;
+      console.log('Store locally stored index', index);
+      displayMessage('Waiting', 4000);
       break;
     }
   }
@@ -167,7 +168,8 @@ function retrieveLocallyStoredStuff() {
   //   storedTasksList = JSON.parse(localStorage.storedTasksList);
   // }
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
-    wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
+    wakeUpOrNowClickedOnce = localStorage.wakeUpOrNowClickedOnce;
+    // wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
   }
   // if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
   //   uniqueIdOfLastTouched = localStorage.uniqueIdOfLastTouched;
@@ -232,6 +234,7 @@ function textListToTaskList(taskListAsText) {
       if (!succes) {console.log('Retrieval got wrong at index ', index);}
     }
   }
+  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
   uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
 }
 
@@ -733,6 +736,7 @@ function clearDay() {
     taskList = [];
     makeFirstTasks();
     wakeUpOrNowClickedOnce = false;
+    localStorage.indexOfLastTouched = 0;
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     storeLocally();
