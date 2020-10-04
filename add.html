@@ -15,139 +15,148 @@
       <span id='message' display='none'></span>
     </div>
 
-    <div class="container1">
+    <h2 align='center'>
+      Add task
+    </h2>
 
-      <h2 align='center'>
-        Add task
-      </h2>
-
-      <div class='topic'>
-        <div>
-          <h4>Task text</h4>
-
-          Write task text: &nbsp;
-          <input type="text" id='inputTaskBox' autofocus value='' alt='Write task text'>
-        </div>
+    <div class='topic'>
+      <div>
+        <span class="text">Task text &nbsp;</span>
+        <input type="text" id='inputTaskBox' autofocus value='' alt='Write task text'>
       </div>
+    </div>
 
-      <!-- <span>   <br>   </span> -->
+    <span>   <br>   </span>
 
-      <div class='topic'>
-        <!-- <h4>Duration</h4> -->
-        <div class="container">
-          <span id='text1'>
-            Input duration: &nbsp;
-            <input type="text" id='inputTimeBox' value='30' alt='Write duration here'> <br> <!-- TODO: Make value default value -->
-          </span>
-          <table id='table'>
-            <tr>
-              <td><button class='timeAdjuster' type="button" id="plus1h">&#x25B4;</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus30m">&#x25B4;</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus15m">&#x25B4;</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus5m">&#x25B4;</button></td>
-            </tr>
-            <tr>
-              <td><button class='timeAdjuster' type="button" id="plus1hTime">1h</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus30mTime">30m</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus15mTime">15m</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus5mTime">5m</button></td>
-            </tr>
-            <tr>
-              <td><button class='timeAdjuster' type="button" id="minus1h">&#x25BE;</button></td>
-              <td><button class='timeAdjuster' type="button" id="minus30m">&#x25BE;</button></td>
-              <td><button class='timeAdjuster' type="button" id="minus15m">&#x25BE;</button></td>
-              <td><button class='timeAdjuster' type="button" id="minus5m">&#x25BE;</button></td>
-            </tr>
-          </table>
-        </div>
+    <div class='topic'>
+      <div class="container">
+        <span id='text1'>
+          Duration &nbsp;
+          <input type="text" id='inputTimeBox' value='30' alt='Write duration here'> <br>
+        </span>
+        <table id='table'>
+          <tr>
+            <td><button class='timeAdjuster' type="button" id="plus1h">&#x25B4;</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus30m">&#x25B4;</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus15m">&#x25B4;</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus5m">&#x25B4;</button></td>
+          </tr>
+          <tr>
+            <td><button class='timeAdjuster' type="button" id="plus1hTime">1h</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus30mTime">30m</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus15mTime">15m</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus5mTime">5m</button></td>
+          </tr>
+          <tr>
+            <td><button class='timeAdjuster' type="button" id="minus1h">&#x25BE;</button></td>
+            <td><button class='timeAdjuster' type="button" id="minus30m">&#x25BE;</button></td>
+            <td><button class='timeAdjuster' type="button" id="minus15m">&#x25BE;</button></td>
+            <td><button class='timeAdjuster' type="button" id="minus5m">&#x25BE;</button></td>
+          </tr>
+        </table>
       </div>
+    </div>
 
-      <div class='topic'>
-        <!-- <h4>Time</h4> -->
-        <div class="container">
-          <table id='text1'>
-            <tr>
-              <td>
-                Input time: &nbsp;&nbsp;&nbsp;&nbsp;
-                <input type="text" id='inputTimeBox' alt='Write time here'>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <button type="button" id="now" alt='Set time to now'>Now</button>
-              </td>
-            </tr>
-          </table>
-          <table id='table'>
-            <tr>
-              <td><button class='timeAdjuster' type="button" id="plus1h">&#x25B4;</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus30m">&#x25B4;</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus15m">&#x25B4;</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus5m">&#x25B4;</button></td>
-            </tr>
-            <tr>
-              <td><button class='timeAdjuster' type="button" id="plus1hTime">1h</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus30mTime">30m</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus15mTime">15m</button></td>
-              <td><button class='timeAdjuster' type="button" id="plus5mTime">5m</button></td>
-            </tr>
-            <tr>
-              <td><button class='timeAdjuster' type="button" id="minus1h">&#x25BE;</button></td>
-              <td><button class='timeAdjuster' type="button" id="minus30m">&#x25BE;</button></td>
-              <td><button class='timeAdjuster' type="button" id="minus15m">&#x25BE;</button></td>
-              <td><button class='timeAdjuster' type="button" id="minus5m">&#x25BE;</button></td>
-            </tr>
-          </table>
-        </div>
+    <span>   <br>   </span>
+
+    <div class='topic'>
+      <div class="container">
+        <table>
+          <tr>
+            <td>
+              <span class="text">Task starts at</span> <br>(optional)
+            </td>
+            <td>
+              <input type="text" id='inputTimeBox' alt='Write time here'>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button type="button" id="clear" alt='Clear time'>Clear</button>
+            </td>
+            <td>
+              <button type="button" id="now" alt='Set time to now'>Now</button>
+            </td>
+          </tr>
+        </table>
+        <table id='table'>
+          <tr>
+            <td><button class='timeAdjuster' type="button" id="plus1h">&#x25B4;</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus30m">&#x25B4;</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus15m">&#x25B4;</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus5m">&#x25B4;</button></td>
+          </tr>
+          <tr>
+            <td><button class='timeAdjuster' type="button" id="plus1hTime">1h</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus30mTime">30m</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus15mTime">15m</button></td>
+            <td><button class='timeAdjuster' type="button" id="plus5mTime">5m</button></td>
+          </tr>
+          <tr>
+            <td><button class='timeAdjuster' type="button" id="minus1h">&#x25BE;</button></td>
+            <td><button class='timeAdjuster' type="button" id="minus30m">&#x25BE;</button></td>
+            <td><button class='timeAdjuster' type="button" id="minus15m">&#x25BE;</button></td>
+            <td><button class='timeAdjuster' type="button" id="minus5m">&#x25BE;</button></td>
+          </tr>
+        </table>
       </div>
+    </div>
 
+    <span>   <br>   </span>
 
-
-      <div class='topic'>
-        <div>
-          <h4>Drain level &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Gain level</h4>
-
-          &nbsp;
-          <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-
-          <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-          <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
-
-          <br>
-
-          <input type="radio" id='d1' class="drain" name='drain' value="d1" checked='checked'>
-          <!-- <label for="d1">1</label> -->
-          <input type="radio" id='d2' class="drain" name='drain' value="d2">
-          <input type="radio" id='d3' class="drain" name='drain' value="d3">
-          <input type="radio" id='d4' class="drain" name='drain' value="d4">
-          <input type="radio" id='d5' class="drain" name='drain' value="d5">
-
-          <input type="radio" id='g1' class="drain" name='drain' value="g1">
-          <input type="radio" id='g2' class="drain" name='drain' value="g2">
-          <input type="radio" id='g3' class="drain" name='drain' value="g3">
-          <input type="radio" id='g4' class="drain" name='drain' value="g4">
-          <input type="radio" id='g5' class="drain" name='drain' value="g5">
-
-
-
-        </div>
-
-        <span>   <br>   </span>
-
-        <div>
-          <button type="button" id="apply">Apply</button>
-        </div>
-      </div>
+    <div class='topic'>
+      <table>
+        <tr>
+          <td>
+            <span class="text">Drain leve</span>l
+          </td>
+          <td>
+            <span class="text">Gain level</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart_empty.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+          </td>
+          <td>
+            <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+            <img src="200px-A_SVG_semicircle_heart.svg.png" style="width: 14px; height: 14px;"> &nbsp;&nbsp;
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="radio" id='d1' class="drain" name='drain' value="d1" checked='checked'>
+            <input type="radio" id='d2' class="drain" name='drain' value="d2">
+            <input type="radio" id='d3' class="drain" name='drain' value="d3">
+            <input type="radio" id='d4' class="drain" name='drain' value="d4">
+            <input type="radio" id='d5' class="drain" name='drain' value="d5">
+          </td>
+          <td>
+            <input type="radio" id='g1' class="drain" name='drain' value="g1">
+            <input type="radio" id='g2' class="drain" name='drain' value="g2">
+            <input type="radio" id='g3' class="drain" name='drain' value="g3">
+            <input type="radio" id='g4' class="drain" name='drain' value="g4">
+            <input type="radio" id='g5' class="drain" name='drain' value="g5">
+          </td>
+        </tr>
+      </table>
 
       <span>   <br>   </span>
+
+      <div>
+        <button type="button" id="cancel">Cancel</button>
+        <button type="button" id="apply">OK (then tap task to insert new task before)</button>
+      </div>
+    </div>
+
+    <span>   <br>   </span>
 
   </body>
 </html>

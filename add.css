@@ -19,23 +19,26 @@ td {
   padding: 0px;
 }
 
+span {
+  height: 2px;
+}
+
 .container {
   display: grid;
-  grid-template-columns: 5% 45% 45% 5%;
+  grid-template-columns: 45% 45% 10%;
   grid-template-rows: auto; /* auto;*/
-  grid-gap: .3rem;
+  grid-gap: .6rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. input table .'
+  'input table .'
   /* '. body .'; */
 }
 
 .topic {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
+  padding: 7px;
+  margin-bottom: -15px;
   border-radius: 10px;
   background-color: rgba(154, 219, 240, .25);
   width: 90%;
@@ -43,13 +46,23 @@ td {
 
 .timeAdjuster {
   width: 30px;
-  /* height:  15px; */
 }
 
-#text1 {
+
+.text {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+#d1, #g1 {
+  margin-left: 0px;
+}
+
+#text1, #text2 {
   display: flex;
   grid-area: input;
-  place-self: center;
+  align-self: center;
+  font-weight: bold;
 }
 
 #inputTimeBox {
@@ -71,6 +84,6 @@ td {
   width: 30px;
 }
 
-#apply {
-  font-size: 1em;
+#apply, #cancel {
+  font-size: 0.7em;
 }
