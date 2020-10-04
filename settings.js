@@ -51,7 +51,7 @@ function applyTaskDuration() {
 
   let min = document.getElementById('inputBoxM').value.trim();
 
-  if (isNaN(min) || min < 0 || 24*60 - 2 < min) {
+  if (isNaN(min) || min < 0 || 24*60 - 2 < min) { // TODO: Scroll to top or display message
     displayMessage('Use only numbers between 0 and 1438, please.', 3000);
     document.getElementById('inputBoxM').select();
     return;

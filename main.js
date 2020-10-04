@@ -80,6 +80,9 @@ class Task {
 
 // Runs when the page is loaded:
 function setUpFunc() {
+  taskList = [];
+  makeFirstTasks();
+
   retrieveLocallyStoredStuff();
 
   // fillStressBar();
@@ -89,6 +92,8 @@ function setUpFunc() {
   createTimeMarker();
 
   updateTimeMarker();
+
+  adjustAddTaskButton();
 
   // makeFirstTasks(); // Moved to retrieveLocallyStoredStuff()
 
@@ -128,6 +133,20 @@ function makeFirstTasks() {
 }
 
 
+function adjustAddTaskButton() { // TODO: Make resizing of window work
+  let height = window.innerHeight|| document.documentElement.clientHeight||
+               document.body.clientHeight;
+  let width  = window.innerWidth || document.documentElement.clientWidth ||
+               document.body.clientWidth;
+  // console.log(width, height);
+
+  let addTaskButton = document.getElementById('addTaskButton');
+  // addTaskButton.style.position = 'relative';
+  addTaskButton.style.left = width * 0.84 + 'px';
+  addTaskButton.style.bottom = height * 0.11 + 'px';
+}
+
+
 function storeLocally() {
   localStorage.taskListAsText = JSON.stringify(taskListExtractor());
   // if (!localStorage.storedTasksList) {
@@ -153,8 +172,12 @@ function storeLocally() {
 
 
 function retrieveLocallyStoredStuff() {
-  taskList = [];
-  makeFirstTasks();
+  // taskList = [];
+  // makeFirstTasks();
+
+  if (!localStorage.getItem('indexOfLastTouched')) { // If NOT present...
+    localStorage.indexOfLastTouched = 0;
+  }
 
   if (localStorage.getItem('taskListAsText')) {
     lastTaskList = taskList;
@@ -219,9 +242,8 @@ function debugExamples() {
 
 function textListToTaskList(taskListAsText) {
   let succes = false;
-  if (taskListAsText === []) {
+  if (taskListAsText.length === 0 && taskList.length === 0) {
     makeFirstTasks();
-    // storeLocally();
   } else {
     for (const [index, text] of taskListAsText.entries()) {
       let parsedList = parseText(text.trim());
@@ -278,8 +300,10 @@ function updateTimeMarker() {
   let sec = now.getSeconds();
   // The height of the nowSpan is set to the percentage the passed time represents of the number of minutes in a day
   let nowHeight = zoom * ((hours * 60 + min) * 100 ) / (24*60) + '%';
-  nowSpanElement = document.getElementById('nowSpan');
-  nowSpanElement.style.height = nowHeight;
+  if (document.getElementById('nowSpan')) {
+    nowSpanElement = document.getElementById('nowSpan');
+    nowSpanElement.style.height = nowHeight;
+  }
 
   if (taskList.length === 2) {
     document.getElementById("info").style.animationPlayState = "running";
@@ -388,6 +412,8 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
+
+document.getElementById('addTaskButton').addEventListener('click', function() {goToPage('add.html')});
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
@@ -825,7 +851,6 @@ function createNullTimes() {
 
 function getStress(task) {
   let currentStressLevel = task.startStressLevel;
-  console.log(task.text, currentStressLevel);
   let gradient = ['hsl(255, 100%, ' + (100 - Math.floor(currentStressLevel * 10)).toString() + '%)'];
 
   let durationM = Math.floor(task.duration / 60000);
@@ -835,9 +860,6 @@ function getStress(task) {
     colourBit = 'hsl(255, 100%, ' + (100 - Math.floor(stress * 10)).toString() + '%)';
     gradient.push(colourBit);
   }
-
-  // stressLevel = stress;
-  console.log(task.text, stress);
 
   return [gradient, stress];
 }
@@ -993,6 +1015,8 @@ function renderTasks() {
 
   // Make new time markings in timeBar
   fillTimeBar(zoom);
+
+  // adjustAddTaskButton();
 
 
   // Refresh view from taskList

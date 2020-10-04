@@ -195,6 +195,27 @@ input {
   background-color: rgba(123, 217, 71, .25);
 }
 
+#addTaskButton {
+  position: relative;
+  bottom: 50px;
+  left: 320px;
+  font-size: x-large;
+  line-height: 0.1em;
+  text-align: center;
+  padding: .1em 0.12em .2em .1em;
+  height: 1.1em;
+}
+
+/* button.addTaskButton {
+  position: absolute;
+  bottom: 225px;
+  left: 310px;
+  border: 3px solid rgba(154, 219, 240, .9);
+  background-color: rgba(154, 219, 240, .6);
+  border-radius: 25px;
+  z-index: 999;
+} */
+
 #storage {
   grid-area: storage;
 }
