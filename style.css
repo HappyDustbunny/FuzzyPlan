@@ -9,16 +9,29 @@ body {
   background-color: white;
 }
 
+button:hover,
+button:focus {
+  /* transform: scaleY(1.2); */
+  transform: rotateX(10deg);
+  border: 1px solid rgb(255, 50, 255);
+}
+
+/* button.addTaskButton {
+position: absolute;
+bottom: 225px;
+left: 310px;
+border: 3px solid rgba(154, 219, 240, .9);
+background-color: rgba(154, 219, 240, .6);
+border-radius: 25px;
+z-index: 999;
+} */
+
 div {
   /* flex: initial; */
   text-align: left;
   border: 1px solid rgb(96, 139, 168);
   border-radius: 4px;
   background-color: rgba(154, 219, 240, .35);
-}
-
-p {
-  font-size: 10px;
 }
 
 h1 {
@@ -31,12 +44,14 @@ input {
   border-radius: 10px;
 }
 
-.task {
-  text-align: left;
-  border: 1px solid rgb(96, 139, 168);
-  border-radius: 10px;
-  background-color: rgba(154, 219, 240, .6);
-  grid-area: taskListing;
+p {
+  font-size: 10px;
+}
+
+@keyframes infoAnimation {
+  0% {border: 1px solid rgb(96, 139, 168);}
+  50% {border: 1px solid rgb(255, 0, 0);}
+  100% {border: 1px solid rgb(96, 139, 168);}
 }
 
 @media only screen and (min-width: 450px) {
@@ -48,6 +63,21 @@ input {
   .container2 {
     height: 430px;
   }
+}
+
+.button-disabled{
+  cursor: not-allowed;
+  K  /* pointer-events: none; */
+  border: none;
+}
+
+.centerWrapper {
+  display: grid;
+  grid-template-columns: 20px 40px auto 40px 40px 20px;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
 }
 
 .container1 {
@@ -62,15 +92,6 @@ input {
   'storage header info month'
   '. hearts . .'
   '. messages . .';
-}
-
-.centerWrapper {
-  display: grid;
-  grid-template-columns: 20px 40px auto 40px 40px 20px;
-  grid-gap: .3rem;
-  background-color: transparent;
-  border: none;
-  overflow-y: scroll;
 }
 
 .container2 {
@@ -102,51 +123,6 @@ input {
   padding-left: 3px;
 }
 
-#nowSpan {
-  border-bottom: 3px solid rgba(255, 0, 255, 1.0);
-  grid-area: timeBar;
-  z-index: 999;
-}
-
-#stressDiv {
-  display: flex;
-  flex-direction: column;
-  background-color: transparent;
-  border: none;
-  height: 1440px;
-  align-items: center;
-  grid-area: stressBar;
-}
-
-#timeDiv {
-  display: flex;
-  flex-direction: column;
-  background-color: transparent;
-  /* background-color: red; */
-  border: none;
-  width: 100%;
-  height: 1440px;
-  align-items: center;
-  grid-area: timeBar;
-}
-
-#taskDiv {
-  display: flex;
-  flex-direction: column;
-  background-color: transparent;
-  border: none;
-  height: 1440px;
-  width: 100%;
-  grid-area: taskListing;
-}
-
-.stressDiv {
-  font-size: 14px;
-  height: 1.0417%;
-  color: hsl(255, 100%, 85%);
-  border: none;
-  border-radius: 0px;
-}
 
 .halfHours1,
 .halfHours2 {
@@ -166,10 +142,9 @@ input {
   height: 1.0417%;
 }
 
-.isNullTime {
-  background-color: white;
-  border: 1px solid rgba(154, 219, 240, 1.0);
-  border-radius: 10px;
+.isClicked {
+  transform: rotateX(10deg);
+  border: 1px solid rgb(255, 50, 255);
 }
 
 /* .dontTouch {
@@ -177,22 +152,44 @@ input {
   /* pointer-events: none; */
 /* } */
 
+.isGain {
+  border: 1px solid rgba(123, 217, 71, 1.0);
+  background-color: rgba(123, 217, 71, .25);
+}
+
 .pause {
   border: none;
   background-color: rgba(154, 219, 240, .25);
   box-shadow: 0px 0px 3px 2px rgba(152, 250, 172, 0.56);
 }
 
-.isFuzzy {
-  border: 1px solid rgba(154, 219, 240, 1.0);
+.stressDiv {
+  font-size: 14px;
+  height: 1.0417%;
+  color: hsl(255, 100%, 85%);
+  border: none;
+  border-radius: 0px;
+}
+
+.task {
+  text-align: left;
+  border: 1px solid rgb(96, 139, 168);
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .6);
+  grid-area: taskListing;
+}
+
+.isFuzzy { /* Needs to come after .task */
+   border: 1px solid rgba(154, 219, 240, 1.0);
   border-radius: 10px;
   background-color: rgba(154, 219, 240, .25);
   box-shadow: 0px 0px 3px 2px rgba(154, 219, 240, .25);
 }
 
-.isGain {
-  border: 1px solid rgba(123, 217, 71, 1.0);
-  background-color: rgba(123, 217, 71, .25);
+.isNullTime { /* Needs to come after .task */
+  background-color: white;
+  border: 1px solid rgba(154, 219, 240, 1.0);
+  border-radius: 10px;
 }
 
 #addTaskButton {
@@ -206,28 +203,13 @@ input {
   height: 1.1em;
 }
 
-/* button.addTaskButton {
-  position: absolute;
-  bottom: 225px;
-  left: 310px;
-  border: 3px solid rgba(154, 219, 240, .9);
-  background-color: rgba(154, 219, 240, .6);
-  border-radius: 25px;
-  z-index: 999;
-} */
-
-#storage {
-  grid-area: storage;
-}
-
-#name {
+#heart {
+  display: flex;
+  text-align: center;
   justify-content: center;
-  grid-area: header;
-}
-
-#month {
-  grid-area: month;
-  justify-self: end;
+  background-color: white;
+  font-size: 14px;
+  grid-area: hearts;
 }
 
 #info {
@@ -247,29 +229,70 @@ input {
 }
 
 #info img {
-   height: 13px;
-   width: 13px;
-}
-
-@keyframes infoAnimation {
-  0% {border: 1px solid rgb(96, 139, 168);}
-  50% {border: 1px solid rgb(255, 0, 0);}
-  100% {border: 1px solid rgb(96, 139, 168);}
-}
-
-#heart {
-  display: flex;
-  text-align: center;
-  justify-content: center;
-  background-color: white;
-  font-size: 14px;
-  grid-area: hearts;
+  height: 13px;
+  width: 13px;
 }
 
 #message {
   display: flex;
   text-align: center;
   grid-area: messages;
+}
+
+#month {
+  grid-area: month;
+  justify-self: end;
+}
+
+#name {
+  justify-content: center;
+  grid-area: header;
+}
+#nowSpan {
+  border-bottom: 3px solid rgba(255, 0, 255, 1.0);
+  grid-area: timeBar;
+  z-index: 999;
+}
+
+#settings {
+  width: auto;
+  font-size: 15px;
+}
+
+#storage {
+  grid-area: storage;
+}
+
+#stressDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  border: none;
+  height: 1440px;
+  align-items: center;
+  grid-area: stressBar;
+}
+
+#taskDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  border: none;
+  height: 1440px;
+  width: 100%;
+  grid-area: taskListing;
+}
+
+#timeDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  /* background-color: red; */
+  border: none;
+  width: 100%;
+  height: 1440px;
+  align-items: center;
+  grid-area: timeBar;
 }
 
 #upButton,
@@ -281,132 +304,9 @@ input {
   /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
 }
 
-.button-disabled{
-  cursor: not-allowed;
-  /* pointer-events: none; */
-  border: none;
-  /* background-image: linear-gradient(#c5c5f6, #c2e6f2, #c2e6f2, #c2e6f2,#c5c5f6) !important; */
-}
 
 #zoom {
   text-align: left;
   width: auto;
   font-size: 15px;
-  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
 }
-
-#settings {
-  /* display: block; */
-  width: auto;
-  font-size: 15px;
-  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
-}
-
-/* #topButton {
-  width: 80%;
-  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0);
-  grid-area: taskHeader;
-}
-
-#bottomButton {
-  width: 80%;
-  background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9898ff);
-  grid-area: taskFooter;
-} */
-
-
-.isClicked {
-  transform: rotateX(10deg);
-  border: 1px solid rgb(255, 50, 255);
-}
-
-button:hover,
-button:focus {
-  /* transform: scaleY(1.2); */
-  transform: rotateX(10deg);
-  border: 1px solid rgb(255, 50, 255);
-}
-
-/* .time {
-text-align: center;
-width: 27px;
-height: 19px;
-border: 2px outset #9898ff;
-border-radius: 5px;
-background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
-}
-
-.usedTime {
-text-align: center;
-width: 27px;
-height: 19px;
-border: 2px inset #9898ff;
-border-radius: 5px;
-background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
-} */
-
-/* div[data-minutes='0'] {
-  height: 30px;
-}
-
-div[data-minutes='30'] {
-  height: 15px;
-} */
-
-/* div:nth-child(odd) {
-  background-color: rgba(96, 139, 168, 0.4);
-}
-
-div:nth-child(even) {
-  background-color: rgba(96, 139, 168, .2);
-} */
-/*
-.div1 {
-  background-color: rgba(96, 139, 168, .2)
-}
-
-.div2 {
-  background-color: rgba(255, 255, 255, .2)
-} */
-
-/* .box {
-  display: inline;
-  align-items: end;
-  justify-content: center;
-}
-
-.box1 {
-  display: flex;
-  align-items: start;
-  justify-content: center;
-}
-
-div {
-  flex: initial;
-  height: 40px;
-  text-align: center;
-  padding-top: 50px;
-  border: 1px solid rgb(96, 139, 168);
-  border-radius: 25px;
-  background-color: rgba(96, 139, 168, .2) !important;
-}
-
-.mid {
-  height: 100px;
-  padding-top: 130px;
-  padding-bottom: 0px;
-}
-
-.thumb {
-  padding: 10px;
-  height: 50px;
-  width: 50px;
-} */
-
-
-/* .day {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-} */

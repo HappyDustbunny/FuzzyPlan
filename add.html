@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FuzzyPlan</title>
     <link rel="stylesheet" href="add.css">
-    <script src="settings.js" defer></script>
+    <script src="add.js" defer></script>
   </head>
   <body onload="setUpFunc()">
 
@@ -32,26 +32,50 @@
       <div class="container">
         <span id='text1'>
           Duration &nbsp;
-          <input type="text" id='inputTimeBox' value='30' alt='Write duration here'> <br>
+          <input type="text" id='inputDurationBox' alt='Write duration here in minutes'> <br>
         </span>
         <table id='table'>
           <tr>
-            <td><button class='timeAdjuster' type="button" id="plus1h">&#x25B4;</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus30m">&#x25B4;</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus15m">&#x25B4;</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus5m">&#x25B4;</button></td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="durationPlus1h">&#x25B4;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="durationPlus30m">&#x25B4;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="durationPlus15m">&#x25B4;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="durationPlus5m">&#x25B4;</button>
+            </td>
           </tr>
           <tr>
-            <td><button class='timeAdjuster' type="button" id="plus1hTime">1h</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus30mTime">30m</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus15mTime">15m</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus5mTime">5m</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="durationPlus1hMiddle">1h</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="durationPlus30mMiddle">30m</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="durationPlus15mMiddle">15m</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="durationPlus5mMiddle">5m</button></td>
           </tr>
           <tr>
-            <td><button class='timeAdjuster' type="button" id="minus1h">&#x25BE;</button></td>
-            <td><button class='timeAdjuster' type="button" id="minus30m">&#x25BE;</button></td>
-            <td><button class='timeAdjuster' type="button" id="minus15m">&#x25BE;</button></td>
-            <td><button class='timeAdjuster' type="button" id="minus5m">&#x25BE;</button></td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="durationMinus1h">&#x25BE;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="durationMinus30m">&#x25BE;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="durationMinus15m">&#x25BE;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="durationMinus5m">&#x25BE;</button>
+            </td>
           </tr>
         </table>
       </div>
@@ -81,22 +105,46 @@
         </table>
         <table id='table'>
           <tr>
-            <td><button class='timeAdjuster' type="button" id="plus1h">&#x25B4;</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus30m">&#x25B4;</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus15m">&#x25B4;</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus5m">&#x25B4;</button></td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="timePlus1h">&#x25B4;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="timePlus30m">&#x25B4;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="timePlus15m">&#x25B4;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundUp"></button>
+              <button class='timeAdjusterTop' type="button" id="timePlus5m">&#x25B4;</button>
+            </td>
           </tr>
           <tr>
-            <td><button class='timeAdjuster' type="button" id="plus1hTime">1h</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus30mTime">30m</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus15mTime">15m</button></td>
-            <td><button class='timeAdjuster' type="button" id="plus5mTime">5m</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="timePlus1hMiddle">1h</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="timePlus30mMiddle">30m</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="timePlus15mMiddle">15m</button></td>
+            <td><button class='timeAdjusterMiddle' type="button" id="timePlus5mMiddle">5m</button></td>
           </tr>
           <tr>
-            <td><button class='timeAdjuster' type="button" id="minus1h">&#x25BE;</button></td>
-            <td><button class='timeAdjuster' type="button" id="minus30m">&#x25BE;</button></td>
-            <td><button class='timeAdjuster' type="button" id="minus15m">&#x25BE;</button></td>
-            <td><button class='timeAdjuster' type="button" id="minus5m">&#x25BE;</button></td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="timeMinus1h">&#x25BE;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="timeMinus30m">&#x25BE;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="timeMinus15m">&#x25BE;</button>
+            </td>
+            <td>
+              <button type="button" class="backgroundDown"></button>
+              <button class='timeAdjusterBottom' type="button" id="timeMinus5m">&#x25BE;</button>
+            </td>
           </tr>
         </table>
       </div>

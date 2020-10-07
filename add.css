@@ -12,7 +12,7 @@ button {
   font-size: 0.6em;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
   border: 1px solid rgb(96, 139, 168);
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 td {
@@ -44,14 +44,65 @@ span {
   width: 90%;
 }
 
-.timeAdjuster {
+.timeAdjusterTop {
   width: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: none; /* linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0); */
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 10;
+  top: 12px;
+  border-bottom: none;
 }
 
+.timeAdjusterMiddle {
+  width: 30px;
+  border-radius: 0px;
+  background-image: none;
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 5;
+  border: none;
+}
+
+.timeAdjusterBottom {
+  width: 30px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-image: none; /* linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9abdf0, #9898ff); */
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 10;
+  top: -36px;
+  border-top: none;
+}
 
 .text {
   font-weight: bold;
   margin-bottom: 4px;
+}
+
+.backgroundUp {
+  width: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0);
+  position: relative;
+  top: 34px;
+  z-index: 1;
+  border-bottom: none;
+}
+
+.backgroundDown {
+  width: 30px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  position: relative;
+  top: -14px;
+  z-index: 1;
+  border-top: none;
 }
 
 #d1, #g1 {
@@ -66,8 +117,8 @@ span {
 }
 
 #inputTimeBox {
-  /* display: flex; */
   grid-area: input;
+  width: 30px;
   height: 15px;
 }
 
@@ -77,12 +128,17 @@ span {
 }
 
 #inputTaskBox {
-  width: 200px;
+  width: 212px;
 }
 
-#inputTimeBox {
-  width: 30px;
+#inputDurationBox {
+  width: 50px;
+  height: 15px;
 }
+
+/* #inputTimeBox {
+  width: 30px;
+} */
 
 #apply, #cancel {
   font-size: 0.7em;

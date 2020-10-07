@@ -78,7 +78,7 @@ function fillDateBar(zoom) {
 
   for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
     // Insert monthnames before each the 1th
-    if (thisMonth < i.getMonth()) {
+    if (thisMonth < i.getMonth()) { // TODO: Oups! This doesn't handle dec --> jan
       thisMonth = i.getMonth();
       monthNameNode = document.createElement('button');
       monthNameNode.classList.add('monthName');
@@ -94,7 +94,8 @@ function fillDateBar(zoom) {
 
     newNode.setAttribute('id', id)
     newNode.classList.add('dateButton');
-    if (i.getDay() > 4) { // Weekday 5 and 6 are Saturday and Sunday
+    let dayNumber = i.getDay();
+    if (dayNumber === 0 || dayNumber === 6) { // Weekday 6 and 0 are Saturday and Sunday
       newNode.classList.add('weekend');
     }
 

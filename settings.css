@@ -15,11 +15,24 @@ button {
   border-radius: 5px;
 }
 
+button[id*='memory'] {
+  width: 300px;
+}
+
 button:hover,
 button:focus {
   /* transform: scaleY(1.2); */
   transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
+}
+
+.container {
+  /* width: 400px; */
+  display: flex;
+  align-items: center;
+  /* align-content: space-between; */
+  flex-direction: column;
+  /* justify-content: space-between; */
 }
 
 .container1, .container2 {
@@ -35,13 +48,8 @@ button:focus {
   '. body .';
 }
 
-.container {
-  /* width: 400px; */
-  display: flex;
-  align-items: center;
-  /* align-content: space-between; */
-  flex-direction: column;
-  /* justify-content: space-between; */
+.highLighted {
+  border: 1px solid rgb(255, 50, 255);
 }
 
 .notInUse {
@@ -49,8 +57,13 @@ button:focus {
   border: none;
 }
 
-.highLighted {
-  border: 1px solid rgb(255, 50, 255);
+.topic {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .25);
+  width: 90%;
 }
 
 #info {
@@ -73,17 +86,4 @@ button:focus {
 #stores {
   display: flex;
   flex-direction: column;
-}
-
-button[id*='memory'] {
-  width: 300px;
-}
-
-.topic {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-  border-radius: 10px;
-  background-color: rgba(154, 219, 240, .25);
-  width: 90%;
 }
