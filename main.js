@@ -865,7 +865,7 @@ function getStress(task) {
 }
 
 
-function displayMessage(text, displayTime) {
+function displayMessage(text, displayTime) {  // displayTime in milliseconds
   console.log(text);
   msg = document.getElementById('message');
   msg.style.display = 'inline-block';
@@ -1165,6 +1165,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
     let endTime = new Date(task.date.getTime() + task.duration);
     let endH = endTime.getHours();
     let endM = endTime.getMinutes();
+    // Check if leading zeroes are needed and add them
     let nils = ['', '', '', ''];
     if (timeH < 10) {
       nils[0] = '0';
@@ -1250,7 +1251,7 @@ function parseText(rawText) {
   let minutes = /[0-9]+m/.exec(rawText);
   if (minutes) { // If 30m is in rawText store number in minutes and remove 30m from rawText
     minutes = /[0-9]+/.exec(minutes).toString();
-    rawText = rawText.replace(minutes + 'm', '')
+    rawText = rawText.replace(minutes + 'm', '');
   } else {
     minutes = '0';
   };
@@ -1258,7 +1259,7 @@ function parseText(rawText) {
   let hours = /[0-9]+h/.exec(rawText);
   if (hours) { // If 2h is in rawText store number in minutes and remove 2h from rawText
     hours = /[0-9]+/.exec(hours).toString();
-    rawText = rawText.replace(hours + 'h', '')
+    rawText = rawText.replace(hours + 'h', '');
   } else {
     hours = '0';
   };
@@ -1278,9 +1279,9 @@ function parseText(rawText) {
     } else if (time.length == 3) {
       timeH = /[0-9]/.exec(time).toString();
     }
-    time = time.replace(timeH, '')
+    time = time.replace(timeH, '');
     timeM = /[0-9][0-9]/.exec(time).toString();
-    rawText = rawText.replace(timeH + timeM, '')
+    rawText = rawText.replace(timeH + timeM, '');
     // Make new datetime from timeM and timeH
     let now = new Date();
     taskStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);  // NO need for DST shenanigans here!
