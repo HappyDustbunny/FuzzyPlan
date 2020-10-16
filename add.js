@@ -2,16 +2,19 @@ let defaultTaskDuration = 30;
 
 let taskText = '';
 let taskDuration = defaultTaskDuration;
-let taskTime = new Date();
+let taskTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);;
+let drainGainLevel = 1;
 
 // TODO: change text of OK button depending of Input Time status.
 
-// Makes pressing Enter add task
-document.getElementById('inputTaskBox').addEventListener('keypress', function () { inputAtEnterText(event); });
-document.getElementById('inputDurationBox').addEventListener('keypress', function () { inputAtEnterDuration(event); });
-document.getElementById('inputTimeBox').addEventListener('keypress', function () { inputAtEnterTime(event); });
+document.getElementById('inputTaskBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readTaskText(); } });
+document.getElementById('inputDurationBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readDurationTime(); } });
+document.getElementById('inputTimeBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readTaskStartTime(); } });
+// document.getElementById('inputTimeBox').addEventListener('keypress', function () { inputAtEnterTime(event); });
 
-document.getElementById('clear').addEventListener('click', clearTimeBox);
 
 document.getElementById('durationPlus1h').addEventListener('click', function() {changeDuration(60);});
 document.getElementById('durationPlus30m').addEventListener('click', function() {changeDuration(30);});
@@ -33,9 +36,15 @@ document.getElementById('timeMinus30m').addEventListener('click', function() {ch
 document.getElementById('timeMinus15m').addEventListener('click', function() {changeTime(-15);});
 document.getElementById('timeMinus5m').addEventListener('click', function() {changeTime(-5);});
 
+document.getElementById('clear').addEventListener('click', clearTimeBox);
 document.getElementById('now').addEventListener('click', setTimeNow);
 
+document.getElementById('cancel').addEventListener('click', justReturn);
+document.getElementById('apply').addEventListener('click', returnTask);
+
 function setUpFunc() {
+  document.getElementById('d1').checked = 'checked';
+  document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
   retrieveLocallyStoredStuff();
 
@@ -49,6 +58,9 @@ function setUpFunc() {
 function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
+  }
+  if (localStorage.getItem('currentTask')) {
+    parseCurrentTask(localStorage.currentTask);
   }
 }
 
@@ -78,6 +90,7 @@ function changeTime(minutes) {
 function fillTimeBox(time) {
   taskTimeHours = time.getHours().toString();
   taskTimeMinutes = time.getMinutes().toString();
+
   // Check if leading zeroes are needed and add them
   let nils = ['', ''];
   if (taskTimeHours < 10) {
@@ -87,7 +100,11 @@ function fillTimeBox(time) {
     nils[1] = '0';
   }
   prettyTaskTime = nils[0] + taskTimeHours + ':' + nils[1] + taskTimeMinutes;
-  document.getElementById('inputTimeBox').value = prettyTaskTime;
+  if (0 < taskTimeHours || 0 < taskTimeMinutes) {
+    document.getElementById('inputTimeBox').value = prettyTaskTime;
+  }
+
+  document.getElementById('apply').textContent = 'Ok';
 }
 
 function setTimeNow() {
@@ -97,6 +114,7 @@ function setTimeNow() {
 
 function clearTimeBox() {
   document.getElementById('inputTimeBox').value = '';
+  document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
   taskTimeHours = 0;
   taskTimeMinutes = 0;
 }
@@ -107,7 +125,7 @@ function clearTaskBox() {
 
 function readTaskText() {
   let contentInputBox = document.getElementById('inputTaskBox').value.trim();
-  let badCharacters = /[^a-zA-Z\.\,\?\!\(\)\"]+/.exec(contentInputBox);
+  let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
   if (badCharacters) {
     displayMessage('Please dont use ' + badCharacters + ' for task description.', 3000);
   } else {
@@ -117,16 +135,19 @@ function readTaskText() {
 }
 
 function readDurationTime() {
-  let contentInputBox = document.getElementById('inputDurationBox').value.trim(); // TODO: Sanitize input and add functionality
+  let contentInputBox = document.getElementById('inputDurationBox').value.trim();
   let badCharacters = /[^0-9hm]/.exec(contentInputBox);
   if (badCharacters) {
     displayMessage('Please use the format 1h30m for 1 hour and 30 minutes', 3000);
   } else {
-    let timeH = /[0-9]+h/.exec(contentInputBox).toString();
-    contentInputBox = contentInputBox.replace(timeH, '');
-    let timeM = /[0-9]+m/.exec(contentInputBox).toString();
-    timeH = Number(timeH.replace('h', ''));
+    let timeH = 0;
+    let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString(); // TODO: Check if numbers are too big
     timeM = Number(timeM.replace('m', ''));
+    if (/h/.exec(contentInputBox)) {
+      timeH = /[0-9]+h/.exec(contentInputBox).toString();
+      contentInputBox = contentInputBox.replace(timeH, '');
+      timeH = Number(timeH.replace('h', ''));
+    }
     taskDuration = timeH * 60 + timeM;
     console.log(timeH, timeM, taskDuration);
   }
@@ -143,26 +164,64 @@ function readTaskStartTime() {
     let timeM = /[0-9][0-9]/.exec(contentInputBox);
     let now = new Date();
     taskTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
+    fillTimeBox(taskTime);
   }
 }
 
-function inputAtEnterText(event) {
-  if (event.key === 'Enter') { // TODO: Can't this be moved to the eventListener?
-    readTaskText();
-  }
-}
-
-function inputAtEnterDuration(event) {
-  if (event.key === 'Enter') {
+function returnTask() {
+  readTaskText();
+  if (taskText === '') {
+    displayMessage('Please write a task text', 3000);
+  } else {
     readDurationTime();
+    readTaskStartTime();
+    readDrainGainRadioButtons();
+    formatTask();
+    window.location.assign('main.html');
   }
 }
 
-function inputAtEnterTime(event) {
-  if (event.key === 'Enter') {
-    readTaskStartTime();
+function justReturn() {
+  window.location.assign('main.html');
+}
+
+function readDrainGainRadioButtons() {
+  let radioButtonResult = document.getElementsByClassName('drain');
+  for (var i = 0; i < 10; i++) {
+    if (radioButtonResult[i].type === 'radio' && radioButtonResult[i].checked) {
+      drainGainLevel = radioButtonResult[i].value;
+    }
   }
 }
+
+function formatTask() {
+  let returnText = '';
+  if (taskTime) {
+    returnText = taskText + ' ' + taskTime.getHours() + taskTime.getMinutes() + ' ' + taskDuration + 'm ' + drainGainLevel;
+  } else {
+    returnText = taskText + ' ' + taskDuration + 'm ' + drainGainLevel;
+  }
+  localStorage.newTaskText = returnText;
+  console.log(returnText);
+}
+
+// function inputAtEnterText(event) {
+//   if (event.key === 'Enter') {
+//     readTaskText();
+//   }
+// }
+
+// function inputAtEnterDuration(event) {
+//   if (event.key === 'Enter') {
+//     readDurationTime();
+//   }
+// }
+
+// function inputAtEnterTime(event) {
+//   if (event.key === 'Enter') {
+//     readTaskStartTime();
+//   }
+// }
 
 
 function displayMessage(text, displayTime) { // displayTime in milliseconds
@@ -173,4 +232,67 @@ function displayMessage(text, displayTime) { // displayTime in milliseconds
   msg.textContent = text;
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
+}
+
+
+function parseCurrentTask(currentTask) {
+  let minutes = /[0-9]+m/.exec(currentTask);
+  if (minutes) { // If 30m is in currentTask store number in minutes and remove 30m from currentTask
+    minutes = /[0-9]+/.exec(minutes).toString();
+    currentTask = currentTask.replace(minutes + 'm', '');
+  } else {
+    minutes = '0';
+  };
+
+  let hours = /[0-9]+h/.exec(currentTask);
+  if (hours) { // If 2h is in currentTask store number in minutes and remove 2h from currentTask
+    hours = /[0-9]+/.exec(hours).toString();
+    currentTask = currentTask.replace(hours + 'h', '');
+  } else {
+    hours = '0';
+  };
+
+  // Make duration in milliseconds form hours and minutes
+  let duration = hours * 60 + minutes;
+  if (duration == 0) {
+    taskDuration = defaultTaskDuration; // If no duration is provided use the default task duration
+  }
+  fillDurationBox(taskDuration);
+
+  let time = /[0-9]?[0-9]:?[0-9][0-9]/.exec(currentTask);
+  if (time) { // If 1230 or 12:30 is found in currentTask store numbers in hours and minutes and remove 1230 from currentTask
+    time.toString().replace(':', '');
+    time = time[0].toString();
+    if (time.length == 4) {
+      timeH = /[0-9][0-9]/.exec(time).toString();
+    } else if (time.length == 3) {
+      timeH = /[0-9]/.exec(time).toString();
+    }
+    time = time.replace(timeH, '');
+    timeM = /[0-9][0-9]/.exec(time).toString();
+    currentTask = currentTask.replace(timeH + timeM, '');
+    // Make new datetime from timeM and timeH
+    let now = new Date();
+    taskStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);  // NO need for DST shenanigans here!
+    fillTimeBox(taskStart);
+  };
+
+
+  let drain = /d+[-]*[1-9]+/.exec(currentTask);
+  if (drain) {
+    drainGainLevel = drain;
+  } else {
+    drainGainLevel = 'd1';
+  };
+
+  let gain = /g+[-]*[1-5]+/.exec(currentTask); // Gain counts double as the assumption is consious relaxation
+  if (gain) {
+    drainGainLevel = gain;
+  };
+
+  if (drain) {
+    document.getElementById(drain).checked = 'checked';
+  } else if (gain) {
+    document.getElementById(gain).checked = 'checked';
+  }
 }

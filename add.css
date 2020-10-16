@@ -155,6 +155,10 @@ span {
   width: 30px;
 } */
 
+#apply {
+  width: 260px;
+}
+
 #apply, #cancel {
   font-size: 0.7em;
 }

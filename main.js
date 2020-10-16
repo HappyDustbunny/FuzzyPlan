@@ -17,8 +17,9 @@ let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting pe
 // let stressLevel = wakeUpStress;
 let tDouble = 240;  // Doubling time for stress level in minutes
 let alarmOn = false;
+let newTaskText = ''; // Recieve new task text from add.html
 
-let storage = window.localStorage; // TODO: Is this in use?
+// let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
 // randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
@@ -103,6 +104,7 @@ function setUpFunc() {
 
   renderTasks();
 
+  document.getElementById('inputBox').value = newTaskText;
   document.getElementById('inputBox').focus();
 
   let now = new Date()
@@ -214,6 +216,12 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('inputBoxContent') != '') {
     document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
     localStorage.removeItem('inputBoxContent');
+  }
+
+  if (localStorage.getItem('newTaskText')) {
+    newTaskText = localStorage.newTaskText;
+    console.log('newTaskText', newTaskText);
+    // localStorage.removeItem('newTaskText');
   }
 }
 
@@ -1292,7 +1300,7 @@ function parseText(rawText) {
   };
 
 
-  let drain = /d+[-]*[1-9]+/.exec(rawText); // TODO: Limit drain to 1-5?
+  let drain = /d+[-]*[1-9]+/.exec(rawText);
   if (/d+[-]*[1-9]+/.exec(drain)) {
     drain = /[-]*[1-9]/.exec(drain).toString();
     rawText = rawText.replace('d' + drain, '');
@@ -1301,9 +1309,9 @@ function parseText(rawText) {
     // rawText = rawText.replace('d', '');
   };
 
-  let gain = /g+[-]*[1-9]+/.exec(rawText); // TODO: Should gain count double?
-  if (/g+[-]*[1-9]+/.exec(gain)) {
-    gain = /[-]*[1-9]/.exec(gain).toString();
+  let gain = /g+[-]*[1-5]+/.exec(rawText); // Gain counts double as the assumption is consious relaxation
+  if (/g+[-]*[1-5]+/.exec(gain)) {
+    gain = 2 * /[-]*[1-5]/.exec(gain).toString();
     drain = '-' + gain;
     rawText = rawText.replace('g' + gain, '');
   };
