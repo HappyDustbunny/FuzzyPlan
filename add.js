@@ -196,32 +196,14 @@ function readDrainGainRadioButtons() {
 
 function formatTask() {
   let returnText = '';
-  if (taskTime) {
-    returnText = taskText + ' ' + taskTime.getHours() + taskTime.getMinutes() + ' ' + taskDuration + 'm ' + drainGainLevel;
-  } else {
+  if (document.getElementById('inputTimeBox').value === '') {
     returnText = taskText + ' ' + taskDuration + 'm ' + drainGainLevel;
+  } else {
+    returnText = taskText + ' ' + taskTime.getHours() + taskTime.getMinutes() + ' ' + taskDuration + 'm ' + drainGainLevel;
   }
   localStorage.newTaskText = returnText;
   console.log(returnText);
 }
-
-// function inputAtEnterText(event) {
-//   if (event.key === 'Enter') {
-//     readTaskText();
-//   }
-// }
-
-// function inputAtEnterDuration(event) {
-//   if (event.key === 'Enter') {
-//     readDurationTime();
-//   }
-// }
-
-// function inputAtEnterTime(event) {
-//   if (event.key === 'Enter') {
-//     readTaskStartTime();
-//   }
-// }
 
 
 function displayMessage(text, displayTime) { // displayTime in milliseconds

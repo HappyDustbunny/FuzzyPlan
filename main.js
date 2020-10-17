@@ -39,7 +39,7 @@ class Task {
   constructor(date, duration, text, drain) {
     this.date = date; // Start time as Javascript date
     this.duration = duration; // Duration in milliseconds
-    this.drain = drain;
+    this.drain = Number(drain);
     this.text = text;
     this.uniqueId = this.giveAUniqueId();
     this.end();
@@ -1150,7 +1150,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
     if (task.drain > 1) {
       drain = ' d' + task.drain;
     } else if (task.drain < -1) {
-      drain = ' g' + (-task.drain);
+      drain = ' g' + (-task.drain) / 2;
     }
 
   }
@@ -1313,7 +1313,7 @@ function parseText(rawText) {
   if (/g+[-]*[1-5]+/.exec(gain)) {
     gain = 2 * /[-]*[1-5]/.exec(gain).toString();
     drain = '-' + gain;
-    rawText = rawText.replace('g' + gain, '');
+    rawText = rawText.replace('g' + gain / 2, '');
   };
 
   let text = rawText.trim();
