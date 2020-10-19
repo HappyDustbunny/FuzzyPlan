@@ -574,6 +574,9 @@ function inputAtEnter(event) {
         resetInputBox();
       }
     }
+    document.getElementById('editButton').textContent = '\u25BEClear';
+  } else {
+    document.getElementById('editButton').textContent = 'Clear\u25B8';
   }
 }
 
@@ -755,7 +758,7 @@ function removeFuzzyOverlap(task) {
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearTextboxOrDay() {
-  editButton = document.getElementById('editButton');
+  let editButton = document.getElementById('editButton');
   // if (editButton.textContent == 'Edit') {
   //   editTask();
   //   editButton.textContent = 'Clear\u25B8';
@@ -784,6 +787,7 @@ function clearDay() {
     storeLocally();
     adjustNowAndWakeUpButtons();
     setUpFunc();
+    document.getElementById('inputBox').value = '';
   } else {
     displayMessage('Nothing was changed', 3000);
   }
@@ -808,7 +812,7 @@ function editTask() {
   renderTasks();
   document.getElementById('inputBox').focus();
   let nextLast = taskText.length - 1;
-  inputBox.setSelectionRange(nextLast, nextLast); // Makes changing task time easier by focusing just before m in 45m
+  inputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
 }
 
 // Used by an eventListener. Toggles zoom.
