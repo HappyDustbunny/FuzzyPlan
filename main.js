@@ -451,6 +451,9 @@ function  fillHearths(currentStressLevel) {
   if (10 < max) {
     max = 10;
   }
+  if (max < 0) {
+    max = 0;
+  }
 
   for (var i = 0; i < max; i++) {
     let newHeart = document.createElement('img');
@@ -800,7 +803,7 @@ function editTask() {
   if (1 < taskList[id].drain) {
     drain = ' d' + taskList[id].drain + ' ';
   } else if (taskList[id].drain < 0) {
-    drain = ' g' + (-taskList[id].drain) + ' ';
+    drain = ' g' + (-taskList[id].drain) / 2 + ' ';
   }
   taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
   document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
