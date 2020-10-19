@@ -104,7 +104,12 @@ function setUpFunc() {
 
   renderTasks();
 
-  document.getElementById('inputBox').value = newTaskText;
+  if (newTaskText != '' && /\d{4}/.exec(newTaskText)) { // Fall-through will be quicker than finding the DOM elemnent and assigning an empty value. Hence the first condition
+    inputFixedTask(newTaskText);
+  } else {
+    document.getElementById('inputBox').value = newTaskText;
+  }
+
   document.getElementById('inputBox').focus();
 
   let now = new Date()
@@ -413,7 +418,7 @@ document.getElementById('nowButton').addEventListener('click', jumpToNow);
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
-document.getElementById('editButton').addEventListener('click', clearOrEdit);
+document.getElementById('editButton').addEventListener('click', clearTextboxOrDay);
 
 // Tie event to zoom button (⍐ / ⍗). Toggles zoom
 document.getElementById('zoom').addEventListener('click', zoomFunc);
@@ -556,19 +561,7 @@ function inputAtEnter(event) {
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
-      let parsedList = parseText(contentInputBox);
-      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-      if (taskList.length == 1 && parsedList[0] == '') {
-        displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
-      } else {
-        let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
-
-        if (!succes) {
-          displayMessage('Not enough room. \nPlease clear some space', 3000);
-        }
-        renderTasks();
-        jumpTo(uniqueIdOfLastTouched)
-      }
+      inputFixedTask(contentInputBox);
     } else {
       if (/[^0-9]/.exec(contentInputBox) != null) { // If there is a chosen task AND text it must be an error
         nullifyClick();
@@ -580,8 +573,23 @@ function inputAtEnter(event) {
         displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000)
         resetInputBox();
       }
-      // displayMessage('A task needs text ', 3000);
     }
+  }
+}
+
+function inputFixedTask(contentInputBox) {
+  let parsedList = parseText(contentInputBox);
+  let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+  if (taskList.length == 1 && parsedList[0] == '') {
+    displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
+  } else {
+    let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
+
+    if (!succes) {
+      displayMessage('Not enough room. \nPlease clear some space', 3000);
+    }
+    renderTasks();
+    jumpTo(uniqueIdOfLastTouched)
   }
 }
 
@@ -746,7 +754,7 @@ function removeFuzzyOverlap(task) {
 }
 
 // Used by an eventListener. Govern the Edit/Clear button
-function clearOrEdit() {
+function clearTextboxOrDay() {
   editButton = document.getElementById('editButton');
   // if (editButton.textContent == 'Edit') {
   //   editTask();
@@ -767,8 +775,10 @@ function clearDay() {
   if (answer == true) {
     taskList = [];
     makeFirstTasks();
+    resetInputBox();
     wakeUpOrNowClickedOnce = false;
     localStorage.indexOfLastTouched = 0;
+    localStorage.removeItem('newTaskText');
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     storeLocally();

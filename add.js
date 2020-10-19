@@ -5,7 +5,6 @@ let taskDuration = defaultTaskDuration;
 let taskTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);;
 let drainGainLevel = 1;
 
-// TODO: change text of OK button depending of Input Time status.
 
 document.getElementById('inputTaskBox').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readTaskText(); } });
@@ -42,6 +41,7 @@ document.getElementById('now').addEventListener('click', setTimeNow);
 document.getElementById('cancel').addEventListener('click', justReturn);
 document.getElementById('apply').addEventListener('click', returnTask);
 
+
 function setUpFunc() {
   document.getElementById('d1').checked = 'checked';
   document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
@@ -64,10 +64,12 @@ function retrieveLocallyStoredStuff() {
   }
 }
 
+
 function changeDuration(minutes) {
   taskDuration += minutes;
   fillDurationBox(taskDuration);
 }
+
 
 function fillDurationBox(duration) {
   let hours = 0;
@@ -82,12 +84,23 @@ function fillDurationBox(duration) {
   textBox.value = formattedDuration;
 }
 
+
 function changeTime(minutes) {
   taskTime = new Date(taskTime.getTime() + minutes * 60000);
   fillTimeBox(taskTime);
 }
 
+
 function fillTimeBox(time) {
+  prettyTaskTime = prettifyTime(time);
+
+  document.getElementById('inputTimeBox').value = prettyTaskTime;
+
+  document.getElementById('apply').textContent = 'Ok'; // Remove instruction from return-button as the task will be added the right place automatically
+}
+
+
+function prettifyTime(time) {
   taskTimeHours = time.getHours().toString();
   taskTimeMinutes = time.getMinutes().toString();
 
@@ -100,17 +113,16 @@ function fillTimeBox(time) {
     nils[1] = '0';
   }
   prettyTaskTime = nils[0] + taskTimeHours + ':' + nils[1] + taskTimeMinutes;
-  if (0 < taskTimeHours || 0 < taskTimeMinutes) {
-    document.getElementById('inputTimeBox').value = prettyTaskTime;
-  }
 
-  document.getElementById('apply').textContent = 'Ok';
+  return prettyTaskTime
 }
+
 
 function setTimeNow() {
   taskTime = new Date();
   fillTimeBox(taskTime);
 }
+
 
 function clearTimeBox() {
   document.getElementById('inputTimeBox').value = '';
@@ -119,9 +131,11 @@ function clearTimeBox() {
   taskTimeMinutes = 0;
 }
 
+
 function clearTaskBox() {
   document.getElementById('inputTaskBox').value = '';
 }
+
 
 function readTaskText() {
   let contentInputBox = document.getElementById('inputTaskBox').value.trim();
@@ -133,6 +147,7 @@ function readTaskText() {
     console.log(contentInputBox);
   }
 }
+
 
 function readDurationTime() {
   let contentInputBox = document.getElementById('inputDurationBox').value.trim();
@@ -153,6 +168,7 @@ function readDurationTime() {
   }
 }
 
+
 function readTaskStartTime() {
   let contentInputBox = document.getElementById('inputTimeBox').value.trim();
   let badCharacters = /[^0-9:]/.exec(contentInputBox);
@@ -164,9 +180,12 @@ function readTaskStartTime() {
     let timeM = /[0-9][0-9]/.exec(contentInputBox);
     let now = new Date();
     taskTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
-    fillTimeBox(taskTime);
+    if (0 < timeH || 0 < timeM) {
+      fillTimeBox(taskTime);
+    }
   }
 }
+
 
 function returnTask() {
   readTaskText();
@@ -181,9 +200,11 @@ function returnTask() {
   }
 }
 
+
 function justReturn() {
   window.location.assign('main.html');
 }
+
 
 function readDrainGainRadioButtons() {
   let radioButtonResult = document.getElementsByClassName('drain');
@@ -194,12 +215,14 @@ function readDrainGainRadioButtons() {
   }
 }
 
+
 function formatTask() {
   let returnText = '';
-  if (document.getElementById('inputTimeBox').value === '') {
+  if (document.getElementById('inputTimeBox').value.trim() === '') {
     returnText = taskText + ' ' + taskDuration + 'm ' + drainGainLevel;
   } else {
-    returnText = taskText + ' ' + taskTime.getHours() + taskTime.getMinutes() + ' ' + taskDuration + 'm ' + drainGainLevel;
+    let prettyTaskTime = prettifyTime(taskTime);
+    returnText = taskText + ' ' + prettyTaskTime.replace(':', '') + ' ' + taskDuration + 'm ' + drainGainLevel;
   }
   localStorage.newTaskText = returnText;
   console.log(returnText);

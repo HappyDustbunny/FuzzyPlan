@@ -30,6 +30,11 @@ span {
   height: 2px;
 }
 
+::placeholder {
+  color: #788793; /* Lighter gray*/
+  color: rgb(150, 150, 150);
+}
+
 .container1 {
   display: grid;
   grid-template-columns: 5% auto 5%;
