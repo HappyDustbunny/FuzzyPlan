@@ -447,12 +447,13 @@ function twoFingerNavigation(event) {
 
 function  fillHearths(currentStressLevel) {
   const heartSpan = document.getElementById('heart');
+
   let max = currentStressLevel;
-  if (10 < max) {
-    max = 10;
-  }
   if (max < 0) {
     max = 0;
+  }
+  if (10 < max) {
+    max = 10;
   }
 
   for (var i = 0; i < max; i++) {

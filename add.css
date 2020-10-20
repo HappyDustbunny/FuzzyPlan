@@ -6,6 +6,16 @@ body {
   margin-right: auto;
 }
 
+h1 {
+  margin: 0px;
+  grid-area: header1;
+}
+
+h2 {
+  margin: 0px;
+  grid-area: header2;
+}
+
 input {
   width: 18px;
   padding-left: 8px;
@@ -38,13 +48,17 @@ span {
 .container1 {
   display: grid;
   grid-template-columns: 5% auto 5%;
-  grid-template-areas: '. messages .'
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+  '. header1 .'
+  '. header2 .'
+  '. messages .'
 }
 
 .container {
   display: grid;
   grid-template-columns: 50% 45% 5%;
-  grid-template-rows: auto; /* auto;*/
+  grid-template-rows: 65px;
   grid-gap: .6rem;
   background-color: transparent;
   border: none;
@@ -72,7 +86,7 @@ span {
   background-color: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 10;
-  top: 12px;
+  top: -23px;
   border-bottom: none;
 }
 
@@ -82,6 +96,7 @@ span {
   background-image: none;
   background-color: rgba(0, 0, 0, 0);
   position: relative;
+  top: -35px;
   z-index: 5;
   border: none;
 }
@@ -94,7 +109,7 @@ span {
   background-color: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 10;
-  top: -36px;
+  top: -73px;
   border-top: none;
 }
 
@@ -109,7 +124,7 @@ span {
   border-bottom-right-radius: 0px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0);
   position: relative;
-  top: 34px;
+  /* top: 34px; */
   z-index: 1;
   border-bottom: none;
 }
@@ -120,7 +135,7 @@ span {
   border-top-right-radius: 0px;
   background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9adbf0, #9898ff);
   position: relative;
-  top: -14px;
+  top: -50px;
   z-index: 1;
   border-top: none;
 }
@@ -171,4 +186,6 @@ span {
 #message {
   text-align: center;
   grid-area: messages;
+  /* height: 40px; */
+  /* margin-top: 20px; */
 }

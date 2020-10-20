@@ -39,28 +39,30 @@ document.getElementById('clear').addEventListener('click', clearTimeBox);
 document.getElementById('now').addEventListener('click', setTimeNow);
 
 document.getElementById('cancel').addEventListener('click', justReturn);
-document.getElementById('apply').addEventListener('click', returnTask);
+document.getElementById('apply').addEventListener('click', function() {readTaskText(); returnTask();});
 
 
 function setUpFunc() {
+  document.getElementById('inputTaskBox').value = '';
   document.getElementById('d1').checked = 'checked';
   document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
-  retrieveLocallyStoredStuff();
-
-  clearTaskBox();
+  manageLocallyStoredStuff();
 
   fillDurationBox(defaultTaskDuration);
 
   clearTimeBox();
 }
 
-function retrieveLocallyStoredStuff() {
+function manageLocallyStoredStuff() {
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
   }
   if (localStorage.getItem('currentTask')) {
     parseCurrentTask(localStorage.currentTask);
+  }
+  if (localStorage.getItem('newTaskText')) {
+      localStorage.removeItem('newTaskText');
   }
 }
 
@@ -132,19 +134,16 @@ function clearTimeBox() {
 }
 
 
-function clearTaskBox() {
-  document.getElementById('inputTaskBox').value = '';
-}
-
 
 function readTaskText() {
   let contentInputBox = document.getElementById('inputTaskBox').value.trim();
   let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please dont use ' + badCharacters + ' for task description.', 3000);
+    displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000);
   } else {
     taskText = contentInputBox;
     console.log(contentInputBox);
+    returnTask();
   }
 }
 
@@ -188,7 +187,7 @@ function readTaskStartTime() {
 
 
 function returnTask() {
-  readTaskText();
+  // readTaskText();
   if (taskText === '') {
     displayMessage('Please write a task text', 3000);
   } else {
@@ -235,6 +234,8 @@ function displayMessage(text, displayTime) { // displayTime in milliseconds
   msg.style.display = 'inline-block';
   msg.style.color = 'red';
   msg.textContent = text;
+  msg.style.height = '40px';
+  msg.style.marginTop = '20px';
 
   setTimeout(function() {msg.style.display = 'none';}, displayTime)
 }
