@@ -178,14 +178,14 @@ p {
   box-shadow: 0px 0px 3px 2px rgba(154, 219, 240, .25);
 }
 
+.isGain { /* Needs to come after .isFuzzy and before .isClicked */
+  border: 1px solid rgba(123, 217, 71, 1.0);
+  background-color: rgba(123, 217, 71, .2);
+}
+
 .isClicked { /* Needs to come after .isFuzzy */
   transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
-}
-
-.isGain { /* Needs to come after .isFuzzy */
-  border: 1px solid rgba(123, 217, 71, 1.0);
-  background-color: rgba(123, 217, 71, .2);
 }
 
 .isNotFuzzy.isGain { /* Needs to come after .isFuzzy */
@@ -208,9 +208,10 @@ p {
   text-align: center;
   padding: .1em 0.12em .2em .1em;
   height: 1.3em;
-  background-image: linear-gradient(#b1de9c, #b9f09a, #b9f09a, #b9f09a, #b1de9c);
+  background-image: linear-gradient(#08e22a, #0bfb31, #0bfb31, #0bfb31, #08e22a);
   border-radius: 15px;
   width: 1.3em;
+  border: 1px solid rgb(108, 168, 48);
 }
 
 #heart {

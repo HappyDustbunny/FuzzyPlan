@@ -18,6 +18,7 @@ let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting pe
 let tDouble = 240;  // Doubling time for stress level in minutes
 let alarmOn = false;
 let newTaskText = ''; // Recieve new task text from add.html
+let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
 
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
@@ -406,9 +407,9 @@ document.getElementById('month').addEventListener('click', function() {goToPage(
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
 
-// Insert a 15 min planning task at start-your-day time according to settings // TODO: Settings
+// Insert a 15 min planning task at start-your-day time according to settings
 // document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700);}); // // TODO: connect to wakeup time
+document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700);});
 
 // Insert a 15 min planning task at the current time
 // document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
@@ -898,9 +899,20 @@ function displayMessage(text, displayTime) {  // displayTime in milliseconds
   msg.style.color = 'red';
   msg.textContent = text;
 
-  setTimeout(function() {msg.style.display = 'none';}, displayTime)
+  // Add an eventListener to stop annoying messages by clicking anywhere
+  setTimeout(function() {document.addEventListener('click', stopTimeout);}, 500);  // A short timeout is necessary in order to not fire immediately
+
+  msgTimeOutID = setTimeout(function() {
+    msg.style.display = 'none';
+      document.removeEventListener('click', stopTimeout);
+    }, displayTime)
 }
 
+function stopTimeout() {  // To remove an eventListener anonymous functions can't be used
+  clearTimeout(msgTimeOutID);
+  msg.style.display = 'none';
+  document.removeEventListener('click', stopTimeout);
+}
 
 function taskHasBeenClicked(event) {
   let myUniqueId = event.target.id;
@@ -931,31 +943,31 @@ function taskHasBeenClicked(event) {
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
     }
+    document.getElementById('addTaskButton').textContent = '+';
 
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
     nullifyClick();
 
   }  else if (contentInputBox == '' && !chosenTaskId) {
-    // No text in inputBox and no chosenTaskId: Getting ready to Edit, delete or clone
+    // No text in inputBox and no chosenTaskId: Getting ready to edit or delete
     chosenTask = document.getElementById(myUniqueId);
-    // chosenTask.classList.add('isClicked'); // TODO: Affects only DOM. Make it a part of Task
     let myId = getIndexFromUniqueId(myUniqueId);
     taskList[myId].isClicked = 'isClicked'; // TODO: Unclick later
-    // editButton.textContent = 'Clear\u25B8';
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
-
-    // jumpTo(chosenTaskId);
 
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
     if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
       displayMessage('Unasigned time can not be edited', 3000);
     } else if (chosenTaskId === myUniqueId) {
-      editTask(); // TODO: Edit eats task
+      editTask();
+      document.getElementById('addTaskButton').textContent = '\u270D';
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
-      displayMessage('A fixed task can not be swapped. \nPlease edit before swap.', 3000)
+      displayMessage('One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.', 3000)
+      taskList[chosenId].isClicked = 'isNotClicked';
+      taskList[id].isClicked = 'isNotClicked';
     } else if (taskList[chosenId].fuzzyness === 'isFuzzy' && taskList[id].fuzzyness === 'isFuzzy') {
       swapTasks(myUniqueId);
     }

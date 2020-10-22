@@ -47,9 +47,9 @@ function setUpFunc() {
   document.getElementById('d1').checked = 'checked';
   document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
-  manageLocallyStoredStuff();
-
   fillDurationBox(defaultTaskDuration);
+
+  manageLocallyStoredStuff();
 
   clearTimeBox();
 }
@@ -58,8 +58,8 @@ function manageLocallyStoredStuff() {
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
   }
-  if (localStorage.getItem('currentTask')) {
-    parseCurrentTask(localStorage.currentTask);
+  if (localStorage.getItem('inputBoxContent')) {
+    parseCurrentTask(localStorage.inputBoxContent);
   }
   if (localStorage.getItem('newTaskText')) {
       localStorage.removeItem('newTaskText');
@@ -82,8 +82,7 @@ function fillDurationBox(duration) {
 
   let formattedDuration = hours + 'h' + minutes + 'm';
 
-  let textBox = document.getElementById('inputDurationBox');
-  textBox.value = formattedDuration;
+  document.getElementById('inputDurationBox').value = formattedDuration;
 }
 
 
@@ -163,7 +162,6 @@ function readDurationTime() {
       timeH = Number(timeH.replace('h', ''));
     }
     taskDuration = timeH * 60 + timeM;
-    console.log(timeH, timeM, taskDuration);
   }
 }
 
@@ -258,9 +256,8 @@ function parseCurrentTask(currentTask) {
     hours = '0';
   };
 
-  // Make duration in milliseconds form hours and minutes
-  let duration = hours * 60 + minutes;
-  if (duration == 0) {
+  taskDuration = Number(hours * 60) + Number(minutes);
+  if (taskDuration == 0) {
     taskDuration = defaultTaskDuration; // If no duration is provided use the default task duration
   }
   fillDurationBox(taskDuration);
@@ -282,7 +279,7 @@ function parseCurrentTask(currentTask) {
     taskStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);  // NO need for DST shenanigans here!
     fillTimeBox(taskStart);
   };
-
+  currentTask = currentTask.replace(time, '');
 
   let drain = /d+[-]*[1-9]+/.exec(currentTask);
   if (drain) {
@@ -301,4 +298,8 @@ function parseCurrentTask(currentTask) {
   } else if (gain) {
     document.getElementById(gain).checked = 'checked';
   }
+  currentTask = currentTask.replace(drain, '');
+  currentTask = currentTask.replace(gain, '');
+
+  document.getElementById('inputTaskBox').value = currentTask.trim();
 }
