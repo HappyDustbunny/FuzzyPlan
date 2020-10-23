@@ -1,6 +1,6 @@
 
 body {
-  max-width: 450px;
+  max-width: 400px;
   min-width: 340px;
   margin-left: auto;
   margin-right: auto;
@@ -36,10 +36,6 @@ td {
   padding: 0px;
 }
 
-span {
-  height: 2px;
-}
-
 ::placeholder {
   color: #788793; /* Lighter gray*/
   color: rgb(150, 150, 150);
@@ -52,20 +48,33 @@ span {
   grid-template-areas:
   '. header1 .'
   '. header2 .'
-  '. messages .'
+  '. messages .';
+  margin-top: -10px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-rows: 50px;
+}
+
+.timeButtons {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: space-between;
+  /* display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: 50px; */
 }
 
 .container {
   display: grid;
   grid-template-columns: 50% 45% 5%;
-  grid-template-rows: 65px;
   grid-gap: .6rem;
   background-color: transparent;
   border: none;
-  overflow-y: scroll;
   grid-template-areas:
   'input table .'
-  /* '. body .'; */
 }
 
 .topic {
@@ -86,17 +95,18 @@ span {
   background-color: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 10;
-  top: -23px;
+  top: 2px;
   border-bottom: none;
 }
 
 .timeAdjusterMiddle {
   width: 30px;
-  border-radius: 0px;
-  background-image: none;
+  height: 45px;
+  border-radius: 10px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
   background-color: rgba(0, 0, 0, 0);
   position: relative;
-  top: -35px;
+  top: -20px;
   z-index: 5;
   border: none;
 }
@@ -109,7 +119,7 @@ span {
   background-color: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 10;
-  top: -73px;
+  top: -42px;
   border-top: none;
 }
 
@@ -124,7 +134,7 @@ span {
   border-bottom-right-radius: 0px;
   background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0);
   position: relative;
-  /* top: 34px; */
+  top: 0px;
   z-index: 1;
   border-bottom: none;
 }
@@ -135,7 +145,7 @@ span {
   border-top-right-radius: 0px;
   background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9adbf0, #9898ff);
   position: relative;
-  top: -50px;
+  top: -48px;
   z-index: 1;
   border-top: none;
 }
@@ -171,9 +181,9 @@ span {
   height: 15px;
 }
 
-/* #inputTimeBox {
-  width: 30px;
-} */
+#optional {
+  font-size: 0.6em;
+}
 
 #apply {
   width: 260px;
@@ -181,6 +191,7 @@ span {
 
 #apply, #cancel {
   font-size: 0.7em;
+  margin-top: 5px;
 }
 
 #message {

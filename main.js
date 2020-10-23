@@ -105,12 +105,12 @@ function setUpFunc() {
 
   renderTasks();
 
-  readyInputBox();
-
   let now = new Date()
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
   console.log(nowMinusOneHour);
   jumpToTime(nowMinusOneHour);
+
+  readyInputBox();
   // jumpToNow()
 }
 
