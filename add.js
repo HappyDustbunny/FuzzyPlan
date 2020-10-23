@@ -43,7 +43,6 @@ document.getElementById('apply').addEventListener('click', function() {readTaskT
 
 
 function setUpFunc() {
-  document.getElementById('inputTaskBox').value = '';
   document.getElementById('d1').checked = 'checked';
   document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
@@ -52,6 +51,9 @@ function setUpFunc() {
   manageLocallyStoredStuff();
 
   clearTimeBox();
+  
+  document.getElementById('inputTaskBox').value = '';
+  document.getElementById('inputTaskBox').focus();
 }
 
 function manageLocallyStoredStuff() {

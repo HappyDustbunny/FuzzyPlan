@@ -105,13 +105,7 @@ function setUpFunc() {
 
   renderTasks();
 
-  if (newTaskText != '' && /\d{4}/.exec(newTaskText)) { // Fall-through will be quicker than finding the DOM elemnent and assigning an empty value. Hence the first condition
-    inputFixedTask(newTaskText);
-  } else {
-    document.getElementById('inputBox').value = newTaskText;
-  }
-
-  document.getElementById('inputBox').focus();
+  readyInputBox();
 
   let now = new Date()
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
@@ -120,6 +114,19 @@ function setUpFunc() {
   // jumpToNow()
 }
 
+
+function readyInputBox() {
+  if (newTaskText != '' && /\d{4}/.exec(newTaskText)) { // Fall-through will be quicker than finding the DOM elemnent and assigning an empty value. Hence the first condition
+    inputFixedTask(newTaskText);
+  } else {
+    document.getElementById('inputBox').value = newTaskText;
+  }
+  if (localStorage.getItem('newTaskText')) {
+    localStorage.removeItem('newTaskText');
+  }
+
+  document.getElementById('inputBox').focus();
+}
 
 function createTimeMarker() {
   // Create time marker to show current time on timebar
@@ -226,8 +233,6 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('newTaskText')) {
     newTaskText = localStorage.newTaskText;
-    console.log('newTaskText', newTaskText);
-    // localStorage.removeItem('newTaskText');
   }
 }
 
@@ -276,6 +281,12 @@ function textListToTaskList(taskListAsText) {
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
+}
+
+// Clear input box and let it loose focus
+function looseInputBoxFocus() {
+  document.getElementById('inputBox').value = '';
+  document.getElementById('inputBox').blur();
 }
 
 // Fill the half hour time slots of the timebar
@@ -419,7 +430,7 @@ document.getElementById('nowButton').addEventListener('click', jumpToNow);
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
-document.getElementById('editButton').addEventListener('click', clearTextboxOrDay);
+document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
 
 // Tie event to zoom button (⍐ / ⍗). Toggles zoom
 document.getElementById('zoom').addEventListener('click', zoomFunc);
@@ -579,9 +590,9 @@ function inputAtEnter(event) {
         resetInputBox();
       }
     }
-    document.getElementById('editButton').textContent = '\u25BEClear';
+    document.getElementById('clearButton').textContent = '\u25BEClear';
   } else {
-    document.getElementById('editButton').textContent = 'Clear\u25B8';
+    document.getElementById('clearButton').textContent = 'Clear\u25B8';
   }
 }
 
@@ -624,7 +635,7 @@ function addWhereverAfter(uniqueId, task) {
   let myId = getIndexFromUniqueId(uniqueId);
   for (var id=myId; id<taskList.length - 1; id++) {
     succes = addTaskAfter(taskList[id].uniqueId, task);
-    resetInputBox();
+    looseInputBoxFocus();
     if (succes) {
       break;
     }
@@ -641,7 +652,7 @@ function addTaskAfter(uniqueId, task) {
   if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end() <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
-    resetInputBox();
+    looseInputBoxFocus();
     anneal();
     return true;
   } else {
@@ -665,7 +676,7 @@ function addTaskBefore(myId, task) {
     }
     taskList.splice(id, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
-    resetInputBox();
+    looseInputBoxFocus();
     anneal();
     return true;
   }
@@ -763,18 +774,14 @@ function removeFuzzyOverlap(task) {
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearTextboxOrDay() {
-  let editButton = document.getElementById('editButton');
-  // if (editButton.textContent == 'Edit') {
-  //   editTask();
-  //   editButton.textContent = 'Clear\u25B8';
-  // } else
+  let clearButton = document.getElementById('clearButton');
   if (document.getElementById('inputBox').value != '' ) {
-    resetInputBox();
-    editButton.textContent = '\u25BEClear';
+    clearButton.textContent = '\u25BEClear';
     id = '';
   } else {
     clearDay();
   }
+  resetInputBox();
 }
 
 
@@ -812,7 +819,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('editButton').textContent = 'Clear\u25B8';  // \u23F5
+  document.getElementById('clearButton').textContent = 'Clear\u25B8';  // \u23F5
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -924,7 +931,7 @@ function taskHasBeenClicked(event) {
 
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('inputBox').value.trim();
-  let editButton = document.getElementById('editButton');
+  let clearButton = document.getElementById('clearButton');
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
@@ -938,7 +945,7 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
-      editButton.textContent = '\u25BEClear';
+      clearButton.textContent = '\u25BEClear';
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
@@ -972,7 +979,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    // editButton.textContent = 'Clear\u25B8';  // \u25b8 for small triangle
+    // clearButton.textContent = 'Clear\u25B8';  // \u25b8 for small triangle
   }
   renderTasks();
 

@@ -74,7 +74,8 @@ p {
 
 .centerWrapper {
   display: grid;
-  grid-template-columns: 20px 40px auto 40px 40px 20px;
+  grid-template-columns: 6% 11% 45% 11% 11% 6%;
+  /* grid-template-columns: 20px 40px auto 40px 40px 20px; */
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
@@ -157,7 +158,7 @@ p {
 .stressDiv {
   font-size: 14px;
   height: 1.0417%;
-  width: 7px;
+  width: 10px;
   color: hsl(255, 100%, 85%);
   border: none;
   border-radius: 0px;
@@ -306,18 +307,9 @@ p {
   grid-area: timeBar;
 }
 
-#upButton,
-#nowButton,
-#editButton {
-  /* width: auto;
-  font-size: 10px;
-  padding: 0px; */
-  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
-}
-
 
 #zoom {
-  text-align: left;
+  text-align: center;
   width: auto;
   font-size: 15px;
 }
