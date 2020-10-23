@@ -605,7 +605,7 @@ function inputFixedTask(contentInputBox) {
     let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
 
     if (!succes) {
-      displayMessage('Not enough room. \nPlease clear some space', 3000);
+      displayMessage('Not enough room. \nPlease clear some space', 3000);  // TODO: Does this just drop a new task if there is not room??
     }
     renderTasks();
     jumpTo(uniqueIdOfLastTouched)

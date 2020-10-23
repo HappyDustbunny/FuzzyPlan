@@ -200,3 +200,19 @@ td {
   /* height: 40px; */
   /* margin-top: 20px; */
 }
+
+[type=radio] {
+  position: absolute;
+  opacity: 0%;
+  width: 0px;
+  height: 0px;
+}
+
+[type=radio] + img {
+  opacity: 25%;
+}
+
+[type=radio]:checked + img {
+  opacity: 100%;
+  /* background-color: blue; */
+}
