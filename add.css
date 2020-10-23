@@ -32,10 +32,6 @@ button {
   border-radius: 10px;
 }
 
-td {
-  padding: 0px;
-}
-
 ::placeholder {
   color: #788793; /* Lighter gray*/
   color: rgb(150, 150, 150);
@@ -75,6 +71,16 @@ td {
   border: none;
   grid-template-areas:
   'input table .'
+}
+
+.container2 {
+  display: grid;
+  grid-template-columns: 48% 48%;
+  column-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table'
 }
 
 .topic {
@@ -187,6 +193,10 @@ td {
 
 #apply {
   width: 260px;
+}
+
+#cancel {
+  width: 15%;
 }
 
 #apply, #cancel {
