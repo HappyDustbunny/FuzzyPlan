@@ -51,9 +51,13 @@ function setUpFunc() {
   manageLocallyStoredStuff();
 
   clearTimeBox();
-  
-  document.getElementById('inputTaskBox').value = '';
-  document.getElementById('inputTaskBox').focus();
+
+  let inputBox = document.getElementById('inputTaskBox');
+  if (inputBox.value === '') {
+    document.getElementById('inputTaskBox').focus();
+  } else {
+    document.getElementById('inputTaskBox').blur();
+  }
 }
 
 function manageLocallyStoredStuff() {
