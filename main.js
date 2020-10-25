@@ -95,8 +95,6 @@ function setUpFunc() {
 
   updateTimeMarker();
 
-  adjustAddTaskButton();
-
   // makeFirstTasks(); // Moved to retrieveLocallyStoredStuff()
 
   adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
@@ -145,20 +143,6 @@ function makeFirstTasks() {
     task.fuzzyness = 'isNotFuzzy';
     taskList.push(task);
   }
-}
-
-
-function adjustAddTaskButton() { // TODO: Make resizing of window work
-  let height = window.innerHeight|| document.documentElement.clientHeight||
-               document.body.clientHeight;
-  let width  = window.innerWidth || document.documentElement.clientWidth ||
-               document.body.clientWidth;
-  // console.log(width, height);
-
-  let addTaskButton = document.getElementById('addTaskButton');
-  // addTaskButton.style.position = 'relative';
-  addTaskButton.style.left = width * 0.84 + 'px';
-  addTaskButton.style.bottom = height * 0.11 + 'px';
 }
 
 
@@ -438,9 +422,17 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
-document.getElementById('addTaskButton').addEventListener('click', function() {goToPage('add.html')});
+document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
+// document.getElementById('addTaskButton').addEventListener('click', function() {goToPage('add.html')});
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+
+
+function addTaskButtonClicked() {
+  document.getElementById('animationBox').classList.add('fromLowerRight');
+  // goToPage('add.html');
+  setTimeout(function() {goToPage('add.html');}, 120);
+}
 
 function twoFingerNavigation(event) {
   if (sessionStorage.touchX && event.touches.length === 1) {
@@ -1061,9 +1053,6 @@ function renderTasks() {
   // Make new time markings in timeBar
   fillTimeBar(zoom);
 
-  // adjustAddTaskButton();
-
-
   // Refresh view from taskList
   for (const [index, task] of displayList.entries()) {
     // Create tasks as buttons
@@ -1150,7 +1139,7 @@ function jumpTo(index) {
 function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
-    container.scrollTop = document.getElementById('nowSpan').offsetTop + 600 * zoom;
+    container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
     // document.getElementById('inputBox').focus();
   }
 }

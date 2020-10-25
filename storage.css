@@ -1,6 +1,11 @@
+h1 {
+  margin: unset;
+}
+
 
 h3 {
   text-align: center;
+  margin-top: unset;
 }
 
 input {

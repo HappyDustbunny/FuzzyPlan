@@ -26,6 +26,7 @@
       }
     </style>
   </head>
+
   <body>
     <h1>Instructioner</h1>
     <button type="button" id="english" title="English" alt='English'>
@@ -123,6 +124,7 @@
         10 hjerter er afslappet, 0 hjerter er vildt stresset.
       </p>
       <button type="button" id='goBack2'>Gå tilbage</button>
+
       <script type="text/javascript">
         document.getElementById('goBack1').addEventListener('click', goBack);
         document.getElementById('goBack2').addEventListener('click', goBack);
@@ -150,9 +152,11 @@
         function goBack() {
           window.location.assign(document.referrer); // TODO: Fix cycling between DK and UK
         }
+
         function goDK() {
           window.location.assign('instructions_dk.html')
         }
+        
         function goUK() {
           window.location.assign('instructions.html')
         }

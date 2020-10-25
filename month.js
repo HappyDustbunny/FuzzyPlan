@@ -1,8 +1,8 @@
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskDict = {};  // JS object usable much like a Python dictionary
 let displayDict = {};    // JS object usable much like a Python dictionary
-let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
-let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
+// let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
+// let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 
 
 class Task {
@@ -19,7 +19,7 @@ class Task {
 function setUpFunc() {
   retrieveLocallyStoredStuff();
 
-  fillDateBar(zoom);
+  fillDateBar();
 
   renderTasks();
 
@@ -34,7 +34,7 @@ document.getElementById('day').addEventListener('click', function() {goToPage('m
 
 document.getElementById('clearButton').addEventListener('click', resetInputBox);
 
-document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
+// document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
 
 document.getElementById('taskDiv').addEventListener('click', function () {taskHasBeenClicked(event); }, true);
 document.getElementById('taskDiv').addEventListener('dblclick', function () {taskHasBeenDoubleClicked(event); }, true);
@@ -43,18 +43,12 @@ document.getElementById('inputBox').addEventListener('keypress', function () { i
 
 function storeLocally() {
   localStorage.monthListAsText = JSON.stringify(monthTaskDict);
-
-  localStorage.zoom = zoom;
 }
 
 
 function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('monthListAsText') != null) {
     monthTaskDict = JSON.parse(localStorage.monthListAsText);
-  }
-
-  if (localStorage.getItem('zoom')) {
-    zoom = localStorage.zoom;
   }
 
   if (localStorage.getItem('inputBoxContent') != '') {
@@ -64,7 +58,7 @@ function retrieveLocallyStoredStuff() {
 }
 
 
-function fillDateBar(zoom) {
+function fillDateBar() {
   let now = new Date();
   let nowPlus3Month =  new Date();
   nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);

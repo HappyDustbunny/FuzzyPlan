@@ -26,6 +26,7 @@
       }
     </style>
   </head>
+
   <body>
     <h1>Instructions</h1>
     <button type="button" id="english" title="English" alt='English'>
@@ -119,6 +120,7 @@
         10 hearts is relaxed, zero hearts is stressed out.
       </p>
       <button type="button" id='goBack2'>Go back</button>
+
       <script type="text/javascript">
         document.getElementById('goBack1').addEventListener('click', goBack);
         document.getElementById('goBack2').addEventListener('click', goBack);
@@ -145,9 +147,11 @@
         function goBack() {
           window.location.assign(document.referrer);
         }
+        
         function goDK() {
           window.location.assign('instructions_dk.html')
         }
+
         function goUK() {
           window.location.assign('instructions.html')
         }

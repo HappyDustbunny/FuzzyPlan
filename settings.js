@@ -3,12 +3,20 @@
 //   localStorage.setItem(e.key, e.newValue);
 // });
 
+document.getElementById('day').addEventListener('click', goBack);
+
 document.getElementById('apply1').addEventListener('click', applyTaskDuration);
+
 document.getElementById('apply2').addEventListener('click', applyToc);
+
 document.getElementById('info').addEventListener('click', info);
+
 document.getElementById('apply3').addEventListener('click', applyStressModel);
-document.getElementById('goBack2').addEventListener('click', goBack);
+
+document.getElementById('goBack').addEventListener('click', goBack);
+
 document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
+
 document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
 // document.getElementById('stressLevel').addEventListener('click', setStressLevel);
 // document.getElementById('tDouble').addEventListener('click', setTDouble);
