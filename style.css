@@ -218,7 +218,7 @@ html {
   width: 0px;
   height: 0px;
   background-color: white;
-  border: 2px solid black;
+  /* border: 2px solid black; */
   position: absolute;
   transition: width .12s;
   transition: height .12s;
@@ -228,7 +228,7 @@ html {
   bottom: 0px;
   right: 0px;
   width: 360px;
-  height: 740px;
+  height: 680px;
   /* animation-name: fromLowerRight;
   animation-duration: .93s; */
 }

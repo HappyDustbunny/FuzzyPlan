@@ -101,15 +101,15 @@ function setUpFunc() {
 
   // debugExamples(); // Make debug example tasks. Run from commandline if needed. DO NOT UNCOMMENT
 
-  renderTasks();
+  // renderTasks();  // Is in adjustNowAndWakeUpButtons
 
   let now = new Date()
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
-  console.log(nowMinusOneHour);
-  jumpToTime(nowMinusOneHour);
+  jumpToTime(nowMinusOneHour, false);
+
+  updateHearts(now);
 
   readyInputBox();
-  // jumpToNow()
 }
 
 
@@ -404,7 +404,7 @@ document.getElementById('settings').addEventListener('click', settings);
 
 // Insert a 15 min planning task at start-your-day time according to settings
 // document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700);});
+document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700, false);});
 
 // Insert a 15 min planning task at the current time
 // document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
@@ -431,7 +431,7 @@ document.addEventListener('touchmove', function() {twoFingerNavigation(event);})
 function addTaskButtonClicked() {
   document.getElementById('animationBox').classList.add('fromLowerRight');
   // goToPage('add.html');
-  setTimeout(function() {goToPage('add.html');}, 120);
+  setTimeout(function() {goToPage('add.html');}, 80);
 }
 
 function twoFingerNavigation(event) {
@@ -576,7 +576,7 @@ function inputAtEnter(event) {
       } else if (/\d[0-5][0-9]/.exec(contentInputBox) != null || /[1-2]\d[0-5][0-9]/.exec(contentInputBox) != null) {
         // If there is 3-4 numbers, jump to the time indicated
         resetInputBox();
-        jumpToTime(contentInputBox);
+        jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
         displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000)
         resetInputBox();
@@ -792,6 +792,7 @@ function clearDay() {
     adjustNowAndWakeUpButtons();
     setUpFunc();
     document.getElementById('inputBox').value = '';
+    document.getElementById('addTaskButton').textContent = '+';
   } else {
     displayMessage('Nothing was changed', 3000);
   }
@@ -1145,7 +1146,7 @@ function jumpToNow() {
 }
 
 
-function jumpToTime(time) {
+function jumpToTime(time, showMessage) {
   let min = /[0-9][0-9]$/.exec(time);
   let hours = time.toString().replace(min, '');
   if (Number(min) < 30) { // The time-divs are at half hour intervals and we can only jump to time-divs
@@ -1160,7 +1161,9 @@ function jumpToTime(time) {
     timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
     if (timeDiv) {
       container.scrollTop = timeDiv.offsetTop - 180 * zoom;
-      displayMessage('Jumped to ' + hours + ':' + min, 700);
+      if (showMessage) {
+        displayMessage('Jumped to ' + hours + ':' + min, 700);
+      }
     } else {
       displayMessage('Number not recognised as a time', 1000)
     }
