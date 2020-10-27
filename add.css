@@ -85,7 +85,7 @@ button {
 .container2 {
   display: grid;
   grid-template-columns: 48% 48%;
-  column-gap: .6rem;
+  column-gap: .2rem;
   background-color: transparent;
   border: none;
   grid-template-areas:
@@ -134,7 +134,7 @@ button {
   background-color: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 10;
-  top: -42px;
+  top: -43px;
   border-top: none;
 }
 
@@ -165,6 +165,25 @@ button {
   border-top: none;
 }
 
+#gainDiv {
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+#info {
+  width: 22px;
+  /* background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #bbbbf2); */
+  border-radius: 20px;
+  /* justify-content: center;
+  grid-area: info; */
+  /* padding-left: 5px; */
+}
+
+#infoImg {
+  height: 13px;
+  width: 13px;
+}
+
 #d1, #g1 {
   margin-left: 0px;
 }
@@ -179,7 +198,7 @@ button {
 #inputTimeBox {
   grid-area: input;
   width: 54px;
-  height: 15px;
+  height: 20px;
 }
 
 #table {
@@ -188,12 +207,12 @@ button {
 }
 
 #inputTaskBox {
-  width: 212px;
+  width: auto;
 }
 
 #inputDurationBox {
-  width: 50px;
-  height: 15px;
+  width: 60px;
+  /* height: 15px; */
 }
 
 #optional {
@@ -209,7 +228,7 @@ button {
 }
 
 #apply, #cancel {
-  font-size: 0.7em;
+  font-size: 0.6em;
   margin-top: 5px;
 }
 

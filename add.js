@@ -38,6 +38,8 @@ document.getElementById('timeMinus5m').addEventListener('click', function() {cha
 document.getElementById('clear').addEventListener('click', clearTimeBox);
 document.getElementById('now').addEventListener('click', setTimeNow);
 
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+
 document.getElementById('cancel').addEventListener('click', justReturn);
 document.getElementById('apply').addEventListener('click', function() {readTaskText(); returnTask();});
 
@@ -203,6 +205,13 @@ function returnTask() {
   }
 }
 
+function goToPage(page) {
+  returnTask();
+
+  // TODO: Make sure the data is stored the same way by all pages and retrieved as expected
+
+  window.location.assign(page);
+}
 
 function justReturn() {
   window.location.assign('main.html');

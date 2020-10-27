@@ -56,10 +56,10 @@ p {
 }
 
 html {
-  background-color: black;
+  background-color: white;
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (min-width: 400px) {
   html {
     background-color: black;
   }
@@ -222,27 +222,23 @@ html {
   position: absolute;
   transition: width .12s;
   transition: height .12s;
+  visibility: hidden;
 }
 
 #animationBox.fromLowerRight { /* Adding class make animation run */
   bottom: 0px;
   right: 0px;
   width: 360px;
-  height: 680px;
-  /* animation-name: fromLowerRight;
-  animation-duration: .93s; */
+  height: 540px;
+  visibility: visible;
 }
 
 #dummyAdd {
-  background-color: 'rgba(154, 219, 240, .25)';
+  background-color: rgba(154, 219, 240, .25);
   width: 100%;
   height: 200px;
 }
 
-/* @keyframes fromLowerRight {
-  from {width: 0px; height: 0px;}
-  to {width: 360px; height: 740px;}
-} */
 
 #heart {
   display: flex;
@@ -260,13 +256,7 @@ html {
   justify-content: center;
   grid-area: info;
   padding-left: 5px;
-
-  animation-name: infoAnimation;
-  animation-duration: 2s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-play-state: paused;
+  margin-top: 2px;
 }
 
 #info img {
@@ -283,6 +273,8 @@ html {
 #month {
   grid-area: month;
   justify-self: end;
+  margin-top: 2px;
+  margin-right: 2px;
 }
 
 #name {
@@ -298,10 +290,13 @@ html {
 #settings {
   width: auto;
   font-size: 15px;
+  margin-left: 2px;
 }
 
 #storage {
   grid-area: storage;
+  margin-top: 2px;
+  margin-left: 2px;
 }
 
 #stressDiv {
