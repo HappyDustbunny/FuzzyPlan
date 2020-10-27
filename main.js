@@ -314,12 +314,12 @@ function updateTimeMarker() {
     nowSpanElement.style.height = nowHeight;
   }
 
-  if (taskList.length === 2) {
-    document.getElementById("info").style.animationPlayState = "running";
-  } else {
-    document.getElementById("info").style.animationPlayState = "paused";
-    // TODO: Fix hanging border if animation is paused mid cycle
-  }
+  // if (taskList.length === 2) {
+  //   document.getElementById("info").style.animationPlayState = "running";
+  // } else {
+  //   document.getElementById("info").style.animationPlayState = "paused";
+  //   // TODO: Fix hanging border if animation is paused mid cycle
+  // }
 
   updateHearts(now);
 
@@ -431,7 +431,7 @@ document.addEventListener('touchmove', function() {twoFingerNavigation(event);})
 function addTaskButtonClicked() {
   document.getElementById('animationBox').classList.add('fromLowerRight');
   // goToPage('add.html');
-  setTimeout(function() {goToPage('add.html');}, 12000);
+  setTimeout(function() {goToPage('add.html');}, 900);
 }
 
 function twoFingerNavigation(event) {

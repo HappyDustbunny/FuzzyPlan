@@ -110,7 +110,7 @@ button {
   background-color: rgba(0, 0, 0, 0);
   position: relative;
   z-index: 10;
-  top: 2px;
+  top: 3px;
   border-bottom: none;
 }
 
@@ -172,16 +172,7 @@ button {
 
 #info {
   width: 22px;
-  /* background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #bbbbf2); */
   border-radius: 20px;
-  /* justify-content: center;
-  grid-area: info; */
-  /* padding-left: 5px; */
-}
-
-#infoImg {
-  height: 13px;
-  width: 13px;
 }
 
 #d1, #g1 {

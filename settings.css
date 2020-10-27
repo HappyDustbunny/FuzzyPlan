@@ -74,18 +74,12 @@ button:focus {
 }
 
 #info {
-  background-image: linear-gradient(#bbbbf2, #c7e9f4, #c7e9f4, #c7e9f4, #9898ff);
   border-radius: 20px;
+  font-size: 0.6em;
 }
 
 #day {
   grid-area: day;
-}
-
-#info img {
-   display: block;
-   height: 13px;
-   width: 13px;
 }
 
 #message {
