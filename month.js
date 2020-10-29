@@ -1,6 +1,7 @@
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskDict = {};  // JS object usable much like a Python dictionary
-let displayDict = {};    // JS object usable much like a Python dictionary
+let tasksOfTheDay = {};
+// let displayDict = {};    // JS object usable much like a Python dictionary
 // let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 // let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 
@@ -15,6 +16,7 @@ class Task {
     return this.date.getDate() + this.date.getMonth();
   }
 }
+
 
 function setUpFunc() {
   retrieveLocallyStoredStuff();
@@ -142,10 +144,33 @@ function taskHasBeenDoubleClicked() {
 
   let day =  document.getElementById(myId).children;
 
-  document.getElementById('inputBox').value = day[2].textContent.replace(/\u25CF /g, '').trim();
+  tasksOfTheDay = day[2].textContent.replace(/\u25CF /g, '|').trim();
   monthTaskDict[myId] = '';
   day[2].textContent = '';
   day[1].innerHTML = '';
+
+  fillChooseBox();
+}
+
+
+function fillChooseBox() {
+  document.getElementById('putBack').setAttribute('class', 'active');
+
+  let chooseBox = document.getElementById('chooseBox');
+  chooseBox.setAttribute('class', 'active');
+  let tasks = tasksOfTheDay.trim().split('|');
+  tasks.shift(); // Remove empth '' stemming from first |
+
+  if (tasks != '') {
+    for (var task of tasks) {
+      newButton = document.createElement('button');
+      newButton.classList.add('floatingTask');
+      newButton.textContent = task;
+
+      document.getElementById('chooseBox').appendChild(newButton);  // TODO: Remember to remove newButtons when used
+    }
+  }
+
 }
 
 
@@ -218,8 +243,8 @@ function renderTasks() {
 
       if (tasks != '') {
         for (var task of tasks) {
-          children[1].innerHTML += task + '&nbsp;' + '<br>';
-          children[2].textContent +=  ' \u25CF ' + task + '\u00a0';
+          children[1].innerHTML += ' \u25CF ' + task + '&nbsp;' + '<br>'; // Write to tooltip
+          children[2].textContent +=  ' \u25CF ' + task + '\u00a0'; // Write task to date
         }
       }
     }

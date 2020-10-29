@@ -13,8 +13,8 @@ body {
 div {
   /* flex: initial; */
   text-align: left;
-  /* border: 1px solid rgb(96, 139, 168);
-  border-radius: 4px; */
+  /* border: 1px solid rgb(96, 139, 168); */
+  border-radius: 10px;
   background-color: rgba(154, 219, 240, .35);
 }
 
@@ -30,6 +30,11 @@ input {
   width: auto;
   padding-left: 8px;
   border-radius: 10px;
+}
+
+button {
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .35);
 }
 
 button:hover,
@@ -91,25 +96,53 @@ button:focus {
 
 .container1 {
   display: grid;
-  grid-template-columns: 40px auto 25px 40px;
-  grid-template-rows: auto auto;
+  grid-template-columns: 40px auto 45px;
+  grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'month header . .'
-  '. messages . .';
+  'month header .'
+  '. messages .';
+}
+
+.floatingTask {
+  display: flex;
+  flex-flow: column wrap;
+  background-color: rgba(123, 217, 71, .6);
+  border-radius: 10px;
 }
 
 .centerWrapper {
   display: grid;
   grid-template-columns: 12px 40px auto 40px;
+  grid-template-rows: auto auto;
   grid-gap: .6rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
-  grid-template-areas: '. clear inputbox .'
+  grid-template-areas:
+  '. clear inputbox .'
+  '. putback chooseBox .'
+}
+
+#chooseBox {
+  display: none;
+}
+
+#chooseBox.active {
+  display: grid;
+  grid-area: chooseBox;
+}
+
+#putBack {
+  display: none;
+}
+
+#putBack.active {
+  display: grid;
+  grid-area: putback;
 }
 
 .container2 {
@@ -226,7 +259,7 @@ button:focus {
 
 /* button:hover,
 button:focus {
-  /* transform: scaleY(1.2); */
+  transform: scaleY(1.2);
   transform: rotateX(10deg);
   border: 1px solid rgb(255, 50, 255);
 } */
