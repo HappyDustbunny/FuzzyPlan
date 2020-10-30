@@ -114,6 +114,10 @@ button:focus {
   border-radius: 10px;
 }
 
+.floatingTask.clicked {
+  border: 2px solid rgb(255, 50, 255);
+}
+
 .centerWrapper {
   display: grid;
   grid-template-columns: 12px 40px auto 40px;
@@ -138,6 +142,8 @@ button:focus {
 
 #putBack {
   display: none;
+	line-height: 0.8em;
+	padding-top: 2px;
 }
 
 #putBack.active {
@@ -244,12 +250,12 @@ button:focus {
   grid-area: messages;
 }
 
-#zoom {
+/* #zoom {
   text-align: left;
   width: auto;
   font-size: 15px;
-  /* background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff); */
-}
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+} */
 
 
 .isClicked {

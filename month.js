@@ -1,6 +1,8 @@
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskDict = {};  // JS object usable much like a Python dictionary
 let tasksOfTheDay = {};
+let putBackId = '';
+let clickedChooseBoxElement = null;
 // let displayDict = {};    // JS object usable much like a Python dictionary
 // let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 // let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
@@ -36,7 +38,9 @@ document.getElementById('day').addEventListener('click', function() {goToPage('m
 
 document.getElementById('clearButton').addEventListener('click', resetInputBox);
 
-// document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
+document.getElementById('inputBox').addEventListener('click', inputBoxHasBeenClicked);
+
+document.getElementById('putBack').addEventListener('click', putBack);
 
 document.getElementById('taskDiv').addEventListener('click', function () {taskHasBeenClicked(event); }, true);
 document.getElementById('taskDiv').addEventListener('dblclick', function () {taskHasBeenDoubleClicked(event); }, true);
@@ -124,12 +128,20 @@ function taskHasBeenClicked(event) {
   if (myId === '') {
     myId = event.target.closest('button').id;
   }
-
   let contentInputBox = document.getElementById('inputBox').value.trim();
+  let chooseBox = document.getElementById('chooseBox');
 
+  // If there is text in input box a
   if (contentInputBox != '') {
     monthTaskDict[myId] += '|' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
+
+    // If there is nothing in input box and chooseBox is active
+  } else if (contentInputBox === '' && chooseBox.classList.contains('active')) {
+    monthTaskDict[myId] += '|' + clickedChooseBoxElement.textContent;
+    cleanUpChooseBox();
+
   }
+
   renderTasks();
 
   resetInputBox();
@@ -141,36 +153,93 @@ function taskHasBeenDoubleClicked() {
   if (myId === '') {
     myId = event.target.closest('button').id;
   }
+// TODO: Check if chooseBox is active. If so display a message about emptying the chooseBox first
+  putBackId = myId;
 
   let day =  document.getElementById(myId).children;
 
-  tasksOfTheDay = day[2].textContent.replace(/\u25CF /g, '|').trim();
-  monthTaskDict[myId] = '';
-  day[2].textContent = '';
-  day[1].innerHTML = '';
+  if (monthTaskDict[myId]) {
+    tasksOfTheDay = monthTaskDict[myId];
+    monthTaskDict[myId] = '';
+    day[2].textContent = '';
+    day[1].innerHTML = '';
 
-  fillChooseBox();
+    fillChooseBox();  // Merge fillChooseBox back in here?
+  }
 }
 
 
 function fillChooseBox() {
-  document.getElementById('putBack').setAttribute('class', 'active');
-
   let chooseBox = document.getElementById('chooseBox');
-  chooseBox.setAttribute('class', 'active');
+  chooseBox.classList.add('active');
+  document.getElementById('putBack').classList.add('active');
+
   let tasks = tasksOfTheDay.trim().split('|');
-  tasks.shift(); // Remove empth '' stemming from first |
+  tasks.shift(); // Remove empty '' stemming from first |
 
   if (tasks != '') {
+    let counter = 0;
     for (var task of tasks) {
       newButton = document.createElement('button');
       newButton.classList.add('floatingTask');
       newButton.textContent = task;
+      newButton.setAttribute('id', 'task' + counter);
+      newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
 
-      document.getElementById('chooseBox').appendChild(newButton);  // TODO: Remember to remove newButtons when used
+
+      counter += 1;
+
+      document.getElementById('chooseBox').appendChild(newButton);  // TODO: Set a lock on inputBox and tasks while chooseBox is active
     }
   }
+}
 
+
+function putBack() {
+  monthTaskDict[putBackId] = tasksOfTheDay;
+
+  let chooseBox = document.getElementById('chooseBox');
+
+  while (chooseBox.firstChild) {
+    chooseBox.removeChild(chooseBox.lastChild);
+  }
+
+  chooseBox.classList.remove('active');
+  document.getElementById('putBack').classList.remove('active');
+
+  renderTasks();
+
+  resetInputBox();
+}
+
+
+function floatingTaskHasBeenClicked(event) {
+  let button = document.getElementById(event.target.id)
+  if (button.classList.contains('clicked')) {
+    button.classList.remove('clicked');
+    clickedChooseBoxElement = null;
+  } else {
+    button.classList.add('clicked');
+    clickedChooseBoxElement = button;
+  }
+  console.log(event.target.id);
+}
+
+
+function inputBoxHasBeenClicked() {
+  if (clickedChooseBoxElement) {
+    document.getElementById('inputBox').value = clickedChooseBoxElement.textContent;
+    cleanUpChooseBox();
+  }
+}
+
+
+function cleanUpChooseBox() {
+  clickedChooseBoxElement.remove();
+  if (!chooseBox.hasChildNodes()) {
+    chooseBox.classList.remove('active');
+    document.getElementById('putBack').classList.remove('active');
+  }
 }
 
 
