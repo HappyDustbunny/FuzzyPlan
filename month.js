@@ -36,7 +36,7 @@ document.addEventListener('touchmove', function() {twoFingerNavigation(event);})
 
 document.getElementById('day').addEventListener('click', function() {goToPage('main.html');});
 
-document.getElementById('clearButton').addEventListener('click', resetInputBox);
+document.getElementById('clearButton').addEventListener('click', clearBehavior);
 
 document.getElementById('inputBox').addEventListener('click', inputBoxHasBeenClicked);
 
@@ -136,7 +136,7 @@ function taskHasBeenClicked(event) {
     monthTaskDict[myId] += '|' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
 
     // If there is nothing in input box and chooseBox is active
-  } else if (contentInputBox === '' && chooseBox.classList.contains('active')) {
+  } else if (contentInputBox === '' && chooseBox.classList.contains('active') && clickedChooseBoxElement) {
     monthTaskDict[myId] += '|' + clickedChooseBoxElement.textContent;
     cleanUpChooseBox();
 
@@ -149,22 +149,25 @@ function taskHasBeenClicked(event) {
 
 
 function taskHasBeenDoubleClicked() {
-  let myId = event.target.id;
-  if (myId === '') {
-    myId = event.target.closest('button').id;
-  }
-// TODO: Check if chooseBox is active. If so display a message about emptying the chooseBox first
-  putBackId = myId;
+  if (document.getElementById('chooseBox').classList.contains('active')) {
+    displayMessage('Please finish the current edit \nbefore starting a new', 3000);
+  } else {
+    let myId = event.target.id;
+    if (myId === '') {
+      myId = event.target.closest('button').id;
+    }
+    putBackId = myId;
 
-  let day =  document.getElementById(myId).children;
+    let day =  document.getElementById(myId).children;
 
-  if (monthTaskDict[myId]) {
-    tasksOfTheDay = monthTaskDict[myId];
-    monthTaskDict[myId] = '';
-    day[2].textContent = '';
-    day[1].innerHTML = '';
+    if (monthTaskDict[myId]) {
+      tasksOfTheDay = monthTaskDict[myId];
+      monthTaskDict[myId] = '';
+      day[2].textContent = '';
+      day[1].innerHTML = '';
 
-    fillChooseBox();  // Merge fillChooseBox back in here?
+      fillChooseBox();  // Merge fillChooseBox back in here?
+    }
   }
 }
 
@@ -173,23 +176,27 @@ function fillChooseBox() {
   let chooseBox = document.getElementById('chooseBox');
   chooseBox.classList.add('active');
   document.getElementById('putBack').classList.add('active');
+  document.getElementById('moveToDay').classList.add('active');
 
   let tasks = tasksOfTheDay.trim().split('|');
-  tasks.shift(); // Remove empty '' stemming from first |
+  tasks.shift(); // Removes empty '' stemming from first |
 
   if (tasks != '') {
     let counter = 0;
     for (var task of tasks) {
-      newButton = document.createElement('button');
-      newButton.classList.add('floatingTask');
-      newButton.textContent = task;
-      newButton.setAttribute('id', 'task' + counter);
-      newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
+      if (counter === 0) {
+        document.getElementById('inputBox').value = task;
+      } else {
+        newButton = document.createElement('button');
+        newButton.classList.add('floatingTask');
+        newButton.textContent = task;
+        newButton.setAttribute('id', 'task' + counter);
+        newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
 
+        document.getElementById('chooseBox').appendChild(newButton);  // TODO: Set a lock on inputBox and tasks while chooseBox is active
+      }
 
       counter += 1;
-
-      document.getElementById('chooseBox').appendChild(newButton);  // TODO: Set a lock on inputBox and tasks while chooseBox is active
     }
   }
 }
@@ -261,7 +268,7 @@ function inputAtEnter(event) { // TODO: Month is of by one month
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
 
             if (textInputBox === '') {
-              gotoDate(myId); // TODO: Make gotoDate()
+              gotoDate(myId); // TODO: Make gotoDate() and sanitize input. The next line reacts badly to 1/12
             }
 
             monthTaskDict[myId] += '|' + textInputBox[0].toUpperCase() + textInputBox.slice(1);
@@ -319,6 +326,18 @@ function renderTasks() {
     }
   }
 }
+
+
+function clearBehavior() {
+  if (document.getElementById('inputBox').value === '') {
+    alert('To clear all information in this calendar, clear your browser data (Site data).\n\n' +
+    'Go to your browsers Settings or Options and look for Delete cookies and site data.\n\n' +
+    'This option may be under Privacy or Security.');
+  } else {
+    resetInputBox();
+  }
+}
+
 
 function resetInputBox() {
   document.getElementById('inputBox').value = '';

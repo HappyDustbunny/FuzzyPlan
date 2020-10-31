@@ -103,7 +103,7 @@ button:focus {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'month header .'
+  'month header day'
   '. messages .';
 }
 
@@ -120,35 +120,50 @@ button:focus {
 
 .centerWrapper {
   display: grid;
-  grid-template-columns: 12px 40px auto 40px;
+  grid-template-columns: 6px 40px auto 40px 6px;
   grid-template-rows: auto auto;
   grid-gap: .6rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. clear inputbox .'
-  '. putback chooseBox .'
+  '. clear inputbox moveToDay .'
+  '. putback chooseBox . .'
+}
+
+#day {
+  grid-area: day;
+}
+
+#moveToDay {
+  display: none;
+  grid-area: moveToDay;
+}
+
+#moveToDay.active {
+  line-height: 0.8em;
+  padding-top: 5px;
+  display: grid;
 }
 
 #chooseBox {
   display: none;
+  grid-area: chooseBox;
 }
 
 #chooseBox.active {
   display: grid;
-  grid-area: chooseBox;
 }
 
 #putBack {
   display: none;
 	line-height: 0.8em;
 	padding-top: 2px;
+  grid-area: putback;
 }
 
 #putBack.active {
   display: grid;
-  grid-area: putback;
 }
 
 .container2 {
