@@ -38,7 +38,9 @@ document.getElementById('day').addEventListener('click', function() {goToPage('m
 
 document.getElementById('clearButton').addEventListener('click', clearBehavior);
 
-document.getElementById('inputBox').addEventListener('click', inputBoxHasBeenClicked);
+// document.getElementById('inputBox').addEventListener('click', inputBoxHasBeenClicked);
+
+document.getElementById('moveToDay').addEventListener('click', todayButtonHasBeenClicked);
 
 document.getElementById('putBack').addEventListener('click', putBack);
 
@@ -123,28 +125,46 @@ function fillDateBar() {
 }
 
 
+function todayButtonHasBeenClicked() {
+  // TODO: Store content of inputBox in localStorage for retrieval when reloading day
+  if (document.getElementById('chooseBox').classList.contains('active')) {
+    handleChoosebox();
+  } else {
+    resetInputBox();
+  }
+}
+
+function handleChoosebox() {
+  let chooseBox = document.getElementById('chooseBox');
+
+  if (chooseBox.classList.contains('active')) {
+    if (chooseBox.hasChildNodes()) {
+      document.getElementById('inputBox').value = chooseBox.firstChild.innerText;
+      chooseBox.firstChild.remove();
+    }
+    if (!chooseBox.hasChildNodes()) {
+      chooseBox.classList.remove('active');
+      document.getElementById('putBack').classList.remove('active');
+    }
+  }
+}
+
 function taskHasBeenClicked(event) {
   let myId = event.target.id;
   if (myId === '') {
     myId = event.target.closest('button').id;
   }
   let contentInputBox = document.getElementById('inputBox').value.trim();
-  let chooseBox = document.getElementById('chooseBox');
 
-  // If there is text in input box a
   if (contentInputBox != '') {
     monthTaskDict[myId] += '|' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
 
-    // If there is nothing in input box and chooseBox is active
-  } else if (contentInputBox === '' && chooseBox.classList.contains('active') && clickedChooseBoxElement) {
-    monthTaskDict[myId] += '|' + clickedChooseBoxElement.textContent;
-    cleanUpChooseBox();
+    resetInputBox();
 
+    handleChoosebox();
   }
 
   renderTasks();
-
-  resetInputBox();
 }
 
 
@@ -219,35 +239,35 @@ function putBack() {
   resetInputBox();
 }
 
+//
+// function floatingTaskHasBeenClicked(event) {
+//   let button = document.getElementById(event.target.id)
+//   if (button.classList.contains('clicked')) {
+//     button.classList.remove('clicked');
+//     clickedChooseBoxElement = null;
+//   } else {
+//     button.classList.add('clicked');
+//     clickedChooseBoxElement = button;
+//   }
+//   console.log(event.target.id);
+// }
 
-function floatingTaskHasBeenClicked(event) {
-  let button = document.getElementById(event.target.id)
-  if (button.classList.contains('clicked')) {
-    button.classList.remove('clicked');
-    clickedChooseBoxElement = null;
-  } else {
-    button.classList.add('clicked');
-    clickedChooseBoxElement = button;
-  }
-  console.log(event.target.id);
-}
+//
+// function inputBoxHasBeenClicked() {
+//   if (clickedChooseBoxElement) {
+//     document.getElementById('inputBox').value = clickedChooseBoxElement.textContent;
+//     cleanUpChooseBox();
+//   }
+// }
 
-
-function inputBoxHasBeenClicked() {
-  if (clickedChooseBoxElement) {
-    document.getElementById('inputBox').value = clickedChooseBoxElement.textContent;
-    cleanUpChooseBox();
-  }
-}
-
-
-function cleanUpChooseBox() {
-  clickedChooseBoxElement.remove();
-  if (!chooseBox.hasChildNodes()) {
-    chooseBox.classList.remove('active');
-    document.getElementById('putBack').classList.remove('active');
-  }
-}
+//
+// function cleanUpChooseBox() {
+//   clickedChooseBoxElement.remove();
+//   if (!chooseBox.hasChildNodes()) {
+//     chooseBox.classList.remove('active');
+//     document.getElementById('putBack').classList.remove('active');
+//   }
+// }
 
 
 function inputAtEnter(event) { // TODO: Month is of by one month
