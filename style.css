@@ -90,7 +90,7 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'storage header info month'
+  'month header info storage'
   '. hearts . .'
   '. messages . .';
 }

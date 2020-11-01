@@ -1,8 +1,9 @@
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskDict = {};  // JS object usable much like a Python dictionary
-let tasksOfTheDay = {};
+let tasksOfTheChoosenDay = {};
 let putBackId = '';
 let clickedChooseBoxElement = null;
+let tasksSentBetween = null;
 // let displayDict = {};    // JS object usable much like a Python dictionary
 // let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 // let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
@@ -62,6 +63,12 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('inputBoxContent') != '') {
     document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
     localStorage.removeItem('inputBoxContent');
+  }
+
+  if (localStorage.getItem('tasksSentBetween')) {
+    tasksOfTheChoosenDay = JSON.parse(localStorage.tasksSentBetween);
+    fillChooseBox();
+    localStorage.removeItem('tasksSentBetween');
   }
 }
 
@@ -126,7 +133,7 @@ function fillDateBar() {
 
 
 function todayButtonHasBeenClicked() {
-  // TODO: Store content of inputBox in localStorage for retrieval when reloading day
+  tasksSentBetween += '|' + document.getElementById('inputBox').value
   if (document.getElementById('chooseBox').classList.contains('active')) {
     handleChoosebox();
   } else {
@@ -181,12 +188,12 @@ function taskHasBeenDoubleClicked() {
     let day =  document.getElementById(myId).children;
 
     if (monthTaskDict[myId]) {
-      tasksOfTheDay = monthTaskDict[myId];
+      tasksOfTheChoosenDay = monthTaskDict[myId];
       monthTaskDict[myId] = '';
       day[2].textContent = '';
       day[1].innerHTML = '';
 
-      fillChooseBox();  // Merge fillChooseBox back in here?
+      fillChooseBox();
     }
   }
 }
@@ -198,7 +205,7 @@ function fillChooseBox() {
   document.getElementById('putBack').classList.add('active');
   document.getElementById('moveToDay').classList.add('active');
 
-  let tasks = tasksOfTheDay.trim().split('|');
+  let tasks = tasksOfTheChoosenDay.trim().split('|');
   tasks.shift(); // Removes empty '' stemming from first |
 
   if (tasks != '') {
@@ -223,7 +230,7 @@ function fillChooseBox() {
 
 
 function putBack() {
-  monthTaskDict[putBackId] = tasksOfTheDay;
+  monthTaskDict[putBackId] = tasksOfTheChoosenDay;
 
   let chooseBox = document.getElementById('chooseBox');
 
