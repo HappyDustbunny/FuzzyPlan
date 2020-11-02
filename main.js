@@ -19,6 +19,8 @@ let tDouble = 240;  // Doubling time for stress level in minutes
 let alarmOn = false;
 let newTaskText = ''; // Recieve new task text from add.html
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
+let tasksFromMonth = null;
+let firstTaskFromMonth = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
@@ -122,6 +124,9 @@ function readyInputBox() {
   if (localStorage.getItem('newTaskText')) {
     localStorage.removeItem('newTaskText');
   }
+  if (firstTaskFromMonth){
+    document.getElementById('inputBox').value = firstTaskFromMonth;
+  }
 
   document.getElementById('inputBox').focus();
 }
@@ -217,6 +222,59 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('newTaskText')) {
     newTaskText = localStorage.newTaskText;
+  }
+
+  if (localStorage.getItem('tasksSentBetween')) {
+    tasksFromMonth = JSON.parse(localStorage.tasksSentBetween);
+    fillChooseBox();
+    localStorage.removeItem('tasksSentBetween');
+  }
+}
+
+
+function fillChooseBox() {
+  let chooseBox = document.getElementById('chooseBox');
+  chooseBox.classList.add('active');
+  document.getElementById('postpone').classList.add('active');
+
+  let tasks = tasksFromMonth.trim().split('|');
+  tasks.shift(); // Removes empty '' stemming from first |
+  console.log(tasks);
+
+  if (tasks != '') {
+    let counter = 0;
+    for (var task of tasks) {
+      if (counter === 0) {
+        firstTaskFromMonth = task;
+      } else {
+        newButton = document.createElement('button');
+        newButton.classList.add('floatingTask');
+        newButton.textContent = task;
+        newButton.setAttribute('id', 'task' + counter);
+        // newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
+
+        document.getElementById('chooseBox').appendChild(newButton);  // TODO: Set a lock on inputBox and tasks while chooseBox is active
+      }
+
+      counter += 1;
+    }
+  }
+}
+
+
+
+function handleChoosebox() {
+  let chooseBox = document.getElementById('chooseBox');
+
+  if (chooseBox.classList.contains('active')) {
+    if (chooseBox.hasChildNodes()) {
+      document.getElementById('inputBox').value = chooseBox.firstChild.innerText;
+      chooseBox.firstChild.remove();
+    }
+    if (!chooseBox.hasChildNodes()) {
+      chooseBox.classList.remove('active');
+      // document.getElementById('putBack').classList.remove('active');
+    }
   }
 }
 
@@ -584,7 +642,7 @@ function inputAtEnter(event) {
     }
     document.getElementById('clearButton').textContent = '\u25BEClear';
   } else {
-    document.getElementById('clearButton').textContent = 'Clear\u25B8';
+    document.getElementById('clearButton').textContent = '\u25C2Clear';
   }
 }
 
@@ -769,6 +827,7 @@ function clearTextboxOrDay() {
   let clearButton = document.getElementById('clearButton');
   if (document.getElementById('inputBox').value != '' ) {
     clearButton.textContent = '\u25BEClear';
+    document.getElementById('addTaskButton').textContent = '+';  // From hand writing: \u270D
     id = '';
   } else {
     clearDay();
@@ -812,7 +871,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('clearButton').textContent = 'Clear\u25B8';  // \u23F5
+  document.getElementById('clearButton').textContent = '\u25C2Clear';  // \u23F5
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -939,6 +998,7 @@ function taskHasBeenClicked(event) {
         addTaskBefore(myUniqueId, task);
       }
       clearButton.textContent = '\u25BEClear';
+      handleChoosebox();
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)

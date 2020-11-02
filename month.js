@@ -52,6 +52,7 @@ document.getElementById('inputBox').addEventListener('keypress', function () { i
 
 function storeLocally() {
   localStorage.monthListAsText = JSON.stringify(monthTaskDict);
+  localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
 }
 
 
@@ -218,7 +219,7 @@ function fillChooseBox() {
         newButton.classList.add('floatingTask');
         newButton.textContent = task;
         newButton.setAttribute('id', 'task' + counter);
-        newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
+        // newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
 
         document.getElementById('chooseBox').appendChild(newButton);  // TODO: Set a lock on inputBox and tasks while chooseBox is active
       }

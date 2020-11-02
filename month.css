@@ -114,9 +114,9 @@ button:focus {
   border-radius: 10px;
 }
 
-.floatingTask.clicked {
+/* .floatingTask.clicked {
   border: 2px solid rgb(255, 50, 255);
-}
+} */
 
 .centerWrapper {
   display: grid;
