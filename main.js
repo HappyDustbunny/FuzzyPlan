@@ -224,7 +224,7 @@ function retrieveLocallyStoredStuff() {
     newTaskText = localStorage.newTaskText;
   }
 
-  if (localStorage.getItem('tasksSentBetween')) {
+  if (localStorage.getItem('tasksSentBetween') != 'null') {
     tasksFromMonth = JSON.parse(localStorage.tasksSentBetween);
     fillChooseBox();
     localStorage.removeItem('tasksSentBetween');
@@ -234,8 +234,8 @@ function retrieveLocallyStoredStuff() {
 
 function fillChooseBox() {
   let chooseBox = document.getElementById('chooseBox');
-  chooseBox.classList.add('active');
-  document.getElementById('postpone').classList.add('active');
+  chooseBox.classList.add('active'); // TODO: Is the active-class used??
+  document.getElementById('postpone').classList.add('active'); // TODO: Is the active-class used??
 
   let tasks = tasksFromMonth.trim().split('|');
   tasks.shift(); // Removes empty '' stemming from first |
@@ -261,7 +261,10 @@ function fillChooseBox() {
   }
 }
 
-
+function postponeTask() {
+  // TODO: Add functionality to Postpone button and adjust arrow for Clear-button
+  console.log('TODO: Add functionality to Postpone button and adjust arrow for Clear-button');
+}
 
 function handleChoosebox() {
   let chooseBox = document.getElementById('chooseBox');
@@ -460,6 +463,8 @@ document.getElementById('month').addEventListener('click', function() {goToPage(
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
 
+document.getElementById('postpone').addEventListener('click', postponeTask);
+
 // Insert a 15 min planning task at start-your-day time according to settings
 // document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
 document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700, false);});
@@ -606,16 +611,16 @@ function adjustNowAndWakeUpButtons() {
 
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-    upBtn.textContent = wakeUpH + ':' + min + '\u25B8';
+    upBtn.textContent = wakeUpH + ':' + min + '\u25B8';  // Black right-pointing small triangle
     nowBtn.title = 'Press to insert a 15 min planning period now';
-    nowBtn.textContent = 'Now' + '\u25B8';
+    nowBtn.textContent = 'Now' + '\u25B8';  // Black right-pointing small triangle
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
-    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;
+    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;  // Black right-pointing small triangle
     nowBtn.title = 'Jump to now';
-    nowBtn.textContent = '\u25B8' + 'Now';
+    nowBtn.textContent = '\u25B8' + 'Now';  // Black right-pointing small triangle
   }
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -640,9 +645,13 @@ function inputAtEnter(event) {
         resetInputBox();
       }
     }
-    document.getElementById('clearButton').textContent = '\u25BEClear';
+    document.getElementById('clearButton').textContent = '\u25BEClear'; // Black down-pointing small triangle
+    document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    document.getElementById('clearButton').textContent = '\u25C2Clear';
+    document.getElementById('clearButton').textContent = '\u25C2Clear'; // Black left-pointing small triangle
+    document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
+    document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
   }
 }
 
@@ -826,8 +835,9 @@ function removeFuzzyOverlap(task) {
 function clearTextboxOrDay() {
   let clearButton = document.getElementById('clearButton');
   if (document.getElementById('inputBox').value != '' ) {
-    clearButton.textContent = '\u25BEClear';
-    document.getElementById('addTaskButton').textContent = '+';  // From hand writing: \u270D
+    clearButton.textContent = '\u25BEClear'; // Black down-pointing small triangle
+    document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
     id = '';
   } else {
     clearDay();
@@ -852,6 +862,7 @@ function clearDay() {
     setUpFunc();
     document.getElementById('inputBox').value = '';
     document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
     displayMessage('Nothing was changed', 3000);
   }
@@ -871,7 +882,7 @@ function editTask() {
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('clearButton').textContent = '\u25C2Clear';  // \u23F5
+  document.getElementById('clearButton').textContent = '\u25C2Clear';  // Black left-pointing small triangle
   chosenTaskId = '';
   renderTasks();
   document.getElementById('inputBox').focus();
@@ -997,13 +1008,14 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
-      clearButton.textContent = '\u25BEClear';
+      clearButton.textContent = '\u25BEClear'; // Black down-pointing small triangle
       handleChoosebox();
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
     }
     document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
 
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
@@ -1020,10 +1032,11 @@ function taskHasBeenClicked(event) {
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
     if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
-      displayMessage('Unasigned time can not be edited', 3000);
+      // displayMessage('Unasigned time can not be edited', 3000);  // More confusing than helpful(?)
     } else if (chosenTaskId === myUniqueId) {
       editTask();
-      document.getElementById('addTaskButton').textContent = '\u270D';
+      document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
+      document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
       displayMessage('One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.', 3000)
       taskList[chosenId].isClicked = 'isNotClicked';
@@ -1032,7 +1045,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    // clearButton.textContent = 'Clear\u25B8';  // \u25b8 for small triangle
+    // clearButton.textContent = 'Clear\u25B8';  // Black right-pointing small triangle
   }
   renderTasks();
 
