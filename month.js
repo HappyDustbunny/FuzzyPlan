@@ -134,7 +134,7 @@ function fillDateBar() {
 
 
 function todayButtonHasBeenClicked() {
-  tasksSentBetween += '|' + document.getElementById('inputBox').value
+  tasksSentBetween += '|' + document.getElementById('inputBox').value;
   if (document.getElementById('chooseBox').classList.contains('active')) {
     handleChoosebox();
   } else {
@@ -325,6 +325,13 @@ function inputAtEnter(event) { // TODO: Month is of by one month
 
 
 function renderTasks() {
+  // Store a backup of monthTaskDict
+  let monthListAsText = JSON.stringify(monthTaskDict);
+  if (monthListAsText) {
+    localStorage.monthListAsText = monthListAsText;
+  }
+
+
   // Remove old text from buttons and tooltips
   const days = document.getElementById('taskDiv').children;
   const len = days.length;

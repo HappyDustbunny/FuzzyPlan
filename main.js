@@ -21,6 +21,7 @@ let newTaskText = ''; // Recieve new task text from add.html
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
 let tasksFromMonth = null;
 let firstTaskFromMonth = '';
+let tasksSentBetween = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
@@ -153,9 +154,7 @@ function makeFirstTasks() {
 
 function storeLocally() {
   localStorage.taskListAsText = JSON.stringify(taskListExtractor());
-  // if (!localStorage.storedTasksList) {
-  //   localStorage.storedTasksList = JSON.stringify(storedTasksList);
-  // }
+
   localStorage.wakeUpOrNowClickedOnce = wakeUpOrNowClickedOnce;
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId === uniqueIdOfLastTouched) {
@@ -165,20 +164,12 @@ function storeLocally() {
   }
 
   localStorage.zoom = zoom;
-  // // localStorage.wakeUpH = wakeUpH;
-  // // localStorage.wakeUpM = wakeUpM;
-  // sessionStorage.chosenTask = '';
-  // // sessionStorage.chosenTaskId = chosenTaskId;
-  // sessionStorage.uniqueIdList = JSON.stringify(uniqueIdList);
-  // sessionStorage.nullTimeClicked = '';
-  // sessionStorage.zoomSymbolModifyer = zoomSymbolModifyer;
+
+  localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
 }
 
 
 function retrieveLocallyStoredStuff() {
-  // taskList = [];
-  // makeFirstTasks();
-
   if (!localStorage.getItem('indexOfLastTouched')) { // If NOT present...
     localStorage.indexOfLastTouched = 0;
   }
@@ -189,16 +180,11 @@ function retrieveLocallyStoredStuff() {
     taskListAsText = JSON.parse(localStorage.taskListAsText);
     textListToTaskList(taskListAsText);
   }
-  // if (localStorage.getItem('storedTasksList')) {
-  //   storedTasksList = JSON.parse(localStorage.storedTasksList);
-  // }
+
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
     wakeUpOrNowClickedOnce = localStorage.wakeUpOrNowClickedOnce;
-    // wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
   }
-  // if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
-  //   uniqueIdOfLastTouched = localStorage.uniqueIdOfLastTouched;
-  // }
+
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
   }
@@ -215,7 +201,7 @@ function retrieveLocallyStoredStuff() {
     tDouble = localStorage.tDouble;
   }
 
-  if (localStorage.getItem('inputBoxContent') != '') {
+  if (localStorage.getItem('inputBoxContent')) {
     document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
     localStorage.removeItem('inputBoxContent');
   }
@@ -224,7 +210,7 @@ function retrieveLocallyStoredStuff() {
     newTaskText = localStorage.newTaskText;
   }
 
-  if (localStorage.getItem('tasksSentBetween') != 'null') {
+  if (localStorage.getItem('tasksSentBetween')) {
     tasksFromMonth = JSON.parse(localStorage.tasksSentBetween);
     fillChooseBox();
     localStorage.removeItem('tasksSentBetween');
@@ -261,10 +247,12 @@ function fillChooseBox() {
   }
 }
 
+
 function postponeTask() {
-  // TODO: Add functionality to Postpone button and adjust arrow for Clear-button
-  console.log('TODO: Add functionality to Postpone button and adjust arrow for Clear-button');
+  tasksSentBetween += '|' + document.getElementById('inputBox').value
+  resetInputBox();
 }
+
 
 function handleChoosebox() {
   let chooseBox = document.getElementById('chooseBox');
@@ -1114,9 +1102,10 @@ function fixTimes() {
 function renderTasks() {
   displayList = createNullTimes();
 
-  let taskListAsText = taskListExtractor();
-  if (JSON.stringify(taskListAsText)) {
-    localStorage.taskListAsText = JSON.stringify(taskListAsText);  // Store a backup of taskList
+  // Store a backup of taskList
+  let taskListAsText = JSON.stringify(taskListExtractor());
+  if (taskListAsText) {
+    localStorage.taskListAsText = taskListAsText;
   }
 
   clearOldTasksEtc();
