@@ -9,16 +9,17 @@ let tasksSentBetween = '';
 // let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 
 
-class Task {
-  constructor(date, text) {
-    this.date = date;
-    this.text = text;
-    this.dateId = this.dateToId();
-  }
-  dateToId() {
-    return this.date.getDate() + this.date.getMonth();
-  }
-}
+// class Task { // TODO: Should the code be rewritten to use this class?
+//   constructor(date, text) {
+//     this.date = date;
+//     this.text = text;
+//     this.dateId = this.dateToId();
+//     this.isClicked = 'isNotClicked'
+//   }
+//   dateToId() {
+//     return this.date.getDate() + this.date.getMonth();
+//   }
+// }
 
 
 function setUpFunc() {
@@ -46,7 +47,7 @@ document.getElementById('moveToDay').addEventListener('click', todayButtonHasBee
 document.getElementById('putBack').addEventListener('click', putBack);
 
 document.getElementById('taskDiv').addEventListener('click', function () {taskHasBeenClicked(event); }, true);
-document.getElementById('taskDiv').addEventListener('dblclick', function () {taskHasBeenDoubleClicked(event); }, true);
+// document.getElementById('taskDiv').addEventListener('dblclick', function () {taskHasBeenDoubleClicked(event); }, true);
 
 document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
@@ -66,7 +67,7 @@ function retrieveLocallyStoredStuff() {
     localStorage.removeItem('inputBoxContent');
   }
 
-  if (localStorage.getItem('tasksSentBetween')) {
+  if (JSON.parse(localStorage.getItem('tasksSentBetween'))) {
     tasksOfTheChoosenDay = JSON.parse(localStorage.tasksSentBetween);
     fillChooseBox();
     localStorage.removeItem('tasksSentBetween');
@@ -102,7 +103,8 @@ function fillDateBar() {
 
     // monthTaskDict[id] = '';
 
-    newNode.setAttribute('id', id)
+    newNode.setAttribute('id', id);
+    newNode.setAttribute('class', 'isNotClicked');
     newNode.classList.add('dateButton');
     let dayNumber = i.getDay();
     if (dayNumber === 0 || dayNumber === 6) { // Weekday 6 and 0 are Saturday and Sunday
@@ -160,42 +162,55 @@ function handleChoosebox() {
 function taskHasBeenClicked(event) {
   let myId = event.target.id;
   if (myId === '') {
-    myId = event.target.closest('button').id;
-  }
-  let contentInputBox = document.getElementById('inputBox').value.trim();
-
-  if (contentInputBox != '') {
-    monthTaskDict[myId] += '|' + contentInputBox[0].toUpperCase() + contentInputBox.slice(1);
-
-    resetInputBox();
-
-    handleChoosebox();
+    myId = event.target.closest('button').nextSibling.id;
   }
 
-  renderTasks();
-}
+  let text = document.getElementById('inputBox').value.trim();
 
+  if (text != '' && event.target.classList[0] === 'isNotClicked') {
+    // Text in inputBox and no clicked date
+    if (text != '') {
+      monthTaskDict[myId] += '|' + text[0].toUpperCase() + text.slice(1);
 
-function taskHasBeenDoubleClicked() {
-  if (document.getElementById('chooseBox').classList.contains('active')) {
-    displayMessage('Please finish the current edit \nbefore starting a new', 3000);
+      resetInputBox();
+
+      handleChoosebox();
+    }
+
+    renderTasks();  // TODO: Fnug! Wrong choise. NEVER store information in the DOM. Implement Task-class
+
+  } else if (text != '' && event.target.classList[0] === 'isClicked') {
+    // Text in inputBox and a clicked date. Should not happen.
+    console.log('Text in inputBox and a clicked date. Should not happen.');
+    event.target.setAttribute('class', 'isNotClicked');
+
+  } else if (text === '' && event.target.classList[0] === 'isClicked') {
+    // No text in inputBox and a clicked date. Effectively a doubleclick
+    if (document.getElementById('chooseBox').classList.contains('active')) {
+      displayMessage('Please finish the current edit \nbefore starting a new', 3000);
+    } else {
+      let myId = event.target.id;
+      if (myId === '') {
+        myId = event.target.closest('button').nextSibling.id;
+      }
+      putBackId = myId;
+
+      let day =  document.getElementById(myId).children;
+
+      if (monthTaskDict[myId]) {
+        tasksOfTheChoosenDay = monthTaskDict[myId];
+        monthTaskDict[myId] = '';
+        day[2].textContent = '';
+        day[1].innerHTML = '';
+
+        fillChooseBox();
+      }
+    }
+    event.target.setAttribute('class', 'isNotClicked');
+
   } else {
-    let myId = event.target.id;
-    if (myId === '') {
-      myId = event.target.closest('button').id;
-    }
-    putBackId = myId;
-
-    let day =  document.getElementById(myId).children;
-
-    if (monthTaskDict[myId]) {
-      tasksOfTheChoosenDay = monthTaskDict[myId];
-      monthTaskDict[myId] = '';
-      day[2].textContent = '';
-      day[1].innerHTML = '';
-
-      fillChooseBox();
-    }
+    // No text in inputBox and no clicked date
+    event.target.setAttribute('class', 'isClicked');
   }
 }
 
@@ -230,7 +245,7 @@ function fillChooseBox() {
 }
 
 
-function putBack() {
+function putBack() { // TODO: Fix removal of postponed tasks from day i putBack is clicked. Maybe hide it?
   monthTaskDict[putBackId] = tasksOfTheChoosenDay;
 
   let chooseBox = document.getElementById('chooseBox');
@@ -286,10 +301,11 @@ function inputAtEnter(event) { // TODO: Month is of by one month
       let dateArray = /\d+\/\d+/.exec(contentInputBox);
 
       if ( dateArray != null ) {
+        // Is it a legit date?
         if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
           /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
 
-            // let myId = dateArray[0].replace('\/', '');
+            // Make myId from date
             let myId = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString() +
               (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString()
 
@@ -297,9 +313,9 @@ function inputAtEnter(event) { // TODO: Month is of by one month
 
             if (textInputBox === '') {
               gotoDate(myId); // TODO: Make gotoDate() and sanitize input. The next line reacts badly to 1/12
+            } else {
+              monthTaskDict[myId] += '|' + textInputBox[0].toUpperCase() + textInputBox.slice(1);
             }
-
-            monthTaskDict[myId] += '|' + textInputBox[0].toUpperCase() + textInputBox.slice(1);
 
         } else {
           displayMessage('Not a date. Please fix date or remove the back-slash', 4000);
@@ -347,7 +363,7 @@ function renderTasks() {
     let button = document.getElementById(myId);
 
     if (button != null && button.class != 'weekend') {
-      let children = button.childNodes;
+      let children = button.childNodes;  // datePart, toolTip and text
 
       let tasks = monthTaskDict[myId].trim().split("|");
       tasks.shift();  // Remove empty "" stemming from first |
@@ -377,6 +393,7 @@ function clearBehavior() {
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
+  handleChoosebox();
 }
 
 

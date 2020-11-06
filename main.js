@@ -20,8 +20,8 @@ let alarmOn = false;
 let newTaskText = ''; // Recieve new task text from add.html
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
 let tasksFromMonth = null;
-let firstTaskFromMonth = '';
-let tasksSentBetween = '';
+let firstTaskFromMonth = null;
+let tasksSentBetween = null;
 
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
@@ -254,7 +254,7 @@ function postponeTask() {
 }
 
 
-function handleChoosebox() {
+function handleChoosebox() {  // TODO: If task is edited and inserted while choosebox is active it forget all about chooseBox
   let chooseBox = document.getElementById('chooseBox');
 
   if (chooseBox.classList.contains('active')) {
@@ -264,7 +264,6 @@ function handleChoosebox() {
     }
     if (!chooseBox.hasChildNodes()) {
       chooseBox.classList.remove('active');
-      // document.getElementById('putBack').classList.remove('active');
     }
   }
 }
@@ -314,6 +313,7 @@ function textListToTaskList(taskListAsText) {
 function resetInputBox() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').focus();
+  handleChoosebox();
 }
 
 // Clear input box and let it loose focus
@@ -439,7 +439,7 @@ function sayTic() {
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
-window.addEventListener('storage', function(e) {
+window.addEventListener('storage', function(e) {  // TODO: WTF does this do?
   localStorage.setItem(e.key, e.newValue);
 });
 
@@ -491,10 +491,10 @@ function twoFingerNavigation(event) {
   }
   if (event.touches.length > 1) {
     if (!sessionStorage.touchX) {
-      sessionStorage.touchX = event.touches[0].screenX;
-    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Left swipe
+      sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
+    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
       goToPage('storage.html');
-    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Right swipe
+    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
       goToPage('month.html');
     }
   }
@@ -1008,6 +1008,7 @@ function taskHasBeenClicked(event) {
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
     nullifyClick();
+    console.log('Text in inputbox and a chosenTaskId. Should not happen.');
 
   }  else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to edit or delete
