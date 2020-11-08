@@ -1,11 +1,11 @@
-let taskList = [];
-let lastTaskList = [];
-let displayList = [];
+let taskList = [];  // List of all tasks
+let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
 let startAndEndTimes = [];
 let chosenTask = '';
 let chosenTaskId = '';
+let idOfLastTouched = 0;
 let uniqueIdOfLastTouched = 0;
-let uniqueIdList = [];
+let uniqueIdList = []; // Used by the class Task only
 let nullTimeClicked = false;
 let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
@@ -16,9 +16,10 @@ let wakeUpOrNowClickedOnce = false;
 let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
 // let stressLevel = wakeUpStress;
 let tDouble = 240;  // Doubling time for stress level in minutes
-let alarmOn = false;
 let newTaskText = ''; // Recieve new task text from add.html
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
+let taskAlarms = 'off'; // Turn alarms off by defalult
+let reminder = 'off'; // Turn reminders off by default
 let tasksFromMonth = null;
 let firstTaskFromMonth = null;
 let tasksSentBetween = null;
@@ -46,7 +47,7 @@ class Task {
     this.drain = Number(drain);
     this.text = text;
     this.uniqueId = this.giveAUniqueId();
-    this.end();
+    this.end = this.end();
     this.height = this.height();
     this.isClicked = 'isNotClicked'
   }
@@ -67,7 +68,6 @@ class Task {
     while (tryAgain);
 
     uniqueIdList.push(uniqueId);
-    // uniqueIdOfLastTouched = uniqueId;
     return uniqueId;
   }
 
@@ -98,12 +98,9 @@ function setUpFunc() {
 
   updateTimeMarker();
 
-  // makeFirstTasks(); // Moved to retrieveLocallyStoredStuff()
-
-  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
-
   // debugExamples(); // Make debug example tasks. Run from commandline if needed. DO NOT UNCOMMENT
 
+  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
   // renderTasks();  // Is in adjustNowAndWakeUpButtons
 
   let now = new Date()
@@ -116,7 +113,7 @@ function setUpFunc() {
 }
 
 
-function readyInputBox() {
+function readyInputBox() {  // Take result from add-button and insert in list or in inputBox
   if (newTaskText != '' && /\d{4}/.exec(newTaskText)) { // Fall-through will be quicker than finding the DOM elemnent and assigning an empty value. Hence the first condition
     inputFixedTask(newTaskText);
   } else {
@@ -153,44 +150,52 @@ function makeFirstTasks() {
 
 
 function storeLocally() {
-  localStorage.taskListAsText = JSON.stringify(taskListExtractor());
+  localStorage.taskList = JSON.stringify(taskList);
 
   localStorage.wakeUpOrNowClickedOnce = wakeUpOrNowClickedOnce;
-  for (const [index, task] of taskList.entries()) {
-    if (task.uniqueId === uniqueIdOfLastTouched) {
-      localStorage.indexOfLastTouched = index;
-      break;
-    }
-  }
 
   localStorage.zoom = zoom;
 
-  localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
+  localStorage.defaultTaskDuration = defaultTaskDuration;
+
+  localStorage.wakeUpStress = wakeUpStress;
+
+  localStorage.tDouble = tDouble;
+
+  localStorage.idOflastTouched = idOfLastTouched;
+
+  let inputBoxContent = document.getElementById('inputBox').value; // TODO: Is this used?
+  if (inputBoxContent) {
+    localStorage.inputBoxContent = inputBoxContent;
+  }
+
+  if (tasksSentBetween) {
+    localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
+  }
 }
 
 
 function retrieveLocallyStoredStuff() {
-  if (!localStorage.getItem('indexOfLastTouched')) { // If NOT present...
-    localStorage.indexOfLastTouched = 0;
-  }
 
-  if (localStorage.getItem('taskListAsText')) {
-    lastTaskList = taskList;
-    // localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor()); // TODO: Is this line doing anything??
-    taskListAsText = JSON.parse(localStorage.taskListAsText);
-    textListToTaskList(taskListAsText);
+  if (localStorage.getItem('taskList')) {
+    taskList = JSON.parse(localStorage.taskList);
+    // Fix dates messed up by JSON.stringify
+    for (const [index, task] of taskList.entries()) {
+      task.date = new Date(task.date);
+      task.end = new Date(task.end);
+    }
   }
 
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
     wakeUpOrNowClickedOnce = localStorage.wakeUpOrNowClickedOnce;
   }
 
-  if (localStorage.getItem('defaultTaskDuration')) {
-    defaultTaskDuration = localStorage.defaultTaskDuration;
-  }
-
   if (localStorage.getItem('zoom')) {
     zoom = localStorage.zoom;
+  }
+
+  if (localStorage.getItem('defaultTaskDuration')) {
+    defaultTaskDuration = localStorage.defaultTaskDuration;
   }
 
   if (localStorage.getItem('wakeUpStress')) {
@@ -201,12 +206,16 @@ function retrieveLocallyStoredStuff() {
     tDouble = localStorage.tDouble;
   }
 
-  if (localStorage.getItem('inputBoxContent')) {
+  if (!localStorage.getItem('idOfLastTouched')) { // If NOT present...
+    localStorage.idOfLastTouched = 0;
+  }
+
+  if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
     document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
     localStorage.removeItem('inputBoxContent');
   }
 
-  if (localStorage.getItem('newTaskText')) {
+  if (localStorage.getItem('newTaskText')) {  // Text from add-button
     newTaskText = localStorage.newTaskText;
   }
 
@@ -268,46 +277,6 @@ function handleChoosebox() {  // TODO: If task is edited and inserted while choo
   }
 }
 
-
-function debugExamples() {
-  let exList = [
-    '700 debugging example',
-    '1h long1',
-    '30m short1',
-    '30m short2',
-    '45m medium1',
-    '1200 1h lunch',
-    // '1530 1h tea',
-    '1h long2' ,
-    '45m medium2',
-    '30m short3'
-  ];
-
-  console.log('Debugging example list ', exList);
-
-  uniqueIdOfLastTouched = taskList[0].uniqueId;
-  textListToTaskList(exList);
-  renderTasks();
-}
-
-
-function textListToTaskList(taskListAsText) {
-  let succes = false;
-  if (taskListAsText.length === 0 && taskList.length === 0) {
-    makeFirstTasks();
-  } else {
-    for (const [index, text] of taskListAsText.entries()) {
-      let parsedList = parseText(text.trim());
-      let id = uniqueIdOfLastTouched;
-      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-      // console.log(task.text, [].concat(taskList));
-      succes = addTask(id, task);
-      if (!succes) {console.log('Retrieval got wrong at index ', index);}
-    }
-  }
-  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
-  uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
-}
 
 // Clear input box and give it focus
 function resetInputBox() {
@@ -372,10 +341,11 @@ function updateTimeMarker() {
 
   updateHearts(now);
 
+  // Update alarm Toc sound
   let taskAlarms = localStorage.radioButtonResultAlarm;
-  let nowTime = hours.toString() + min.toString() + sec.toString();
-  let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
   if (taskAlarms != 'off') {
+    let nowTime = hours.toString() + min.toString() + sec.toString();
+    let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
     if (taskAlarms === 'beginning' || taskAlarms === 'both') {
       if (startAndEndTimes.includes('beginning' + nowTime)) {
         sayToc();
@@ -389,6 +359,7 @@ function updateTimeMarker() {
     }
   }
 
+  // Update reminder Tic sound
   let reminder = localStorage.radioButtonResultReminder;
   if (reminder != 'off') {
     if (reminder === 'regularly') {
@@ -408,8 +379,9 @@ function updateTimeMarker() {
 function updateHearts(now) {
   let currentTask = taskList[0];
 
+  // Find the current task and remove old hearts from the display
   for (const [index,  task] of displayList.entries()) {
-    if (task.date < now && now < task.end()) {
+    if (task.date < now && now < task.end) {
       // Remove old hearts from heart span
       const heartNode = document.getElementById('heart');
       while (heartNode.firstChild) {
@@ -424,7 +396,7 @@ function updateHearts(now) {
   let time = (now - currentTask.date) / 60000;
   let result = currentTask.startStressLevel * Math.pow(2, time/(tDouble/currentTask.drain));
 
-  fillHearths(Math.round(10 - result)); // TODO: Fix hearts during nullTime
+  fillHearths(Math.round(10 - result));
 }
 
 function sayToc() {
@@ -693,10 +665,10 @@ function addWhereverAfter(uniqueId, task) {
 
 function addTaskAfter(uniqueId, task) {
   let id = getIndexFromUniqueId(uniqueId);
-  task.date = taskList[id].end();
-  task.end();
+  task.date = taskList[id].end;
+  task.end = new Date(task.date.getTime() + task.duration);
   task.fuzzyness = 'isFuzzy';
-  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end() <= taskList[id + 1].date) {
+  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     looseInputBoxFocus();
@@ -711,14 +683,14 @@ function addTaskAfter(uniqueId, task) {
 function addTaskBefore(myId, task) {
   let id = getIndexFromUniqueId(myId);
   task.date = new Date(taskList[id].date.getTime() - task.duration);
-  if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end() > task.date) {
+  if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end > task.date) {
     displayMessage('Not enough rooom here', 3000);
     return false;
   } else {
     if (taskList[id].fuzzyness === 'isNotFuzzy') {
       task.fuzzyness = 'isNotFuzzy';
     } else {
-      task.date = new Date(taskList[id - 1].end());
+      task.date = new Date(taskList[id - 1].end);
       task.fuzzyness = 'isFuzzy';
     }
     taskList.splice(id, 0, task);
@@ -754,7 +726,7 @@ function addFixedTask(task) {
     }
   } else if (overlap === 'noOverlap') {
     for (var n=0; n<len; n++) {
-      if (task.end() < taskList[n].date) {
+      if (task.end < taskList[n].date) {
         taskList.splice(n, 0, task);
         task.fuzzyness = 'isNotFuzzy';
         uniqueIdOfLastTouched = task.uniqueId;
@@ -776,8 +748,8 @@ function isThereASoftOverlap(task) {
   let len = taskList.length;
 
   for (var n=0; n<len; n++) {
-    if ((taskList[n].date < task.date && task.date < taskList[n].end())
-      || (taskList[n].date < task.end() && task.end() < taskList[n].end())) {
+    if ((taskList[n].date < task.date && task.date < taskList[n].end)
+      || (taskList[n].date < task.end && task.end < taskList[n].end)) {
         if (taskList[n].fuzzyness === 'isNotFuzzy') {
           overlap = 'hardOverlap';
           return overlap;
@@ -800,8 +772,8 @@ function removeFuzzyOverlap(task) {
   let len = taskList.length;
   // debugger;
   for (var n=1; n<len - 1; n++) {
-    if ((taskList[n].date < task.date && task.date < taskList[n].end())
-    || (taskList[n].date < task.end() && task.end() < taskList[n].end())) {
+    if ((taskList[n].date < task.date && task.date < taskList[n].end)
+    || (taskList[n].date < task.end && task.end < taskList[n].end)) {
       if (taskList[n].fuzzyness === 'isNotFuzzy') {
         console.log('Bugger. Logic broke.', taskList[n]);
       };
@@ -904,9 +876,9 @@ function createNullTimes() {
 
   let len = taskList.length;
   for (var n=1; n<len; n++) {
-    duration = taskList[n].date.getTime() - taskList[n-1].end().getTime();
+    duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
-      let nullTime = new Task(taskList[n-1].end(), duration, '', -1);
+      let nullTime = new Task(taskList[n-1].end, duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
       nullTime.startStressLevel = currentStressLevel;
@@ -1074,12 +1046,12 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
   fixTimes();
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
-    if (taskList[n + 1].date < taskList[n].end()) {
+    if (taskList[n + 1].date < taskList[n].end) {
       [taskList[n], taskList[n + 1]] = [taskList[n + 1], taskList[n]];
       fixTimes();
     }
-    if (taskList[n + 1].date - taskList[n].end() > 0 && taskList[n + 1].fuzzyness === 'isFuzzy') {
-      taskList[n + 1].date = taskList[n].end();
+    if (taskList[n + 1].date - taskList[n].end > 0 && taskList[n + 1].fuzzyness === 'isFuzzy') {
+      taskList[n + 1].date = taskList[n].end;
     }
   }
   fixTimes();
@@ -1089,10 +1061,10 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
 function fixTimes() {
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
-    if (taskList[n].end() <= taskList[n + 1].date) {
+    if (taskList[n].end <= taskList[n + 1].date) {
       continue;
     } else if (taskList[n + 1].fuzzyness === 'isFuzzy') {
-      taskList[n + 1].date = taskList[n].end();
+      taskList[n + 1].date = taskList[n].end;
     } else {
       // console.log(n, 'Overlapping a fixed task');
     }
@@ -1203,7 +1175,7 @@ function jumpTo(index) {
 function jumpToNow() {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
-    container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
+    container.scrollTop = document.getElementById('nowSpan').offsetTop + 800 * zoom;
     // document.getElementById('inputBox').focus();
   }
 }
@@ -1413,4 +1385,47 @@ function parseText(rawText) {
 
   parsedList = [taskStart, duration, text, drain];
   return parsedList;
+}
+
+
+////////////////////////////////// Maintenence code //////////////////////////
+
+function debugExamples() {
+  let exList = [
+    '700 debugging example',
+    '1h long1',
+    '30m short1',
+    '30m short2',
+    '45m medium1',
+    '1200 1h lunch',
+    // '1530 1h tea',
+    '1h long2' ,
+    '45m medium2',
+    '30m short3'
+  ];
+
+  console.log('Debugging example list ', exList);
+
+  uniqueIdOfLastTouched = taskList[0].uniqueId;
+  textListToTaskList(exList);
+  renderTasks();
+}
+
+
+function textListToTaskList(taskListAsText) {  // Used by debugExamples()
+  let succes = false;
+  if (taskListAsText.length === 0 && taskList.length === 0) {
+    makeFirstTasks();
+  } else {
+    for (const [index, text] of taskListAsText.entries()) {
+      let parsedList = parseText(text.trim());
+      let id = uniqueIdOfLastTouched;
+      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+      // console.log(task.text, [].concat(taskList));
+      succes = addTask(id, task);
+      if (!succes) {console.log('Retrieval got wrong at index ', index);}
+    }
+  }
+  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
+  uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
 }
