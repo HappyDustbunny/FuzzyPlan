@@ -80,7 +80,7 @@ function fillDateBar() {
   let nowPlus3Month =  new Date();
   nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
 
-  // Make a button with monthname
+  // Make the first button with monthname
   let thisMonth = now.getMonth();
   monthNameNode = document.createElement('button');
   monthNameNode.classList.add('monthName');
@@ -89,7 +89,7 @@ function fillDateBar() {
 
   for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
     // Insert monthnames before each the 1th
-    if (thisMonth < i.getMonth()) { // TODO: Oups! This doesn't handle dec --> jan
+    if (thisMonth < i.getMonth() || (thisMonth === 11 && i.getMonth() === 0)) {  // Month 0 is january
       thisMonth = i.getMonth();
       monthNameNode = document.createElement('button');
       monthNameNode.classList.add('monthName');
@@ -100,8 +100,6 @@ function fillDateBar() {
     let newNode = document.createElement('button');
 
     let id = i.getDate().toString() + i.getMonth().toString();
-
-    // monthTaskDict[id] = '';
 
     newNode.setAttribute('id', id);
     newNode.setAttribute('class', 'isNotClicked');

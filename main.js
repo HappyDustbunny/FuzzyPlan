@@ -7,7 +7,7 @@ let idOfLastTouched = 0;
 let uniqueIdOfLastTouched = 0;
 let uniqueIdList = []; // Used by the class Task only
 let nullTimeClicked = false;
-let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
+let zoom = 1.0;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 let defaultTaskDuration = 30;
 let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
@@ -103,11 +103,9 @@ function setUpFunc() {
   adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
   // renderTasks();  // Is in adjustNowAndWakeUpButtons
 
-  let now = new Date()
-  let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
-  jumpToTime(nowMinusOneHour, false);
+  jumpToNow();
 
-  updateHearts(now);
+  updateHearts(); // Update hearts to current time
 
   readyInputBox();
 }
@@ -339,7 +337,7 @@ function updateTimeMarker() {
   //   // TODO: Fix hanging border if animation is paused mid cycle
   // }
 
-  updateHearts(now);
+  updateHearts();
 
   // Update alarm Toc sound
   let taskAlarms = localStorage.radioButtonResultAlarm;
@@ -376,7 +374,8 @@ function updateTimeMarker() {
   }
 }
 
-function updateHearts(now) {
+function updateHearts() {
+  let now = new Date;
   let currentTask = taskList[0];
 
   // Find the current task and remove old hearts from the display
@@ -571,9 +570,9 @@ function adjustNowAndWakeUpButtons() {
 
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-    upBtn.textContent = wakeUpH + ':' + min + '\u25B8';  // Black right-pointing small triangle
+    upBtn.textContent = wakeUpH + ':' + min + ' \u25BE';  // Black down-pointing small triangle
     nowBtn.title = 'Press to insert a 15 min planning period now';
-    nowBtn.textContent = 'Now' + '\u25B8';  // Black right-pointing small triangle
+    nowBtn.textContent = 'Now' + ' \u25BE';  // Black down-pointing small triangle
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
   } else {
@@ -691,6 +690,7 @@ function addTaskBefore(myId, task) {
       task.fuzzyness = 'isNotFuzzy';
     } else {
       task.date = new Date(taskList[id - 1].end);
+      task.end = new Date(task.date.getTime() + task.duration);
       task.fuzzyness = 'isFuzzy';
     }
     taskList.splice(id, 0, task);
@@ -958,7 +958,6 @@ function taskHasBeenClicked(event) {
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
@@ -1173,11 +1172,14 @@ function jumpTo(index) {
 
 
 function jumpToNow() {
-  if (document.getElementById('container') !== null  && taskList.length > 0) {
-    container = document.getElementById('container');
-    container.scrollTop = document.getElementById('nowSpan').offsetTop + 800 * zoom;
-    // document.getElementById('inputBox').focus();
-  }
+  let now = new Date()
+  let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
+  jumpToTime(nowMinusOneHour, false);
+  // if (document.getElementById('container') !== null  && taskList.length > 0) {
+  //   container = document.getElementById('container');
+  //   container.scrollTop = document.getElementById('nowSpan').offsetTop + 800 * zoom;
+  //   // document.getElementById('inputBox').focus();
+  // }
 }
 
 
