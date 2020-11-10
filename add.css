@@ -84,8 +84,8 @@ button {
 
 .container2 {
   display: grid;
-  grid-template-columns: 48% 48%;
-  column-gap: .2rem;
+  grid-template-columns: 51% 51%;
+  /* column-gap: .2rem; */
   background-color: transparent;
   border: none;
   grid-template-areas:

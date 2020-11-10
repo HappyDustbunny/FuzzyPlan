@@ -36,6 +36,12 @@ z-index: 999;
 
 h1 {
   margin: unset;
+  grid-area: header1;
+}
+
+h2 {
+  margin: 0px;
+  grid-area: header2;
 }
 
 input {
@@ -92,10 +98,224 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'month header info storage'
+  'month header1 info storage'
   '. hearts . .'
   '. messages . .';
 }
+
+/* addButton css below */
+
+/* Har denne en funktion? */
+::placeholder {
+  color: #788793; /* Lighter gray*/
+  color: rgb(150, 150, 150);
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-rows: 50px;
+}
+
+.timeButtons {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: space-between;
+  /* display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: 50px; */
+}
+
+.addContainer1 {
+  display: grid;
+  grid-template-columns: 5% auto 5%;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+  '. header1 .'
+  '. header2 .'
+  '. messages .';
+  /* margin-top: -10px; */
+}
+
+.addContainer2 {
+  display: grid;
+  grid-template-columns: 51% 51%;
+  /* column-gap: .2rem; */
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table'
+}
+
+.topic {
+  padding: 7px;
+  margin-bottom: -15px;
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .25);
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 50% 45% 5%;
+  grid-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table .'
+}
+
+.add {
+  text-align: center;
+  /* width: 10%; */
+  height: 22px;
+  font-size: 0.6em;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  border: 1px solid rgb(96, 139, 168);
+  border-radius: 10px;
+}
+
+
+.timeAdjusterTop {
+  width: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: none; /* linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0); */
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 10;
+  top: 3px;
+  border-bottom: none;
+}
+
+.timeAdjusterMiddle {
+  width: 30px;
+  height: 45px;
+  border-radius: 10px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  top: -20px;
+  z-index: 5;
+  border: none;
+}
+
+.timeAdjusterBottom {
+  width: 30px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-image: none; /* linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9abdf0, #9898ff); */
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 10;
+  top: -43px;
+  border-top: none;
+}
+
+.text {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.backgroundUp {
+  width: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0);
+  position: relative;
+  top: 0px;
+  z-index: 1;
+  border-bottom: none;
+}
+
+.backgroundDown {
+  width: 30px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  position: relative;
+  top: -48px;
+  z-index: 1;
+  border-top: none;
+}
+
+#gainDiv {
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+#info {
+  width: 22px;
+  border-radius: 20px;
+}
+
+#d1, #g1 {
+  margin-left: 0px;
+}
+
+#text1, #text2 {
+  display: flex;
+  grid-area: input;
+  align-self: center;
+  font-weight: bold;
+}
+
+#inputTimeBox {
+  grid-area: input;
+  width: 54px;
+  height: 20px;
+}
+
+#table {
+  grid-area: table;
+  border-collapse: collapse;
+}
+
+#inputTaskBox {
+  width: auto;
+}
+
+#inputDurationBox {
+  width: 60px;
+  /* height: 15px; */
+}
+
+#optional {
+  font-size: 0.6em;
+}
+
+#apply {
+  width: 250px;
+}
+
+#cancel {
+  width: 15%;
+}
+
+#apply, #cancel {
+  font-size: 0.6em;
+  margin-top: 5px;
+}
+
+[type=radio] {
+  position: absolute;
+  opacity: 0%;
+  width: 0px;
+  height: 0px;
+}
+
+[type=radio] + img {
+  opacity: 25%;
+}
+
+[type=radio]:checked + img {
+  opacity: 100%;
+  /* background-color: blue; */
+}
+
+/* addButton-css above */
 
 .container2 {
   display: grid;
@@ -223,16 +443,19 @@ html {
   background-color: white;
   /* border: 2px solid black; */
   position: absolute;
-  transition: width .12s;
-  transition: height .12s;
+  transition: width 0.8s;
+  transition: height 0.8s;
+  /* transition-timing-function: linear; */
+  transition-timing-function: cubic-bezier(.68,-0.55,.27,1.55);
+  transition-property: all;
   visibility: hidden;
 }
 
 #animationBox.fromLowerRight { /* Adding class make animation run */
   bottom: 0px;
   right: 0px;
-  width: 360px;
-  height: 540px;
+  width: 100%;
+  height: 100%;
   visibility: visible;
 }
 
@@ -274,8 +497,9 @@ html {
 }
 
 #name {
+  /* Is this necessary? */
   justify-content: center;
-  grid-area: header;
+  grid-area: header1;
 }
 
 #nowSpan {

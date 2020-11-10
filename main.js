@@ -453,7 +453,7 @@ document.addEventListener('touchmove', function() {twoFingerNavigation(event);})
 function addTaskButtonClicked() {
   document.getElementById('animationBox').classList.add('fromLowerRight');
   // goToPage('add.html');
-  setTimeout(function() {goToPage('add.html');}, 900);
+  // setTimeout(function() {goToPage('add.html');}, 900);
 }
 
 function twoFingerNavigation(event) {

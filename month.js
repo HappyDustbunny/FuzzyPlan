@@ -136,7 +136,6 @@ function fillDateBar() {
 function todayButtonHasBeenClicked() {
   tasksSentBetween += '|' + document.getElementById('inputBox').value;
   if (document.getElementById('chooseBox').classList.contains('active')) {
-    handleChoosebox();
   } else {
     resetInputBox();
   }
@@ -165,7 +164,7 @@ function taskHasBeenClicked(event) {
 
   let text = document.getElementById('inputBox').value.trim();
 
-  if (text != '' && event.target.classList[0] === 'isNotClicked') {
+  if (text != '' && event.target.classList.contains('isNotClicked')) {
     // Text in inputBox and no clicked date
     if (text != '') {
       monthTaskDict[myId] += '|' + text[0].toUpperCase() + text.slice(1);
@@ -177,12 +176,12 @@ function taskHasBeenClicked(event) {
 
     renderTasks();  // TODO: Fnug! Wrong choise. NEVER store information in the DOM. Implement Task-class
 
-  } else if (text != '' && event.target.classList[0] === 'isClicked') {
+  } else if (text != '' && event.target.classList.contains('isClicked')) {
     // Text in inputBox and a clicked date. Should not happen.
     console.log('Text in inputBox and a clicked date. Should not happen.');
     event.target.setAttribute('class', 'isNotClicked');
 
-  } else if (text === '' && event.target.classList[0] === 'isClicked') {
+  } else if (text === '' && event.target.classList.contains('isClicked')) {
     // No text in inputBox and a clicked date. Effectively a doubleclick
     if (document.getElementById('chooseBox').classList.contains('active')) {
       displayMessage('Please finish the current edit \nbefore starting a new', 3000);
@@ -204,11 +203,13 @@ function taskHasBeenClicked(event) {
         fillChooseBox();
       }
     }
-    event.target.setAttribute('class', 'isNotClicked');
+    event.target.classList.add('isNotClicked');
+    event.target.classList.remove('isClicked');
 
   } else {
     // No text in inputBox and no clicked date
-    event.target.setAttribute('class', 'isClicked');
+    event.target.classList.remove('isNotClicked');
+    event.target.classList.add('isClicked');
   }
 }
 
