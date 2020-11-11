@@ -113,7 +113,7 @@ html {
 
 .buttons {
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: auto auto auto auto auto;
   grid-template-rows: 50px;
 }
 
@@ -157,9 +157,20 @@ html {
   margin-right: auto;
 }
 
-.container {
+
+.durationContainer {
   display: grid;
   grid-template-columns: 50% 45% 5%;
+  grid-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table .'
+}
+
+.timeContainer {
+  display: grid;
+  grid-template-columns: 40% 54% 5%;
   grid-gap: .6rem;
   background-color: transparent;
   border: none;
@@ -446,7 +457,8 @@ html {
   transition: width 0.8s;
   transition: height 0.8s;
   /* transition-timing-function: linear; */
-  transition-timing-function: cubic-bezier(.68,-0.55,.27,1.55);
+  /* transition-timing-function: cubic-bezier(.68,-0.55,.27,1.55); */
+  transition-timing-function: cubic-bezier(.54,.38,.6,1.29);
   transition-property: all;
   visibility: hidden;
 }

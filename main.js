@@ -24,6 +24,13 @@ let tasksFromMonth = null;
 let firstTaskFromMonth = null;
 let tasksSentBetween = null;
 
+///////// Add-task button /////////
+let taskDuration_add = defaultTaskDuration;
+let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+
+///////////////////////////////////
+
+
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
 // randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
@@ -444,17 +451,193 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+
+
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
-// document.getElementById('addTaskButton').addEventListener('click', function() {goToPage('add.html')});
+
+document.getElementById('inputTaskBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readTaskText(); } });
+document.getElementById('inputDurationBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readDurationTime(); } });
+document.getElementById('inputTimeBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readTaskStartTime(); } });
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
+document.getElementById('duration').addEventListener('click', function () { addDuration(event);})
+
+document.getElementById('time').addEventListener('click', function () { time_add(event);})
+
+//////////////////// Add-task button code below ///////////////////////////
 
 function addTaskButtonClicked() {
   document.getElementById('animationBox').classList.add('fromLowerRight');
   // goToPage('add.html');
   // setTimeout(function() {goToPage('add.html');}, 900);
 }
+
+function addDuration(event) {
+  let btnId = event.target.id;  // btnId is in the form 'durationPlus30m'
+
+  if (btnId === 'inputDurationBox') {
+    // Do fuckall
+  } else {
+
+    let deltaTime = 0;
+
+    if (btnId.includes('Minus')) {
+      btnId = btnId.replace('durationMinus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = -Number(btnId);
+    } else {
+      btnId = btnId.replace('durationPlus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = Number(btnId);
+    }
+
+    taskDuration_add += deltaTime;
+    if (taskDuration_add < 0) {
+      taskDuration_add = 0;
+    }
+    fillDurationBox(taskDuration_add);
+  }
+}
+
+
+function fillDurationBox(duration) {
+  let hours = 0;
+  let minutes = 0;
+
+  hours = (duration - (duration % 60)) / 60;
+  minutes = duration - hours * 60;
+
+  let formattedDuration = hours + 'h' + minutes + 'm';
+
+  document.getElementById('inputDurationBox').value = formattedDuration;
+}
+
+
+function time_add(event) {
+  let btnId = event.target.id;  // btnId is in the form 'timePlus30m'
+
+  if (btnId === 'now') {
+    taskTime_add = new Date();
+    fillTimeBox(taskTime_add);
+  } else if (btnId === 'clear') {
+    document.getElementById('inputTimeBox').value = '';
+    document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+  } else if (btnId === 'inputTimeBox') {
+    // Do fuckall
+  } else {
+    let deltaTime = 0;
+
+    if (btnId.includes('Minus')) {
+      btnId = btnId.replace('timeMinus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = -Number(btnId);
+    } else {
+      btnId = btnId.replace('timePlus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = Number(btnId);
+    }
+
+    taskTime_add = new Date(taskTime_add.getTime() + deltaTime * 60000);
+    // Ensure that the time is between 00:00 and 23:59
+    if (taskTime_add.getDate() < (new Date).getDate()) {
+      taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 00, 01);
+    } else if ((new Date()).getDate() < taskTime_add.getDate()) {
+      taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59);
+    }
+
+    fillTimeBox(taskTime_add);
+  }
+
+}
+
+
+function fillTimeBox(time) {
+  let prettyTaskTime = prettifyTime(time);
+
+  document.getElementById('inputTimeBox').value = prettyTaskTime;
+
+  document.getElementById('apply').textContent = 'Ok'; // Remove instruction from return-button as the task will be added the right place automatically
+}
+
+
+function prettifyTime(time) {
+  let taskTimeHours = time.getHours().toString();
+  let taskTimeMinutes = time.getMinutes().toString();
+
+  // Check if leading zeroes are needed and add them
+  let nils = ['', ''];
+  if (taskTimeHours < 10) {
+    nils[0] = '0';
+  }
+  if (taskTimeMinutes < 10) {
+    nils[1] = '0';
+  }
+  let prettyTaskTime = nils[0] + taskTimeHours + ':' + nils[1] + taskTimeMinutes;
+
+  return prettyTaskTime
+}
+
+
+function readTaskText() {
+  let contentInputBox = document.getElementById('inputTaskBox').value.trim();
+  let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
+  if (badCharacters) {
+    displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000);
+  } else {
+    taskText_add = contentInputBox;
+    console.log(contentInputBox);
+    returnTask();
+  }
+}
+
+
+function readDurationTime() {
+  let contentInputBox = document.getElementById('inputDurationBox').value.trim();
+  let badCharacters = /[^0-9hm]/.exec(contentInputBox);
+  if (badCharacters) {
+    displayMessage('Please use the format 1h30m for 1 hour and 30 minutes', 3000);
+  } else {
+    let timeH = 0;
+    let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString(); // TODO: Check if numbers are too big
+    timeM = Number(timeM.replace('m', ''));
+    if (/h/.exec(contentInputBox)) {
+      timeH = /[0-9]+h/.exec(contentInputBox).toString();
+      contentInputBox = contentInputBox.replace(timeH, '');
+      timeH = Number(timeH.replace('h', ''));
+    }
+    taskDuration_add = timeH * 60 + timeM;
+  }
+}
+
+
+function readTaskStartTime() {
+  let contentInputBox = document.getElementById('inputTimeBox').value.trim();
+  let badCharacters = /[^0-9:]/.exec(contentInputBox);
+  if (badCharacters) {
+    displayMessage('Please use the format 12:00 or 1200', 3000);
+  } else {
+    let timeH = /[0-9][0-9]/.exec(contentInputBox);
+    contentInputBox = contentInputBox.replace(timeH, '');
+    let timeM = /[0-9][0-9]/.exec(contentInputBox);
+    let now = new Date();
+    taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
+    if (0 < timeH || 0 < timeM) {
+      fillTimeBox(taskTime_add);
+    }
+  }
+}
+
+function returnTask() {
+  // TODO: write task to day-input box and close add-window. Make radiobuttons work
+}
+
+
+//////////////////// Add-task button code above ///////////////////////////
+
 
 function twoFingerNavigation(event) {
   if (sessionStorage.touchX && event.touches.length === 1) {
