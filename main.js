@@ -99,7 +99,8 @@ function setUpFunc() {
 
   retrieveLocallyStoredStuff();
 
-  // fillStressBar();
+  // Set uniqueIdOfLastTouche to the last task before 'Day end'
+  uniqueIdOfLastTouched = taskList[taskList.length - 2].uniqueId;
 
   fillTimeBar(zoom);
 
@@ -487,7 +488,7 @@ function addTaskButtonClicked() {
   storeLocally();
 
   // Trigger animation via CSS
-  document.getElementById('animationBox').classList.add('fromLowerRight');
+  document.getElementById('addView').classList.add('fromLowerRight');
 
   let inputBox = document.getElementById('inputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
@@ -716,13 +717,14 @@ function apply() {
     document.getElementById('inputBox').value = returnText;
 
     // Close add-view via CSS
-    document.getElementById('animationBox').classList.remove('fromLowerRight');
+    document.getElementById('addView').visible = 'hidden';
+    document.getElementById('addView').classList.remove('fromLowerRight');
   }
 }
 
 function returnToDay() {
-  document.getElementById('animationBox').classList.remove('fromLowerRight');
-  // document.getElementById('animationBox').visibility = 'hidden';
+  document.getElementById('addView').visible = 'hidden';
+  document.getElementById('addView').classList.remove('fromLowerRight');
 }
 
 //////////////////// Add-task button code above ///////////////////////////
