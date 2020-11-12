@@ -2,7 +2,7 @@ let defaultTaskDuration = 30;
 
 let taskText = '';
 let taskDuration = defaultTaskDuration;
-let taskTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);;
+let taskTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
 let drainGainLevel = 1;
 
 
@@ -56,9 +56,9 @@ function setUpFunc() {
 
   let inputBox = document.getElementById('inputTaskBox');
   if (inputBox.value === '') {
-    document.getElementById('inputTaskBox').focus();
+    inputBox.focus();
   } else {
-    document.getElementById('inputTaskBox').blur();
+    inputBox.blur();
   }
 }
 

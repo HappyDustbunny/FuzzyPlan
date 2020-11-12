@@ -25,8 +25,10 @@ let firstTaskFromMonth = null;
 let tasksSentBetween = null;
 
 ///////// Add-task button /////////
+let taskText_add = '';
 let taskDuration_add = defaultTaskDuration;
 let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+let drainGainLevel_add = 'd1';
 
 ///////////////////////////////////
 
@@ -455,7 +457,7 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
 
-document.getElementById('inputTaskBox').addEventListener('keypress',
+document.getElementById('inputBox_add').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readTaskText(); } });
 document.getElementById('inputDurationBox').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readDurationTime(); } });
@@ -468,12 +470,42 @@ document.getElementById('duration').addEventListener('click', function () { addD
 
 document.getElementById('time').addEventListener('click', function () { time_add(event);})
 
+document.getElementById('clear').addEventListener('click', clearTimeBox);
+
+document.getElementById('now').addEventListener('click', setTimeNow);
+
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+
+document.getElementById('cancel').addEventListener('click', returnToDay);
+
+document.getElementById('apply').addEventListener('click', apply);
+
+
 //////////////////// Add-task button code below ///////////////////////////
 
 function addTaskButtonClicked() {
+  storeLocally();
+
+  // Trigger animation via CSS
   document.getElementById('animationBox').classList.add('fromLowerRight');
-  // goToPage('add.html');
-  // setTimeout(function() {goToPage('add.html');}, 900);
+
+  let inputBox = document.getElementById('inputBox');         // Day-inputBox
+  let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
+
+  if (inputBox.value != '') {
+    inputBox_add.value = inputBox.value;
+    inputBox_add.blur();
+  } else {
+    inputBox_add.value = '';
+    inputBox_add.focus();
+  }
+
+  fillDurationBox(defaultTaskDuration);
+
+  clearTimeBox();
+
+  document.getElementById('d1').checked = 'checked';
+  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 }
 
 function addDuration(event) {
@@ -512,6 +544,7 @@ function fillDurationBox(duration) {
   minutes = duration - hours * 60;
 
   let formattedDuration = hours + 'h' + minutes + 'm';
+  taskDuration_add = duration;
 
   document.getElementById('inputDurationBox').value = formattedDuration;
 }
@@ -564,6 +597,19 @@ function fillTimeBox(time) {
 }
 
 
+function setTimeNow() {
+  taskTime_add = new Date();
+  fillTimeBox(taskTime_add);
+}
+
+
+function clearTimeBox() {
+  document.getElementById('inputTimeBox').value = '';
+  document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+  taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+}
+
+
 function prettifyTime(time) {
   let taskTimeHours = time.getHours().toString();
   let taskTimeMinutes = time.getMinutes().toString();
@@ -583,14 +629,12 @@ function prettifyTime(time) {
 
 
 function readTaskText() {
-  let contentInputBox = document.getElementById('inputTaskBox').value.trim();
+  let contentInputBox = document.getElementById('inputBox_add').value.trim();
   let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
   if (badCharacters) {
     displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000);
   } else {
     taskText_add = contentInputBox;
-    console.log(contentInputBox);
-    returnTask();
   }
 }
 
@@ -631,10 +675,55 @@ function readTaskStartTime() {
   }
 }
 
-function returnTask() {
-  // TODO: write task to day-input box and close add-window. Make radiobuttons work
+
+function readDrainGainRadioButtons() {
+  let radioButtonResult = document.getElementsByClassName('drain');
+  for (var i = 0; i < 10; i++) {
+    if (radioButtonResult[i].type === 'radio' && radioButtonResult[i].checked) {
+      drainGainLevel_add = radioButtonResult[i].value;
+    }
+  }
 }
 
+
+function formatTask() {
+  let returnText = '';
+  if (document.getElementById('inputTimeBox').value.trim() === '') {
+    returnText =  taskText_add + ' '
+                + taskDuration_add + 'm '
+                + drainGainLevel_add;
+  } else {
+    let prettyTaskTime = prettifyTime(taskTime_add);
+    returnText =  taskText_add + ' '
+                + prettyTaskTime.replace(':', '') + ' '
+                + taskDuration_add + 'm '
+                + drainGainLevel_add;
+  }
+  return returnText;
+}
+
+
+function apply() {
+  let taskText = document.getElementById('inputBox_add');
+  if (taskText === '') {
+    displayMessage('Please write a task text', 3000);
+  } else {
+    readTaskText()
+    readDurationTime();
+    readTaskStartTime();
+    readDrainGainRadioButtons();
+    returnText = formatTask();
+    document.getElementById('inputBox').value = returnText;
+
+    // Close add-view via CSS
+    document.getElementById('animationBox').classList.remove('fromLowerRight');
+  }
+}
+
+function returnToDay() {
+  document.getElementById('animationBox').classList.remove('fromLowerRight');
+  // document.getElementById('animationBox').visibility = 'hidden';
+}
 
 //////////////////// Add-task button code above ///////////////////////////
 
