@@ -467,8 +467,8 @@ function addTaskButtonClicked() {
   storeLocally();
 
   // Trigger animation via CSS
-  document.getElementById('dayView').classList.remove('active');
   document.getElementById('addView').classList.add('active');
+  document.getElementById('dayView').classList.remove('active');
 
   fillDurationBox(defaultTaskDuration);
 
@@ -476,7 +476,7 @@ function addTaskButtonClicked() {
 
   document.getElementById('d1').checked = 'checked';
   // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
-  
+
   let inputBox = document.getElementById('inputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
 
