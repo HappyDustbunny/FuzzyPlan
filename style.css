@@ -266,6 +266,15 @@ html {
   margin-left: 0px;
 }
 
+#dayView {
+  visibility: hidden;
+  position: relative; /* Needs to be relative in order for the add-button to have an absolute position with respect to the viewport and not the total page https://css-tricks.com/absolute-relative-fixed-positioining-how-do-they-differ/ */
+}
+
+#dayView.active {
+  visibility: visible;
+}
+
 #text1, #text2 {
   display: flex;
   grid-area: input;
@@ -432,11 +441,10 @@ html {
   border-radius: 10px;
 }
 
-
 #addTaskButton {
-  position: relative;
-  bottom: 80px;
-  left: 300px;
+  position: absolute;
+  bottom: 10%;
+  left: 80%;
   font-size: x-large;
   line-height: 0.1em;
   text-align: center;
@@ -446,6 +454,7 @@ html {
   width: 1.7em;
   border-radius: 25px;
   border: 1px solid rgb(108, 168, 48);
+  z-index: 10;
 }
 
 #addView {  /* Box that help transition to add-view */
@@ -459,20 +468,12 @@ html {
   transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
 }
 
-#addView.fromLowerRight { /* Adding class make animation run */
+#addView.active { /* Adding class make animation run */
   width: 100%;
   height: 100%;
   visibility: visible;
 }
 
-
-#addView.toInputBox { /* Adding class make animation run */
-  bottom: 500px;
-  left: 0px;
-  width: 0%;
-  height: 0%;
-  visibility: hidden;
-}
 
 #dummyAdd {
   background-color: rgba(154, 219, 240, .25);

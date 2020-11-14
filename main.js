@@ -16,7 +16,6 @@ let wakeUpOrNowClickedOnce = false;
 let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
 // let stressLevel = wakeUpStress;
 let tDouble = 240;  // Doubling time for stress level in minutes
-let newTaskText = ''; // Recieve new task text from add.html
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
 let taskAlarms = 'off'; // Turn alarms off by defalult
 let reminder = 'off'; // Turn reminders off by default
@@ -117,25 +116,9 @@ function setUpFunc() {
 
   updateHearts(); // Update hearts to current time
 
-  readyInputBox();
-}
-
-
-function readyInputBox() {  // Take result from add-button and insert in list or in inputBox
-  if (newTaskText != '' && /\d{4}/.exec(newTaskText)) { // Fall-through will be quicker than finding the DOM elemnent and assigning an empty value. Hence the first condition
-    inputFixedTask(newTaskText);
-  } else {
-    document.getElementById('inputBox').value = newTaskText;
-  }
-  if (localStorage.getItem('newTaskText')) {
-    localStorage.removeItem('newTaskText');
-  }
-  if (firstTaskFromMonth){
-    document.getElementById('inputBox').value = firstTaskFromMonth;
-  }
-
   document.getElementById('inputBox').focus();
 }
+
 
 function createTimeMarker() {
   // Create time marker to show current time on timebar
@@ -221,10 +204,6 @@ function retrieveLocallyStoredStuff() {
   if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
     document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
     localStorage.removeItem('inputBoxContent');
-  }
-
-  if (localStorage.getItem('newTaskText')) {  // Text from add-button
-    newTaskText = localStorage.newTaskText;
   }
 
   if (localStorage.getItem('tasksSentBetween')) {
@@ -488,8 +467,16 @@ function addTaskButtonClicked() {
   storeLocally();
 
   // Trigger animation via CSS
-  document.getElementById('addView').classList.add('fromLowerRight');
+  document.getElementById('dayView').classList.remove('active');
+  document.getElementById('addView').classList.add('active');
 
+  fillDurationBox(defaultTaskDuration);
+
+  clearTimeBox();
+
+  document.getElementById('d1').checked = 'checked';
+  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+  
   let inputBox = document.getElementById('inputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
 
@@ -500,13 +487,6 @@ function addTaskButtonClicked() {
     inputBox_add.value = '';
     inputBox_add.focus();
   }
-
-  fillDurationBox(defaultTaskDuration);
-
-  clearTimeBox();
-
-  document.getElementById('d1').checked = 'checked';
-  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 }
 
 function addDuration(event) {
@@ -717,14 +697,16 @@ function apply() {
     document.getElementById('inputBox').value = returnText;
 
     // Close add-view via CSS
-    document.getElementById('addView').visible = 'hidden';
-    document.getElementById('addView').classList.remove('fromLowerRight');
+    // document.getElementById('addView').visible = 'hidden';
+    document.getElementById('dayView').classList.add('active');
+    document.getElementById('addView').classList.remove('active');
   }
 }
 
 function returnToDay() {
-  document.getElementById('addView').visible = 'hidden';
-  document.getElementById('addView').classList.remove('fromLowerRight');
+  // document.getElementById('addView').visible = 'hidden';
+  document.getElementById('dayView').classList.add('active');
+  document.getElementById('addView').classList.remove('active');
 }
 
 //////////////////// Add-task button code above ///////////////////////////
@@ -1088,7 +1070,6 @@ function clearDay() {
     resetInputBox();
     wakeUpOrNowClickedOnce = false;
     localStorage.indexOfLastTouched = 0;
-    localStorage.removeItem('newTaskText');
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     storeLocally();

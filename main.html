@@ -11,69 +11,77 @@
 
   <body onload="setUpFunc()">
 
-    <div class="container1">
-      <button type="button" class='controlButton' id="month" title='Click to
+    <!-- ---------------------- -->
+    <!-- Day view -->
+    <!-- ---------------------- -->
+
+    <div id="dayView" class="active">
+      <div class="container1">
+        <button type="button" class='controlButton' id="month" title='Click to
         show month (or just swipe rigth with two fingers anywhere)'>
         Month
-      </button>
-      <h1 id='name' align=center>
-        FuzzyPlan
-      </h1>
-      <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
-         ?
-      </button>
-      <button type="button" class='controlButton' id="storage" title='Click to
+        </button>
+        <h1 id='name' align=center>
+          FuzzyPlan
+        </h1>
+        <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
+          ?
+        </button>
+        <button type="button" class='controlButton' id="storage" title='Click to
         show the storage (or just swipe left with two fingers anywhere)'>
         Storage
-      </button>
-      <span id='heart'></span>
-      <span id='message' display='none'></span>
-      <br>
-    </div>
-
-    <div class="centerWrapper">
-      <div id="sortTask" class="noTasksToSort">
-        <button type="button" id="postpone" class="controlButton" title="Click to move
-          content of input box to month (postpone task)">
-          &#x25C2;&nbsp;Postpone <!-- Black left-pointing small triangle  -->
         </button>
-        <button id='upButton' class="controlButton" type="button" title="Press to
-          insert a 15 minute planning period at the chosen wake up time">
-          &#x25BE;&nbsp;7:00 <!-- Black Down-Pointing Small Triangle -->
-        </button>
-        <button id='nowButton' class="controlButton" type="button" title='Press to
-          insert a 15 min planning period at current time'>
-          &#x25BE;&nbsp;Now <!-- Black Down-Pointing Small Triangle -->
-        </button>
+        <span id='heart'></span>
+        <span id='message' display='none'></span>
+        <br>
       </div>
 
-      <input type="text" id='inputBox' autofocus value="">
+      <div class="centerWrapper">
+        <div id="sortTask" class="noTasksToSort">
+          <button type="button" id="postpone" class="controlButton" title="Click to move
+          content of input box to month (postpone task)">
+          &#x25C2;&nbsp;Postpone <!-- Black left-pointing small triangle  -->
+          </button>
+          <button id='upButton' class="controlButton" type="button" title="Press to
+          insert a 15 minute planning period at the chosen wake up time">
+          &#x25BE;&nbsp;7:00 <!-- Black Down-Pointing Small Triangle -->
+          </button>
+          <button id='nowButton' class="controlButton" type="button" title='Press to
+          insert a 15 min planning period at current time'>
+          &#x25BE;&nbsp;Now <!-- Black Down-Pointing Small Triangle -->
+          </button>
+        </div>
 
-      <button id='clearButton' class="controlButton" type="button" title="Clear">
-        &#x25BE;&nbsp;Clear<!-- Black down-pointing small triangle  -->
-      </button>
-      <button id='settings' class="controlButton" type="button" title='Settings'>
-        &#x2699;  <!-- Gear icon -->
-      </button>
-      <button id='zoom' class="controlButton" type="button" title='Toggles zoom'>
-        &#x2350; <!-- ⍐ -->
-      </button>
+        <input type="text" id='inputBox' autofocus value="">
 
-      <div id="chooseBox"></div>
+        <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
+        <button id='clearButton' class="controlButton" type="button" title="Clear">
+          &#x25BE;&nbsp;Clear<!-- Black down-pointing small triangle  -->
+        </button>
+        <button id='settings' class="controlButton" type="button" title='Settings'>
+          &#x2699;  <!-- Gear icon -->
+        </button>
+        <button id='zoom' class="controlButton" type="button" title='Toggles zoom'>
+          &#x2350; <!-- ⍐ -->
+        </button>
 
+        <div id="chooseBox"></div>
 
-      <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
+        <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
+
+      </div>
+
+      <div id='container' class="container2">
+        <div id='stressDiv'> </div>
+        <div id='timeDiv'> </div>
+        <div id='taskDiv'> </div>
+      </div>
+
     </div>
 
-      <!-- <br> -->
-
-    <div id='container' class="container2">
-      <div id='stressDiv'> </div>
-      <div id='timeDiv'> </div>
-      <div id='taskDiv'> </div>
-    </div>
-
-    <button id="addTaskButton" class="controlButton">+</button>
+    <!-- ---------------------- -->
+    <!-- Add-task view -->
+    <!-- ---------------------- -->
 
     <div id='addView'>
       <div class="addContainer1">
@@ -131,8 +139,8 @@
             <span class="text">Task starts at</span>
             <input type="text" id='inputTimeBox' alt='Write time here' tabindex="3" placeholder="12:00">
             <span id='optional'>(optional)</span>
-            <button class="add" type="button" id="now" alt='Set time to now'>Now</button>
-            <button class="add" type="button" id="clear" alt='Clear time'>Clear</button>
+            <button class="add" type="button" id="now" alt='Set time to now' tabindex="4">Now</button>
+            <button class="add" type="button" id="clear" alt='Clear time' tabindex="5">Clear</button>
           </div>
 
           <div class="buttons">
@@ -226,8 +234,8 @@
         </div>
 
         <div>
-          <button class="add" type="button" id="cancel">Cancel</button>
-          <button class="add" type="button" id="apply" tabindex="4">OK</button>
+          <button class="add" type="button" id="cancel" tabindex="6">Cancel</button>
+          <button class="add" type="button" id="apply" tabindex="7">OK</button>
         </div>
       </div>
 
