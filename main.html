@@ -10,236 +10,239 @@
   </head>
 
   <body onload="setUpFunc()">
+    <div id="page">
 
-    <!-- ---------------------- -->
-    <!-- Day view -->
-    <!-- ---------------------- -->
+      <!-- ---------------------- -->
+      <!-- Day view -->
+      <!-- ---------------------- -->
 
-    <div id="dayView" class="active">
-      <div class="container1">
-        <button type="button" class='controlButton' id="month" title='Click to
-        show month (or just swipe rigth with two fingers anywhere)'>
-        Month
-        </button>
-        <h1 id='name' align=center>
-          FuzzyPlan
-        </h1>
-        <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
-          ?
-        </button>
-        <button type="button" class='controlButton' id="storage" title='Click to
-        show the storage (or just swipe left with two fingers anywhere)'>
-        Storage
-        </button>
-        <span id='heart'></span>
-        <span id='message' display='none'></span>
-        <br>
-      </div>
-
-      <div class="centerWrapper">
-        <div id="sortTask" class="noTasksToSort">
-          <button type="button" id="postpone" class="controlButton" title="Click to move
-          content of input box to month (postpone task)">
-          &#x25C2;&nbsp;Postpone <!-- Black left-pointing small triangle  -->
+      <div id="dayView" class="active">
+        <div class="container1">
+          <button type="button" class='controlButton' id="month" title='Click to
+          show month (or just swipe rigth with two fingers anywhere)'>
+          Month
           </button>
-          <button id='upButton' class="controlButton" type="button" title="Press to
-          insert a 15 minute planning period at the chosen wake up time">
-          &#x25BE;&nbsp;7:00 <!-- Black Down-Pointing Small Triangle -->
+          <h1 id='name' align=center>
+            FuzzyPlan
+          </h1>
+          <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
+            ?
           </button>
-          <button id='nowButton' class="controlButton" type="button" title='Press to
-          insert a 15 min planning period at current time'>
-          &#x25BE;&nbsp;Now <!-- Black Down-Pointing Small Triangle -->
+          <button type="button" class='controlButton' id="storage" title='Click to
+          show the storage (or just swipe left with two fingers anywhere)'>
+          Storage
           </button>
+          <span id='heart'></span>
+          <span id='message' display='none'></span>
+          <br>
         </div>
 
-        <input type="text" id='inputBox' autofocus value="">
-
-        <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
-        <button id='clearButton' class="controlButton" type="button" title="Clear">
-          &#x25BE;&nbsp;Clear<!-- Black down-pointing small triangle  -->
-        </button>
-        <button id='settings' class="controlButton" type="button" title='Settings'>
-          &#x2699;  <!-- Gear icon -->
-        </button>
-        <button id='zoom' class="controlButton" type="button" title='Toggles zoom'>
-          &#x2350; <!-- ⍐ -->
-        </button>
-
-        <div id="chooseBox"></div>
-
-        <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
-
-      </div>
-
-      <div id='container' class="container2">
-        <div id='stressDiv'> </div>
-        <div id='timeDiv'> </div>
-        <div id='taskDiv'> </div>
-      </div>
-
-    </div>
-
-    <!-- ---------------------- -->
-    <!-- Add-task view -->
-    <!-- ---------------------- -->
-
-    <div id='addView'>
-      <div class="addContainer1">
-        <h1 align='center'>FuzzyPlan</h1>
-        <h2 align='center'>Add task</h2>
-        <span id='message' display='none'></span>
-      </div>
-
-
-      <div class='topic'>
-        <div>
-          <span class="text">Task text &nbsp;</span>
-          <input type="text" id='inputBox_add' autofocus value='' alt='Write task text' tabindex="1">
-        </div>
-      </div>
-
-      <span>   <br>   </span>
-
-      <div class='topic'>
-        <div id="duration" class="durationContainer">
-          <span id='text1'>
-            Duration &nbsp;
-            <input type="text" id='inputDurationBox' alt='Write duration here in minutes' tabindex="2" placeholder="0h30m"> <br>
-          </span>
-          <div class="buttons">
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="durationPlus60m" alt='Plus 1 hour'>&#x25B4;</button>
-              <button class='add timeAdjusterMiddle' type="button" id="durationPlus60mMiddle" tabIndex = "-1">1h</button>
-              <button class='add timeAdjusterBottom' type="button" id="durationMinus60m" alt='Minus 1 hour'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="durationPlus30m" alt='Puls 30 minutes'>&#x25B4;</button>
-              <button class='add timeAdjusterMiddle' type="button" id="durationPlus30mMiddle" tabIndex = "-1">30m</button>
-              <button class='add timeAdjusterBottom' type="button" id="durationMinus30m" alt='Minus 30 minutes'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="durationPlus15m" alt='Puls 15 minutes'>&#x25B4;</button>
-              <button class='add timeAdjusterMiddle' type="button" id="durationPlus15mMiddle" tabIndex = "-1">15m</button>
-              <button class='add timeAdjusterBottom' type="button" id="durationMinus15m" alt='Minus 15 minutes'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="durationPlus5m" alt='Puls 5 minutes'>&#x25B4;</button>
-              <button class='add timeAdjusterMiddle' type="button" id="durationPlus5mMiddle" tabIndex = "-1">5m</button>
-              <button class='add timeAdjusterBottom' type="button" id="durationMinus5m" alt='Minus 5 minutes'>&#x25BE;</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <span>   <br>   </span>
-
-      <div class='topic'>
-        <div id="time" class="timeContainer">
-          <div class="timeButtons">
-            <span class="text">Task starts at</span>
-            <input type="text" id='inputTimeBox' alt='Write time here' tabindex="3" placeholder="12:00">
-            <span id='optional'>(optional)</span>
-            <button class="add" type="button" id="now" alt='Set time to now' tabindex="4">Now</button>
-            <button class="add" type="button" id="clear" alt='Clear time' tabindex="5">Clear</button>
-          </div>
-
-          <div class="buttons">
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="timePlus300m" alt='Puls 5 hour'>&#x25B4;</button>
-              <td><button class='add timeAdjusterMiddle' type="button" id="timePlus5hMiddle" tabIndex = "-1">5h</button></td>
-              <button class='add timeAdjusterBottom' type="button" id="timeMinus300m" alt='Minus 5 hour'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="timePlus60m" alt='Puls 1 hour'>&#x25B4;</button>
-              <td><button class='add timeAdjusterMiddle' type="button" id="timePlus1hMiddle" tabIndex = "-1">1h</button></td>
-              <button class='add timeAdjusterBottom' type="button" id="timeMinus60m" alt='Minus 1 hour'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="timePlus30m" alt='Puls 30 minutes'>&#x25B4;</button>
-              <td><button class='add timeAdjusterMiddle' type="button" id="timePlus30mMiddle" tabIndex = "-1">30m</button></td>
-              <button class='add timeAdjusterBottom' type="button" id="timeMinus30m" alt='Minus 30 minutes'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="timePlus15m" alt='Puls 15 minutes'>&#x25B4;</button>
-              <td><button class='add timeAdjusterMiddle' type="button" id="timePlus15mMiddle" tabIndex = "-1">15m</button></td>
-              <button class='add timeAdjusterBottom' type="button" id="timeMinus15m" alt='Minus 15 minutes'>&#x25BE;</button>
-            </div>
-            <div>
-              <button class='add timeAdjusterTop' type="button" id="timePlus5m" alt='Puls 5 minutes'>&#x25B4;</button>
-              <td><button class='add timeAdjusterMiddle' type="button" id="timePlus5mMiddle" tabIndex = "-1">5m</button></td>
-              <button class='add timeAdjusterBottom' type="button" id="timeMinus5m" alt='Minus 5 minutes'>&#x25BE;</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <span>   <br>   </span>
-
-      <div class='topic'>
-        <div class="addContainer2">
-          <div class="text">Drain leve</div>
-          <div id='gainDiv'>
-            <span class="text">Gain level</span>
-            <button type="button" class='controlButton' id="info" title="info" alt="Information and user manual">
-               ?
+        <div class="centerWrapper">
+          <div id="sortTask" class="noTasksToSort">
+            <button type="button" id="postpone" class="controlButton" title="Click to move
+            content of input box to month (postpone task)">
+            &#x25C2;&nbsp;Postpone <!-- Black left-pointing small triangle  -->
+            </button>
+            <button id='upButton' class="controlButton" type="button" title="Press to
+            insert a 15 minute planning period at the chosen wake up time">
+            &#x25BE;&nbsp;7:00 <!-- Black Down-Pointing Small Triangle -->
+            </button>
+            <button id='nowButton' class="controlButton" type="button" title='Press to
+            insert a 15 min planning period at current time'>
+            &#x25BE;&nbsp;Now <!-- Black Down-Pointing Small Triangle -->
             </button>
           </div>
 
-          <div>
-            <label>
-              <input type="radio" id='d1' class="drain" name='drain' value="d1" checked='checked'>
-              <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='d2' class="drain" name='drain' value="d2">
-              <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='d3' class="drain" name='drain' value="d3">
-              <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='d4' class="drain" name='drain' value="d4">
-              <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='d5' class="drain" name='drain' value="d5">
-              <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-          </div>
+          <input type="text" id='inputBox' autofocus value="">
 
-          <div>
-            <label>
-              <input type="radio" id='g1' class="drain" name='drain' value="g1">
-              <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='g2' class="drain" name='drain' value="g2">
-              <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='g3' class="drain" name='drain' value="g3">
-              <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='g4' class="drain" name='drain' value="g4">
-              <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-            <label>
-              <input type="radio" id='g5' class="drain" name='drain' value="g5">
-              <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
-            </label>
-          </div>
+          <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
+          <button id='clearButton' class="controlButton" type="button" title="Clear">
+            &#x25BE;&nbsp;Clear<!-- Black down-pointing small triangle  -->
+          </button>
+          <button id='settings' class="controlButton" type="button" title='Settings'>
+            &#x2699;  <!-- Gear icon -->
+          </button>
+          <button id='zoom' class="controlButton" type="button" title='Toggles zoom'>
+            &#x2350; <!-- ⍐ -->
+          </button>
+
+          <div id="chooseBox"></div>
+
+          <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
 
         </div>
 
-        <div>
-          <button class="add" type="button" id="cancel" tabindex="6">Cancel</button>
-          <button class="add" type="button" id="apply" tabindex="7">OK</button>
+        <div id='container' class="container2">
+          <div id='stressDiv'> </div>
+          <div id='timeDiv'> </div>
+          <div id='taskDiv'> </div>
         </div>
+
       </div>
 
-      <span>   <br>   </span>
+      <!-- ---------------------- -->
+      <!-- Add-task view -->
+      <!-- ---------------------- -->
+
+      <div id='addView'>
+        <div class="addContainer1">
+          <h1 align='center'>FuzzyPlan</h1>
+          <h2 align='center'>Add task</h2>
+          <span id='message' display='none'></span>
+        </div>
+
+
+        <div class='topic'>
+          <div>
+            <span class="text">Task text &nbsp;</span>
+            <input type="text" id='inputBox_add' autofocus value='' alt='Write task text' tabindex="1">
+          </div>
+        </div>
+
+        <span>   <br>   </span>
+
+        <div class='topic'>
+          <div id="duration" class="durationContainer">
+            <span id='text1'>
+              Duration &nbsp;
+              <input type="text" id='inputDurationBox' alt='Write duration here in minutes' tabindex="2" placeholder="0h30m"> <br>
+            </span>
+            <div class="buttons">
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus60m" alt='Plus 1 hour'>&#x25B4;</button>
+                <button class='add timeAdjusterMiddle' type="button" id="durationPlus60mMiddle" tabIndex = "-1">1h</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus60m" alt='Minus 1 hour'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus30m" alt='Puls 30 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterMiddle' type="button" id="durationPlus30mMiddle" tabIndex = "-1">30m</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus30m" alt='Minus 30 minutes'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus15m" alt='Puls 15 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterMiddle' type="button" id="durationPlus15mMiddle" tabIndex = "-1">15m</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus15m" alt='Minus 15 minutes'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus5m" alt='Puls 5 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterMiddle' type="button" id="durationPlus5mMiddle" tabIndex = "-1">5m</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus5m" alt='Minus 5 minutes'>&#x25BE;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <span>   <br>   </span>
+
+        <div class='topic'>
+          <div id="time" class="timeContainer">
+            <div class="timeButtons">
+              <span class="text">Task starts at</span>
+              <input type="text" id='inputTimeBox' alt='Write time here' tabindex="3" placeholder="12:00">
+              <span id='optional'>(optional)</span>
+              <button class="add" type="button" id="now" alt='Set time to now' tabindex="4">Now</button>
+              <button class="add" type="button" id="clear" alt='Clear time' tabindex="5">Clear</button>
+            </div>
+
+            <div class="buttons">
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="timePlus300m" alt='Puls 5 hour'>&#x25B4;</button>
+                <td><button class='add timeAdjusterMiddle' type="button" id="timePlus5hMiddle" tabIndex = "-1">5h</button></td>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus300m" alt='Minus 5 hour'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="timePlus60m" alt='Puls 1 hour'>&#x25B4;</button>
+                <td><button class='add timeAdjusterMiddle' type="button" id="timePlus1hMiddle" tabIndex = "-1">1h</button></td>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus60m" alt='Minus 1 hour'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="timePlus30m" alt='Puls 30 minutes'>&#x25B4;</button>
+                <td><button class='add timeAdjusterMiddle' type="button" id="timePlus30mMiddle" tabIndex = "-1">30m</button></td>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus30m" alt='Minus 30 minutes'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="timePlus15m" alt='Puls 15 minutes'>&#x25B4;</button>
+                <td><button class='add timeAdjusterMiddle' type="button" id="timePlus15mMiddle" tabIndex = "-1">15m</button></td>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus15m" alt='Minus 15 minutes'>&#x25BE;</button>
+              </div>
+              <div>
+                <button class='add timeAdjusterTop' type="button" id="timePlus5m" alt='Puls 5 minutes'>&#x25B4;</button>
+                <td><button class='add timeAdjusterMiddle' type="button" id="timePlus5mMiddle" tabIndex = "-1">5m</button></td>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus5m" alt='Minus 5 minutes'>&#x25BE;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <span>   <br>   </span>
+
+        <div class='topic'>
+          <div class="addContainer2">
+            <div class="text">Drain leve</div>
+            <div id='gainDiv'>
+              <span class="text">Gain level</span>
+              <button type="button" class='controlButton' id="info" title="info" alt="Information and user manual">
+                 ?
+              </button>
+            </div>
+
+            <div>
+              <label>
+                <input type="radio" id='d1' class="drain" name='drain' value="d1" checked='checked'>
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='d2' class="drain" name='drain' value="d2">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='d3' class="drain" name='drain' value="d3">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='d4' class="drain" name='drain' value="d4">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='d5' class="drain" name='drain' value="d5">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+            </div>
+
+            <div>
+              <label>
+                <input type="radio" id='g1' class="drain" name='drain' value="g1">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='g2' class="drain" name='drain' value="g2">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='g3' class="drain" name='drain' value="g3">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='g4' class="drain" name='drain' value="g4">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+              <label>
+                <input type="radio" id='g5' class="drain" name='drain' value="g5">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;"> &nbsp;&nbsp;
+              </label>
+            </div>
+
+          </div>
+
+          <div>
+            <button class="add" type="button" id="cancel" tabindex="6">Cancel</button>
+            <button class="add" type="button" id="apply" tabindex="7">OK</button>
+          </div>
+        </div>
+
+        <span>   <br>   </span>
+      </div>
+
     </div>
     <!-- <p>Supported browsers: Firefox, Vivaldi, Chrome, Ecosia app for Samsung</p> -->
   </body>
