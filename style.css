@@ -103,7 +103,7 @@ html {
   '. messages . .';
 }
 
-/* addButton css below */
+/* add view css below */
 
 /* Har denne en funktion? */
 ::placeholder {
@@ -340,7 +340,173 @@ html {
   /* background-color: blue; */
 }
 
-/* addButton-css above */
+/* add View-css above */
+
+/* month view css below */
+
+#monthView {
+    bottom: 780px;
+    /* left: 300px; */
+    width: 0px;
+    /* height: 0px; */
+    background-color: white;
+    position: absolute;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+    position: relative;
+}
+
+#monthView.active {
+    bottom: 780px;
+    /* left: 0px; */
+    width: 100%;
+    height: 100%;
+    visibility: visible;
+    /* position: relative; */
+}
+
+.monthContainer1 {
+  display: grid;
+  grid-template-columns: 40px auto 45px;
+  grid-template-rows: auto auto auto;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  'month header day'
+  '. messages .';
+}
+
+
+.monthContainer2 {
+  display: grid;
+  grid-template-columns: 5% 80% 5%;
+  grid-template-rows: auto auto;
+  grid-gap: .3rem;
+  /* justify-items: center; */
+  background-color: transparent;
+  border: none;
+  height: 90%;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. taskHeader .'
+  '. taskListing .'
+}
+
+#monthTaskDiv {
+  display: grid;
+  grid-area: taskListing;
+}
+
+.dateButton {
+  position: relative;
+  text-align: left;
+  border: 1px solid rgba(154, 219, 240, 1.0);
+  border-radius:  10px;
+  background-color: rgba(154, 219, 240, .25);
+  box-shadow: 0px 0px 3px 2px rgba(154, 219, 240, .25);
+}
+
+.dateButton .toolTip {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -100px;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.dateButton .toolTip::after {
+  content: '';
+  position: absolute;
+  top: 99%;
+  left: 50%;
+  margin-left: -5px;
+  border: solid;
+  border-width: 7px;
+  border-color: rgba(154, 219, 240, 1) transparent transparent transparent;
+}
+
+.dateButton:hover .toolTip {
+  visibility: visible;
+  background-color: rgba(154, 219, 240, 1);
+}
+
+.toolTip:empty {
+   display: none;
+}
+
+.weekend {
+  background-color: rgba(154, 219, 240, .6);
+}
+
+.monthName {
+  background-color: white;
+  border: none;
+  margin: 5px;
+}
+
+/* Messes with original clearButton */
+/* #clearButton {
+  grid-area: clear;
+} */
+
+/* Messes with original inputBox */
+/* #inputBox {
+  grid-area: inputbox;
+} */
+
+#month {
+  grid-area: month;
+  justify-self: end;
+}
+
+#day {
+  grid-area: day;
+}
+
+#moveToDay {
+  display: none;
+  grid-area: moveToDay;
+}
+
+#moveToDay.active {
+  line-height: 0.8em;
+  padding-top: 5px;
+  display: grid;
+}
+
+#monthViewName {
+  /* Put FuzzyPlan header in right place */
+  justify-content: center;
+  grid-area: header;
+}
+
+#chooseBox {
+  display: none;
+  grid-area: chooseBox;
+}
+
+#chooseBox.active {
+  display: grid;
+}
+
+#putBack {
+  display: none;
+	line-height: 0.8em;
+	padding-top: 2px;
+  grid-area: putback;
+}
+
+#putBack.active {
+  display: grid;
+}
+
+/* month view css below */
+
 
 .container2 {
   display: grid;
@@ -522,7 +688,7 @@ html {
 }
 
 #name {
-  /* Is this necessary? */
+  /* Put FuzzyPlan header in right place */
   justify-content: center;
   grid-area: header1;
 }

@@ -119,16 +119,12 @@ function fillDateBar() {
 
     toolTipSpan = document.createElement('span');
     toolTipSpan.classList.add('toolTip');
-    // toolTipSpan.innerHTML =  'Rap <br> Rappelap'; // newNode.textContent;
     newNode.appendChild(toolTipSpan);
 
     textPart = document.createElement('span');
-    // textPart.textContent = 'Raap';
     newNode.appendChild(textPart);
 
-    // newNode.setAttribute('class', 'halfHours' + zoom * 2);
     document.getElementById('taskDiv').appendChild(newNode);
-    // document.getElementById(id).appendChild(toolTipSpan);
   }
 }
 
@@ -292,7 +288,7 @@ function putBack() { // TODO: Fix removal of postponed tasks from day i putBack 
 // }
 
 
-function inputAtEnter(event) { // TODO: Month is of by one month
+function inputAtEnter(event) {
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('inputBox').value.trim();
     if (contentInputBox != '') {

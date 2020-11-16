@@ -12,9 +12,7 @@
   <body onload="setUpFunc()">
     <div id="page">
 
-      <!-- ---------------------- -->
-      <!-- Day view -->
-      <!-- ---------------------- -->
+      <!-- Day view ---------------------- -->
 
       <div id="dayView" class="active">
         <div class="container1">
@@ -53,7 +51,7 @@
             </button>
           </div>
 
-          <input type="text" id='inputBox' autofocus value="">
+          <input type="text" id='dayInputBox' autofocus value="">
 
           <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
           <button id='clearButton' class="controlButton" type="button" title="Clear">
@@ -66,7 +64,7 @@
             &#x2350; <!-- ⍐ -->
           </button>
 
-          <div id="chooseBox"></div>
+          <div id="dayChooseBox"></div>
 
           <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
 
@@ -80,9 +78,7 @@
 
       </div>
 
-      <!-- ---------------------- -->
-      <!-- Add-task view -->
-      <!-- ---------------------- -->
+      <!-- Add-task view ---------------------- -->
 
       <div id='addView'>
         <div class="addContainer1">
@@ -241,6 +237,44 @@
         </div>
 
         <span>   <br>   </span>
+      </div>
+
+      <!-- Month view ---------------------- -->
+
+      <div id="monthView">
+        <div class="monthContainer1">
+          <h1 id='monthViewName' align=center>
+            FuzzyPlan
+          </h1>
+
+          <button type="button" class='controlButton' id="day" title='       Click to get back to day-view
+          (or just swipe left with two fingers anywhere)'>Day</button>
+
+          <span id='message' display='none'></span>
+          <br>
+        </div>
+
+        <div class="CenterWrapper">
+          <button id='clearButton' class="controlButton" type="button" title="Clear input box">
+            Clear&#x25B8;
+          </button>
+          <input type="text" id='monthInputBox' autofocus value="">
+
+          <button type="button" id="moveToDay" class="controlButton" title="Click to move content of input
+            box to today's plan">
+            Today&#x25B8;
+          </button>
+
+          <button type="button" id="putBack" class="controlButton" title="Put the tasks back">
+            Put back
+          </button>
+          <div id='monthChooseBox'></div>
+        </div>
+
+        <div class="monthContainer2">
+          <!-- <div id='dateDiv'> </div> -->
+          <div id='monthTaskDiv'> </div>
+        </div>
       </div>
 
     </div>

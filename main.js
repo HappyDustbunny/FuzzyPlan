@@ -23,14 +23,17 @@ let tasksFromMonth = null;
 let firstTaskFromMonth = null;
 let tasksSentBetween = null;
 
-///////// Add-task button /////////
+///////// Add-view /////////
 let taskText_add = '';
 let taskDuration_add = defaultTaskDuration;
 let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
 let drainGainLevel_add = 'd1';
 
-///////////////////////////////////
-
+///////// Month-view ////////
+let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
+// let tasksOfTheChoosenDay = {};
+let putBackId = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
@@ -52,8 +55,8 @@ class Task {
   constructor(date, duration, text, drain) {
     this.date = date; // Start time as Javascript date
     this.duration = duration; // Duration in milliseconds
-    this.drain = Number(drain);
     this.text = text;
+    this.drain = Number(drain);
     this.uniqueId = this.giveAUniqueId();
     this.end = this.end();
     this.height = this.height();
@@ -116,7 +119,7 @@ function setUpFunc() {
 
   updateHearts(); // Update hearts to current time
 
-  document.getElementById('inputBox').focus();
+  document.getElementById('dayInputBox').focus();
 }
 
 
@@ -155,7 +158,7 @@ function storeLocally() {
 
   localStorage.idOflastTouched = idOfLastTouched;
 
-  let inputBoxContent = document.getElementById('inputBox').value; // TODO: Is this used?
+  let inputBoxContent = document.getElementById('dayInputBox').value; // TODO: Is this used?
   if (inputBoxContent) {
     localStorage.inputBoxContent = inputBoxContent;
   }
@@ -202,28 +205,32 @@ function retrieveLocallyStoredStuff() {
   }
 
   if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
-    document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
+    document.getElementById('dayInputBox').value = localStorage.getItem('inputBoxContent');
     localStorage.removeItem('inputBoxContent');
   }
 
-  if (localStorage.getItem('tasksSentBetween')) {
-    tasksFromMonth = JSON.parse(localStorage.tasksSentBetween);
-    fillChooseBox();
-    localStorage.removeItem('tasksSentBetween');
-  }
+  // if (localStorage.getItem('tasksSentBetween')) {
+  //   tasksFromMonth = JSON.parse(localStorage.tasksSentBetween);
+  //   fillChooseBox();
+  //   localStorage.removeItem('tasksSentBetween');
+  // }
 }
 
 
-function fillChooseBox() {
-  let chooseBox = document.getElementById('chooseBox');
-  chooseBox.classList.add('active'); // TODO: Is the active-class used??
-  document.getElementById('postpone').classList.add('active'); // TODO: Is the active-class used??
+function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
+  let chooseBox = document.getElementById(whichView + 'ChooseBox');
+  chooseBox.classList.add('active');
+  if (whichView != 'day') {
+    document.getElementById('putBack').classList.add('active');
+    document.getElementById('moveToDay').classList.add('active');
+  } else {
+    document.getElementById('postpone').classList.add('active');
+  }
 
-  let tasks = tasksFromMonth.trim().split('|');
-  tasks.shift(); // Removes empty '' stemming from first |
+  let tasks = tasksFromMonth ; // TODO: Clean up here
   console.log(tasks);
 
-  if (tasks != '') {
+  if (tasks != null) {
     let counter = 0;
     for (var task of tasks) {
       if (counter === 0) {
@@ -245,19 +252,20 @@ function fillChooseBox() {
 
 
 function postponeTask() {
-  tasksSentBetween += '|' + document.getElementById('inputBox').value
-  resetInputBox();
+  tasksSentBetween += '|' + document.getElementById('dayInputBox').value
+  resetInputBox('day');
 }
 
 
-function handleChoosebox() {  // TODO: If task is edited and inserted while choosebox is active it forget all about chooseBox
-  let chooseBox = document.getElementById('chooseBox');
+function handleChoosebox(whichView) {  // TODO: If task is edited and inserted while choosebox is active it forget all about chooseBox
+  let chooseBox = document.getElementById(whichView + 'ChooseBox');
 
   if (chooseBox.classList.contains('active')) {
     if (chooseBox.hasChildNodes()) {
-      document.getElementById('inputBox').value = chooseBox.firstChild.innerText;
+      document.getElementById(whichView + 'InputBox').value = chooseBox.firstChild.innerText;
       chooseBox.firstChild.remove();
     }
+
     if (!chooseBox.hasChildNodes()) {
       chooseBox.classList.remove('active');
     }
@@ -266,16 +274,16 @@ function handleChoosebox() {  // TODO: If task is edited and inserted while choo
 
 
 // Clear input box and give it focus
-function resetInputBox() {
-  document.getElementById('inputBox').value = '';
-  document.getElementById('inputBox').focus();
-  handleChoosebox();
+function resetInputBox(whichView) { // whichView can be 'day' or 'month'
+  document.getElementById(whichView + 'InputBox').value = '';
+  document.getElementById(whichView + 'InputBox').focus();
+  handleChoosebox('day');
 }
 
 // Clear input box and let it loose focus
-function looseInputBoxFocus() {
-  document.getElementById('inputBox').value = '';
-  document.getElementById('inputBox').blur();
+function looseInputBoxFocus(whichView) {
+  document.getElementById(whichView + 'InputBox').value = '';
+  document.getElementById(whichView + 'InputBox').blur();
 }
 
 // Fill the half hour time slots of the timebar
@@ -406,7 +414,7 @@ window.addEventListener('storage', function(e) {  // TODO: WTF does this do?
 
 document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
 document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
-document.getElementById('month').addEventListener('click', function() {goToPage('month.html');});
+document.getElementById('month').addEventListener('click', monthButtonClicked);
 
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
@@ -422,7 +430,7 @@ document.getElementById('upButton').addEventListener('click', function() {jumpTo
 document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
-document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
 document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
@@ -433,7 +441,7 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
-
+////////// Eventlisteners for Add-view   /////////////////////
 
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
 
@@ -460,8 +468,15 @@ document.getElementById('cancel').addEventListener('click', returnToDay);
 
 document.getElementById('apply').addEventListener('click', apply);
 
+////////////////// Eventlisteners for Month-view ///////////////////////
 
-//////////////////// Add-task button code below ///////////////////////////
+document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
+
+
+document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
+
+document.getElementById('day').addEventListener('click', gotoDay);
+//////////////////// Add-view code below ///////////////////////////
 
 function addTaskButtonClicked() {
   storeLocally();
@@ -477,7 +492,7 @@ function addTaskButtonClicked() {
   document.getElementById('d1').checked = 'checked';
   // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
-  let inputBox = document.getElementById('inputBox');         // Day-inputBox
+  let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
 
   if (inputBox.value != '') {
@@ -694,7 +709,7 @@ function apply() {
     readTaskStartTime();
     readDrainGainRadioButtons();
     returnText = formatTask();
-    document.getElementById('inputBox').value = returnText;
+    document.getElementById('dayInputBox').value = returnText;
 
     // Close add-view via CSS
     // document.getElementById('addView').visible = 'hidden';
@@ -709,7 +724,265 @@ function returnToDay() {
   document.getElementById('addView').classList.remove('active');
 }
 
-//////////////////// Add-task button code above ///////////////////////////
+//////////////////// Add-view button code above ///////////////////////////
+
+
+function monthButtonClicked() {
+  fillDateBar();
+
+  monthRenderTasks();
+
+  // resetInputBox('day');
+  document.getElementById('monthInputBox').focus();
+}
+
+
+//////////////////// Month-view code below ///////////////////////////
+
+function monthButtonClicked() {
+  storeLocally();
+
+  // Trigger animation via CSS
+  document.getElementById('monthView').classList.add('active');
+  document.getElementById('dayView').classList.remove('active');
+
+  fillDateBar();
+
+  monthRenderTasks();
+}
+
+
+function gotoDay() {
+  // Trigger animation via CSS
+  document.getElementById('monthView').classList.remove('active'); // TODO: Fix animation
+  document.getElementById('dayView').classList.add('active');
+
+  fillChooseBox('day');
+}
+
+
+function fillDateBar() { // TODO: Make this show the week before now and highlight today
+  let now = new Date();
+  let nowPlus3Month =  new Date();
+  nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
+
+  // Make the first button with monthname
+  let thisMonth = now.getMonth();
+  monthNameNode = document.createElement('button');
+  monthNameNode.classList.add('monthName');
+  monthNameNode.textContent = months[now.getMonth()];
+  document.getElementById('monthTaskDiv').appendChild(monthNameNode);
+
+  for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
+    // Insert monthnames before each the 1th
+    if (thisMonth < i.getMonth() || (thisMonth === 11 && i.getMonth() === 0)) {  // Month 0 is january
+      thisMonth = i.getMonth();
+      monthNameNode = document.createElement('button');
+      monthNameNode.classList.add('monthName');
+      monthNameNode.textContent = months[i.getMonth()];
+      document.getElementById('monthTaskDiv').appendChild(monthNameNode);
+    }
+
+    let newNode = document.createElement('button');
+
+    let id = i.getDate().toString() + '-' + i.getMonth().toString();
+
+    newNode.setAttribute('id', id);
+    newNode.setAttribute('class', 'isNotClicked');
+    newNode.classList.add('dateButton');
+    let dayNumber = i.getDay();
+    if (dayNumber === 0 || dayNumber === 6) { // Weekday 6 and 0 are Saturday and Sunday
+      newNode.classList.add('weekend');
+    }
+
+    datePart = document.createElement('span');
+    datePart.classList.add('datePart');
+    if (i.getDate() < 10) {
+      datePart.textContent = '\u00a0\u00a0'; // Adjust all dates to align right
+    }
+    datePart.textContent += i.getDate() + '/' + (i.getMonth() + 1) +  '\u00a0\u00a0\u00a0';
+    newNode.appendChild(datePart);
+
+    toolTipSpan = document.createElement('span');
+    toolTipSpan.classList.add('toolTip');
+    newNode.appendChild(toolTipSpan);
+
+    textPart = document.createElement('span');
+    newNode.appendChild(textPart);
+
+    document.getElementById('monthTaskDiv').appendChild(newNode);
+  }
+}
+
+
+function monthTaskHasBeenClicked(event) {
+  let myId = event.target.id;
+  if (myId === '') {
+    myId = event.target.closest('button').nextSibling.id;
+  }
+
+  let contentInputBox = document.getElementById('monthInputBox').value.trim();
+
+  if (contentInputBox != '' && event.target.classList.contains('isNotClicked')) {
+    // Text in inputBox and no clicked date
+    if (contentInputBox != '') {
+      let now = new Date();
+      let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId) , 12, 00)
+
+      let task = new Task(clickedDate, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
+
+      if (monthTaskList[myId]) {
+        monthTaskList[myId].push(task);
+      } else {
+        monthTaskList[myId] = [task];
+      }
+
+      // monthTaskDict[myId] += '|' + text[0].toUpperCase() + text.slice(1);
+
+      resetInputBox('month');
+
+      handleChoosebox('month');
+    }
+
+    monthRenderTasks();  // TODO: Fnug! Wrong choise. NEVER store information in the DOM. Implement Task-class
+
+  } else if (contentInputBox != '' && event.target.classList.contains('isClicked')) {
+    // Text in inputBox and a clicked date. Should not happen.
+    console.log('Text in inputBox and a clicked date. Should not happen.');
+    event.target.setAttribute('class', 'isNotClicked');
+
+    // No text in inputBox and a clicked date. Effectively a doubleclick
+  } else if (contentInputBox === '' && event.target.classList.contains('isClicked')) {
+    if (document.getElementById('monthChooseBox').classList.contains('active')) {
+      displayMessage('Please finish the current edit \nbefore starting a new', 3000);
+    } else {
+      let myId = event.target.id;
+      if (myId === '') {
+        myId = event.target.closest('button').nextSibling.id;
+      }
+      putBackId = myId;
+
+      let day =  document.getElementById(myId).children;
+
+      if (monthTaskList[myId]) {
+        tasksFromMonth = monthTaskList[myId];
+        monthTaskList[myId] = '';
+        day[2].textContent = '';
+        day[1].innerHTML = '';
+
+        fillChooseBox('month');
+      }
+    }
+    event.target.classList.add('isNotClicked');
+    event.target.classList.remove('isClicked');
+
+  } else {
+    // No text in inputBox and no clicked date
+    event.target.classList.remove('isNotClicked');
+    event.target.classList.add('isClicked');
+  }
+}
+
+
+function monthInputAtEnter(event) {
+  if (event.key === 'Enter') {
+    let contentInputBox = document.getElementById('monthInputBox').value.trim();
+    if (contentInputBox != '') {
+
+      // Check if date is provided in the form 7/11
+      let dateArray = /\d+\/\d+/.exec(contentInputBox);
+
+      if ( dateArray != null ) {
+        // Is it a legit date?
+        if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
+          /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
+
+            // Make myId from date
+            let month = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
+            let day = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
+            let myId = month + day;
+
+            let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
+
+            if (textInputBox === '') {
+              gotoDate(myId); // TODO: Make gotoDate() and sanitize input. The next line reacts badly to 1/12
+            } else {
+              let now = new Date();
+              let taskStart = new Date(now.getFullYear(), month, day, 12, 0);
+              let task = new Task(taskStart, 15 * 60000, textInputBox[0].toUpperCase() + textInputBox.slice(1), 1);
+
+              if (monthTaskList[myId]) {
+                monthTaskList[myId].push(task);
+              } else {
+                monthTaskList[myId] = [task];
+              }
+            }
+
+        } else {
+          displayMessage('Not a date. Please fix date or remove the back-slash', 4000);
+          return;
+        }
+
+      } else {
+        let now = new Date();
+        let nowPlusOneDay = new Date();
+        nowPlusOneDay = new Date(nowPlusOneDay.setDate(nowPlusOneDay.getDate() + 1));
+
+        let myId = nowPlusOneDay.getDate().toString() + '-' + nowPlusOneDay.getMonth().toString();
+
+        let task = new Task(nowPlusOneDay, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
+
+        if (monthTaskList[myId]) {
+          monthTaskList[myId].push(task);
+        } else {
+          monthTaskList[myId] = [task];
+        }
+      }
+
+      monthRenderTasks();
+
+      resetInputBox('month');
+
+    }
+  }
+}
+
+
+function monthRenderTasks() {
+
+  // Remove old text from buttons and tooltips
+  const days = document.getElementById('monthTaskDiv').children;
+  const len = days.length;
+  for (var i = 0; i < len; i++) {
+    if (days[i].children.length > 0) {
+      days[i].children[2].textContent = '';
+      days[i].children[1].innerHTML = '';
+    }
+  }
+
+  // Write new text into buttons and tooltips
+  // for (const [index, task]) of monthTaskList.entries()) {
+  for (var myId in monthTaskList) {
+    let button = document.getElementById(myId);
+
+    if (button != null && button.class != 'weekend') {
+      let children = button.childNodes;  // datePart, toolTip and text
+
+      let tasks = monthTaskList[myId];
+
+      if (tasks != '') {
+        for (var task of tasks) {
+          children[1].innerHTML += ' \u25CF ' + task.text + '&nbsp;' + '<br>'; // Write to tooltip
+          children[2].textContent +=  ' \u25CF ' + task.text + '\u00a0'; // Write task to date
+        }
+      }
+    }
+  }
+}
+
+// Remenber nested functions to limit scope and new debugging tools
+
+//////////////////// Month-view code above ///////////////////////////
 
 
 function twoFingerNavigation(event) {
@@ -762,7 +1035,7 @@ function  fillHearths(currentStressLevel) {
 function goToPage(page) {
   storeLocally();
 
-  let inputBoxContent = document.getElementById('inputBox').value;
+  let inputBoxContent = document.getElementById('dayInputBox').value;
   if (inputBoxContent != '') {
     localStorage.inputBoxContent = inputBoxContent;
   }
@@ -838,14 +1111,14 @@ function adjustNowAndWakeUpButtons() {
     nowBtn.textContent = '\u25B8' + 'Now';  // Black right-pointing small triangle
   }
   renderTasks();
-  document.getElementById('inputBox').focus();
+  document.getElementById('dayInputBox').focus();
 }
 
 
 // Used by an eventListener. Makes pressing Enter add task
 function inputAtEnter(event) {
   if (event.key === 'Enter') {
-    let contentInputBox = document.getElementById('inputBox').value.trim();
+    let contentInputBox = document.getElementById('dayInputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
       inputFixedTask(contentInputBox);
     } else {
@@ -853,11 +1126,11 @@ function inputAtEnter(event) {
         nullifyClick();
       } else if (/\d[0-5][0-9]/.exec(contentInputBox) != null || /[1-2]\d[0-5][0-9]/.exec(contentInputBox) != null) {
         // If there is 3-4 numbers, jump to the time indicated
-        resetInputBox();
+        resetInputBox('day');
         jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
         displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000)
-        resetInputBox();
+        resetInputBox('day');
       }
     }
     document.getElementById('clearButton').textContent = '\u25BEClear'; // Black down-pointing small triangle
@@ -899,7 +1172,7 @@ function addTask(myId, task) {
   } else {
     succes = addFixedTask(task);
   }
-  resetInputBox();
+  resetInputBox('day');
   return succes;
 }
 
@@ -909,7 +1182,7 @@ function addWhereverAfter(uniqueId, task) {
   let myId = getIndexFromUniqueId(uniqueId);
   for (var id=myId; id<taskList.length - 1; id++) {
     succes = addTaskAfter(taskList[id].uniqueId, task);
-    looseInputBoxFocus();
+    looseInputBoxFocus('day');
     if (succes) {
       break;
     }
@@ -926,7 +1199,7 @@ function addTaskAfter(uniqueId, task) {
   if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
-    looseInputBoxFocus();
+    looseInputBoxFocus('day');
     anneal();
     return true;
   } else {
@@ -951,7 +1224,7 @@ function addTaskBefore(myId, task) {
     }
     taskList.splice(id, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
-    looseInputBoxFocus();
+    looseInputBoxFocus('day');
     anneal();
     return true;
   }
@@ -1050,7 +1323,7 @@ function removeFuzzyOverlap(task) {
 // Used by an eventListener. Govern the Edit/Clear button
 function clearTextboxOrDay() {
   let clearButton = document.getElementById('clearButton');
-  if (document.getElementById('inputBox').value != '' ) {
+  if (document.getElementById('dayInputBox').value != '' ) {
     clearButton.textContent = '\u25BEClear'; // Black down-pointing small triangle
     document.getElementById('addTaskButton').textContent = '+';
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
@@ -1058,7 +1331,7 @@ function clearTextboxOrDay() {
   } else {
     clearDay();
   }
-  resetInputBox();
+  resetInputBox('day');
 }
 
 
@@ -1067,7 +1340,7 @@ function clearDay() {
   if (answer == true) {
     taskList = [];
     makeFirstTasks();
-    resetInputBox();
+    resetInputBox('day');
     wakeUpOrNowClickedOnce = false;
     localStorage.indexOfLastTouched = 0;
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
@@ -1075,7 +1348,7 @@ function clearDay() {
     storeLocally();
     adjustNowAndWakeUpButtons();
     setUpFunc();
-    document.getElementById('inputBox').value = '';
+    document.getElementById('dayInputBox').value = '';
     document.getElementById('addTaskButton').textContent = '+';
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
@@ -1087,22 +1360,30 @@ function clearDay() {
 function editTask() {
   let id = getIndexFromUniqueId(chosenTaskId);
   let drain = '';
+
   if (1 < taskList[id].drain) {
     drain = ' d' + taskList[id].drain + ' ';
   } else if (taskList[id].drain < 0) {
     drain = ' g' + (-taskList[id].drain) / 2 + ' ';
   }
+
   taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
-  document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
+
+  let dayInputBox = document.getElementById('dayInputBox');
+  dayInputBox.value = taskText;  // Insert text in inputBox
+
   taskList.splice(id, 1);
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
   document.getElementById('clearButton').textContent = '\u25C2Clear';  // Black left-pointing small triangle
   chosenTaskId = '';
+
   renderTasks();
-  document.getElementById('inputBox').focus();
+
+  dayInputBox.focus();
+
   let nextLast = taskText.length - 1;
-  inputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
+  dayInputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
 }
 
 // Used by an eventListener. Toggles zoom.
@@ -1208,7 +1489,7 @@ function taskHasBeenClicked(event) {
   }
 
   // The eventListener is tied to the parent, so the event given is the parent event
-  let contentInputBox = document.getElementById('inputBox').value.trim();
+  let contentInputBox = document.getElementById('dayInputBox').value.trim();
   let clearButton = document.getElementById('clearButton');
 
   if (contentInputBox !== '' && !chosenTaskId) {
@@ -1223,7 +1504,7 @@ function taskHasBeenClicked(event) {
         addTaskBefore(myUniqueId, task);
       }
       clearButton.textContent = '\u25BEClear'; // Black down-pointing small triangle
-      handleChoosebox();
+      handleChoosebox('day');
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
@@ -1421,7 +1702,7 @@ function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
-    // document.getElementById('inputBox').focus();
+    // document.getElementById('dayInputBox').focus();
   }
 }
 
@@ -1433,7 +1714,7 @@ function jumpToNow() {
   // if (document.getElementById('container') !== null  && taskList.length > 0) {
   //   container = document.getElementById('container');
   //   container.scrollTop = document.getElementById('nowSpan').offsetTop + 800 * zoom;
-  //   // document.getElementById('inputBox').focus();
+  //   // document.getElementById('dayInputBox').focus();
   // }
 }
 
