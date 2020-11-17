@@ -89,6 +89,19 @@ html {
   '. chooseBox . . . .'
 }
 
+.monthCenterWrapper {
+  display: grid;
+  grid-template-columns: 6px 40px auto 40px 6px;
+  grid-template-rows: auto auto;
+  grid-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. clear inputbox moveToDay .'
+  '. putback monthChooseBox . .'
+}
+
 .container1 {
   display: grid;
   grid-template-columns: 40px auto 25px 40px;
@@ -449,15 +462,13 @@ html {
   margin: 5px;
 }
 
-/* Messes with original clearButton */
-/* #clearButton {
+#monthClearButton {
   grid-area: clear;
-} */
+}
 
-/* Messes with original inputBox */
-/* #inputBox {
+#monthInputBox {
   grid-area: inputbox;
-} */
+}
 
 #month {
   grid-area: month;
@@ -485,12 +496,12 @@ html {
   grid-area: header;
 }
 
-#chooseBox {
+#monthChooseBox {
   display: none;
-  grid-area: chooseBox;
+  grid-area: monthChooseBox;
 }
 
-#chooseBox.active {
+#monthChooseBox.active {
   display: grid;
 }
 

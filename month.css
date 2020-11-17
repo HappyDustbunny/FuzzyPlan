@@ -154,6 +154,14 @@ button:focus {
 #chooseBox.active {
   display: grid;
 }
+#monthChooseBox {
+  display: none;
+  grid-area: chooseBox;
+}
+
+#monthChooseBox.active {
+  display: grid;
+}
 
 #putBack {
   display: none;
