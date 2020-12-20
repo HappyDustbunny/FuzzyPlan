@@ -21,7 +21,7 @@ let taskAlarms = 'off'; // Turn alarms off by defalult
 let reminder = 'off'; // Turn reminders off by default
 let tasksFromClickedDayInMonth = null;
 let firstTaskFromMonth = null;
-let tasksSentBetween = null;
+let tasksSentBetween = [];
 
 ///////// Add-view /////////
 let taskText_add = '';
@@ -158,14 +158,14 @@ function storeLocally() {
 
   localStorage.idOflastTouched = idOfLastTouched;
 
-  let inputBoxContent = document.getElementById('dayInputBox').value; // TODO: Is this used?
-  if (inputBoxContent) {  // TODO: Should be sanitized
-    localStorage.inputBoxContent = inputBoxContent;
-  }
+  // let inputBoxContent = document.getElementById('dayInputBox').value; // TODO: Is this used?
+  // if (inputBoxContent) {  // TODO: Should be sanitized
+  //   localStorage.inputBoxContent = inputBoxContent;
+  // }
 
-  if (tasksSentBetween) { // TODO: Is this used?
-    localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
-  }
+  // if (tasksSentBetween) { // TODO: Is this used?
+  //   localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
+  // }
 
   if (monthTaskList) {
     localStorage.monthTaskList = JSON.stringify(monthTaskList);
@@ -208,10 +208,10 @@ function retrieveLocallyStoredStuff() {
     localStorage.idOfLastTouched = 0;
   }
 
-  if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
-    document.getElementById('dayInputBox').value = localStorage.getItem('inputBoxContent');
-    localStorage.removeItem('inputBoxContent');
-  }
+  // if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
+  //   document.getElementById('dayInputBox').value = localStorage.getItem('inputBoxContent');
+  //   localStorage.removeItem('inputBoxContent');
+  // }
 
   if (localStorage.getItem('monthTaskList')) {
     monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
@@ -228,40 +228,75 @@ function retrieveLocallyStoredStuff() {
 function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   let chooseBox = document.getElementById(whichView + 'ChooseBox');
   chooseBox.classList.add('active');
+  let tasks = [];
+
   if (whichView != 'day') {
     document.getElementById('putBack').classList.add('active');
     document.getElementById('moveToDay').classList.add('active');
-  } else {
-    document.getElementById('postpone').classList.add('active');
-  }
 
-  let tasks = tasksFromClickedDayInMonth ; // TODO: Clean up here
+    if (0 < tasksSentBetween.length) {
+      tasks = tasksSentBetween;
+    } else if (0 < tasksFromClickedDayInMonth.length) {
+      tasks = tasksFromClickedDayInMonth ;
+    } else {
+      console.log('Nothing to show in ChooseBox');
+    }
+
+  } else {
+    document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Should it be?
+    document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
+
+    tasks = tasksSentBetween;
+
+  }
   console.log(tasks);
 
   if (tasks != null) {
     let counter = 0;
     for (var task of tasks) {
       if (counter === 0) {
-        document.getElementById('monthInputBox').value = task.text;
+        document.getElementById(whichView + 'InputBox').value = task.text;
       } else {
-        newButton = document.createElement('button');
+        newButton = document.createElement('button'); // TODO: The buttons appear in Day view, but the CSS fucks up. The grid-area is not set correctly
         newButton.classList.add('floatingTask');
         newButton.textContent = task.text;
         newButton.setAttribute('id', 'task' + counter);
-        // newButton.addEventListener('click', function () {floatingTaskHasBeenClicked(event);}, true);
 
-        document.getElementById('monthChooseBox').appendChild(newButton);  // TODO: Set a lock on inputBox and tasks while chooseBox is active
+        document.getElementById(whichView + 'ChooseBox').appendChild(newButton);
       }
 
       counter += 1;
     }
   }
+
+  tasksSentBetween = [];
+
 }
 
 
 function postponeTask() {
-  tasksSentBetween += '|' + document.getElementById('dayInputBox').value
+  let contentInputBox = document.getElementById('dayInputBox').value.trim();
+  let parsedList = parseText(contentInputBox);
+  let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+  tasksSentBetween.push(task);
+  anneal();
+  renderTasks();
   resetInputBox('day');
+}
+
+function moveToDay() {
+  let contentInputBox = document.getElementById('monthInputBox').value.trim();
+  let parsedList = parseText(contentInputBox);
+  let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+  tasksSentBetween.push(task);
+  resetInputBox('month');
+}
+
+// Clear input box and give it focus
+function resetInputBox(whichView) { // whichView can be 'day' or 'month'
+  document.getElementById(whichView + 'InputBox').value = '';
+  document.getElementById(whichView + 'InputBox').focus();
+  handleChoosebox(whichView);
 }
 
 
@@ -275,19 +310,12 @@ function handleChoosebox(whichView) {  // TODO: If task is edited and inserted w
     } else {
       chooseBox.classList.remove('active');
 
-        document.getElementById('putBack').classList.remove('active');
-        document.getElementById('moveToDay').classList.remove('active');
+      document.getElementById('putBack').classList.remove('active');
+      document.getElementById('moveToDay').classList.remove('active');
     }
   }
 }
 
-
-// Clear input box and give it focus
-function resetInputBox(whichView) { // whichView can be 'day' or 'month'
-  document.getElementById(whichView + 'InputBox').value = '';
-  document.getElementById(whichView + 'InputBox').focus();
-  handleChoosebox(whichView);
-}
 
 // Clear input box and let it loose focus
 function looseInputBoxFocus(whichView) {
@@ -486,6 +514,8 @@ document.getElementById('monthTaskDiv').addEventListener('click', function () { 
 document.getElementById('day').addEventListener('click', gotoDay);
 
 document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
+
+document.getElementById('moveToDay').addEventListener('click', moveToDay);
 
 document.getElementById('putBack').addEventListener('click', putBack);
 
@@ -740,16 +770,6 @@ function returnToDay() {
 //////////////////// Add-view button code above ///////////////////////////
 
 
-function monthButtonClicked() {
-  fillDateBar();
-
-  monthRenderTasks();
-
-  // resetInputBox('day');
-  document.getElementById('monthInputBox').focus();
-}
-
-
 //////////////////// Month-view code below ///////////////////////////
 
 function monthButtonClicked() {
@@ -762,6 +782,13 @@ function monthButtonClicked() {
   fillDateBar();
 
   monthRenderTasks();
+
+  if (0 < tasksSentBetween.length) {
+    fillChooseBox('month');
+  }
+
+  // resetInputBox('day');
+  document.getElementById('monthInputBox').focus();
 }
 
 
@@ -839,7 +866,7 @@ function monthTaskHasBeenClicked(event) {
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
 
   if (contentInputBox != '' && day.classList.contains('isNotClicked')) {
-    // Text in inputBox and no clicked date
+    // Text in inputBox and no previous clicked date
     if (contentInputBox != '') {
       let now = new Date();
       let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId) , 12, 00)
@@ -853,7 +880,9 @@ function monthTaskHasBeenClicked(event) {
       }
 
       if (document.getElementById('monthChooseBox').classList.contains('active')) {
-        tasksFromClickedDayInMonth.shift();  // Removes task from list of tasks being handled in chooseBox in order to make putBack() function as expected
+        if (tasksFromClickedDayInMonth) {
+          tasksFromClickedDayInMonth.shift();  // Removes task from list of tasks being handled in chooseBox in order to make putBack() function as expected
+        } // tasksSentBetween does not need this shift. I think. As it behaves as expected for now.
       }
 
       resetInputBox('month');
@@ -883,6 +912,7 @@ function monthTaskHasBeenClicked(event) {
 
       if (monthTaskList[myId]) {
         tasksFromClickedDayInMonth = monthTaskList[myId];
+        console.log(tasksFromClickedDayInMonth);
         monthTaskList[myId] = '';
         dayChildren[2].textContent = '';
         dayChildren[1].innerHTML = '';
@@ -980,7 +1010,6 @@ function monthRenderTasks() {
   }
 
   // Write new text into buttons and tooltips
-  // for (const [index, task]) of monthTaskList.entries()) {
   for (var myId in monthTaskList) {
     let button = document.getElementById(myId);
 
@@ -1166,7 +1195,7 @@ function inputAtEnter(event) {
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
       inputFixedTask(contentInputBox);
     } else {
-      if (/[^0-9]/.exec(contentInputBox) != null) { // If there is a chosen task AND text it must be an error
+      if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') { // If there is a chosen task AND text it must be an error
         nullifyClick();
       } else if (/\d[0-5][0-9]/.exec(contentInputBox) != null || /[1-2]\d[0-5][0-9]/.exec(contentInputBox) != null) {
         // If there is 3-4 numbers, jump to the time indicated
@@ -1416,7 +1445,7 @@ function editTask() {
   let dayInputBox = document.getElementById('dayInputBox');
   dayInputBox.value = taskText;  // Insert text in inputBox
 
-  taskList.splice(id, 1);
+  taskList.splice(id, 1);  // Remove clicked task from taskList
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
   document.getElementById('clearButton').textContent = '\u25C2Clear';  // Black left-pointing small triangle
@@ -1456,7 +1485,7 @@ function createNullTimes() {
 
   let len = taskList.length;
   for (var n=1; n<len; n++) {
-    duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
+    let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
       let nullTime = new Task(taskList[n-1].end, duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
@@ -1572,7 +1601,7 @@ function taskHasBeenClicked(event) {
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
     if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
-      // displayMessage('Unasigned time can not be edited', 3000);  // More confusing than helpful(?)
+      // displayMessage('Unasigned time can not be edited', 3000);  // More confusing than helpful(?) Yep. Need clean up.
     } else if (chosenTaskId === myUniqueId) {
       editTask();
       document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand

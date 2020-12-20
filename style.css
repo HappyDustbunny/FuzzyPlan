@@ -363,7 +363,6 @@ html {
     width: 0px;
     /* height: 0px; */
     background-color: white;
-    position: absolute;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
     position: relative;
@@ -477,6 +476,10 @@ html {
 
 #day {
   grid-area: day;
+}
+
+#dayChooseBox {
+  grid-area: chooseBox;
 }
 
 #moveToDay {
@@ -748,6 +751,8 @@ div.tasksToSort #postpone {
   flex-flow: column wrap;
   background-color: rgba(123, 217, 71, .6);
   border-radius: 10px;
+  cursor: not-allowed;
+  width: 100%;
 }
 
 #settings {
