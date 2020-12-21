@@ -249,7 +249,6 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     tasks = tasksSentBetween;
 
   }
-  console.log(tasks);
 
   if (tasks != null) {
     let counter = 0;
@@ -270,6 +269,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   }
 
   tasksSentBetween = [];
+  tasksFromClickedDayInMonth = [];
 
 }
 
@@ -279,6 +279,10 @@ function postponeTask() {
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
   tasksSentBetween.push(task);
+
+  if (!document.getElementById('dayChooseBox').classList.contains('active')) {
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+  }
   anneal();
   renderTasks();
   resetInputBox('day');
@@ -912,7 +916,6 @@ function monthTaskHasBeenClicked(event) {
 
       if (monthTaskList[myId]) {
         tasksFromClickedDayInMonth = monthTaskList[myId];
-        console.log(tasksFromClickedDayInMonth);
         monthTaskList[myId] = '';
         dayChildren[2].textContent = '';
         dayChildren[1].innerHTML = '';
@@ -954,6 +957,7 @@ function monthInputAtEnter(event) {
             if (textInputBox === '') {
               gotoDate(myId); // TODO: Make gotoDate() and sanitize input. The next line reacts badly to 1/12
             } else {
+              // Insert a new task at the provided date
               let now = new Date();
               let taskStart = new Date(now.getFullYear(), month, day, 12, 0);
               let task = new Task(taskStart, 15 * 60000, textInputBox[0].toUpperCase() + textInputBox.slice(1), 1);
@@ -970,6 +974,7 @@ function monthInputAtEnter(event) {
           return;
         }
 
+      // If no date is included make a new task tomorrow
       } else {
         let now = new Date();
         let nowPlusOneDay = new Date();
@@ -1583,7 +1588,9 @@ function taskHasBeenClicked(event) {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
     }
     document.getElementById('addTaskButton').textContent = '+';
-    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    if (!document.getElementById('dayChooseBox').classList.contains('active')) {
+      document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    }
 
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
