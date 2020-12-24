@@ -273,6 +273,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
 
 }
 
+// TODO: Clearing inputbox while chooseBox is active should pull the next item up
 
 function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
@@ -1169,7 +1170,7 @@ function adjustNowAndWakeUpButtons() {
   let upBtn = document.getElementById('upButton');
   let nowBtn = document.getElementById('nowButton');
 
-  if (parseInt(wakeUpM) <= 9) {
+  if (parseInt(wakeUpM) <= 9) { // Adjust minutes to two digits always
     min = '0' + parseInt(wakeUpM);
   } else {
     min = parseInt(wakeUpM);
@@ -1490,7 +1491,9 @@ function createNullTimes() {
 
   let len = taskList.length;
   for (var n=1; n<len; n++) {
-    let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
+    if (taskList[n - 1].end) {
+      let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
+    }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
       let nullTime = new Task(taskList[n-1].end, duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
