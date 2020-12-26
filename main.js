@@ -1,13 +1,13 @@
-let taskList = [];
-let lastTaskList = [];
-let displayList = [];
+let taskList = [];  // List of all tasks
+let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
 let startAndEndTimes = [];
 let chosenTask = '';
 let chosenTaskId = '';
+let idOfLastTouched = 0;
 let uniqueIdOfLastTouched = 0;
-let uniqueIdList = [];
+let uniqueIdList = []; // Used by the class Task only
 let nullTimeClicked = false;
-let zoom = 0.5;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
+let zoom = 1.0;  // The height of all elements will be multiplied with zoom. Values can be 1 or 0.5
 let zoomSymbolModifyer = 0; // The last digit of the \u numbers \u2357 ⍐ and \u2350 ⍗
 let defaultTaskDuration = 30;
 let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
@@ -16,9 +16,24 @@ let wakeUpOrNowClickedOnce = false;
 let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
 // let stressLevel = wakeUpStress;
 let tDouble = 240;  // Doubling time for stress level in minutes
-let alarmOn = false;
-let newTaskText = ''; // Recieve new task text from add.html
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
+let taskAlarms = 'off'; // Turn alarms off by defalult
+let reminder = 'off'; // Turn reminders off by default
+let tasksFromClickedDayInMonth = null;
+let firstTaskFromMonth = null;
+let tasksSentBetween = [];
+
+///////// Add-view /////////
+let taskText_add = '';
+let taskDuration_add = defaultTaskDuration;
+let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+let drainGainLevel_add = 'd1';
+
+///////// Month-view ////////
+let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
+// let tasksOfTheChoosenDay = {};
+let putBackId = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
 // A list of unique numbers to use as task-ids
@@ -40,10 +55,10 @@ class Task {
   constructor(date, duration, text, drain) {
     this.date = date; // Start time as Javascript date
     this.duration = duration; // Duration in milliseconds
-    this.drain = Number(drain);
     this.text = text;
+    this.drain = Number(drain);
     this.uniqueId = this.giveAUniqueId();
-    this.end();
+    this.end = this.end();
     this.height = this.height();
     this.isClicked = 'isNotClicked'
   }
@@ -64,7 +79,6 @@ class Task {
     while (tryAgain);
 
     uniqueIdList.push(uniqueId);
-    // uniqueIdOfLastTouched = uniqueId;
     return uniqueId;
   }
 
@@ -87,7 +101,8 @@ function setUpFunc() {
 
   retrieveLocallyStoredStuff();
 
-  // fillStressBar();
+  // Set uniqueIdOfLastTouche to the last task before 'Day end'
+  uniqueIdOfLastTouched = taskList[taskList.length - 2].uniqueId;
 
   fillTimeBar(zoom);
 
@@ -95,36 +110,18 @@ function setUpFunc() {
 
   updateTimeMarker();
 
-  // makeFirstTasks(); // Moved to retrieveLocallyStoredStuff()
-
-  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
-
   // debugExamples(); // Make debug example tasks. Run from commandline if needed. DO NOT UNCOMMENT
 
+  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
   // renderTasks();  // Is in adjustNowAndWakeUpButtons
 
-  let now = new Date()
-  let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
-  jumpToTime(nowMinusOneHour, false);
+  jumpToNow();
 
-  updateHearts(now);
+  updateHearts(); // Update hearts to current time
 
-  readyInputBox();
+  document.getElementById('dayInputBox').focus();
 }
 
-
-function readyInputBox() {
-  if (newTaskText != '' && /\d{4}/.exec(newTaskText)) { // Fall-through will be quicker than finding the DOM elemnent and assigning an empty value. Hence the first condition
-    inputFixedTask(newTaskText);
-  } else {
-    document.getElementById('inputBox').value = newTaskText;
-  }
-  if (localStorage.getItem('newTaskText')) {
-    localStorage.removeItem('newTaskText');
-  }
-
-  document.getElementById('inputBox').focus();
-}
 
 function createTimeMarker() {
   // Create time marker to show current time on timebar
@@ -147,59 +144,56 @@ function makeFirstTasks() {
 
 
 function storeLocally() {
-  localStorage.taskListAsText = JSON.stringify(taskListExtractor());
-  // if (!localStorage.storedTasksList) {
-  //   localStorage.storedTasksList = JSON.stringify(storedTasksList);
-  // }
+  localStorage.taskList = JSON.stringify(taskList);
+
   localStorage.wakeUpOrNowClickedOnce = wakeUpOrNowClickedOnce;
-  for (const [index, task] of taskList.entries()) {
-    if (task.uniqueId === uniqueIdOfLastTouched) {
-      localStorage.indexOfLastTouched = index;
-      break;
-    }
-  }
 
   localStorage.zoom = zoom;
-  // // localStorage.wakeUpH = wakeUpH;
-  // // localStorage.wakeUpM = wakeUpM;
-  // sessionStorage.chosenTask = '';
-  // // sessionStorage.chosenTaskId = chosenTaskId;
-  // sessionStorage.uniqueIdList = JSON.stringify(uniqueIdList);
-  // sessionStorage.nullTimeClicked = '';
-  // sessionStorage.zoomSymbolModifyer = zoomSymbolModifyer;
+
+  localStorage.defaultTaskDuration = defaultTaskDuration;
+
+  localStorage.wakeUpStress = wakeUpStress;
+
+  localStorage.tDouble = tDouble;
+
+  localStorage.idOflastTouched = idOfLastTouched;
+
+  // let inputBoxContent = document.getElementById('dayInputBox').value; // TODO: Is this used?
+  // if (inputBoxContent) {  // TODO: Should be sanitized
+  //   localStorage.inputBoxContent = inputBoxContent;
+  // }
+
+  // if (tasksSentBetween) { // TODO: Is this used?
+  //   localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
+  // }
+
+  if (monthTaskList) {
+    localStorage.monthTaskList = JSON.stringify(monthTaskList);
+  }
 }
 
 
 function retrieveLocallyStoredStuff() {
-  // taskList = [];
-  // makeFirstTasks();
 
-  if (!localStorage.getItem('indexOfLastTouched')) { // If NOT present...
-    localStorage.indexOfLastTouched = 0;
+  if (localStorage.getItem('taskList')) {
+    taskList = JSON.parse(localStorage.taskList);
+    // Fix dates messed up by JSON.stringify
+    for (const [index, task] of taskList.entries()) {
+      task.date = new Date(task.date);
+      task.end = new Date(task.end);
+    }
   }
 
-  if (localStorage.getItem('taskListAsText')) {
-    lastTaskList = taskList;
-    // localStorage.lastTaskListAsText = JSON.stringify(taskListExtractor()); // TODO: Is this line doing anything??
-    taskListAsText = JSON.parse(localStorage.taskListAsText);
-    textListToTaskList(taskListAsText);
-  }
-  // if (localStorage.getItem('storedTasksList')) {
-  //   storedTasksList = JSON.parse(localStorage.storedTasksList);
-  // }
   if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
     wakeUpOrNowClickedOnce = localStorage.wakeUpOrNowClickedOnce;
-    // wakeUpOrNowClickedOnce = (localStorage.wakeUpOrNowClickedOnce === 'true');
-  }
-  // if (sessionStorage.getItem('uniqueIdOfLastTouched')) {
-  //   uniqueIdOfLastTouched = localStorage.uniqueIdOfLastTouched;
-  // }
-  if (localStorage.getItem('defaultTaskDuration')) {
-    defaultTaskDuration = localStorage.defaultTaskDuration;
   }
 
   if (localStorage.getItem('zoom')) {
     zoom = localStorage.zoom;
+  }
+
+  if (localStorage.getItem('defaultTaskDuration')) {
+    defaultTaskDuration = localStorage.defaultTaskDuration;
   }
 
   if (localStorage.getItem('wakeUpStress')) {
@@ -210,67 +204,128 @@ function retrieveLocallyStoredStuff() {
     tDouble = localStorage.tDouble;
   }
 
-  if (localStorage.getItem('inputBoxContent') != '') {
-    document.getElementById('inputBox').value = localStorage.getItem('inputBoxContent');
-    localStorage.removeItem('inputBoxContent');
+  if (!localStorage.getItem('idOfLastTouched')) { // If NOT present...
+    localStorage.idOfLastTouched = 0;
   }
 
-  if (localStorage.getItem('newTaskText')) {
-    newTaskText = localStorage.newTaskText;
+  // if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
+  //   document.getElementById('dayInputBox').value = localStorage.getItem('inputBoxContent');
+  //   localStorage.removeItem('inputBoxContent');
+  // }
+
+  if (localStorage.getItem('monthTaskList')) {
+    monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
   }
+
+  // if (localStorage.getItem('tasksSentBetween')) {
+  //   tasksFromClickedDayInMonth = JSON.parse(localStorage.tasksSentBetween);
+  //   fillChooseBox();
+  //   localStorage.removeItem('tasksSentBetween');
+  // }
 }
 
 
-function debugExamples() {
-  let exList = [
-    '700 debugging example',
-    '1h long1',
-    '30m short1',
-    '30m short2',
-    '45m medium1',
-    '1200 1h lunch',
-    // '1530 1h tea',
-    '1h long2' ,
-    '45m medium2',
-    '30m short3'
-  ];
+function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
+  let chooseBox = document.getElementById(whichView + 'ChooseBox');
+  chooseBox.classList.add('active');
+  let tasks = [];
 
-  console.log('Debugging example list ', exList);
+  if (whichView != 'day') {
+    document.getElementById('putBack').classList.add('active');
+    document.getElementById('moveToDay').classList.add('active');
 
-  uniqueIdOfLastTouched = taskList[0].uniqueId;
-  textListToTaskList(exList);
-  renderTasks();
-}
+    if (0 < tasksSentBetween.length) {
+      tasks = tasksSentBetween;
+    } else if (0 < tasksFromClickedDayInMonth.length) {
+      tasks = tasksFromClickedDayInMonth ;
+    } else {
+      console.log('Nothing to show in ChooseBox');
+    }
 
-
-function textListToTaskList(taskListAsText) {
-  let succes = false;
-  if (taskListAsText.length === 0 && taskList.length === 0) {
-    makeFirstTasks();
   } else {
-    for (const [index, text] of taskListAsText.entries()) {
-      let parsedList = parseText(text.trim());
-      let id = uniqueIdOfLastTouched;
-      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-      // console.log(task.text, [].concat(taskList));
-      succes = addTask(id, task);
-      if (!succes) {console.log('Retrieval got wrong at index ', index);}
+    document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Should it be?
+    document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
+
+    tasks = tasksSentBetween;
+
+  }
+
+  if (tasks != null) {
+    let counter = 0;
+    for (var task of tasks) {
+      if (counter === 0) {
+        document.getElementById(whichView + 'InputBox').value = task.text;
+      } else {
+        newButton = document.createElement('button'); // TODO: The buttons appear in Day view, but the CSS fucks up. The grid-area is not set correctly
+        newButton.classList.add('floatingTask');
+        newButton.textContent = task.text;
+        newButton.setAttribute('id', 'task' + counter);
+
+        document.getElementById(whichView + 'ChooseBox').appendChild(newButton);
+      }
+
+      counter += 1;
     }
   }
-  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
-  uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
+
+  tasksSentBetween = [];
+  tasksFromClickedDayInMonth = [];
+
+}
+
+// TODO: Clearing inputbox while chooseBox is active should pull the next item up
+
+function postponeTask() {
+  let contentInputBox = document.getElementById('dayInputBox').value.trim();
+  let parsedList = parseText(contentInputBox);
+  let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+  tasksSentBetween.push(task);
+
+  if (!document.getElementById('dayChooseBox').classList.contains('active')) {
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+  }
+  anneal();
+  renderTasks();
+  resetInputBox('day');
+}
+
+function moveToDay() {
+  let contentInputBox = document.getElementById('monthInputBox').value.trim();
+  let parsedList = parseText(contentInputBox);
+  let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+  tasksSentBetween.push(task);
+  resetInputBox('month');
 }
 
 // Clear input box and give it focus
-function resetInputBox() {
-  document.getElementById('inputBox').value = '';
-  document.getElementById('inputBox').focus();
+function resetInputBox(whichView) { // whichView can be 'day' or 'month'
+  document.getElementById(whichView + 'InputBox').value = '';
+  document.getElementById(whichView + 'InputBox').focus();
+  handleChoosebox(whichView);
 }
 
+
+function handleChoosebox(whichView) {  // TODO: If task is edited and inserted while choosebox is active it forget all about chooseBox
+  let chooseBox = document.getElementById(whichView + 'ChooseBox');
+
+  if (chooseBox.classList.contains('active')) {
+    if (chooseBox.hasChildNodes()) {
+      document.getElementById(whichView + 'InputBox').value = chooseBox.firstChild.innerText;
+      chooseBox.firstChild.remove();
+    } else {
+      chooseBox.classList.remove('active');
+
+      document.getElementById('putBack').classList.remove('active');
+      document.getElementById('moveToDay').classList.remove('active');
+    }
+  }
+}
+
+
 // Clear input box and let it loose focus
-function looseInputBoxFocus() {
-  document.getElementById('inputBox').value = '';
-  document.getElementById('inputBox').blur();
+function looseInputBoxFocus(whichView) {
+  document.getElementById(whichView + 'InputBox').value = '';
+  document.getElementById(whichView + 'InputBox').blur();
 }
 
 // Fill the half hour time slots of the timebar
@@ -321,12 +376,13 @@ function updateTimeMarker() {
   //   // TODO: Fix hanging border if animation is paused mid cycle
   // }
 
-  updateHearts(now);
+  updateHearts();
 
+  // Update alarm Toc sound
   let taskAlarms = localStorage.radioButtonResultAlarm;
-  let nowTime = hours.toString() + min.toString() + sec.toString();
-  let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
   if (taskAlarms != 'off') {
+    let nowTime = hours.toString() + min.toString() + sec.toString();
+    let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
     if (taskAlarms === 'beginning' || taskAlarms === 'both') {
       if (startAndEndTimes.includes('beginning' + nowTime)) {
         sayToc();
@@ -340,6 +396,7 @@ function updateTimeMarker() {
     }
   }
 
+  // Update reminder Tic sound
   let reminder = localStorage.radioButtonResultReminder;
   if (reminder != 'off') {
     if (reminder === 'regularly') {
@@ -356,11 +413,13 @@ function updateTimeMarker() {
   }
 }
 
-function updateHearts(now) {
+function updateHearts() {
+  let now = new Date;
   let currentTask = taskList[0];
 
+  // Find the current task and remove old hearts from the display
   for (const [index,  task] of displayList.entries()) {
-    if (task.date < now && now < task.end()) {
+    if (task.date < now && now < task.end) {
       // Remove old hearts from heart span
       const heartNode = document.getElementById('heart');
       while (heartNode.firstChild) {
@@ -375,7 +434,7 @@ function updateHearts(now) {
   let time = (now - currentTask.date) / 60000;
   let result = currentTask.startStressLevel * Math.pow(2, time/(tDouble/currentTask.drain));
 
-  fillHearths(Math.round(10 - result)); // TODO: Fix hearts during nullTime
+  fillHearths(Math.round(10 - result));
 }
 
 function sayToc() {
@@ -390,17 +449,19 @@ function sayTic() {
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
-window.addEventListener('storage', function(e) {
+window.addEventListener('storage', function(e) {  // TODO: WTF does this do?
   localStorage.setItem(e.key, e.newValue);
 });
 
 
 document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
 document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
-document.getElementById('month').addEventListener('click', function() {goToPage('month.html');});
+document.getElementById('month').addEventListener('click', monthButtonClicked);
 
 // Unfold settings
 document.getElementById('settings').addEventListener('click', settings);
+
+document.getElementById('postpone').addEventListener('click', postponeTask);
 
 // Insert a 15 min planning task at start-your-day time according to settings
 // document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
@@ -411,7 +472,7 @@ document.getElementById('upButton').addEventListener('click', function() {jumpTo
 document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
-document.getElementById('inputBox').addEventListener('keypress', function () { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('keypress', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
 document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
@@ -422,17 +483,591 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
+////////// Eventlisteners for Add-view   /////////////////////
+
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
-// document.getElementById('addTaskButton').addEventListener('click', function() {goToPage('add.html')});
+
+document.getElementById('inputBox_add').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readTaskText(); } });
+document.getElementById('inputDurationBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readDurationTime(); } });
+document.getElementById('inputTimeBox').addEventListener('keypress',
+        function () { if (event.key === 'Enter') { readTaskStartTime(); } });
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
+document.getElementById('duration').addEventListener('click', function () { addDuration(event);})
+
+document.getElementById('time').addEventListener('click', function () { time_add(event);})
+
+document.getElementById('clear').addEventListener('click', clearTimeBox);
+
+document.getElementById('now').addEventListener('click', setTimeNow);
+
+document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+
+document.getElementById('cancel').addEventListener('click', returnToDay);
+
+document.getElementById('apply').addEventListener('click', apply);
+
+////////////////// Eventlisteners for Month-view ///////////////////////
+
+document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
+
+document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
+
+document.getElementById('day').addEventListener('click', gotoDay);
+
+document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
+
+document.getElementById('moveToDay').addEventListener('click', moveToDay);
+
+document.getElementById('putBack').addEventListener('click', putBack);
+
+//////////////////// Add-view code below ///////////////////////////
 
 function addTaskButtonClicked() {
-  document.getElementById('animationBox').classList.add('fromLowerRight');
-  // goToPage('add.html');
-  setTimeout(function() {goToPage('add.html');}, 900);
+  storeLocally();
+
+  // Trigger animation via CSS
+  document.getElementById('addView').classList.add('active');
+  document.getElementById('dayView').classList.remove('active');
+
+  fillDurationBox(defaultTaskDuration);
+
+  clearTimeBox();
+
+  document.getElementById('d1').checked = 'checked';
+  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+
+  let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
+  let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
+
+  if (inputBox.value != '') {
+    inputBox_add.value = inputBox.value;
+    inputBox_add.blur();
+  } else {
+    inputBox_add.value = '';
+    inputBox_add.focus();
+  }
 }
+
+function addDuration(event) {
+  let btnId = event.target.id;  // btnId is in the form 'durationPlus30m'
+
+  if (btnId === 'inputDurationBox') {
+    // Do fuckall
+  } else {
+
+    let deltaTime = 0;
+
+    if (btnId.includes('Minus')) {
+      btnId = btnId.replace('durationMinus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = -Number(btnId);
+    } else {
+      btnId = btnId.replace('durationPlus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = Number(btnId);
+    }
+
+    taskDuration_add += deltaTime;
+    if (taskDuration_add < 0) {
+      taskDuration_add = 0;
+    }
+    fillDurationBox(taskDuration_add);
+  }
+}
+
+
+function fillDurationBox(duration) {
+  let hours = 0;
+  let minutes = 0;
+
+  hours = (duration - (duration % 60)) / 60;
+  minutes = duration - hours * 60;
+
+  let formattedDuration = hours + 'h' + minutes + 'm';
+  taskDuration_add = duration;
+
+  document.getElementById('inputDurationBox').value = formattedDuration;
+}
+
+
+function time_add(event) {
+  let btnId = event.target.id;  // btnId is in the form 'timePlus30m'
+
+  if (btnId === 'now') {
+    taskTime_add = new Date();
+    fillTimeBox(taskTime_add);
+  } else if (btnId === 'clear') {
+    document.getElementById('inputTimeBox').value = '';
+    document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+  } else if (btnId === 'inputTimeBox') {
+    // Do fuckall
+  } else {
+    let deltaTime = 0;
+
+    if (btnId.includes('Minus')) {
+      btnId = btnId.replace('timeMinus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = -Number(btnId);
+    } else {
+      btnId = btnId.replace('timePlus', '');
+      btnId = btnId.replace('m', '');
+      deltaTime = Number(btnId);
+    }
+
+    taskTime_add = new Date(taskTime_add.getTime() + deltaTime * 60000);
+    // Ensure that the time is between 00:00 and 23:59
+    if (taskTime_add.getDate() < (new Date).getDate()) {
+      taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 00, 01);
+    } else if ((new Date()).getDate() < taskTime_add.getDate()) {
+      taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59);
+    }
+
+    fillTimeBox(taskTime_add);
+  }
+
+}
+
+
+function fillTimeBox(time) {
+  let prettyTaskTime = prettifyTime(time);
+
+  document.getElementById('inputTimeBox').value = prettyTaskTime;
+
+  document.getElementById('apply').textContent = 'Ok'; // Remove instruction from return-button as the task will be added the right place automatically
+}
+
+
+function setTimeNow() {
+  taskTime_add = new Date();
+  fillTimeBox(taskTime_add);
+}
+
+
+function clearTimeBox() {
+  document.getElementById('inputTimeBox').value = '';
+  document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+  taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+}
+
+
+function prettifyTime(time) {
+  let taskTimeHours = time.getHours().toString();
+  let taskTimeMinutes = time.getMinutes().toString();
+
+  // Check if leading zeroes are needed and add them
+  let nils = ['', ''];
+  if (taskTimeHours < 10) {
+    nils[0] = '0';
+  }
+  if (taskTimeMinutes < 10) {
+    nils[1] = '0';
+  }
+  let prettyTaskTime = nils[0] + taskTimeHours + ':' + nils[1] + taskTimeMinutes;
+
+  return prettyTaskTime
+}
+
+
+function readTaskText() {
+  let contentInputBox = document.getElementById('inputBox_add').value.trim();
+  let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
+  if (badCharacters) {
+    displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000);
+  } else {
+    taskText_add = contentInputBox;
+  }
+}
+
+
+function readDurationTime() {
+  let contentInputBox = document.getElementById('inputDurationBox').value.trim();
+  let badCharacters = /[^0-9hm]/.exec(contentInputBox);
+  if (badCharacters) {
+    displayMessage('Please use the format 1h30m for 1 hour and 30 minutes', 3000);
+  } else {
+    let timeH = 0;
+    let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString(); // TODO: Check if numbers are too big
+    timeM = Number(timeM.replace('m', ''));
+    if (/h/.exec(contentInputBox)) {
+      timeH = /[0-9]+h/.exec(contentInputBox).toString();
+      contentInputBox = contentInputBox.replace(timeH, '');
+      timeH = Number(timeH.replace('h', ''));
+    }
+    taskDuration_add = timeH * 60 + timeM;
+  }
+}
+
+
+function readTaskStartTime() {
+  let contentInputBox = document.getElementById('inputTimeBox').value.trim();
+  let badCharacters = /[^0-9:]/.exec(contentInputBox);
+  if (badCharacters) {
+    displayMessage('Please use the format 12:00 or 1200', 3000);
+  } else {
+    let timeH = /[0-9][0-9]/.exec(contentInputBox);
+    contentInputBox = contentInputBox.replace(timeH, '');
+    let timeM = /[0-9][0-9]/.exec(contentInputBox);
+    let now = new Date();
+    taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
+    if (0 < timeH || 0 < timeM) {
+      fillTimeBox(taskTime_add);
+    }
+  }
+}
+
+
+function readDrainGainRadioButtons() {
+  let radioButtonResult = document.getElementsByClassName('drain');
+  for (var i = 0; i < 10; i++) {
+    if (radioButtonResult[i].type === 'radio' && radioButtonResult[i].checked) {
+      drainGainLevel_add = radioButtonResult[i].value;
+    }
+  }
+}
+
+
+function formatTask() {
+  let returnText = '';
+  if (document.getElementById('inputTimeBox').value.trim() === '') {
+    returnText =  taskText_add + ' '
+                + taskDuration_add + 'm '
+                + drainGainLevel_add;
+  } else {
+    let prettyTaskTime = prettifyTime(taskTime_add);
+    returnText =  taskText_add + ' '
+                + prettyTaskTime.replace(':', '') + ' '
+                + taskDuration_add + 'm '
+                + drainGainLevel_add;
+  }
+  return returnText;
+}
+
+
+function apply() {
+  let taskText = document.getElementById('inputBox_add');
+  if (taskText === '') {
+    displayMessage('Please write a task text', 3000);
+  } else {
+    readTaskText()
+    readDurationTime();
+    readTaskStartTime();
+    readDrainGainRadioButtons();
+    returnText = formatTask();
+    document.getElementById('dayInputBox').value = returnText;
+
+    // Close add-view via CSS
+    // document.getElementById('addView').visible = 'hidden';
+    document.getElementById('dayView').classList.add('active');
+    document.getElementById('addView').classList.remove('active');
+  }
+}
+
+function returnToDay() {
+  // document.getElementById('addView').visible = 'hidden';
+  document.getElementById('dayView').classList.add('active');
+  document.getElementById('addView').classList.remove('active');
+}
+
+//////////////////// Add-view button code above ///////////////////////////
+
+
+//////////////////// Month-view code below ///////////////////////////
+
+function monthButtonClicked() {
+  storeLocally();
+
+  // Trigger animation via CSS
+  document.getElementById('monthView').classList.add('active');
+  document.getElementById('dayView').classList.remove('active');
+
+  fillDateBar();
+
+  monthRenderTasks();
+
+  if (0 < tasksSentBetween.length) {
+    fillChooseBox('month');
+  }
+
+  // resetInputBox('day');
+  document.getElementById('monthInputBox').focus();
+}
+
+
+function gotoDay() {
+  // Trigger animation via CSS
+  document.getElementById('monthView').classList.remove('active'); // TODO: Fix animation
+  document.getElementById('dayView').classList.add('active');
+
+  fillChooseBox('day');
+}
+
+
+function fillDateBar() { // TODO: Make this show the week before now and highlight today
+  let now = new Date();
+  let nowPlus3Month =  new Date();
+  nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
+
+  // Make the first button with monthname
+  let thisMonth = now.getMonth();
+  monthNameNode = document.createElement('button');
+  monthNameNode.classList.add('monthName');
+  monthNameNode.textContent = months[now.getMonth()];
+  document.getElementById('monthTaskDiv').appendChild(monthNameNode);
+
+  for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
+    // Insert monthnames before each the 1th
+    if (thisMonth < i.getMonth() || (thisMonth === 11 && i.getMonth() === 0)) {  // Month 0 is january
+      thisMonth = i.getMonth();
+      monthNameNode = document.createElement('button');
+      monthNameNode.classList.add('monthName');
+      monthNameNode.textContent = months[i.getMonth()];
+      document.getElementById('monthTaskDiv').appendChild(monthNameNode);
+    }
+
+    let newNode = document.createElement('button');
+
+    let id = i.getDate().toString() + '-' + i.getMonth().toString();
+
+    newNode.setAttribute('id', id);
+    newNode.setAttribute('class', 'isNotClicked');
+    newNode.classList.add('dateButton');
+    let dayNumber = i.getDay();
+    if (dayNumber === 0 || dayNumber === 6) { // Weekday 6 and 0 are Saturday and Sunday
+      newNode.classList.add('weekend');
+    }
+
+    datePart = document.createElement('span');
+    datePart.classList.add('datePart');
+    if (i.getDate() < 10) {
+      datePart.textContent = '\u00a0\u00a0'; // Adjust all dates to align right
+    }
+    datePart.textContent += i.getDate() + '/' + (i.getMonth() + 1) +  '\u00a0\u00a0\u00a0';
+    newNode.appendChild(datePart);
+
+    toolTipSpan = document.createElement('span');
+    toolTipSpan.classList.add('toolTip');
+    newNode.appendChild(toolTipSpan);
+
+    textPart = document.createElement('span');
+    newNode.appendChild(textPart);
+
+    document.getElementById('monthTaskDiv').appendChild(newNode);
+  }
+}
+
+
+function monthTaskHasBeenClicked(event) {
+  let myId = event.target.id;
+  if (myId === '') {
+    myId = event.target.closest('button').id;
+  }
+
+  let day =  document.getElementById(myId);
+
+  let contentInputBox = document.getElementById('monthInputBox').value.trim();
+
+  if (contentInputBox != '' && day.classList.contains('isNotClicked')) {
+    // Text in inputBox and no previous clicked date
+    if (contentInputBox != '') {
+      let now = new Date();
+      let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId) , 12, 00)
+
+      let task = new Task(clickedDate, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
+
+      if (monthTaskList[myId]) {
+        monthTaskList[myId].push(task);
+      } else {
+        monthTaskList[myId] = [task];
+      }
+
+      if (document.getElementById('monthChooseBox').classList.contains('active')) {
+        if (tasksFromClickedDayInMonth) {
+          tasksFromClickedDayInMonth.shift();  // Removes task from list of tasks being handled in chooseBox in order to make putBack() function as expected
+        } // tasksSentBetween does not need this shift. I think. As it behaves as expected for now.
+      }
+
+      resetInputBox('month');
+
+      // handleChoosebox('month'); // Now in resetInputBox
+    }
+
+    monthRenderTasks();
+
+  } else if (contentInputBox != '' && day.classList.contains('isClicked')) {
+    // Text in inputBox and a clicked date. Should not happen.
+    console.log('Text in inputBox and a clicked date. Should not happen.');
+    day.setAttribute('class', 'isNotClicked');
+
+    // No text in inputBox and a clicked date. Effectively a doubleclick
+  } else if (contentInputBox === '' && day.classList.contains('isClicked')) {
+    if (document.getElementById('monthChooseBox').classList.contains('active')) {
+      displayMessage('Please finish the current edit \nbefore starting a new', 3000);
+    } else {
+      // let myId = event.target.id;
+      // if (myId === '') {
+      //   myId = event.target.closest('button').nextSibling.id;
+      // }
+      putBackId = myId;
+
+      let dayChildren = day.children;
+
+      if (monthTaskList[myId]) {
+        tasksFromClickedDayInMonth = monthTaskList[myId];
+        monthTaskList[myId] = '';
+        dayChildren[2].textContent = '';
+        dayChildren[1].innerHTML = '';
+
+        fillChooseBox('month');
+      }
+    }
+    day.classList.add('isNotClicked');
+    day.classList.remove('isClicked');
+
+  } else {
+    // No text in inputBox and no clicked date
+    day.classList.remove('isNotClicked');
+    day.classList.add('isClicked');
+  }
+}
+
+
+function monthInputAtEnter(event) {
+  if (event.key === 'Enter') {
+    let contentInputBox = document.getElementById('monthInputBox').value.trim();
+    if (contentInputBox != '') {
+
+      // Check if date is provided in the form 7/11
+      let dateArray = /\d+\/\d+/.exec(contentInputBox);
+
+      if ( dateArray != null ) {
+        // Is it a legit date?
+        if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
+          /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
+
+            // Make myId from date
+            let month = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
+            let day = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
+            let myId = month + day;
+
+            let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
+
+            if (textInputBox === '') {
+              gotoDate(myId); // TODO: Make gotoDate() and sanitize input. The next line reacts badly to 1/12
+            } else {
+              // Insert a new task at the provided date
+              let now = new Date();
+              let taskStart = new Date(now.getFullYear(), month, day, 12, 0);
+              let task = new Task(taskStart, 15 * 60000, textInputBox[0].toUpperCase() + textInputBox.slice(1), 1);
+
+              if (monthTaskList[myId]) {
+                monthTaskList[myId].push(task);
+              } else {
+                monthTaskList[myId] = [task];
+              }
+            }
+
+        } else {
+          displayMessage('Not a date. Please fix date or remove the back-slash', 4000);
+          return;
+        }
+
+      // If no date is included make a new task tomorrow
+      } else {
+        let now = new Date();
+        let nowPlusOneDay = new Date();
+        nowPlusOneDay = new Date(nowPlusOneDay.setDate(nowPlusOneDay.getDate() + 1));
+
+        let myId = nowPlusOneDay.getDate().toString() + '-' + nowPlusOneDay.getMonth().toString();
+
+        let task = new Task(nowPlusOneDay, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
+
+        if (monthTaskList[myId]) {
+          monthTaskList[myId].push(task);
+        } else {
+          monthTaskList[myId] = [task];
+        }
+      }
+
+      monthRenderTasks();
+
+      resetInputBox('month');
+
+    }
+  }
+}
+
+
+function monthRenderTasks() {
+
+  storeLocally();
+
+  // Remove old text from buttons and tooltips
+  const days = document.getElementById('monthTaskDiv').children;
+  const len = days.length;
+  for (var i = 0; i < len; i++) {
+    if (days[i].children.length > 0) {
+      days[i].children[2].textContent = '';
+      days[i].children[1].innerHTML = '';
+    }
+  }
+
+  // Write new text into buttons and tooltips
+  for (var myId in monthTaskList) {
+    let button = document.getElementById(myId);
+
+    if (button != null && button.class != 'weekend') {
+      let children = button.childNodes;  // datePart, toolTip and text
+
+      let tasks = monthTaskList[myId];
+
+      if (tasks != '') {
+        for (var task of tasks) {
+          children[1].innerHTML += ' \u25CF ' + task.text + '&nbsp;' + '<br>'; // Write to tooltip
+          children[2].textContent +=  ' \u25CF ' + task.text + '\u00a0'; // Write task to date
+        }
+      }
+    }
+  }
+}
+
+
+function putBack() { // TODO: Fix removal of postponed tasks from day i putBack is clicked. Maybe hide it?
+  monthTaskList[putBackId] = tasksFromClickedDayInMonth;
+
+  let chooseBox = document.getElementById('monthChooseBox');
+
+  while (chooseBox.firstChild) {
+    chooseBox.removeChild(chooseBox.lastChild);
+  }
+
+  chooseBox.classList.remove('active');
+  document.getElementById('putBack').classList.remove('active');
+
+  monthRenderTasks();
+
+  resetInputBox('month');
+}
+
+
+function monthClearBehavior() {
+  if (document.getElementById('monthInputBox').value === '') {
+    alert('To clear all information in this calendar, clear your browser data (Site data).\n\n' +
+    'Go to your browsers Settings or Options and look for Delete cookies and site data.\n\n' +
+    'This option may be under Privacy or Security.');
+  } else {
+    resetInputBox('month');
+  }
+}
+
+
+// Remenber nested functions to limit scope and new debugging tools
+
+//////////////////// Month-view code above ///////////////////////////
+
 
 function twoFingerNavigation(event) {
   if (sessionStorage.touchX && event.touches.length === 1) {
@@ -440,10 +1075,10 @@ function twoFingerNavigation(event) {
   }
   if (event.touches.length > 1) {
     if (!sessionStorage.touchX) {
-      sessionStorage.touchX = event.touches[0].screenX;
-    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Left swipe
+      sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
+    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
       goToPage('storage.html');
-    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Right swipe
+    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
       goToPage('month.html');
     }
   }
@@ -483,11 +1118,6 @@ function  fillHearths(currentStressLevel) {
 
 function goToPage(page) {
   storeLocally();
-
-  let inputBoxContent = document.getElementById('inputBox').value;
-  if (inputBoxContent != '') {
-    localStorage.inputBoxContent = inputBoxContent;
-  }
 
   window.location.assign(page);
 }
@@ -540,7 +1170,7 @@ function adjustNowAndWakeUpButtons() {
   let upBtn = document.getElementById('upButton');
   let nowBtn = document.getElementById('nowButton');
 
-  if (parseInt(wakeUpM) <= 9) {
+  if (parseInt(wakeUpM) <= 9) { // Adjust minutes to two digits always
     min = '0' + parseInt(wakeUpM);
   } else {
     min = parseInt(wakeUpM);
@@ -548,43 +1178,47 @@ function adjustNowAndWakeUpButtons() {
 
   if (!wakeUpOrNowClickedOnce) {
     upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-    upBtn.textContent = wakeUpH + ':' + min + '\u25B8';
+    upBtn.textContent = wakeUpH + ':' + min + ' \u25BE';  // Black down-pointing small triangle
     nowBtn.title = 'Press to insert a 15 min planning period now';
-    nowBtn.textContent = 'Now' + '\u25B8';
+    nowBtn.textContent = 'Now' + ' \u25BE';  // Black down-pointing small triangle
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
-    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;
+    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;  // Black right-pointing small triangle
     nowBtn.title = 'Jump to now';
-    nowBtn.textContent = '\u25B8' + 'Now';
+    nowBtn.textContent = '\u25B8' + 'Now';  // Black right-pointing small triangle
   }
   renderTasks();
-  document.getElementById('inputBox').focus();
+  document.getElementById('dayInputBox').focus();
 }
 
 
 // Used by an eventListener. Makes pressing Enter add task
 function inputAtEnter(event) {
   if (event.key === 'Enter') {
-    let contentInputBox = document.getElementById('inputBox').value.trim();
+    let contentInputBox = document.getElementById('dayInputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
       inputFixedTask(contentInputBox);
     } else {
-      if (/[^0-9]/.exec(contentInputBox) != null) { // If there is a chosen task AND text it must be an error
+      if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') { // If there is a chosen task AND text it must be an error
         nullifyClick();
       } else if (/\d[0-5][0-9]/.exec(contentInputBox) != null || /[1-2]\d[0-5][0-9]/.exec(contentInputBox) != null) {
         // If there is 3-4 numbers, jump to the time indicated
-        resetInputBox();
+        resetInputBox('day');
         jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
         displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000)
-        resetInputBox();
+        resetInputBox('day');
       }
     }
-    document.getElementById('clearButton').textContent = '\u25BEClear';
+    document.getElementById('clearButton').textContent = '\u25BEClear'; // Black down-pointing small triangle
+    document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    document.getElementById('clearButton').textContent = 'Clear\u25B8';
+    document.getElementById('clearButton').textContent = '\u25C2Clear'; // Black left-pointing small triangle
+    document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
+    document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
   }
 }
 
@@ -617,7 +1251,7 @@ function addTask(myId, task) {
   } else {
     succes = addFixedTask(task);
   }
-  resetInputBox();
+  resetInputBox('day');
   return succes;
 }
 
@@ -627,7 +1261,7 @@ function addWhereverAfter(uniqueId, task) {
   let myId = getIndexFromUniqueId(uniqueId);
   for (var id=myId; id<taskList.length - 1; id++) {
     succes = addTaskAfter(taskList[id].uniqueId, task);
-    looseInputBoxFocus();
+    looseInputBoxFocus('day');
     if (succes) {
       break;
     }
@@ -638,13 +1272,13 @@ function addWhereverAfter(uniqueId, task) {
 
 function addTaskAfter(uniqueId, task) {
   let id = getIndexFromUniqueId(uniqueId);
-  task.date = taskList[id].end();
-  task.end();
+  task.date = taskList[id].end;
+  task.end = new Date(task.date.getTime() + task.duration);
   task.fuzzyness = 'isFuzzy';
-  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end() <= taskList[id + 1].date) {
+  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) {
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
-    looseInputBoxFocus();
+    looseInputBoxFocus('day');
     anneal();
     return true;
   } else {
@@ -656,19 +1290,20 @@ function addTaskAfter(uniqueId, task) {
 function addTaskBefore(myId, task) {
   let id = getIndexFromUniqueId(myId);
   task.date = new Date(taskList[id].date.getTime() - task.duration);
-  if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end() > task.date) {
+  if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end > task.date) {
     displayMessage('Not enough rooom here', 3000);
     return false;
   } else {
     if (taskList[id].fuzzyness === 'isNotFuzzy') {
       task.fuzzyness = 'isNotFuzzy';
     } else {
-      task.date = new Date(taskList[id - 1].end());
+      task.date = new Date(taskList[id - 1].end);
+      task.end = new Date(task.date.getTime() + task.duration);
       task.fuzzyness = 'isFuzzy';
     }
     taskList.splice(id, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
-    looseInputBoxFocus();
+    looseInputBoxFocus('day');
     anneal();
     return true;
   }
@@ -699,7 +1334,7 @@ function addFixedTask(task) {
     }
   } else if (overlap === 'noOverlap') {
     for (var n=0; n<len; n++) {
-      if (task.end() < taskList[n].date) {
+      if (task.end < taskList[n].date) {
         taskList.splice(n, 0, task);
         task.fuzzyness = 'isNotFuzzy';
         uniqueIdOfLastTouched = task.uniqueId;
@@ -721,8 +1356,8 @@ function isThereASoftOverlap(task) {
   let len = taskList.length;
 
   for (var n=0; n<len; n++) {
-    if ((taskList[n].date < task.date && task.date < taskList[n].end())
-      || (taskList[n].date < task.end() && task.end() < taskList[n].end())) {
+    if ((taskList[n].date < task.date && task.date < taskList[n].end)
+      || (taskList[n].date < task.end && task.end < taskList[n].end)) {
         if (taskList[n].fuzzyness === 'isNotFuzzy') {
           overlap = 'hardOverlap';
           return overlap;
@@ -745,8 +1380,8 @@ function removeFuzzyOverlap(task) {
   let len = taskList.length;
   // debugger;
   for (var n=1; n<len - 1; n++) {
-    if ((taskList[n].date < task.date && task.date < taskList[n].end())
-    || (taskList[n].date < task.end() && task.end() < taskList[n].end())) {
+    if ((taskList[n].date < task.date && task.date < taskList[n].end)
+    || (taskList[n].date < task.end && task.end < taskList[n].end)) {
       if (taskList[n].fuzzyness === 'isNotFuzzy') {
         console.log('Bugger. Logic broke.', taskList[n]);
       };
@@ -767,13 +1402,15 @@ function removeFuzzyOverlap(task) {
 // Used by an eventListener. Govern the Edit/Clear button
 function clearTextboxOrDay() {
   let clearButton = document.getElementById('clearButton');
-  if (document.getElementById('inputBox').value != '' ) {
-    clearButton.textContent = '\u25BEClear';
+  if (document.getElementById('dayInputBox').value != '' ) {
+    clearButton.textContent = '\u25BEClear'; // Black down-pointing small triangle
+    document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
     id = '';
   } else {
     clearDay();
   }
-  resetInputBox();
+  resetInputBox('day');
 }
 
 
@@ -782,17 +1419,17 @@ function clearDay() {
   if (answer == true) {
     taskList = [];
     makeFirstTasks();
-    resetInputBox();
+    resetInputBox('day');
     wakeUpOrNowClickedOnce = false;
     localStorage.indexOfLastTouched = 0;
-    localStorage.removeItem('newTaskText');
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     storeLocally();
     adjustNowAndWakeUpButtons();
     setUpFunc();
-    document.getElementById('inputBox').value = '';
+    document.getElementById('dayInputBox').value = '';
     document.getElementById('addTaskButton').textContent = '+';
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
     displayMessage('Nothing was changed', 3000);
   }
@@ -802,22 +1439,30 @@ function clearDay() {
 function editTask() {
   let id = getIndexFromUniqueId(chosenTaskId);
   let drain = '';
+
   if (1 < taskList[id].drain) {
     drain = ' d' + taskList[id].drain + ' ';
   } else if (taskList[id].drain < 0) {
     drain = ' g' + (-taskList[id].drain) / 2 + ' ';
   }
+
   taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
-  document.getElementById('inputBox').value = taskText;  // Insert text in inputBox
-  taskList.splice(id, 1);
+
+  let dayInputBox = document.getElementById('dayInputBox');
+  dayInputBox.value = taskText;  // Insert text in inputBox
+
+  taskList.splice(id, 1);  // Remove clicked task from taskList
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
-  document.getElementById('clearButton').textContent = 'Clear\u25B8';  // \u23F5
+  document.getElementById('clearButton').textContent = '\u25C2Clear';  // Black left-pointing small triangle
   chosenTaskId = '';
+
   renderTasks();
-  document.getElementById('inputBox').focus();
+
+  dayInputBox.focus();
+
   let nextLast = taskText.length - 1;
-  inputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
+  dayInputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
 }
 
 // Used by an eventListener. Toggles zoom.
@@ -846,9 +1491,11 @@ function createNullTimes() {
 
   let len = taskList.length;
   for (var n=1; n<len; n++) {
-    duration = taskList[n].date.getTime() - taskList[n-1].end().getTime();
+    if (taskList[n - 1].end) {
+      let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
+    }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
-      let nullTime = new Task(taskList[n-1].end(), duration, '', -1);
+      let nullTime = new Task(taskList[n-1].end, duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
       nullTime.startStressLevel = currentStressLevel;
@@ -923,12 +1570,11 @@ function taskHasBeenClicked(event) {
   }
 
   // The eventListener is tied to the parent, so the event given is the parent event
-  let contentInputBox = document.getElementById('inputBox').value.trim();
+  let contentInputBox = document.getElementById('dayInputBox').value.trim();
   let clearButton = document.getElementById('clearButton');
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    let contentInputBox = document.getElementById('inputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
@@ -938,16 +1584,21 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
-      clearButton.textContent = '\u25BEClear';
+      clearButton.textContent = '\u25BEClear'; // Black down-pointing small triangle
+      handleChoosebox('day');
 
     } else {
       displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
     }
     document.getElementById('addTaskButton').textContent = '+';
+    if (!document.getElementById('dayChooseBox').classList.contains('active')) {
+      document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    }
 
   } else if (contentInputBox !== '' && chosenTaskId){
     // Text in inputbox and a chosenTaskId. Should not happen.
     nullifyClick();
+    console.log('Text in inputbox and a chosenTaskId. Should not happen.');
 
   }  else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to edit or delete
@@ -960,10 +1611,11 @@ function taskHasBeenClicked(event) {
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
     if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
-      displayMessage('Unasigned time can not be edited', 3000);
+      // displayMessage('Unasigned time can not be edited', 3000);  // More confusing than helpful(?) Yep. Need clean up.
     } else if (chosenTaskId === myUniqueId) {
       editTask();
-      document.getElementById('addTaskButton').textContent = '\u270D';
+      document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
+      document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
       displayMessage('One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.', 3000)
       taskList[chosenId].isClicked = 'isNotClicked';
@@ -972,7 +1624,7 @@ function taskHasBeenClicked(event) {
       swapTasks(myUniqueId);
     }
     chosenTaskId = '';
-    // clearButton.textContent = 'Clear\u25B8';  // \u25b8 for small triangle
+    // clearButton.textContent = 'Clear\u25B8';  // Black right-pointing small triangle
   }
   renderTasks();
 
@@ -1012,12 +1664,12 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
   fixTimes();
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
-    if (taskList[n + 1].date < taskList[n].end()) {
+    if (taskList[n + 1].date < taskList[n].end) {
       [taskList[n], taskList[n + 1]] = [taskList[n + 1], taskList[n]];
       fixTimes();
     }
-    if (taskList[n + 1].date - taskList[n].end() > 0 && taskList[n + 1].fuzzyness === 'isFuzzy') {
-      taskList[n + 1].date = taskList[n].end();
+    if (taskList[n + 1].date - taskList[n].end > 0 && taskList[n + 1].fuzzyness === 'isFuzzy') {
+      taskList[n + 1].date = taskList[n].end;
     }
   }
   fixTimes();
@@ -1027,10 +1679,10 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
 function fixTimes() {
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
-    if (taskList[n].end() <= taskList[n + 1].date) {
+    if (taskList[n].end <= taskList[n + 1].date) {
       continue;
     } else if (taskList[n + 1].fuzzyness === 'isFuzzy') {
-      taskList[n + 1].date = taskList[n].end();
+      taskList[n + 1].date = taskList[n].end;
     } else {
       // console.log(n, 'Overlapping a fixed task');
     }
@@ -1041,10 +1693,12 @@ function fixTimes() {
 function renderTasks() {
   displayList = createNullTimes();
 
-  let taskListAsText = taskListExtractor();
-  if (JSON.stringify(taskListAsText)) {
-    localStorage.taskListAsText = JSON.stringify(taskListAsText);  // Store a backup of taskList
-  }
+  // // Store a backup of taskList
+  // let taskListAsText = JSON.stringify(taskListExtractor());
+  // if (taskListAsText) {
+  //   localStorage.taskListAsText = taskListAsText;
+  // }
+  storeLocally();
 
   clearOldTasksEtc();
 
@@ -1132,17 +1786,20 @@ function jumpTo(index) {
   if (document.getElementById('container') !== null  && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
-    // document.getElementById('inputBox').focus();
+    // document.getElementById('dayInputBox').focus();
   }
 }
 
 
 function jumpToNow() {
-  if (document.getElementById('container') !== null  && taskList.length > 0) {
-    container = document.getElementById('container');
-    container.scrollTop = document.getElementById('nowSpan').offsetTop + 500 * zoom;
-    // document.getElementById('inputBox').focus();
-  }
+  let now = new Date()
+  let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
+  jumpToTime(nowMinusOneHour, false);
+  // if (document.getElementById('container') !== null  && taskList.length > 0) {
+  //   container = document.getElementById('container');
+  //   container.scrollTop = document.getElementById('nowSpan').offsetTop + 800 * zoom;
+  //   // document.getElementById('dayInputBox').focus();
+  // }
 }
 
 
@@ -1350,4 +2007,47 @@ function parseText(rawText) {
 
   parsedList = [taskStart, duration, text, drain];
   return parsedList;
+}
+
+
+////////////////////////////////// Maintenence code //////////////////////////
+
+function debugExamples() {
+  let exList = [
+    '700 debugging example',
+    '1h long1',
+    '30m short1',
+    '30m short2',
+    '45m medium1',
+    '1200 1h lunch',
+    // '1530 1h tea',
+    '1h long2' ,
+    '45m medium2',
+    '30m short3'
+  ];
+
+  console.log('Debugging example list ', exList);
+
+  uniqueIdOfLastTouched = taskList[0].uniqueId;
+  textListToTaskList(exList);
+  renderTasks();
+}
+
+
+function textListToTaskList(taskListAsText) {  // Used by debugExamples()
+  let succes = false;
+  if (taskListAsText.length === 0 && taskList.length === 0) {
+    makeFirstTasks();
+  } else {
+    for (const [index, text] of taskListAsText.entries()) {
+      let parsedList = parseText(text.trim());
+      let id = uniqueIdOfLastTouched;
+      let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+      // console.log(task.text, [].concat(taskList));
+      succes = addTask(id, task);
+      if (!succes) {console.log('Retrieval got wrong at index ', index);}
+    }
+  }
+  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
+  uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
 }

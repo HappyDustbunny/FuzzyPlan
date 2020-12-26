@@ -27,16 +27,21 @@ border-radius: 25px;
 z-index: 999;
 } */
 
-div {
-  /* flex: initial; */
+/* div {
   text-align: left;
   border: 1px solid rgb(96, 139, 168);
   border-radius: 4px;
   background-color: rgba(154, 219, 240, .35);
-}
+} */
 
 h1 {
   margin: unset;
+  grid-area: header1;
+}
+
+h2 {
+  margin: 0px;
+  grid-area: header2;
 }
 
 input {
@@ -73,12 +78,28 @@ html {
 
 .centerWrapper {
   display: grid;
-  grid-template-columns: 6% 11% 45% 11% 11% 6%;
-  /* grid-template-columns: 20px 40px auto 40px 40px 20px; */
+  grid-template-columns: 24% 47% 10% 6% 6%;
+  grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
+  grid-template-areas:
+  '. . . . . .'
+  '. chooseBox . . . .'
+}
+
+.monthCenterWrapper {
+  display: grid;
+  grid-template-columns: 6px 40px auto 40px 6px;
+  grid-template-rows: auto auto;
+  grid-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. clear inputbox moveToDay .'
+  '. putback monthChooseBox . .'
 }
 
 .container1 {
@@ -90,10 +111,416 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'storage header info month'
+  'month header1 info storage'
   '. hearts . .'
   '. messages . .';
 }
+
+/* add view css below */
+
+/* Har denne en funktion? */
+::placeholder {
+  color: #788793; /* Lighter gray*/
+  color: rgb(150, 150, 150);
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  grid-template-rows: 50px;
+}
+
+.timeButtons {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: space-between;
+  /* display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: 50px; */
+}
+
+.addContainer1 {
+  display: grid;
+  grid-template-columns: 5% auto 5%;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+  '. header1 .'
+  '. header2 .'
+  '. messages .';
+  /* margin-top: -10px; */
+}
+
+.addContainer2 {
+  display: grid;
+  grid-template-columns: 51% 51%;
+  /* column-gap: .2rem; */
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table'
+}
+
+.topic {
+  padding: 7px;
+  margin-bottom: -15px;
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .25);
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.durationContainer {
+  display: grid;
+  grid-template-columns: 50% 45% 5%;
+  grid-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table .'
+}
+
+.timeContainer {
+  display: grid;
+  grid-template-columns: 40% 54% 5%;
+  grid-gap: .6rem;
+  background-color: transparent;
+  border: none;
+  grid-template-areas:
+  'input table .'
+}
+
+.add {
+  text-align: center;
+  /* width: 10%; */
+  height: 22px;
+  font-size: 0.6em;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  border: 1px solid rgb(96, 139, 168);
+  border-radius: 10px;
+}
+
+
+.timeAdjusterTop {
+  width: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: none; /* linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0); */
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 10;
+  top: 3px;
+  border-bottom: none;
+}
+
+.timeAdjusterMiddle {
+  width: 30px;
+  height: 45px;
+  border-radius: 10px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  top: -20px;
+  z-index: 5;
+  border: none;
+}
+
+.timeAdjusterBottom {
+  width: 30px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-image: none; /* linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9abdf0, #9898ff); */
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 10;
+  top: -43px;
+  border-top: none;
+}
+
+.text {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.backgroundUp {
+  width: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background-image: linear-gradient(#9898ff, #9adbf0, #9adbf0, #9adbf0, #9adbf0);
+  position: relative;
+  top: 0px;
+  z-index: 1;
+  border-bottom: none;
+}
+
+.backgroundDown {
+  width: 30px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  background-image: linear-gradient(#9adbf0, #9adbf0, #9adbf0, #9adbf0, #9898ff);
+  position: relative;
+  top: -48px;
+  z-index: 1;
+  border-top: none;
+}
+
+#page {
+  height: 800px;
+}
+
+#gainDiv {
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+#info {
+  width: 22px;
+  border-radius: 20px;
+}
+
+#d1, #g1 {
+  margin-left: 0px;
+}
+
+#dayView {
+  visibility: hidden;
+  position: relative; /* Needs to be relative in order for the add-button to have an absolute position with respect to the viewport and not the total page https://css-tricks.com/absolute-relative-fixed-positioining-how-do-they-differ/ */
+  transition: all 0.4s;
+}
+
+#dayView.active {
+  visibility: visible;
+}
+
+#text1, #text2 {
+  display: flex;
+  grid-area: input;
+  align-self: center;
+  font-weight: bold;
+}
+
+#inputTimeBox {
+  grid-area: input;
+  width: 54px;
+  height: 20px;
+}
+
+#table {
+  grid-area: table;
+  border-collapse: collapse;
+}
+
+#inputTaskBox {
+  width: auto;
+}
+
+#inputDurationBox {
+  width: 60px;
+  /* height: 15px; */
+}
+
+#optional {
+  font-size: 0.6em;
+}
+
+#apply {
+  width: 250px;
+}
+
+#cancel {
+  width: 15%;
+}
+
+#apply, #cancel {
+  font-size: 0.6em;
+  margin-top: 5px;
+}
+
+[type=radio] {
+  position: absolute;
+  opacity: 0%;
+  width: 0px;
+  height: 0px;
+}
+
+[type=radio] + img {
+  opacity: 25%;
+}
+
+[type=radio]:checked + img {
+  opacity: 100%;
+  /* background-color: blue; */
+}
+
+/* add View-css above */
+
+/* month view css below */
+
+#monthView {
+    bottom: 780px;
+    /* left: 300px; */
+    width: 0px;
+    /* height: 0px; */
+    background-color: white;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+    position: relative;
+}
+
+#monthView.active {
+    bottom: 780px;
+    /* left: 0px; */
+    width: 100%;
+    height: 100%;
+    visibility: visible;
+    /* position: relative; */
+}
+
+.monthContainer1 {
+  display: grid;
+  grid-template-columns: 40px auto 45px;
+  grid-template-rows: auto auto auto;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  'month header day'
+  '. messages .';
+}
+
+
+.monthContainer2 {
+  display: grid;
+  grid-template-columns: 5% 80% 5%;
+  grid-template-rows: auto auto;
+  grid-gap: .3rem;
+  /* justify-items: center; */
+  background-color: transparent;
+  border: none;
+  height: 90%;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. taskHeader .'
+  '. taskListing .'
+}
+
+#monthTaskDiv {
+  display: grid;
+  grid-area: taskListing;
+}
+
+.dateButton {
+  position: relative;
+  text-align: left;
+  border: 1px solid rgba(154, 219, 240, 1.0);
+  border-radius:  10px;
+  background-color: rgba(154, 219, 240, .25);
+  box-shadow: 0px 0px 3px 2px rgba(154, 219, 240, .25);
+}
+
+.dateButton .toolTip {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -100px;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.dateButton .toolTip::after {
+  content: '';
+  position: absolute;
+  top: 99%;
+  left: 50%;
+  margin-left: -5px;
+  border: solid;
+  border-width: 7px;
+  border-color: rgba(154, 219, 240, 1) transparent transparent transparent;
+}
+
+.dateButton:hover .toolTip {
+  visibility: visible;
+  background-color: rgba(154, 219, 240, 1);
+}
+
+.toolTip:empty {
+   display: none;
+}
+
+.weekend {
+  background-color: rgba(154, 219, 240, .6);
+}
+
+.monthName {
+  background-color: white;
+  border: none;
+  margin: 5px;
+}
+
+#monthClearButton {
+  grid-area: clear;
+}
+
+#monthInputBox {
+  grid-area: inputbox;
+}
+
+#month {
+  grid-area: month;
+  justify-self: end;
+}
+
+#day {
+  grid-area: day;
+}
+
+#dayChooseBox {
+  grid-area: chooseBox;
+}
+
+#moveToDay {
+  display: none;
+  grid-area: moveToDay;
+}
+
+#moveToDay.active {
+  line-height: 0.8em;
+  padding-top: 5px;
+  display: grid;
+}
+
+#monthViewName {
+  /* Put FuzzyPlan header in right place */
+  justify-content: center;
+  grid-area: header;
+}
+
+#monthChooseBox {
+  display: none;
+  grid-area: monthChooseBox;
+}
+
+#monthChooseBox.active {
+  display: grid;
+}
+
+#putBack {
+  display: none;
+	line-height: 0.8em;
+	padding-top: 2px;
+  grid-area: putback;
+}
+
+#putBack.active {
+  display: grid;
+}
+
+/* month view css below */
+
 
 .container2 {
   display: grid;
@@ -103,7 +530,7 @@ html {
   /* justify-items: center; */
   background-color: transparent;
   border: none;
-  height: 480px;
+  height: 700px;
   overflow-y: scroll;
   grid-template-areas:
   '. . . taskHeader .'
@@ -200,38 +627,42 @@ html {
 }
 
 #addTaskButton {
-  position: relative;
-  bottom: 80px;
-  left: 300px;
+  position: absolute;
+  bottom: 10%;
+  left: 80%;
   font-size: x-large;
   line-height: 0.1em;
   text-align: center;
   padding: .1em 0.12em .2em .1em;
-  height: 1.3em;
   background-image: linear-gradient(#08e22a, #0bfb31, #0bfb31, #0bfb31, #08e22a);
-  border-radius: 15px;
-  width: 1.3em;
+  height: 1.7em;
+  width: 1.7em;
+  border-radius: 25px;
   border: 1px solid rgb(108, 168, 48);
+  z-index: 10;
 }
 
-#animationBox {  /* Box that help transition to add.html*/
+#addView {  /* Box that help transition to add-view */
+  bottom: 0px;
+  left: 300px;
   width: 0px;
   height: 0px;
   background-color: white;
-  /* border: 2px solid black; */
   position: absolute;
-  transition: width .12s;
-  transition: height .12s;
   visibility: hidden;
+  transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+  position: relative;
 }
 
-#animationBox.fromLowerRight { /* Adding class make animation run */
-  bottom: 0px;
-  right: 0px;
-  width: 360px;
-  height: 540px;
+#addView.active { /* Adding class make animation run */
+  bottom: 794px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
   visibility: visible;
+  position: relative;
 }
+
 
 #dummyAdd {
   background-color: rgba(154, 219, 240, .25);
@@ -253,6 +684,8 @@ html {
   width: 22px;
   border-radius: 20px;
   margin-top: 2px;
+  font-size: 0.8em;
+  padding-left: 7px;
 }
 
 #message {
@@ -269,14 +702,57 @@ html {
 }
 
 #name {
+  /* Put FuzzyPlan header in right place */
   justify-content: center;
-  grid-area: header;
+  grid-area: header1;
 }
 
 #nowSpan {
   border-bottom: 3px solid rgba(255, 0, 255, 1.0);
   grid-area: timeBar;
   z-index: 999;
+}
+
+div.tasksToSort {
+  display: grid;
+}
+
+div.tasksToSort #upButton {
+  display: none;
+}
+
+div.tasksToSort #nowButton {
+  display: none;
+}
+
+div.tasksToSort #postpone {
+  line-height: 0.8em;
+  padding-top: 5px;
+  display: grid;
+  justify-self: end;
+  /* background-image: linear-gradient(#18ee4491, #a5ff987a, #a5ff987a, #a5ff987a, #18ee4491) */
+}
+
+#postpone {
+  display: none;
+}
+
+#chooseBox {
+  display: none;
+  grid-area: chooseBox;
+}
+
+#chooseBox.active {
+  display: grid;
+}
+
+.floatingTask {
+  display: flex;
+  flex-flow: column wrap;
+  background-color: rgba(123, 217, 71, .6);
+  border-radius: 10px;
+  cursor: not-allowed;
+  width: 100%;
 }
 
 #settings {
