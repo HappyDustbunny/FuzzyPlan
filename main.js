@@ -1490,10 +1490,10 @@ function createNullTimes() {
   taskList[0].stressGradient = currentStressLevel;
 
   let len = taskList.length;
-  for (var n=1; n<len; n++) {
-    if (taskList[n - 1].end) {
+  for (var n=1; n<len; n++) {  // TODO: Fix Add-button position again again. Fix duration in add-view
+    // if (taskList[n - 1].end) { // This condition makes dayStart and dayEnd collapse // TODO: Fix this and insert before a fixed task. Maybe run task.end() somewhere appropriate
       let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
-    }
+    // }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
       let nullTime = new Task(taskList[n-1].end, duration, '', -1);
       nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
