@@ -269,7 +269,8 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   }
 
   tasksSentBetween = [];
-  tasksFromClickedDayInMonth = [];
+  // tasksFromClickedDayInMonth = [];  // If this is emptied here putBack will have nothing to put back. It should be emptied elsewhere. Or after a test here
+  // TODO: Postpone can leave tasks with an end that doesn't match duration and start time
 
 }
 
@@ -571,7 +572,7 @@ function addDuration(event) {
       deltaTime = Number(btnId);
     }
 
-    taskDuration_add += deltaTime;
+    taskDuration_add = Number(taskDuration_add) + deltaTime;
     if (taskDuration_add < 0) {
       taskDuration_add = 0;
     }
@@ -715,6 +716,7 @@ function readTaskStartTime() {
     taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
     if (0 < timeH || 0 < timeM) {
       fillTimeBox(taskTime_add);
+      return taskTime_add
     }
   }
 }
@@ -754,10 +756,14 @@ function apply() {
   } else {
     readTaskText()
     readDurationTime();
-    readTaskStartTime();
+    let startTime = readTaskStartTime();
     readDrainGainRadioButtons();
     returnText = formatTask();
-    document.getElementById('dayInputBox').value = returnText;
+    if (startTime) {
+      inputFixedTask(returnText);
+    } else {
+      document.getElementById('dayInputBox').value = returnText;
+    }
 
     // Close add-view via CSS
     // document.getElementById('addView').visible = 'hidden';
@@ -799,14 +805,14 @@ function monthButtonClicked() {
 
 function gotoDay() {
   // Trigger animation via CSS
-  document.getElementById('monthView').classList.remove('active'); // TODO: Fix animation
+  document.getElementById('monthView').classList.remove('active');
   document.getElementById('dayView').classList.add('active');
 
   fillChooseBox('day');
 }
 
 
-function fillDateBar() { // TODO: Make this show the week before now and highlight today
+function fillDateBar() {
   let now = new Date();
   let nowPlus3Month =  new Date();
   nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
@@ -956,7 +962,7 @@ function monthInputAtEnter(event) {
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
 
             if (textInputBox === '') {
-              gotoDate(myId); // TODO: Make gotoDate() and sanitize input. The next line reacts badly to 1/12
+              gotoDate(myId); // TODO: Make gotoDate() (yank it from month.js?) and sanitize input
             } else {
               // Insert a new task at the provided date
               let now = new Date();
@@ -1035,7 +1041,7 @@ function monthRenderTasks() {
 }
 
 
-function putBack() { // TODO: Fix removal of postponed tasks from day i putBack is clicked. Maybe hide it?
+function putBack() { // TODO: Fix putBack.
   monthTaskList[putBackId] = tasksFromClickedDayInMonth;
 
   let chooseBox = document.getElementById('monthChooseBox');
@@ -1231,7 +1237,7 @@ function inputFixedTask(contentInputBox) {
     let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
 
     if (!succes) {
-      displayMessage('Not enough room. \nPlease clear some space', 3000);  // TODO: Does this just drop a new task if there is not room??
+      displayMessage('Not enough room. \nPlease clear some space', 3000);  // TODO: This just drop a new task if there is not room. Oups.
     }
     renderTasks();
     jumpTo(uniqueIdOfLastTouched)
@@ -1492,7 +1498,8 @@ function createNullTimes() {
   let len = taskList.length;
   for (var n=1; n<len; n++) {  // TODO: Fix Add-button position again again. Fix duration in add-view
     // if (taskList[n - 1].end) { // This condition makes dayStart and dayEnd collapse // TODO: Fix this and insert before a fixed task. Maybe run task.end() somewhere appropriate
-      let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
+      // let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
+    let duration = taskList[n].date.getTime() - (taskList[n - 1].date.getTime() + taskList[n - 1].duration);
     // }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
       let nullTime = new Task(taskList[n-1].end, duration, '', -1);
