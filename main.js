@@ -184,8 +184,10 @@ function retrieveLocallyStoredStuff() {
     }
   }
 
-  if (localStorage.getItem('wakeUpOrNowClickedOnce')) {
-    wakeUpOrNowClickedOnce = localStorage.wakeUpOrNowClickedOnce;
+  if (localStorage.getItem('wakeUpOrNowClickedOnce') == 'false') {
+    wakeUpOrNowClickedOnce = false;
+  } else {
+    wakeUpOrNowClickedOnce = true;
   }
 
   if (localStorage.getItem('zoom')) {
@@ -1677,6 +1679,7 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
     }
     if (taskList[n + 1].date - taskList[n].end > 0 && taskList[n + 1].fuzzyness === 'isFuzzy') {
       taskList[n + 1].date = taskList[n].end;
+      taskList[n + 1].end = new Date(taskList[n + 1].date.getTime() + taskList[n + 1].duration);
     }
   }
   fixTimes();
@@ -1690,6 +1693,7 @@ function fixTimes() {
       continue;
     } else if (taskList[n + 1].fuzzyness === 'isFuzzy') {
       taskList[n + 1].date = taskList[n].end;
+      taskList[n + 1].end = new Date(taskList[n + 1].date.getTime() + taskList[n + 1].duration);
     } else {
       // console.log(n, 'Overlapping a fixed task');
     }
@@ -2022,15 +2026,15 @@ function parseText(rawText) {
 function debugExamples() {
   let exList = [
     '700 debugging example',
-    '1h long1',
-    '30m short1',
-    '30m short2',
-    '45m medium1',
+    '1h longOne',
+    '30m shortOne',
+    '30m shortTwo',
+    '45m mediumOne',
     '1200 1h lunch',
     // '1530 1h tea',
-    '1h long2' ,
-    '45m medium2',
-    '30m short3'
+    '1h longTwo' ,
+    '45m mediumTwo',
+    '30m shortThree'
   ];
 
   console.log('Debugging example list ', exList);
@@ -2057,4 +2061,12 @@ function textListToTaskList(taskListAsText) {  // Used by debugExamples()
   }
   // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
   uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
+}
+
+// For debugging only:
+function showTaskListTimes() {
+  let len = taskList.length;
+  for (var n=1; n<len - 1; n++) {
+    console.log(n, 'Start:', taskList[n].date.getHours(), taskList[n].date.getMinutes(), 'End: ', taskList[n].end.getHours(), taskList[n].end.getMinutes(), taskList[n].text);
+  }
 }
