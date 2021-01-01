@@ -56,7 +56,7 @@ class Task {
     this.date = date; // Start time as Javascript date
     this.duration = duration; // Duration in milliseconds
     this.text = text;
-    this.drain = Number(drain);
+    this.drain = Number(drain);  // drain is a number between -5 and 5. Gain is negative drain.
     this.uniqueId = this.giveAUniqueId();
     this.end = this.end();
     this.height = this.height();
@@ -546,9 +546,21 @@ function addTaskButtonClicked() {
   let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
 
-  if (inputBox.value != '') {
-    inputBox_add.value = inputBox.value;
+  if (inputBox.value != '') {  // Parse the value and fill relevant boxes
+    parsedList = parseText(inputBox.value); // parsedList = [taskStart, duration, text, drain];
+    inputBox_add.value = parsedList[2];
     inputBox_add.blur();
+    fillDurationBox(parsedList[1] / 60000);
+    if (parsedList[0] != '') {  // This will never trigger because fixed times are currently stripped when double clicking a task to edit
+      fillTimeBox(parsedList[0]);
+    }
+    let drain = Number(parsedList[3]);
+    if (0 < drain) {
+      document.getElementsByClassName('drain')[5 - drain].checked = true;
+    } else {
+      document.getElementsByClassName('drain')[4 - drain].checked = true;
+    }
+
   } else {
     inputBox_add.value = '';
     inputBox_add.focus();
@@ -635,7 +647,7 @@ function time_add(event) {
 }
 
 
-function fillTimeBox(time) {
+function fillTimeBox(time) {  // time in Date-format
   let prettyTaskTime = prettifyTime(time);
 
   document.getElementById('inputTimeBox').value = prettyTaskTime;
@@ -1451,7 +1463,7 @@ function editTask() {
   if (1 < taskList[id].drain) {
     drain = ' d' + taskList[id].drain + ' ';
   } else if (taskList[id].drain < 0) {
-    drain = ' g' + (-taskList[id].drain) / 2 + ' ';
+    drain = ' g' + (-taskList[id].drain) + ' ';
   }
 
   taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
@@ -1539,7 +1551,7 @@ function getStress(task) {
   let durationM = Math.floor(task.duration / 60000);
   let stress = 0;
   for (var i = 0; i < durationM; i += 5) {
-    stress = currentStressLevel * Math.pow(2, i/(tDouble/task.drain)); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
+    stress = currentStressLevel * Math.pow(2, i/(tDouble/(task.drain * 2))); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
     colourBit = 'hsl(255, 100%, ' + (100 - Math.floor(stress * 10)).toString() + '%)';
     gradient.push(colourBit);
   }
@@ -1847,7 +1859,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
     if (task.drain > 1) {
       drain = ' d' + task.drain;
     } else if (task.drain < -1) {
-      drain = ' g' + (-task.drain) / 2;
+      drain = ' g' + (-task.drain);
     }
 
   }
@@ -1997,9 +2009,9 @@ function parseText(rawText) {
   };
 
 
-  let drain = /d+[-]*[1-9]+/.exec(rawText);
-  if (/d+[-]*[1-9]+/.exec(drain)) {
-    drain = /[-]*[1-9]/.exec(drain).toString();
+  let drain = /d+[-]*[1-5]+/.exec(rawText);
+  if (/d+[-]*[1-5]+/.exec(drain)) {
+    drain = /[-]*[1-5]/.exec(drain).toString();
     rawText = rawText.replace('d' + drain, '');
   } else {
     drain = '1';
@@ -2008,9 +2020,9 @@ function parseText(rawText) {
 
   let gain = /g+[-]*[1-5]+/.exec(rawText); // Gain counts double as the assumption is consious relaxation
   if (/g+[-]*[1-5]+/.exec(gain)) {
-    gain = 2 * /[-]*[1-5]/.exec(gain).toString();
+    gain = /[-]*[1-5]/.exec(gain).toString();
     drain = '-' + gain;
-    rawText = rawText.replace('g' + gain / 2, '');
+    rawText = rawText.replace('g' + gain, '');
   };
 
   let text = rawText.trim();

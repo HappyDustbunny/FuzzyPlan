@@ -345,7 +345,7 @@ html {
 }
 
 [type=radio] + img {
-  opacity: 25%;
+  opacity: 50%;
 }
 
 [type=radio]:checked + img {
