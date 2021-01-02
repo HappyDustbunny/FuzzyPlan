@@ -85,8 +85,8 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. . . . . .'
-  '. chooseBox . . . .'
+  '. . . . .'
+  '. chooseBox . . .'
 }
 
 .monthCenterWrapper {
@@ -351,6 +351,16 @@ html {
 [type=radio]:checked + img {
   opacity: 100%;
   /* background-color: blue; */
+}
+
+#drainBand {
+  background-image: linear-gradient(to right, hsl(255,50%,0%), hsl(255, 50%, 50%));
+  width: 100%;
+}
+
+#gainBand {
+  background-image: linear-gradient(to right, hsl(255,50%,50%), hsl(255, 50%, 100%));
+  width: 100%;
 }
 
 /* add View-css above */
@@ -652,6 +662,7 @@ html {
   visibility: hidden;
   transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
   position: relative;
+  left: 0px;
 }
 
 #addView.active { /* Adding class make animation run */

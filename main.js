@@ -555,8 +555,8 @@ function addTaskButtonClicked() {
       fillTimeBox(parsedList[0]);
     }
     let drain = Number(parsedList[3]);
-    if (0 < drain) {
       document.getElementsByClassName('drain')[5 - drain].checked = true;
+      if (0 < drain) {
     } else {
       document.getElementsByClassName('drain')[4 - drain].checked = true;
     }
@@ -1252,6 +1252,7 @@ function inputFixedTask(contentInputBox) {
 
     if (!succes) {
       displayMessage('Not enough room. \nPlease clear some space', 3000);  // TODO: This just drop a new task if there is not room. Oups.
+      document.getElementById('dayInputBox').value = contentInputBox;
     }
     renderTasks();
     jumpTo(uniqueIdOfLastTouched)
@@ -1310,6 +1311,7 @@ function addTaskAfter(uniqueId, task) {
 function addTaskBefore(myId, task) {
   let id = getIndexFromUniqueId(myId);
   task.date = new Date(taskList[id].date.getTime() - task.duration);
+  task.end = taskList[id].date;
   if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end > task.date) {
     displayMessage('Not enough rooom here', 3000);
     return false;
@@ -2078,7 +2080,7 @@ function textListToTaskList(taskListAsText) {  // Used by debugExamples()
 // For debugging only:
 function showTaskListTimes() {
   let len = taskList.length;
-  for (var n=1; n<len - 1; n++) {
+  for (var n=0; n<len; n++) {
     console.log(n, 'Start:', taskList[n].date.getHours(), taskList[n].date.getMinutes(), 'End: ', taskList[n].end.getHours(), taskList[n].end.getMinutes(), taskList[n].text);
   }
 }
