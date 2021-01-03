@@ -804,7 +804,7 @@ function monthButtonClicked() {
   document.getElementById('monthView').classList.add('active');
   document.getElementById('dayView').classList.remove('active');
 
-  fillDateBar();
+  fillMonthDateBar();
 
   monthRenderTasks();
 
@@ -826,10 +826,12 @@ function gotoDay() {
 }
 
 
-function fillDateBar() {
+function fillMonthDateBar() {
   let now = new Date();
-  let nowPlus3Month =  new Date();
-  nowPlus3Month = nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3);
+  let nowMinus3Month = new Date();
+  nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 3));
+  let nowPlus3Month = new Date();
+  nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
 
   // Make the first button with monthname
   let thisMonth = now.getMonth();
@@ -838,7 +840,7 @@ function fillDateBar() {
   monthNameNode.textContent = months[now.getMonth()];
   document.getElementById('monthTaskDiv').appendChild(monthNameNode);
 
-  for (let i = now; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
+  for (let i = nowMinus3Month; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
     // Insert monthnames before each the 1th
     if (thisMonth < i.getMonth() || (thisMonth === 11 && i.getMonth() === 0)) {  // Month 0 is january
       thisMonth = i.getMonth();
@@ -854,7 +856,15 @@ function fillDateBar() {
 
     newNode.setAttribute('id', id);
     newNode.setAttribute('class', 'isNotClicked');
-    newNode.classList.add('dateButton');
+
+    if (i < now) {
+      newNode.classList.add('pastDateButton');
+    } else if (i === now) {
+      newNode.classList.add('todayButton');
+    } else {
+      newNode.classList.add('dateButton');
+    }
+
     let dayNumber = i.getDay();
     if (dayNumber === 0 || dayNumber === 6) { // Weekday 6 and 0 are Saturday and Sunday
       newNode.classList.add('weekend');
@@ -1033,6 +1043,42 @@ function monthRenderTasks() {
       days[i].children[2].textContent = '';
       days[i].children[1].innerHTML = '';
     }
+  }
+
+  // Colour days int the past according to taskList for this day
+  let pastDayList = {'12-11': displayList};  // For testing purposes *******************
+  for (var myId in pastDayList) {
+    let tasks = pastDayList[myId];
+    // let gradient = 'red 5% , blue 5%, blue 20%, green 20%';
+    let gradient = '';
+    let light = '50%';
+    // Make gradient
+    for (var n in tasks) {
+      startPercent = parseInt((tasks[n].date.getHours() * 60 + tasks[n].date.getMinutes()) / (24 * 60) * 100);
+      endPercent = parseInt(startPercent + (tasks[n].duration / 60000) / (24 * 60) * 100);
+      if (n == 0) {  // Avoid dayStart, but add white at start of the day
+        gradient += 'hsl(0, 0%, 0%) ' + parseInt((tasks[1].date.getHours() * 60 + tasks[1].date.getMinutes()) / (24 * 60) * 100) + '%';
+        continue;
+      }
+      // Find colour value based on text
+      let string = tasks[n].text;
+      let len = string.length - 1; // Minus 1 to avoid dayEnd
+      let colourValue = 0;
+      for (var nn=0; nn<len; nn++) {
+        colourValue += string.charCodeAt(nn);
+      }
+      colourValue **= 4;  // To move words of similar length apart
+      console.log(string, colourValue, colourValue%300);
+      colourValue %= 311; // Bring colorValue into hsl-space
+      light = '50%';
+      if (colourValue == 0 || colourValue == 181) {light = '100%'} // Make nullTime and dayEnd white
+      // Update gradient
+      gradient += ', hsl(' + colourValue + ', 100%, ' + light +') ' + startPercent + '%, hsl(' + colourValue + ', 100%, ' + light +') ' + endPercent + '%';
+    }
+
+    // Find button and set gradient
+    let button = document.getElementById(myId);
+    button.setAttribute('style', 'background-image: linear-gradient(to right, ' + gradient + ')');
   }
 
   // Write new text into buttons and tooltips
