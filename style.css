@@ -474,6 +474,22 @@ html {
   background-color: rgba(154, 219, 240, .6);
 }
 
+.pastDateButton {
+	background-color: rgba(154, 219, 240, .05);
+  border: 1px solid rgba(121, 145, 153, 0.25);
+}
+
+.pastDateButton.weekend {
+	/* background-color: rgba(160, 179, 185, 0.25);
+  border-color: rgba(160, 179, 185, 1); */
+  border: 3px solid rgb(160, 179, 185);
+}
+
+.todayButton {
+  border: 3px solid rgba(70, 197, 238, 0.83);
+  border-radius: 0px;
+}
+
 .monthName {
   background-color: white;
   border: none;

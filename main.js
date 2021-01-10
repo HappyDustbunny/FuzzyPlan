@@ -453,11 +453,6 @@ function sayTic() {
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
-window.addEventListener('storage', function(e) {  // TODO: WTF does this do?
-  localStorage.setItem(e.key, e.newValue);
-});
-
-
 document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
 document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
 document.getElementById('month').addEventListener('click', monthButtonClicked);
@@ -830,7 +825,7 @@ function gotoDay() {
 function fillMonthDateBar() {
   let now = new Date();
   let nowMinus3Month = new Date();
-  nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 3));
+  nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 1));
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
 
@@ -862,7 +857,7 @@ function fillMonthDateBar() {
 
     if (i < now) {  // For styling purposes. // TODO: Make styling
       newNode.classList.add('pastDateButton');
-    } else if (i === now) {
+    } else if (i.getMonth() == now.getMonth() && i.getDate() == now.getDate()) {
       newNode.classList.add('todayButton');
     }
 
@@ -1047,24 +1042,23 @@ function monthRenderTasks() {
     }
   }
 
-  // Colour days int the past according to taskList for this day
-  let pastDayList = {'12-9': displayList};  // For testing purposes *******************
+  // Colour days int the past according to taskList for each day
+  let pastDayList = {'26-11': taskList};  // For testing purposes *******************
 
   for (var myId in pastDayList) {
-    let tasks = pastDayList[myId];
-    let tasksLength = tasks.length;
+    let tasks = createDisplayList(pastDayList[myId]);
+
     let gradient = '';
     let taskColour = 'white';
+
     // Make gradient for the day currently being processed
     for (var n in tasks) {
-      let colourValueR = 0
-      let colourValueG = 0
-      let colourValueB = 0
+      // Find the percent needed to be coloured (from startPercent to endPercent)
       startPercent = parseInt((tasks[n].date.getHours() * 60 + tasks[n].date.getMinutes()) / (24 * 60) * 100);
       endPercent = parseInt(startPercent + (tasks[n].duration / 60000) / (24 * 60) * 100);
 
       if (n == 0) {  // Avoid dayStart, but add white at start of the day
-        gradient += 'hsl(0, 0%, 0%) ' + parseInt((tasks[1].date.getHours() * 60
+        gradient += 'white ' + parseInt((tasks[1].date.getHours() * 60
         + tasks[1].date.getMinutes()) / (24 * 60) * 100) + '%';
         continue;
       }
@@ -1093,9 +1087,18 @@ function monthRenderTasks() {
 
     // Find button and set gradient
     let button = document.getElementById(myId);
-    let buttonText = document.getElementById(myId).lastChild;
-    button.setAttribute('style', 'background-image: linear-gradient(to right, ' + gradient + ')');
-    buttonText.setAttribute('style', 'display: none');
+    if (button != null) {
+      let buttonText = document.getElementById(myId).lastChild;
+      button.setAttribute('style', 'background-image: linear-gradient(to right, ' + gradient + ')');
+      // Set tool-tip to show the tasks of the day
+      let children = button.childNodes;
+      let rawTasks = pastDayList[myId];
+      if (rawTasks != '') {
+        for (var task of rawTasks) {
+          children[1].innerHTML += ' \u25CF ' + task.text + '&nbsp;' + '<br>'; // Write to tooltip
+        }
+      }
+    }
   }
 
   // Write new text into buttons and tooltips
@@ -1564,7 +1567,7 @@ function zoomFunc() {
 }
 
 
-function createNullTimes() {
+function createDisplayList() {
   let jumpToId = uniqueIdOfLastTouched;
   let currentStressLevel = wakeUpStress;
 
@@ -1779,7 +1782,7 @@ function fixTimes() {
 
 
 function renderTasks() {
-  displayList = createNullTimes();
+  displayList = createDisplayList();
 
   // // Store a backup of taskList
   // let taskListAsText = JSON.stringify(taskListExtractor());

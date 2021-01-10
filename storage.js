@@ -1,4 +1,5 @@
 let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Extra store 1', 'Extra store 2', 'Extra store 3'];
+// TODO: Make 14 day storage possible
 
 document.getElementById('storeList').addEventListener('click', storeList);
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
