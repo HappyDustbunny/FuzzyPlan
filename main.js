@@ -33,6 +33,7 @@ let drainGainLevel_add = 'd1';
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
 // let tasksOfTheChoosenDay = {};
+let trackTaskList = {'morgenprogram': '#00FF00', 'programmere': '#0000FF'}; // TODO: For testing purposes. Remove text to {};
 let putBackId = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
@@ -857,13 +858,14 @@ function fillMonthDateBar() {
     newNode.setAttribute('id', id);
     newNode.setAttribute('class', 'isNotClicked');
 
-    if (i < now) {
+    newNode.classList.add('dateButton'); // Add to all dateButtons
+
+    if (i < now) {  // For styling purposes. // TODO: Make styling
       newNode.classList.add('pastDateButton');
     } else if (i === now) {
       newNode.classList.add('todayButton');
-    } else {
-      newNode.classList.add('dateButton');
     }
+
 
     let dayNumber = i.getDay();
     if (dayNumber === 0 || dayNumber === 6) { // Weekday 6 and 0 are Saturday and Sunday
@@ -890,7 +892,7 @@ function fillMonthDateBar() {
 }
 
 
-function monthTaskHasBeenClicked(event) {
+function monthTaskHasBeenClicked(event) { // TODO: Prevent adding task to pastDateButtons
   let myId = event.target.id;
   if (myId === '') {
     myId = event.target.closest('button').id;
@@ -1046,39 +1048,54 @@ function monthRenderTasks() {
   }
 
   // Colour days int the past according to taskList for this day
-  let pastDayList = {'12-11': displayList};  // For testing purposes *******************
+  let pastDayList = {'12-9': displayList};  // For testing purposes *******************
+
   for (var myId in pastDayList) {
     let tasks = pastDayList[myId];
-    // let gradient = 'red 5% , blue 5%, blue 20%, green 20%';
+    let tasksLength = tasks.length;
     let gradient = '';
-    let light = '50%';
-    // Make gradient
+    let taskColour = 'white';
+    // Make gradient for the day currently being processed
     for (var n in tasks) {
+      let colourValueR = 0
+      let colourValueG = 0
+      let colourValueB = 0
       startPercent = parseInt((tasks[n].date.getHours() * 60 + tasks[n].date.getMinutes()) / (24 * 60) * 100);
       endPercent = parseInt(startPercent + (tasks[n].duration / 60000) / (24 * 60) * 100);
+
       if (n == 0) {  // Avoid dayStart, but add white at start of the day
-        gradient += 'hsl(0, 0%, 0%) ' + parseInt((tasks[1].date.getHours() * 60 + tasks[1].date.getMinutes()) / (24 * 60) * 100) + '%';
+        gradient += 'hsl(0, 0%, 0%) ' + parseInt((tasks[1].date.getHours() * 60
+        + tasks[1].date.getMinutes()) / (24 * 60) * 100) + '%';
         continue;
       }
-      // Find colour value based on text
-      let string = tasks[n].text;
-      let len = string.length - 1; // Minus 1 to avoid dayEnd
-      let colourValue = 0;
-      for (var nn=0; nn<len; nn++) {
-        colourValue += string.charCodeAt(nn);
+
+
+      // Find colour value if text is in trackTaskList
+      let string = tasks[n].text.toLowerCase();
+
+      for (var trackedTaskText in trackTaskList) {
+        taskColour = '#DED';  // Default task colour if not watched
+        if (string == '') {
+          taskColour = 'white'; // nullTime is made white
+          break;
+        } else if (string == trackedTaskText) {
+          taskColour = trackTaskList[trackedTaskText];
+          break;
+        }
       }
-      colourValue **= 4;  // To move words of similar length apart
-      console.log(string, colourValue, colourValue%300);
-      colourValue %= 311; // Bring colorValue into hsl-space
-      light = '50%';
-      if (colourValue == 0 || colourValue == 181) {light = '100%'} // Make nullTime and dayEnd white
-      // Update gradient
-      gradient += ', hsl(' + colourValue + ', 100%, ' + light +') ' + startPercent + '%, hsl(' + colourValue + ', 100%, ' + light +') ' + endPercent + '%';
+
+      gradient += ', ' + taskColour + ' ' + startPercent
+      + '%, ' + taskColour + ' ' + Number(endPercent - 0.3)  + '%, '
+      + 'black ' + Number(endPercent - 0.3) + '%, black ' + endPercent + '%';
+
+      taskColour = 'white';
     }
 
     // Find button and set gradient
     let button = document.getElementById(myId);
+    let buttonText = document.getElementById(myId).lastChild;
     button.setAttribute('style', 'background-image: linear-gradient(to right, ' + gradient + ')');
+    buttonText.setAttribute('style', 'display: none');
   }
 
   // Write new text into buttons and tooltips
