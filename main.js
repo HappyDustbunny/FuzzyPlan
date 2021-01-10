@@ -32,8 +32,8 @@ let drainGainLevel_add = 'd1';
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
-// let tasksOfTheChoosenDay = {};
-let trackTaskList = {'morgenprogram': '#00FF00', 'programmere': '#0000FF'}; // TODO: For testing purposes. Remove text to {};
+let pastDayList = {};
+let trackTaskList = {'morgenprogram': '#00FF00', 'frokost': '#DD0000', 'programmere': '#0000FF'}; // TODO: For testing purposes. Remove text to {};
 let putBackId = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
@@ -98,9 +98,12 @@ class Task {
 // Runs when the page is loaded:
 function setUpFunc() {
   taskList = [];
+
   makeFirstTasks();
 
   retrieveLocallyStoredStuff();
+
+  adjustNowAndWakeUpButtons()
 
   // Set uniqueIdOfLastTouche to the last task before 'Day end'
   uniqueIdOfLastTouched = taskList[taskList.length - 2].uniqueId;
@@ -159,17 +162,22 @@ function storeLocally() {
 
   localStorage.idOflastTouched = idOfLastTouched;
 
-  // let inputBoxContent = document.getElementById('dayInputBox').value; // TODO: Is this used?
-  // if (inputBoxContent) {  // TODO: Should be sanitized
-  //   localStorage.inputBoxContent = inputBoxContent;
-  // }
-
   // if (tasksSentBetween) { // TODO: Is this used?
   //   localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
   // }
 
   if (monthTaskList) {
     localStorage.monthTaskList = JSON.stringify(monthTaskList);
+  }
+
+  // Store today in pastDayList
+  let now = new Date();
+  let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
+  pastDayList[id] = taskList;
+
+
+  if (pastDayList) {
+    localStorage.pastDayList = JSON.stringify(pastDayList);
   }
 }
 
@@ -210,11 +218,6 @@ function retrieveLocallyStoredStuff() {
   if (!localStorage.getItem('idOfLastTouched')) { // If NOT present...
     localStorage.idOfLastTouched = 0;
   }
-
-  // if (localStorage.getItem('inputBoxContent')) { // TODO: Is this used?
-  //   document.getElementById('dayInputBox').value = localStorage.getItem('inputBoxContent');
-  //   localStorage.removeItem('inputBoxContent');
-  // }
 
   if (localStorage.getItem('monthTaskList')) {
     monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
@@ -687,7 +690,7 @@ function readTaskText() {
   let contentInputBox = document.getElementById('inputBox_add').value.trim();
   let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000);
+    displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000, 'add');
   } else {
     taskText_add = contentInputBox;
   }
@@ -698,7 +701,7 @@ function readDurationTime() {
   let contentInputBox = document.getElementById('inputDurationBox').value.trim();
   let badCharacters = /[^0-9hm]/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please use the format 1h30m for 1 hour and 30 minutes', 3000);
+    displayMessage('Please use the format 1h30m for 1 hour and 30 minutes', 3000, 'add');
   } else {
     let timeH = 0;
     let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString(); // TODO: Check if numbers are too big
@@ -717,7 +720,7 @@ function readTaskStartTime() {
   let contentInputBox = document.getElementById('inputTimeBox').value.trim();
   let badCharacters = /[^0-9:]/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please use the format 12:00 or 1200', 3000);
+    displayMessage('Please use the format 12:00 or 1200', 3000, 'day');
   } else {
     let timeH = /[0-9][0-9]/.exec(contentInputBox);
     contentInputBox = contentInputBox.replace(timeH, '');
@@ -762,7 +765,7 @@ function formatTask() {
 function apply() {
   let taskText = document.getElementById('inputBox_add');
   if (taskText === '') {
-    displayMessage('Please write a task text', 3000);
+    displayMessage('Please write a task text', 3000, 'day');
   } else {
     readTaskText()
     readDurationTime();
@@ -848,7 +851,7 @@ function fillMonthDateBar() {
 
     let newNode = document.createElement('button');
 
-    let id = i.getDate().toString() + '-' + i.getMonth().toString();
+    let id = i.getDate().toString() + '-' + i.getMonth().toString()  + '-' + i.getFullYear().toString();
 
     newNode.setAttribute('id', id);
     newNode.setAttribute('class', 'isNotClicked');
@@ -895,6 +898,11 @@ function monthTaskHasBeenClicked(event) { // TODO: Prevent adding task to pastDa
 
   let day =  document.getElementById(myId);
 
+  if (day.classList.contains('pastDateButton')) {
+    displayMessage('Past dates can not be assigned tasks until a time machine has been invented', 3000, 'month');
+    return
+  }
+
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
 
   if (contentInputBox != '' && day.classList.contains('isNotClicked')) {
@@ -932,7 +940,7 @@ function monthTaskHasBeenClicked(event) { // TODO: Prevent adding task to pastDa
     // No text in inputBox and a clicked date. Effectively a doubleclick
   } else if (contentInputBox === '' && day.classList.contains('isClicked')) {
     if (document.getElementById('monthChooseBox').classList.contains('active')) {
-      displayMessage('Please finish the current edit \nbefore starting a new', 3000);
+      displayMessage('Please finish the current edit \nbefore starting a new', 3000, 'month');
     } else {
       // let myId = event.target.id;
       // if (myId === '') {
@@ -978,7 +986,8 @@ function monthInputAtEnter(event) {
             // Make myId from date
             let month = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
             let day = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
-            let myId = month + day;
+            let now = new Date();
+            let myId = day + month + now.getFullYear();
 
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
 
@@ -998,7 +1007,7 @@ function monthInputAtEnter(event) {
             }
 
         } else {
-          displayMessage('Not a date. Please fix date or remove the back-slash', 4000);
+          displayMessage('Not a date. Please fix date or remove the back-slash', 4000, 'month');
           return;
         }
 
@@ -1008,7 +1017,7 @@ function monthInputAtEnter(event) {
         let nowPlusOneDay = new Date();
         nowPlusOneDay = new Date(nowPlusOneDay.setDate(nowPlusOneDay.getDate() + 1));
 
-        let myId = nowPlusOneDay.getDate().toString() + '-' + nowPlusOneDay.getMonth().toString();
+        let myId = nowPlusOneDay.getDate().toString() + '-' + nowPlusOneDay.getMonth().toString() + '-' + nowPlusOneDay.getFullYear();
 
         let task = new Task(nowPlusOneDay, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
 
@@ -1043,8 +1052,6 @@ function monthRenderTasks() {
   }
 
   // Colour days int the past according to taskList for each day
-  let pastDayList = {'26-11': taskList};  // For testing purposes *******************
-
   for (var myId in pastDayList) {
     let tasks = createDisplayList(pastDayList[myId]);
 
@@ -1294,7 +1301,7 @@ function inputAtEnter(event) {
         resetInputBox('day');
         jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
-        displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000)
+        displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000, 'day')
         resetInputBox('day');
       }
     }
@@ -1312,12 +1319,12 @@ function inputFixedTask(contentInputBox) {
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
   if (taskList.length == 1 && parsedList[0] == '') {
-    displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000);
+    displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000, 'day');
   } else {
     let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
 
     if (!succes) {
-      displayMessage('Not enough room. \nPlease clear some space', 3000);  // TODO: This just drop a new task if there is not room. Oups.
+      displayMessage('Not enough room. \nPlease clear some space', 3000, 'day');  // TODO: This just drop a new task if there is not room. Oups.
       document.getElementById('dayInputBox').value = contentInputBox;
     }
     renderTasks();
@@ -1379,7 +1386,7 @@ function addTaskBefore(myId, task) {
   task.date = new Date(taskList[id].date.getTime() - task.duration);
   task.end = taskList[id].date;
   if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end > task.date) {
-    displayMessage('Not enough rooom here', 3000);
+    displayMessage('Not enough rooom here', 3000, 'day');
     return false;
   } else {
     if (taskList[id].fuzzyness === 'isNotFuzzy') {
@@ -1406,7 +1413,7 @@ function addFixedTask(task) {
 
   overlap = isThereASoftOverlap(task);
   if (overlap === 'hardOverlap') {
-    displayMessage('There is an overlap with another fixed time', 3000);
+    displayMessage('There is an overlap with another fixed time', 3000, 'day');
     return false;
   } else if (overlap === 'softOverlap') {
     overlappingTasks = removeFuzzyOverlap(task);
@@ -1519,7 +1526,7 @@ function clearDay() {
     document.getElementById('addTaskButton').textContent = '+';
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    displayMessage('Nothing was changed', 3000);
+    displayMessage('Nothing was changed', 3000, 'day');
   }
 }
 
@@ -1628,9 +1635,9 @@ function getStress(task) {
 }
 
 
-function displayMessage(text, displayTime) {  // displayTime in milliseconds
+function displayMessage(text, displayTime, view) {  // displayTime in milliseconds
   console.log(text);
-  msg = document.getElementById('message');
+  msg = document.getElementById(view + 'Message');
   msg.style.display = 'inline-block';
   msg.style.color = 'red';
   msg.textContent = text;
@@ -1677,7 +1684,7 @@ function taskHasBeenClicked(event) {
       handleChoosebox('day');
 
     } else {
-      displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000)
+      displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000, 'day')
     }
     document.getElementById('addTaskButton').textContent = '+';
     if (!document.getElementById('dayChooseBox').classList.contains('active')) {
@@ -1706,7 +1713,7 @@ function taskHasBeenClicked(event) {
       document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
       document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
-      displayMessage('One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.', 3000)
+      displayMessage('One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.', 3000, 'day');
       taskList[chosenId].isClicked = 'isNotClicked';
       taskList[id].isClicked = 'isNotClicked';
     } else if (taskList[chosenId].fuzzyness === 'isFuzzy' && taskList[id].fuzzyness === 'isFuzzy') {
@@ -1910,10 +1917,10 @@ function jumpToTime(time, showMessage) {
     if (timeDiv) {
       container.scrollTop = timeDiv.offsetTop - 180 * zoom;
       if (showMessage) {
-        displayMessage('Jumped to ' + hours + ':' + min, 700);
+        displayMessage('Jumped to ' + hours + ':' + min, 700, 'day');
       }
     } else {
-      displayMessage('Number not recognised as a time', 1000)
+      displayMessage('Number not recognised as a time', 1000, 'day')
     }
   }
 }
