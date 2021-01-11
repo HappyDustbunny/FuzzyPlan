@@ -20,7 +20,6 @@ let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for mes
 let taskAlarms = 'off'; // Turn alarms off by defalult
 let reminder = 'off'; // Turn reminders off by default
 let tasksFromClickedDayInMonth = null;
-let firstTaskFromMonth = null;
 let tasksSentBetween = [];
 
 ///////// Add-view /////////
@@ -37,13 +36,9 @@ let trackTaskList = {'morgenprogram': '#00FF00', 'frokost': '#DD0000', 'programm
 let putBackId = '';
 
 // let storage = window.localStorage; // TODO: Is this in use?
-// A list of unique numbers to use as task-ids
-// randomList = [117, 9030, 2979, 7649, 700, 3099, 1582, 4392, 3880, 5674, 8862, 5220, 9349, 6299, 1367, 4317, 9225, 1798, 7571, 4609, 6907, 1194, 9487, 9221, 2763, 1553, 128, 1318, 8762, 4974, 6508, 5277, 8256, 3863, 2860, 1904, 1218, 3932, 3615, 7110, 6770, 9075, 5270, 9184, 2702, 1039, 3420, 8488, 5522, 6071, 7870, 740, 2866, 8387, 3628, 5684, 9356, 6843, 9239, 9137, 9114, 5203, 8243, 9374, 9505, 9351, 7053, 4414, 8847, 5835, 9669, 9216, 7724, 5834, 9295, 1948, 8617, 9822, 5452, 2651, 5616, 4355, 1910, 2591, 8171, 7415, 7456, 2431, 4051, 4552, 9965, 7528, 911, 734, 6896, 249, 7375, 1035, 8613, 8836];
 
 // TODO: Inserting at the same time as a fixed task does not generate an error
 
-// console.table(taskList);  // Remember! Shows a table in the console.
-// debugger;  // Remember! Stops execution in order to glean the current value of variable
 
 // Daylight saving time shenanigans
 let today = new Date();
@@ -103,7 +98,7 @@ function setUpFunc() {
 
   retrieveLocallyStoredStuff();
 
-  adjustNowAndWakeUpButtons()
+  // adjustNowAndWakeUpButtons();
 
   // Set uniqueIdOfLastTouche to the last task before 'Day end'
   uniqueIdOfLastTouched = taskList[taskList.length - 2].uniqueId;
@@ -118,6 +113,8 @@ function setUpFunc() {
 
   adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
   // renderTasks();  // Is in adjustNowAndWakeUpButtons
+
+  getDueRemindersFromLast3Months();
 
   jumpToNow();
 
@@ -193,10 +190,10 @@ function retrieveLocallyStoredStuff() {
     }
   }
 
-  if (localStorage.getItem('wakeUpOrNowClickedOnce') == 'false') {
-    wakeUpOrNowClickedOnce = false;
-  } else {
+  if (localStorage.getItem('wakeUpOrNowClickedOnce') == 'true') {
     wakeUpOrNowClickedOnce = true;
+  } else {
+    wakeUpOrNowClickedOnce = false;
   }
 
   if (localStorage.getItem('zoom')) {
@@ -230,6 +227,27 @@ function retrieveLocallyStoredStuff() {
   // }
 }
 
+function getDueRemindersFromLast3Months() {  // If the day in the list lies in the past kick tasks to chooseBox
+  let now = new Date();
+  let nowMinus3Month = new Date();
+  nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 3));
+
+  for (let i = nowMinus3Month; i < now; i.setDate(i.getDate() + 1)) {
+    let myId = i.getDate().toString() + '-' + i.getMonth().toString()  + '-' + i.getFullYear().toString();
+
+    if (monthTaskList[myId]) {
+      thisDay = monthTaskList[myId];
+      Object.assign(tasksFromClickedDayInMonth, thisDay); // Joins two objects by modifying the first with the added values https://attacomsian.com/blog/javascript-merge-objects
+      delete monthTaskList[myId];
+    }
+  }
+
+  if (0 < monthTaskList.length) {
+    fillChooseBox('day');
+  }
+
+}
+
 
 function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   let chooseBox = document.getElementById(whichView + 'ChooseBox');
@@ -249,7 +267,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     }
 
   } else {
-    document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Should it be?
+    document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Nope. Should it be?
     document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
 
     tasks = tasksSentBetween;
@@ -832,7 +850,7 @@ function fillMonthDateBar() {
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
 
-  // Make the first button with monthname
+  // Make the first button with monthname  // TODO: Is this still necessary? Or does it generate an echo?
   let thisMonth = now.getMonth();
   monthNameNode = document.createElement('button');
   monthNameNode.classList.add('monthName');
@@ -890,7 +908,7 @@ function fillMonthDateBar() {
 }
 
 
-function monthTaskHasBeenClicked(event) { // TODO: Prevent adding task to pastDateButtons
+function monthTaskHasBeenClicked(event) {
   let myId = event.target.id;
   if (myId === '') {
     myId = event.target.closest('button').id;
@@ -900,6 +918,9 @@ function monthTaskHasBeenClicked(event) { // TODO: Prevent adding task to pastDa
 
   if (day.classList.contains('pastDateButton')) {
     displayMessage('Past dates can not be assigned tasks until a time machine has been invented', 3000, 'month');
+    return
+  } else if (day.classList.contains('todayButton')) {
+    displayMessage("Use Day-view for today's tasks", 3000, 'month');
     return
   }
 
@@ -942,17 +963,13 @@ function monthTaskHasBeenClicked(event) { // TODO: Prevent adding task to pastDa
     if (document.getElementById('monthChooseBox').classList.contains('active')) {
       displayMessage('Please finish the current edit \nbefore starting a new', 3000, 'month');
     } else {
-      // let myId = event.target.id;
-      // if (myId === '') {
-      //   myId = event.target.closest('button').nextSibling.id;
-      // }
       putBackId = myId;
 
       let dayChildren = day.children;
 
       if (monthTaskList[myId]) {
         tasksFromClickedDayInMonth = monthTaskList[myId];
-        monthTaskList[myId] = '';
+        delete monthTaskList[myId];
         dayChildren[2].textContent = '';
         dayChildren[1].innerHTML = '';
 
@@ -1051,7 +1068,7 @@ function monthRenderTasks() {
     }
   }
 
-  // Colour days int the past according to taskList for each day
+  // Fill in and colour days in the past according to taskList for each day
   for (var myId in pastDayList) {
     let tasks = createDisplayList(pastDayList[myId]);
 
@@ -1112,7 +1129,7 @@ function monthRenderTasks() {
   for (var myId in monthTaskList) {
     let button = document.getElementById(myId);
 
-    if (button != null && button.class != 'weekend') {
+    if (button != null) {
       let children = button.childNodes;  // datePart, toolTip and text
 
       let tasks = monthTaskList[myId];
@@ -1276,6 +1293,7 @@ function adjustNowAndWakeUpButtons() {
     nowBtn.textContent = 'Now' + ' \u25BE';  // Black down-pointing small triangle
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
+    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
     upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
     upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;  // Black right-pointing small triangle
@@ -2109,6 +2127,9 @@ function parseText(rawText) {
 
 
 ////////////////////////////////// Maintenence code //////////////////////////
+
+// console.table(taskList);  // Remember! Shows a table in the console.
+// debugger;  // Remember! Stops execution in order to glean the current value of variable
 
 function debugExamples() {
   let exList = [

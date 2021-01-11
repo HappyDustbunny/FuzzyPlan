@@ -387,6 +387,10 @@ html {
     /* position: relative; */
 }
 
+#monthMessage {
+  grid-area: messages;
+}
+
 .monthContainer1 {
   display: grid;
   grid-template-columns: 40px auto 45px;
