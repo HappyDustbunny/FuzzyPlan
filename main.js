@@ -237,15 +237,19 @@ function getDueRemindersFromLast3Months() {  // If the day in the list lies in t
 
     if (monthTaskList[myId]) {
       thisDay = monthTaskList[myId];
-      Object.assign(tasksFromClickedDayInMonth, thisDay); // Joins two objects by modifying the first with the added values https://attacomsian.com/blog/javascript-merge-objects
+      if (tasksSentBetween) {
+        Object.assign(tasksSentBetween, thisDay); // Joins two objects by modifying the first with the added values https://attacomsian.com/blog/javascript-merge-objects
+      } else {
+        tasksSentBetween = thisDay;
+      }
+
       delete monthTaskList[myId];
     }
   }
 
-  if (0 < monthTaskList.length) {
+  if (0<tasksSentBetween.length) {
     fillChooseBox('day');
   }
-
 }
 
 
@@ -1109,7 +1113,7 @@ function monthRenderTasks() {
       taskColour = 'white';
     }
 
-    // Find button and set gradient
+    // Find button, set gradient and write to tooltip
     let button = document.getElementById(myId);
     if (button != null) {
       let buttonText = document.getElementById(myId).lastChild;
@@ -1119,6 +1123,10 @@ function monthRenderTasks() {
       let rawTasks = pastDayList[myId];
       if (rawTasks != '') {
         for (var task of rawTasks) {
+          if (task.text == 'Day start' || task.text == 'Day end') {
+            continue;
+          }
+
           children[1].innerHTML += ' \u25CF ' + task.text + '&nbsp;' + '<br>'; // Write to tooltip
         }
       }
