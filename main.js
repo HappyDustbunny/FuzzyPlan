@@ -170,13 +170,55 @@ function storeLocally() {
   // Store today in pastDayList
   let now = new Date();
   let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
-  pastDayList[id] = taskList;
+  pastDayList[id] = deepCopyFunc(taskList);  // deepCopyFunc is used to make a deep copy
 
 
+  // Store pastDayList
   if (pastDayList) {
     localStorage.pastDayList = JSON.stringify(pastDayList);
   }
 }
+
+function deepCopyFunc(original) {
+  if (typeof original != 'object' || original === null || // typeof null is 'object', hence the latter check
+    Object.prototype.toString.call(original) === '[object Date]') { // Dates have to be returned as-is
+    return original
+  }
+
+  let deepCopy = {};  // Assume deepCopy is an object
+  if (Array.isArray(original)) { // Change it if it turns out to be an array
+    deepCopy = [];
+  }
+
+  for (var key in original) {
+    let value = original[key];
+
+    deepCopy[key] = deepCopyFunc(value);  // Recursively travel the object for objects
+  }
+
+  return deepCopy
+}
+
+
+// const deepCopyFunction = (inObject) => { // Taken from https://medium.com/javascript-in-plain-english/how-to-deep-copy-objects-and-arrays-in-javascript-7c911359b089
+//   let outObject, value, key
+//
+//   if (typeof inObject !== "object" || inObject === null) {
+//     return inObject // Return the value if inObject is not an object
+//   }
+//
+//   // Create an array or object to hold the values
+//   outObject = Array.isArray(inObject) ? [] : {}
+//
+//   for (key in inObject) {
+//     value = inObject[key]
+//
+//     // Recursively (deep) copy for nested objects, including arrays
+//     outObject[key] = deepCopyFunction(value)
+//   }
+//
+//   return outObject
+// }
 
 
 function retrieveLocallyStoredStuff() {
@@ -220,6 +262,17 @@ function retrieveLocallyStoredStuff() {
     monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
   }
 
+  if (localStorage.getItem('pastDayList')) {
+    pastDayList = JSON.parse(localStorage.getItem('pastDayList'));
+    // Fix dates messed up by JSON.stringify
+    for (const key in pastDayList) {
+      for (const index in pastDayList[key]) {
+        pastDayList[key][index].date = new Date(pastDayList[key][index].date);
+        pastDayList[key][index].end = new Date(pastDayList[key][index].end);
+      }
+    }
+  }
+
   // if (localStorage.getItem('tasksSentBetween')) {
   //   tasksFromClickedDayInMonth = JSON.parse(localStorage.tasksSentBetween);
   //   fillChooseBox();
@@ -229,6 +282,7 @@ function retrieveLocallyStoredStuff() {
 
 function getDueRemindersFromLast3Months() {  // If the day in the list lies in the past kick tasks to chooseBox
   let now = new Date();
+  now = new Date(now.setDate(now.getDate() + 1)); // To include today in the next for-loop
   let nowMinus3Month = new Date();
   nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 3));
 
@@ -1075,6 +1129,7 @@ function monthRenderTasks() {
   // Fill in and colour days in the past according to taskList for each day
   for (var myId in pastDayList) {
     let tasks = createDisplayList(pastDayList[myId]);
+    console.log(myId, tasks);
 
     let gradient = '';
     let taskColour = 'white';
@@ -1600,25 +1655,25 @@ function zoomFunc() {
 }
 
 
-function createDisplayList() {
+function createDisplayList(sourceList) {
   let jumpToId = uniqueIdOfLastTouched;
   let currentStressLevel = wakeUpStress;
 
   displayList = [];
   let duration = 0;
 
-  displayList.push(taskList[0]);
-  taskList[0].stressGradient = currentStressLevel;
+  displayList.push(sourceList[0]);
+  sourceList[0].stressGradient = currentStressLevel;
 
-  let len = taskList.length;
+  let len = sourceList.length;
   for (var n=1; n<len; n++) {  // TODO: Fix Add-button position again again. Fix duration in add-view
-    // if (taskList[n - 1].end) { // This condition makes dayStart and dayEnd collapse // TODO: Fix this and insert before a fixed task. Maybe run task.end() somewhere appropriate
-      // let duration = taskList[n].date.getTime() - taskList[n-1].end.getTime();
-    let duration = taskList[n].date.getTime() - (taskList[n - 1].date.getTime() + taskList[n - 1].duration);
+    // if (sourceList[n - 1].end) { // This condition makes dayStart and dayEnd collapse // TODO: Fix this and insert before a fixed task. Maybe run task.end() somewhere appropriate
+      // let duration = sourceList[n].date.getTime() - sourceList[n-1].end.getTime();
+    let duration = sourceList[n].date.getTime() - (sourceList[n - 1].date.getTime() + sourceList[n - 1].duration);
     // }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
-      let nullTime = new Task(taskList[n-1].end, duration, '', -1);
-      nullTime.uniqueId = taskList[n-1].uniqueId + 'n';
+      let nullTime = new Task(sourceList[n-1].end, duration, '', -1);
+      nullTime.uniqueId = sourceList[n-1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
       nullTime.startStressLevel = currentStressLevel;
       // nullTime.drain = -1;
@@ -1633,11 +1688,11 @@ function createDisplayList() {
       displayList.push(nullTime);
       duration = 0;
     }
-    taskList[n].startStressLevel = currentStressLevel;
-    let result = getStress(taskList[n]);
-    taskList[n].stressGradient = result[0];
+    sourceList[n].startStressLevel = currentStressLevel;
+    let result = getStress(sourceList[n]);
+    sourceList[n].stressGradient = result[0];
     currentStressLevel = result[1];
-    displayList.push(taskList[n]);
+    displayList.push(sourceList[n]);
   }
 
   uniqueIdOfLastTouched = jumpToId;
@@ -1815,7 +1870,7 @@ function fixTimes() {
 
 
 function renderTasks() {
-  displayList = createDisplayList();
+  displayList = createDisplayList(taskList);
 
   // // Store a backup of taskList
   // let taskListAsText = JSON.stringify(taskListExtractor());
