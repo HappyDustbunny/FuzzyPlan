@@ -15,6 +15,9 @@ document.getElementById('apply3').addEventListener('click', applyStressModel);
 
 document.getElementById('goBack').addEventListener('click', goBack);
 
+document.getElementById('clearAllData').addEventListener('click', clearAllData);
+document.getElementById('clearEverything').addEventListener('click', clearEverything);
+
 document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
 
 document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
@@ -136,4 +139,31 @@ function applyStressModel() {
   }
 
   window.location.assign('main.html');
+}
+
+function clearAllData() {
+  let answer = confirm("The data can NOT be retrieved. Are you SURE "
+  + "you want to delete all data, including tasks on past days?")
+  if (answer) {
+    taskList = [];
+    localStorage.taskList = [];
+    localStorage.monthTaskList = [];
+    localStorage.pastDayList = [];
+    location.reload(true);
+  } else {
+    alert('Nothing was deleted.')
+  }
+}
+
+
+function clearEverything() {
+  let answer = confirm('All data and preferences will be cleared. \n\n'
+  + 'They can NOT be retrieved.\n\n'
+  + 'Are you SURE you want to delete everything?\n\n');
+  if (answer) {
+    localStorage.clear();
+    location.reload(true);
+  } else {
+    alert('Nothing was deleted')
+  }
 }
