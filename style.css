@@ -381,15 +381,12 @@ html {
 /* #monthView.active {
     bottom: 780px;
     /* left: 0px; */
-    width: 100%;
+    /* width: 100%;
     height: 100%;
-    visibility: visible;
+    visibility: visible; */
     /* position: relative; */
-} */
+/* } */
 
-#monthMessage {
-  grid-area: messages;
-}
 
 .monthContainer1 {
   display: grid;
@@ -400,7 +397,7 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'month header day'
+  'track header day'
   '. messages .';
 }
 
@@ -413,16 +410,21 @@ html {
   /* justify-items: center; */
   background-color: transparent;
   border: none;
-  height: 90%;
+  height: 700px;
   overflow-y: scroll;
   grid-template-areas:
   '. taskHeader .'
   '. taskListing .'
 }
 
+#monthMessage {
+  grid-area: messages;
+}
+
 #monthTaskDiv {
-  display: grid;
+  display: flex;
   grid-area: taskListing;
+  flex-direction: column;
 }
 
 .pastDateButton {
@@ -498,6 +500,10 @@ html {
   background-color: white;
   border: none;
   margin: 5px;
+}
+
+#track {
+  grid-area: track;
 }
 
 #monthClearButton {
