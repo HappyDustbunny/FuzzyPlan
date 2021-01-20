@@ -284,14 +284,14 @@ html {
 }
 
 #dayView {
-  visibility: hidden;
+  /* visibility: hidden; */
   position: relative; /* Needs to be relative in order for the add-button to have an absolute position with respect to the viewport and not the total page https://css-tricks.com/absolute-relative-fixed-positioining-how-do-they-differ/ */
   transition: all 0.4s;
 }
 
-#dayView.active {
+/* #dayView.active {
   visibility: visible;
-}
+} */
 
 #text1, #text2 {
   display: flex;
@@ -368,24 +368,24 @@ html {
 /* month view css below */
 
 #monthView {
-    bottom: 780px;
+    /* bottom: 780px; */
     /* left: 300px; */
-    width: 0px;
+    width: 100%;
     /* height: 0px; */
     background-color: white;
-    visibility: hidden;
+    /* visibility: hidden; */
     transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
     position: relative;
 }
 
-#monthView.active {
+/* #monthView.active {
     bottom: 780px;
     /* left: 0px; */
     width: 100%;
     height: 100%;
     visibility: visible;
     /* position: relative; */
-}
+} */
 
 #monthMessage {
   grid-area: messages;
@@ -558,7 +558,50 @@ html {
   display: grid;
 }
 
-/* month view css below */
+/* month view css above */
+
+/* track view css below */
+.trackContainer {
+  display: grid;
+  grid-template-columns: 40px auto 45px;
+  grid-template-rows: auto auto auto;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. header .'
+  '. messages .';
+}
+
+#trackViewName {
+  /* Put FuzzyPlan header in right place */
+  justify-content: center;
+  grid-area: header;
+}
+
+
+#trackView {
+    /* bottom: 3400px; */
+    /* left: 300px; */
+    width: 100%;
+    /* height: 0px; */
+    background-color: white;
+    /* visibility: hidden; */
+    transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+    position: relative;
+}
+
+/* #trackView.active {
+    bottom: 3400px;
+    /* left: 0px; */
+    /* width: 100%;
+    height: 100%;
+    visibility: visible; */
+    /* position: relative; */
+/* } */
+
+/* track view css above */
 
 
 .container2 {
@@ -682,26 +725,26 @@ html {
 }
 
 #addView {  /* Box that help transition to add-view */
-  bottom: 0px;
-  left: 300px;
-  width: 0px;
-  height: 0px;
+  /* bottom: 0px; */
+  /* left: 300px; */
+  width: 100%;
+  /* height: 0px; */
   background-color: white;
   position: absolute;
-  visibility: hidden;
+  /* visibility: hidden; */
   transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
   position: relative;
   left: 0px;
 }
 
-#addView.active { /* Adding class make animation run */
-  bottom: 794px;
+/* #addView.active { /* Adding class make animation run */
+  /* bottom: 794px;
   left: 0px;
   width: 100%;
   height: 100%;
   visibility: visible;
   position: relative;
-}
+} */
 
 
 #dummyAdd {

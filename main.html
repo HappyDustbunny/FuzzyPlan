@@ -80,7 +80,7 @@
 
       <!-- Add-task view ---------------------- -->
 
-      <div id='addView'>
+      <div id='addView' hidden>
         <div class="addContainer1">
           <h1 align='center'>FuzzyPlan</h1>
           <h2 align='center'>Add task</h2>
@@ -241,8 +241,11 @@
 
       <!-- Month view ---------------------- -->
 
-      <div id="monthView">
+      <div id="monthView" hidden>
         <div class="monthContainer1">
+          <button type="button" class="controlButton" id='track' title='Choose which
+          task to track with colours'>Track</button>
+
           <h1 id='monthViewName' align=center>
             FuzzyPlan
           </h1>
@@ -275,6 +278,19 @@
           <!-- <div id='dateDiv'> </div> -->
           <div id='monthTaskDiv'> </div>
         </div>
+      </div>
+
+      <!-- Track view ---------------------- -->
+
+      <div id="trackView" hidden>
+        <div class="trackContainer">
+          <h1 id='trackViewName' align=center>
+            FuzzyPlan
+          </h1>
+
+          <p>Blah blah blah</p>
+        </div>
+
       </div>
 
     </div>

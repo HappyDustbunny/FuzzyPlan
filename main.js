@@ -179,6 +179,7 @@ function storeLocally() {
   }
 }
 
+
 function deepCopyFunc(original) {
   if (typeof original != 'object' || original === null || // typeof null is 'object', hence the latter check
     Object.prototype.toString.call(original) === '[object Date]') { // Dates have to be returned as-is
@@ -198,27 +199,6 @@ function deepCopyFunc(original) {
 
   return deepCopy
 }
-
-
-// const deepCopyFunction = (inObject) => { // Taken from https://medium.com/javascript-in-plain-english/how-to-deep-copy-objects-and-arrays-in-javascript-7c911359b089
-//   let outObject, value, key
-//
-//   if (typeof inObject !== "object" || inObject === null) {
-//     return inObject // Return the value if inObject is not an object
-//   }
-//
-//   // Create an array or object to hold the values
-//   outObject = Array.isArray(inObject) ? [] : {}
-//
-//   for (key in inObject) {
-//     value = inObject[key]
-//
-//     // Recursively (deep) copy for nested objects, including arrays
-//     outObject[key] = deepCopyFunction(value)
-//   }
-//
-//   return outObject
-// }
 
 
 function retrieveLocallyStoredStuff() {
@@ -356,7 +336,6 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
 
 }
 
-// TODO: Clearing inputbox while chooseBox is active should pull the next item up
 
 function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
@@ -590,6 +569,8 @@ document.getElementById('apply').addEventListener('click', apply);
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
+document.getElementById('track').addEventListener('click', trackButtonClicked);
+
 document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
 
 document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
@@ -608,8 +589,10 @@ function addTaskButtonClicked() {
   storeLocally();
 
   // Trigger animation via CSS
-  document.getElementById('addView').classList.add('active');
-  document.getElementById('dayView').classList.remove('active');
+  // document.getElementById('addView').classList.add('active');
+  // document.getElementById('dayView').classList.remove('active');
+  document.getElementById('addView').hidden = false;
+  document.getElementById('dayView').hidden = true;
 
   fillDurationBox(defaultTaskDuration);
 
@@ -856,15 +839,19 @@ function apply() {
 
     // Close add-view via CSS
     // document.getElementById('addView').visible = 'hidden';
-    document.getElementById('dayView').classList.add('active');
-    document.getElementById('addView').classList.remove('active');
+    // document.getElementById('dayView').classList.add('active');
+    // document.getElementById('addView').classList.remove('active');
+    document.getElementById('addView').hidden = true;
+    document.getElementById('dayView').hidden = false;
   }
 }
 
 function returnToDay() {
   // document.getElementById('addView').visible = 'hidden';
-  document.getElementById('dayView').classList.add('active');
-  document.getElementById('addView').classList.remove('active');
+  // document.getElementById('dayView').classList.add('active');
+  // document.getElementById('addView').classList.remove('active');
+  document.getElementById('addView').hidden = true;
+  document.getElementById('dayView').hidden = false;
 }
 
 //////////////////// Add-view button code above ///////////////////////////
@@ -876,8 +863,10 @@ function monthButtonClicked() {
   storeLocally();
 
   // Trigger animation via CSS
-  document.getElementById('monthView').classList.add('active');
-  document.getElementById('dayView').classList.remove('active');
+  // document.getElementById('monthView').classList.add('active');
+  // document.getElementById('dayView').classList.remove('active');
+  document.getElementById('monthView').hidden = false;
+  document.getElementById('dayView').hidden = true;
 
   fillMonthDateBar();
 
@@ -894,8 +883,10 @@ function monthButtonClicked() {
 
 function gotoDay() {
   // Trigger animation via CSS
-  document.getElementById('monthView').classList.remove('active');
-  document.getElementById('dayView').classList.add('active');
+  // document.getElementById('monthView').classList.remove('active');
+  // document.getElementById('dayView').classList.add('active');
+  document.getElementById('monthView').hidden = true;
+  document.getElementById('dayView').hidden = false;
 
   fillChooseBox('day');
 }
@@ -1129,7 +1120,6 @@ function monthRenderTasks() {
   // Fill in and colour days in the past according to taskList for each day
   for (var myId in pastDayList) {
     let tasks = createDisplayList(pastDayList[myId]);
-    console.log(myId, tasks);
 
     let gradient = '';
     let taskColour = 'white';
@@ -1240,6 +1230,24 @@ function monthClearBehavior() {
 // Remenber nested functions to limit scope and new debugging tools
 
 //////////////////// Month-view code above ///////////////////////////
+
+//////////////////// Track-view code above ///////////////////////////
+function trackButtonClicked() {
+  storeLocally();  // TODO: Is this necessary? Wrote it just in case as a copy of monthButtonClicked
+
+  // document.getElementById('trackView').classList.add('active');
+  // document.getElementById('monthView').classList.remove('active');
+  document.getElementById('trackView').hidden = false;
+  document.getElementById('monthView').hidden = true;
+
+  fillDropDownBoxes();
+}
+
+function fillDropDownBoxes() {
+  console.log('Do stuff. Sometime soon. No pressure or anything.');
+}
+
+//////////////////// Track-view code above ///////////////////////////
 
 
 function twoFingerNavigation(event) {
