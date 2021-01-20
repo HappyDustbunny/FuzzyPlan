@@ -1244,7 +1244,30 @@ function trackButtonClicked() {
 }
 
 function fillDropDownBoxes() {
-  console.log('Do stuff. Sometime soon. No pressure or anything.');
+  for (var item in trackTaskList) {
+    trackedItem = document.createElement('span');
+
+    trackedItemCheckBox = document.createElement('label'); // TODO: Make checkbox work/look pretty
+    trackedItemCheckBox.type = 'checkbox';
+    trackedItemCheckBox.name = item;
+    trackedItemCheckBox.id = item;
+    trackedItemCheckBox.value = item;
+
+    trackedItem.appendChild(trackedItemCheckBox);
+
+    trackedItemButton = document.createElement('button');
+    trackedItemButton.classList.add('trackedItemButton');
+    trackedItemButton.textContent = item;
+
+    trackedItem.appendChild(trackedItemButton);
+
+    trackedItemColour = document.createElement('span');
+    trackedItemColour.style.backgroundColor = trackTaskList[item];
+    trackedItemColour.textContent = '\u00a0\u00a0\u00a0\u00a0';
+    trackedItem.appendChild(trackedItemColour);
+
+    document.getElementById('trackedItemsDiv').appendChild(trackedItem);
+  }
 }
 
 //////////////////// Track-view code above ///////////////////////////

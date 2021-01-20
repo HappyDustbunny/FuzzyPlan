@@ -567,7 +567,7 @@ html {
 /* month view css above */
 
 /* track view css below */
-.trackContainer {
+.trackContainer1 {
   display: grid;
   grid-template-columns: 40px auto 45px;
   grid-template-rows: auto auto auto;
@@ -578,6 +578,26 @@ html {
   grid-template-areas:
   '. header .'
   '. messages .';
+}
+
+.trackContainer2 {
+  display: grid;
+  grid-template-columns: 40px auto 45px;
+  grid-template-rows: auto auto auto;
+  grid-gap: .3rem;
+  background-color: transparent;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. . .'
+  '. trackedItems .';
+
+}
+
+#trackedItemsDiv {
+  display: flex;
+  flex-direction: column;
+  grid-area: trackedItems;
 }
 
 #trackViewName {
