@@ -582,16 +582,15 @@ html {
 
 .trackContainer2 {
   display: grid;
-  grid-template-columns: 40px auto 45px;
+  grid-template-columns: 40px auto 25px 25px;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. . .'
-  '. trackedItems .';
-
+  '. . . .'
+  '. trackedItems trackedItemsColour .';
 }
 
 #trackedItemsDiv {
@@ -599,6 +598,30 @@ html {
   flex-direction: column;
   grid-area: trackedItems;
 }
+
+#trackedItemsColourDiv {
+  display: flex;
+  flex-direction: column;
+  grid-area: trackedItemsColour;
+}
+
+/* .trackContainer3 {
+  display: grid;
+  grid-template-columns: 15px auto 25px;
+  grid-template-rows: auto auto auto;
+  grid-gap: .5rem;
+  background-color: transparent;
+  border: none;
+  grid-area: trackedItems;
+  grid-template-areas:
+  '. trackedItemSpan colour'
+} */
+
+/* #trackedItemsDiv {
+  display: flex;
+  flex-direction: column;
+  grid-area: trackedItemSpan;
+} */
 
 #trackViewName {
   /* Put FuzzyPlan header in right place */

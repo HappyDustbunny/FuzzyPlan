@@ -1245,30 +1245,60 @@ function trackButtonClicked() {
 
 function fillDropDownBoxes() {
   for (var item in trackTaskList) {
-    trackedItem = document.createElement('span');
-
-    trackedItemCheckBox = document.createElement('label'); // TODO: Make checkbox work/look pretty
-    trackedItemCheckBox.type = 'checkbox';
-    trackedItemCheckBox.name = item;
-    trackedItemCheckBox.id = item;
-    trackedItemCheckBox.value = item;
-
-    trackedItem.appendChild(trackedItemCheckBox);
-
-    trackedItemButton = document.createElement('button');
-    trackedItemButton.classList.add('trackedItemButton');
-    trackedItemButton.textContent = item;
-
-    trackedItem.appendChild(trackedItemButton);
-
-    trackedItemColour = document.createElement('span');
-    trackedItemColour.style.backgroundColor = trackTaskList[item];
-    trackedItemColour.textContent = '\u00a0\u00a0\u00a0\u00a0';
-    trackedItem.appendChild(trackedItemColour);
-
-    document.getElementById('trackedItemsDiv').appendChild(trackedItem);
+    addTrackedTask(item)
   }
 }
+
+function trackCheckboxClicked(event) {
+  let element = document.getElementsByClassName(event.target.id);
+  // TODO: Add functionality aside greying out line
+
+  if (event.target.checked) {
+    element[0].style.opacity = 1;
+    element[1].style.opacity = 1;
+  } else {
+    element[0].style.opacity = 0.25;
+    element[1].style.opacity = 0.25;
+  }
+}
+
+function addTrackedTask(item) {
+  trackedItem = document.createElement('span');
+
+  // Create checkbox
+  trackedItemCheckBox = document.createElement('input');
+  trackedItemCheckBox.type = 'checkbox';
+  // trackedItemCheckBox.classList.add(item);
+  trackedItemCheckBox.name = item;
+  trackedItemCheckBox.id = item;
+  trackedItemCheckBox.checked = true;
+  trackedItemCheckBox.style.gridArea = '1 / 0';
+
+  trackedItem.appendChild(trackedItemCheckBox);
+
+
+  // Create text
+  trackedItemButton = document.createElement('span');
+  trackedItemButton.classList.add(item);
+  trackedItemButton.textContent = item.charAt(0).toUpperCase() + item.slice(1);
+  trackedItemButton.style.gridArea = '1 / 0';
+
+  trackedItem.appendChild(trackedItemButton);
+
+
+  // Create colour
+  trackedItemColour = document.createElement('span');
+  trackedItemColour.classList.add(item);
+  trackedItemColour.style.backgroundColor = trackTaskList[item];
+  trackedItemColour.textContent = '\u00a0\u00a0\u00a0\u00a0';
+  trackedItemColour.style.gridArea = '2 / 0';
+
+  document.getElementById('trackedItemsDiv').appendChild(trackedItem);
+  document.getElementById('trackedItemsColourDiv').appendChild(trackedItemColour);
+
+  document.getElementById(item).addEventListener('click', function () { trackCheckboxClicked(event); });
+}
+
 
 //////////////////// Track-view code above ///////////////////////////
 
