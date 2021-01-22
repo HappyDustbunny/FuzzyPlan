@@ -576,7 +576,8 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. header month1'
+  '. header1 month1'
+  '. header2 .'
   '. messages .';
 }
 
@@ -589,9 +590,21 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. . . .'
+  '. taskPicker colourPicker .'
   '. trackedItems trackedItemsColour .';
 }
+
+/* #taskPickerDiv {
+  display: flex;
+  flex-direction: column;
+  grid-area: taskPicker;
+}
+
+#colourPickerDiv {
+  display: flex;
+  flex-direction: column;
+  grid-area: colourPicker;
+} */
 
 #trackedItemsDiv {
   display: flex;
@@ -608,6 +621,10 @@ html {
 #month1 {
   grid-area: month1;
   align-self: center;
+}
+
+#trackViewSpacer {
+  height: 60px;
 }
 
 /* .trackContainer3 {
@@ -631,7 +648,7 @@ html {
 #trackViewName {
   /* Put FuzzyPlan header in right place */
   justify-content: center;
-  grid-area: header;
+  grid-area: header1;
 }
 
 

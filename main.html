@@ -284,14 +284,38 @@
 
       <div id="trackView" hidden>
         <div class="trackContainer1">
-          <h1 id='trackViewName' align=center>
+          <h1 id='trackViewName' align='center'>
             FuzzyPlan
           </h1>
+          <h2 align='center'>Choose tasks to track</h2>
 
           <button type="button" class='controlButton' id="month1" title='       Click to
           get back to month-view'>Month</button>
-
         </div>
+
+        <span> <br> </span>
+
+        <div class='topic'>
+          <div>
+            <span class="text">Track &nbsp;</span>
+            <input type="text" id='taskPickerInputBox' autofocus value="" alt='Write task
+            text for the task you want to track' tabindex="1" placeholder="exercise">
+          </div>
+        </div>
+
+        <span> <br> </span>
+
+        <div class='topic'>
+          <div>
+            <span class="text">Colour &nbsp;</span>
+            <input type="text" id='colourPickerInputBox' autofocus value="" alt='Write colour
+            name, rgb-value or hex-value' tabindex="2" placeholder="magenta">
+          </div>
+        </div>
+
+        <span> <br> </span>
+
+        <div id="trackViewSpacer"></div>
 
         <div class="trackContainer2">
           <div id="trackedItemsDiv"></div>
