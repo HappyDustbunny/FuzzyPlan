@@ -576,7 +576,7 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. header .'
+  '. header month1'
   '. messages .';
 }
 
@@ -603,6 +603,11 @@ html {
   display: flex;
   flex-direction: column;
   grid-area: trackedItemsColour;
+}
+
+#month1 {
+  grid-area: month1;
+  align-self: center;
 }
 
 /* .trackContainer3 {
@@ -826,6 +831,7 @@ html {
   grid-area: messages;
 }
 
+/* TODO: There are two #month */
 #month {
   grid-area: month;
   justify-self: end;

@@ -32,8 +32,13 @@ let drainGainLevel_add = 'd1';
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
 let pastDayList = {};
-let trackTaskList = {'morgenprogram': '#00FF00', 'frokost': '#DD0000', 'programmere': '#0000FF'}; // TODO: For testing purposes. Remove text to {};
+
+// TODO: For testing purposes. Remove text to {};
+let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 let putBackId = '';
+
+///////// Track-view ////////
+
 
 // let storage = window.localStorage; // TODO: Is this in use?
 
@@ -170,7 +175,7 @@ function storeLocally() {
   // Store today in pastDayList
   let now = new Date();
   let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
-  pastDayList[id] = deepCopyFunc(taskList);  // deepCopyFunc is used to make a deep copy
+  pastDayList[id] = deepCopyFunc(taskList);  //  Func is used to make a deep copy
 
 
   // Store pastDayList
@@ -582,6 +587,10 @@ document.getElementById('monthClearButton').addEventListener('click', monthClear
 document.getElementById('moveToDay').addEventListener('click', moveToDay);
 
 document.getElementById('putBack').addEventListener('click', putBack);
+
+////////////////// Eventlisteners for Month-view ///////////////////////
+
+document.getElementById('month1').addEventListener('click', returnToMonth);
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -1146,7 +1155,9 @@ function monthRenderTasks() {
           taskColour = 'white'; // nullTime is made white
           break;
         } else if (string == trackedTaskText) {
-          taskColour = trackTaskList[trackedTaskText];
+          if (Number(trackTaskList[trackedTaskText][1]) === 1) {
+            taskColour = trackTaskList[trackedTaskText][0];
+          }
           break;
         }
       }
@@ -1231,7 +1242,8 @@ function monthClearBehavior() {
 
 //////////////////// Month-view code above ///////////////////////////
 
-//////////////////// Track-view code above ///////////////////////////
+//////////////////// Track-view code below ///////////////////////////
+
 function trackButtonClicked() {
   storeLocally();  // TODO: Is this necessary? Wrote it just in case as a copy of monthButtonClicked
 
@@ -1240,29 +1252,45 @@ function trackButtonClicked() {
   document.getElementById('trackView').hidden = false;
   document.getElementById('monthView').hidden = true;
 
-  fillDropDownBoxes();
+  renderTracking();
 }
 
-function fillDropDownBoxes() {
-  for (var item in trackTaskList) {
-    addTrackedTask(item)
+function renderTracking() {
+
+  const trackedItemsDiv = document.getElementById('trackedItemsDiv');
+  while (trackedItemsDiv.firstChild) {
+    trackedItemsDiv.removeChild(trackedItemsDiv.lastChild);
   }
+
+  const trackedItemsColourDiv = document.getElementById('trackedItemsColourDiv');
+  while (trackedItemsColourDiv.firstChild) {
+    trackedItemsColourDiv.removeChild(trackedItemsColourDiv.lastChild);
+  }
+
+  for (const item in trackTaskList) {
+    addTrackedTask(item);
+  }
+
 }
 
 function trackCheckboxClicked(event) {
-  let element = document.getElementsByClassName(event.target.id);
+  let trackedTask = event.target.id;
+  let element = document.getElementsByClassName(trackedTask);
   // TODO: Add functionality aside greying out line
 
+  // Set opacity according to checked status
   if (event.target.checked) {
+    trackTaskList[trackedTask][1] = 1;
     element[0].style.opacity = 1;
     element[1].style.opacity = 1;
   } else {
+    trackTaskList[trackedTask][1] = 0.25;
     element[0].style.opacity = 0.25;
     element[1].style.opacity = 0.25;
   }
 }
 
-function addTrackedTask(item) {
+function addTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
   trackedItem = document.createElement('span');
 
   // Create checkbox
@@ -1271,7 +1299,11 @@ function addTrackedTask(item) {
   // trackedItemCheckBox.classList.add(item);
   trackedItemCheckBox.name = item;
   trackedItemCheckBox.id = item;
-  trackedItemCheckBox.checked = true;
+  if (Number(trackTaskList[item][1]) === 1) {
+    trackedItemCheckBox.checked = true;
+  } else {
+    trackedItemCheckBox.checked = false;
+  }
   trackedItemCheckBox.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemCheckBox);
@@ -1281,6 +1313,7 @@ function addTrackedTask(item) {
   trackedItemButton = document.createElement('span');
   trackedItemButton.classList.add(item);
   trackedItemButton.textContent = item.charAt(0).toUpperCase() + item.slice(1);
+  trackedItemButton.style.opacity = trackTaskList[item][1];
   trackedItemButton.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemButton);
@@ -1289,14 +1322,22 @@ function addTrackedTask(item) {
   // Create colour
   trackedItemColour = document.createElement('span');
   trackedItemColour.classList.add(item);
-  trackedItemColour.style.backgroundColor = trackTaskList[item];
+  trackedItemColour.style.backgroundColor = trackTaskList[item][0];
   trackedItemColour.textContent = '\u00a0\u00a0\u00a0\u00a0';
+  trackedItemColour.style.opacity = trackTaskList[item][1];
   trackedItemColour.style.gridArea = '2 / 0';
 
   document.getElementById('trackedItemsDiv').appendChild(trackedItem);
   document.getElementById('trackedItemsColourDiv').appendChild(trackedItemColour);
 
   document.getElementById(item).addEventListener('click', function () { trackCheckboxClicked(event); });
+}
+
+
+function returnToMonth() {
+  document.getElementById('trackView').hidden = true;
+  document.getElementById('monthView').hidden = false;
+  monthRenderTasks();
 }
 
 
