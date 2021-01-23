@@ -663,6 +663,9 @@ html {
     position: relative;
 }
 
+.colourButton {
+  width: 25%;
+}
 /* #trackView.active {
     bottom: 3400px;
     /* left: 0px; */

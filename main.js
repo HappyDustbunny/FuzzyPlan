@@ -38,7 +38,54 @@ let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '
 let putBackId = '';
 
 ///////// Track-view ////////
-
+let colours = [
+'Aquamarine',
+'Cyan',
+'LightCyan',
+'LightBlue',
+'DarkTurquoise',
+'Turquoise',
+'SteelBlue',
+'DarkCyan',
+'SkyBlue',
+'RoyalBlue',
+'SlateBlue',
+'Blue',
+'DarkBlue',
+'DeepSkyBlue',
+'BlueViolet',
+'Violet',
+'Brown',
+'Sienna',
+'Chocolate',
+'Salmon',
+'Coral',
+'Crimson',
+'DeepPink',
+'Indigo',
+'DarkGreen',
+'ForestGreen',
+'Green',
+'GreenYellow',
+'LawnGreen',
+'SpringGreen',
+'LightGreen',
+'Lime',
+'LimeGreen',
+'Pink',
+'Purple',
+'Red',
+'SeaGreen',
+'Tomato',
+'Khaki',
+'YellowGreen',
+'Yellow',
+'Gold',
+'LightGray',
+'Gray',
+'SlateGray',
+'DarkGrey'
+]
 
 // let storage = window.localStorage; // TODO: Is this in use?
 
@@ -210,13 +257,16 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('taskList')) {
     taskList = JSON.parse(localStorage.taskList);
-    // Fix dates messed up by JSON.stringify
+    // Fix dates messed up by JSON.stringify - and bring them up to current date
+    let now = new Date();
     for (const [index, task] of taskList.entries()) {
       task.date = new Date(task.date);
+      task.date.setDate(now.getDate());
       task.end = new Date(task.end);
+      task.end.setDate(now.getDate());
     }
-  }
 
+  }
   if (localStorage.getItem('wakeUpOrNowClickedOnce') == 'true') {
     wakeUpOrNowClickedOnce = true;
   } else {
@@ -1271,7 +1321,38 @@ function renderTracking() {
     addTrackedTask(item);
   }
 
+  for (const colour in colours) {
+    addColour1(colour);
+    addColour(colour);
+  }
+
 }
+
+function addColour1(colour) {
+  let colourButtons = document.getElementById('colourButtons');
+  let colourButton = document.createElement('button');
+
+  colourButton.style.backgroundColor = colours[colour];
+  colourButton.style.fontSize = '0.6em';
+  colourButton.textContent = colours[colour];
+  colourButton.classList.add('colourButton');
+
+  document.getElementById('colourButtons');
+  colourButtons.appendChild(colourButton);
+}
+
+function addColour(colour) {
+  let selectBox = document.getElementById('colourValues');
+  let option = document.createElement('option');
+
+  option.value = colours[colour];
+  option.textContent = colours[colour];
+  option.style.fontSize = '0.6em';
+  option.style.color = colours[colour];
+
+  selectBox.appendChild(option);
+}
+
 
 function trackCheckboxClicked(event) {
   let trackedTask = event.target.id;
@@ -1291,10 +1372,10 @@ function trackCheckboxClicked(event) {
 }
 
 function addTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
-  trackedItem = document.createElement('span');
+  let trackedItem = document.createElement('span');
 
   // Create checkbox
-  trackedItemCheckBox = document.createElement('input');
+  let trackedItemCheckBox = document.createElement('input');
   trackedItemCheckBox.type = 'checkbox';
   // trackedItemCheckBox.classList.add(item);
   trackedItemCheckBox.name = item;
