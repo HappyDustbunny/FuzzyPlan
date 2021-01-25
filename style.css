@@ -665,6 +665,11 @@ html {
 
 .colourButton {
   width: 25%;
+  height: 30px;
+}
+
+#colourPickerInputBox {
+  width: 200px;
 }
 /* #trackView.active {
     bottom: 3400px;

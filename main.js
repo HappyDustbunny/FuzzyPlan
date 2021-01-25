@@ -40,51 +40,45 @@ let putBackId = '';
 ///////// Track-view ////////
 let colours = [
 'Aquamarine',
-'Cyan',
-'LightCyan',
 'LightBlue',
-'DarkTurquoise',
-'Turquoise',
-'SteelBlue',
-'DarkCyan',
 'SkyBlue',
-'RoyalBlue',
-'SlateBlue',
-'Blue',
-'DarkBlue',
+'SteelBlue',
+'Turquoise',
+'DarkTurquoise',
+'DarkCyan',
+'Cyan',
 'DeepSkyBlue',
+'RoyalBlue',
+'DarkBlue',
+'Blue',
+'Indigo',
 'BlueViolet',
+'Purple',
+'Magenta',
 'Violet',
-'Brown',
+'DeepPink',
+'Crimson',
+'Red',
+'Tomato',
+'Salmon',
 'Sienna',
 'Chocolate',
-'Salmon',
-'Coral',
-'Crimson',
-'DeepPink',
-'Indigo',
-'DarkGreen',
-'ForestGreen',
-'Green',
-'GreenYellow',
+'Brown',
+'Khaki',
+'Gold',
+'Yellow',
+'GreenYellow' ,
 'LawnGreen',
-'SpringGreen',
 'LightGreen',
+'SpringGreen',
 'Lime',
 'LimeGreen',
-'Pink',
-'Purple',
-'Red',
-'SeaGreen',
-'Tomato',
-'Khaki',
-'YellowGreen',
-'Yellow',
-'Gold',
+'ForestGreen',
+'Green',
+'DarkGreen',
 'LightGray',
-'Gray',
-'SlateGray',
-'DarkGrey'
+'DarkGray',
+'Gray'
 ]
 
 // let storage = window.localStorage; // TODO: Is this in use?
@@ -608,9 +602,9 @@ document.getElementById('inputTimeBox').addEventListener('keypress',
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
-document.getElementById('duration').addEventListener('click', function () { addDuration(event);})
+document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
 
-document.getElementById('time').addEventListener('click', function () { time_add(event);})
+document.getElementById('time').addEventListener('click', function () { time_add(event);});
 
 document.getElementById('clear').addEventListener('click', clearTimeBox);
 
@@ -642,6 +636,15 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 document.getElementById('month1').addEventListener('click', returnToMonth);
 
+////////////////// Eventlisteners for Month-view ///////////////////////
+
+document.getElementById('colourButtons').addEventListener('click', function () { colourButtonClicked(event);});
+
+document.getElementById('colourPickerInputBox').addEventListener('focus', function () {
+  document.getElementById('colourButtons').hidden = false;
+});
+
+document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
 //////////////////// Add-view code below ///////////////////////////
 
 function addTaskButtonClicked() {
@@ -1297,8 +1300,6 @@ function monthClearBehavior() {
 function trackButtonClicked() {
   storeLocally();  // TODO: Is this necessary? Wrote it just in case as a copy of monthButtonClicked
 
-  // document.getElementById('trackView').classList.add('active');
-  // document.getElementById('monthView').classList.remove('active');
   document.getElementById('trackView').hidden = false;
   document.getElementById('monthView').hidden = true;
 
@@ -1318,12 +1319,12 @@ function renderTracking() {
   }
 
   for (const item in trackTaskList) {
-    addTrackedTask(item);
+    showTrackedTask(item);
   }
 
   for (const colour in colours) {
     addColour1(colour);
-    addColour(colour);
+    // addColour(colour);
   }
 
 }
@@ -1335,23 +1336,41 @@ function addColour1(colour) {
   colourButton.style.backgroundColor = colours[colour];
   colourButton.style.fontSize = '0.6em';
   colourButton.textContent = colours[colour];
+  colourButton.id = colours[colour];
   colourButton.classList.add('colourButton');
 
   document.getElementById('colourButtons');
   colourButtons.appendChild(colourButton);
 }
 
-function addColour(colour) {
-  let selectBox = document.getElementById('colourValues');
-  let option = document.createElement('option');
 
-  option.value = colours[colour];
-  option.textContent = colours[colour];
-  option.style.fontSize = '0.6em';
-  option.style.color = colours[colour];
+function colourPickerEvent(event) {
+  if (event.key === 'Enter') {
+    // TODO: Sanitize input
+    let chosenColour = document.getElementById('colourPickerInputBox').value.trim();
+    let task = document.getElementById('taskPickerInputBox').value.trim();
+    // task.replace(/ /.g, '_');  // The DOM can't handle spaces
 
-  selectBox.appendChild(option);
+    document.getElementById('chosenColour').style.backgroundColor = chosenColour;
+    document.getElementById('colourButtons').hidden = true;
+
+    addTrackedTask(task, chosenColour);
+  }
 }
+
+
+function colourButtonClicked(event) {
+  let chosenColour = event.target.id;
+  let task = document.getElementById('taskPickerInputBox').value.trim();
+  // task.replace(/ /.g, '_');  // The DOM can't handle spaces
+
+  document.getElementById('colourPickerInputBox').value = chosenColour;
+  document.getElementById('chosenColour').style.backgroundColor = chosenColour;
+  document.getElementById('colourButtons').hidden = true;
+
+  addTrackedTask(task, chosenColour);
+}
+
 
 
 function trackCheckboxClicked(event) {
@@ -1371,8 +1390,17 @@ function trackCheckboxClicked(event) {
   }
 }
 
-function addTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
+function addTrackedTask(text, colour) {
+  text = text.replace(/ /g, '_');  // The DOM can't handle spaces
+  trackTaskList[text] = [colour, '1'];
+  renderTracking();
+}
+
+function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
   let trackedItem = document.createElement('span');
+
+  // identifier = item.replace(' ', '_');  // The DOM can't handle spaces
+  console.log(item);
 
   // Create checkbox
   let trackedItemCheckBox = document.createElement('input');
@@ -1389,11 +1417,11 @@ function addTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for 
 
   trackedItem.appendChild(trackedItemCheckBox);
 
-
   // Create text
   trackedItemButton = document.createElement('span');
   trackedItemButton.classList.add(item);
-  trackedItemButton.textContent = item.charAt(0).toUpperCase() + item.slice(1);
+  let text = item.replace(/_/g, ' ');
+  trackedItemButton.textContent = text.charAt(0).toUpperCase() + text.slice(1);
   trackedItemButton.style.opacity = trackTaskList[item][1];
   trackedItemButton.style.gridArea = '1 / 0';
 
