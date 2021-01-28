@@ -32,58 +32,18 @@ let drainGainLevel_add = 'd1';
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
 let pastDayList = {};
-
-// TODO: For testing purposes. Remove text to {};
-let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
+let trackTaskList = {}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
+// let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 let putBackId = '';
 
 ///////// Track-view ////////
 let colours = [
-'Aquamarine',
-'LightBlue',
-'SkyBlue',
-'SteelBlue',
-'Turquoise',
-'DarkTurquoise',
-'DarkCyan',
-'Cyan',
-'DeepSkyBlue',
-'RoyalBlue',
-'DarkBlue',
-'Blue',
-'Indigo',
-'BlueViolet',
-'Purple',
-'Magenta',
-'Violet',
-'DeepPink',
-'Crimson',
-'Red',
-'Tomato',
-'Salmon',
-'Sienna',
-'Chocolate',
-'Brown',
-'Khaki',
-'Gold',
-'Yellow',
-'GreenYellow' ,
-'LawnGreen',
-'LightGreen',
-'SpringGreen',
-'Lime',
-'LimeGreen',
-'ForestGreen',
-'Green',
-'DarkGreen',
-'LightGray',
-'DarkGray',
-'Gray'
+'Aquamarine','LightBlue', 'SkyBlue', 'SteelBlue', 'Turquoise', 'DarkTurquoise', 'DarkCyan',
+'Cyan','DeepSkyBlue','RoyalBlue','DarkBlue','Blue','Indigo','BlueViolet','Purple','Magenta',
+'Violet','DeepPink','Crimson','Red','Tomato','Salmon','Sienna','Chocolate','Brown','Khaki',
+'Gold','Yellow','GreenYellow' ,'LawnGreen','LightGreen','SpringGreen','Lime','LimeGreen',
+'ForestGreen','Green','DarkGreen','LightGray','DarkGray','Gray'
 ]
-
-// let storage = window.localStorage; // TODO: Is this in use?
-
-// TODO: Inserting at the same time as a fixed task does not generate an error
 
 
 // Daylight saving time shenanigans
@@ -213,6 +173,10 @@ function storeLocally() {
     localStorage.monthTaskList = JSON.stringify(monthTaskList);
   }
 
+  if (trackTaskList) {
+    localStorage.trackTaskList = JSON.stringify(trackTaskList);
+  }
+
   // Store today in pastDayList
   let now = new Date();
   let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
@@ -289,6 +253,11 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('monthTaskList')) {
     monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
+  }
+
+
+  if (localStorage.getItem('trackTaskList')) {
+    trackTaskList = JSON.parse(localStorage.getItem('trackTaskList'));
   }
 
   if (localStorage.getItem('pastDayList')) {
@@ -961,12 +930,7 @@ function fillMonthDateBar() {
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
 
-  // Make the first button with monthname  // TODO: Is this still necessary? Or does it generate an echo?
   let thisMonth = now.getMonth();
-  monthNameNode = document.createElement('button');
-  monthNameNode.classList.add('monthName');
-  monthNameNode.textContent = months[now.getMonth()];
-  document.getElementById('monthTaskDiv').appendChild(monthNameNode);
 
   for (let i = nowMinus3Month; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
     // Insert monthnames before each the 1th
@@ -1309,6 +1273,8 @@ function trackButtonClicked() {
 
 function renderTracking() {
 
+  storeLocally();
+
   // Remove old content
   const trackedItemsDiv = document.getElementById('trackedItemsDiv');
   removeContentFrom (trackedItemsDiv);
@@ -1409,14 +1375,15 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   // Create checkbox
   let trackedItemCheckBox = document.createElement('input');
   trackedItemCheckBox.type = 'checkbox';
-  // trackedItemCheckBox.classList.add(item);
   trackedItemCheckBox.name = item;
   trackedItemCheckBox.id = item;
+
   if (Number(trackTaskList[item][1]) === 1) {
     trackedItemCheckBox.checked = true;
   } else {
     trackedItemCheckBox.checked = false;
   }
+
   trackedItemCheckBox.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemCheckBox);
@@ -1430,7 +1397,6 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   trackedItemButton.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemButton);
-
 
   // Create colour
   trackedItemColour = document.createElement('span');
