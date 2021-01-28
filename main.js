@@ -1201,6 +1201,7 @@ function monthRenderTasks() {
 
       // Find colour value if text is in trackTaskList
       let string = tasks[n].text.toLowerCase();
+      string = string.replace(/ /g, '_');
 
       for (var trackedTaskText in trackTaskList) {
         taskColour = '#DED';  // Default task colour if not watched
@@ -1308,28 +1309,36 @@ function trackButtonClicked() {
 
 function renderTracking() {
 
+  // Remove old content
   const trackedItemsDiv = document.getElementById('trackedItemsDiv');
-  while (trackedItemsDiv.firstChild) {
-    trackedItemsDiv.removeChild(trackedItemsDiv.lastChild);
-  }
+  removeContentFrom (trackedItemsDiv);
 
   const trackedItemsColourDiv = document.getElementById('trackedItemsColourDiv');
-  while (trackedItemsColourDiv.firstChild) {
-    trackedItemsColourDiv.removeChild(trackedItemsColourDiv.lastChild);
-  }
+  removeContentFrom(trackedItemsColourDiv);
 
+  const colourButtons = document.getElementById('colourButtons');
+  removeContentFrom(colourButtons);
+
+  // Add new content
+  // ... to list of tracked tasks
   for (const item in trackTaskList) {
     showTrackedTask(item);
   }
-
+  // ... and to colourButtons (still hidden)
   for (const colour in colours) {
-    addColour1(colour);
-    // addColour(colour);
+    addColour(colour);
   }
-
 }
 
-function addColour1(colour) {
+
+function removeContentFrom(div) {
+  while (div.firstChild) {
+    div.removeChild(div.lastChild);
+  }
+}
+
+
+function addColour(colour) {
   let colourButtons = document.getElementById('colourButtons');
   let colourButton = document.createElement('button');
 
@@ -1349,7 +1358,6 @@ function colourPickerEvent(event) {
     // TODO: Sanitize input
     let chosenColour = document.getElementById('colourPickerInputBox').value.trim();
     let task = document.getElementById('taskPickerInputBox').value.trim();
-    // task.replace(/ /.g, '_');  // The DOM can't handle spaces
 
     document.getElementById('chosenColour').style.backgroundColor = chosenColour;
     document.getElementById('colourButtons').hidden = true;
@@ -1362,7 +1370,6 @@ function colourPickerEvent(event) {
 function colourButtonClicked(event) {
   let chosenColour = event.target.id;
   let task = document.getElementById('taskPickerInputBox').value.trim();
-  // task.replace(/ /.g, '_');  // The DOM can't handle spaces
 
   document.getElementById('colourPickerInputBox').value = chosenColour;
   document.getElementById('chosenColour').style.backgroundColor = chosenColour;
@@ -1380,11 +1387,11 @@ function trackCheckboxClicked(event) {
 
   // Set opacity according to checked status
   if (event.target.checked) {
-    trackTaskList[trackedTask][1] = 1;
+    trackTaskList[trackedTask][1] = "1";
     element[0].style.opacity = 1;
     element[1].style.opacity = 1;
   } else {
-    trackTaskList[trackedTask][1] = 0.25;
+    trackTaskList[trackedTask][1] = "0.25";
     element[0].style.opacity = 0.25;
     element[1].style.opacity = 0.25;
   }
@@ -1398,9 +1405,6 @@ function addTrackedTask(text, colour) {
 
 function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
   let trackedItem = document.createElement('span');
-
-  // identifier = item.replace(' ', '_');  // The DOM can't handle spaces
-  console.log(item);
 
   // Create checkbox
   let trackedItemCheckBox = document.createElement('input');
