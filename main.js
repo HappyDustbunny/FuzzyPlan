@@ -605,13 +605,15 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 document.getElementById('month1').addEventListener('click', returnToMonth);
 
-////////////////// Eventlisteners for Month-view ///////////////////////
+////////////////// Eventlisteners for track-view ///////////////////////
 
 document.getElementById('colourButtons').addEventListener('click', function () { colourButtonClicked(event);});
 
 document.getElementById('colourPickerInputBox').addEventListener('focus', function () {
   document.getElementById('colourButtons').hidden = false;
 });
+
+document.getElementById('taskPickerInputBox').addEventListener('keypress', function () { taskPickerEvent(event); });
 
 document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
 //////////////////// Add-view code below ///////////////////////////
@@ -1271,6 +1273,7 @@ function trackButtonClicked() {
   renderTracking();
 }
 
+
 function renderTracking() {
 
   storeLocally();
@@ -1319,31 +1322,95 @@ function addColour(colour) {
 }
 
 
-function colourPickerEvent(event) {
+function taskPickerEvent(event) {
   if (event.key === 'Enter') {
-    // TODO: Sanitize input
-    let chosenColour = document.getElementById('colourPickerInputBox').value.trim();
-    let task = document.getElementById('taskPickerInputBox').value.trim();
-
-    document.getElementById('chosenColour').style.backgroundColor = chosenColour;
-    document.getElementById('colourButtons').hidden = true;
-
-    addTrackedTask(task, chosenColour);
+    addTrackedTask(null);
   }
 }
 
 
-function colourButtonClicked(event) {
-  let chosenColour = event.target.id;
-  let task = document.getElementById('taskPickerInputBox').value.trim();
+function colourPickerEvent(event) {
+  if (event.key === 'Enter') {
+    addTrackedTask(null);
+  }
 
-  document.getElementById('colourPickerInputBox').value = chosenColour;
-  document.getElementById('chosenColour').style.backgroundColor = chosenColour;
-  document.getElementById('colourButtons').hidden = true;
-
-  addTrackedTask(task, chosenColour);
 }
 
+
+// function addTrackingOfTask(event) {
+//   if (event.key === 'Enter') {
+//     // TODO: Sanitize input
+//     let colourPickerInputBox = document.getElementById('colourPickerInputBox').value.trim();
+//     let chosenColour = colourPickerInputBox.value.trim();
+//     colourPickerInputBox.value = '';
+//
+//     let taskPickerInputBox = document.getElementById('taskPickerInputBox').value.trim();
+//     let task = taskPickerInputBox.value.trim();
+//     taskPickerInputBox.value = '';
+//
+//     document.getElementById('chosenColour').style.backgroundColor = chosenColour;
+//     document.getElementById('colourButtons').hidden = true;
+//
+//     addTrackedTask(task, chosenColour);
+//   }
+// }
+
+
+function colourButtonClicked(event) {
+  let chosenColour = event.target.id;
+  // let task = document.getElementById('taskPickerInputBox').value.trim();
+  //
+  // document.getElementById('colourPickerInputBox').value = chosenColour;
+  // document.getElementById('chosenColour').style.backgroundColor = chosenColour;
+  // document.getElementById('colourButtons').hidden = true;
+
+  addTrackedTask(chosenColour);
+}
+
+// TODO: Make removing tracked task possible idiviually and en masse
+// TODO: Make clear data in Settings work with nowButton and upButton
+
+function addTrackedTask(buttonColour) {
+  // TODO: Sanitize inputs
+  let taskPickerInputBox = document.getElementById('taskPickerInputBox');
+  let text = taskPickerInputBox.value.trim();
+  if (text) {
+    taskPickerInputBox.value = '';
+
+    let colourPickerInputBox = document.getElementById('colourPickerInputBox');
+
+    if (colourPickerInputBox.value.trim() != '') {  // If there is text in the coulorPicker input box...
+      chosenColour = colourPickerInputBox.value.trim();
+    } else if (buttonColour === null) { // If no button has been clicked and no text: assign random colour not already used...
+      let tryAgain = false;
+      do {
+        tryAgain = false;
+        chosenColour = colours[Math.floor(Math.random()*40)];
+        for (var key in trackTaskList) {
+          if (trackTaskList[key][0] === chosenColour) {
+            tryAgain = true;
+            break;
+          }
+        }
+      }
+      while (tryAgain)
+
+    } else { // If a colourButton has been clicked...
+      chosenColour = buttonColour;
+    }
+
+    colourPickerInputBox.value = '';
+
+    // document.getElementById('chosenColour').style.backgroundColor = chosenColour;
+    document.getElementById('colourButtons').hidden = true;
+
+    text = text.replace(/ /g, '_');  // The DOM can't handle spaces
+    trackTaskList[text] = [chosenColour, '1'];
+    renderTracking();
+  } else {
+    displayMessage('Please add a task', 3000, track);
+  }
+}
 
 
 function trackCheckboxClicked(event) {
@@ -1363,11 +1430,6 @@ function trackCheckboxClicked(event) {
   }
 }
 
-function addTrackedTask(text, colour) {
-  text = text.replace(/ /g, '_');  // The DOM can't handle spaces
-  trackTaskList[text] = [colour, '1'];
-  renderTracking();
-}
 
 function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
   let trackedItem = document.createElement('span');

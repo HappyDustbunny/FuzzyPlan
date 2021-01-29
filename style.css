@@ -594,6 +594,10 @@ html {
   '. trackedItems trackedItemsColour .';
 }
 
+#trackMessage {
+  grid-area: messages;
+}
+
 /* #taskPickerDiv {
   display: flex;
   flex-direction: column;
