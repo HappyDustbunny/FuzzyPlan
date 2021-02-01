@@ -42,7 +42,7 @@ let colours = [
 'Cyan','DeepSkyBlue','RoyalBlue','DarkBlue','Blue','Indigo','BlueViolet','Purple','Magenta',
 'Violet','DeepPink','Crimson','Red','Tomato','Salmon','Sienna','Chocolate','Brown','Khaki',
 'Gold','Yellow','GreenYellow' ,'LawnGreen','LightGreen','SpringGreen','Lime','LimeGreen',
-'ForestGreen','Green','DarkGreen','LightGray','DarkGray','Gray'
+'ForestGreen','Green','DarkGreen','Lightgrey','Darkgrey','grey'
 ]
 
 
@@ -310,7 +310,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   chooseBox.classList.add('active');
   let tasks = [];
 
-  if (whichView != 'day') {
+  if (whichView != 'day') { // whichView is 'month'
     document.getElementById('putBack').classList.add('active');
     document.getElementById('moveToDay').classList.add('active');
 
@@ -322,15 +322,20 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
       console.log('Nothing to show in ChooseBox');
     }
 
-  } else {
+  } else {  // whichView is 'day'
     document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Nope. Should it be?
-    document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
 
     tasks = tasksSentBetween;
 
+    if (tasks.length === 0) {
+      document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    } else {
+      document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
+    }
+
   }
 
-  if (tasks != null) {
+  if (tasks.length > 0) {
     let counter = 0;
     for (var task of tasks) {
       if (counter === 0) {
@@ -616,11 +621,15 @@ document.getElementById('colourPickerInputBox').addEventListener('focus', functi
 document.getElementById('taskPickerInputBox').addEventListener('keypress', function () { taskPickerEvent(event); });
 
 document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
+
+document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
+
 //////////////////// Add-view code below ///////////////////////////
 
 function addTaskButtonClicked() {
   storeLocally();
 
+  // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
   // Trigger animation via CSS
   // document.getElementById('addView').classList.add('active');
   // document.getElementById('dayView').classList.remove('active');
@@ -870,19 +879,13 @@ function apply() {
       document.getElementById('dayInputBox').value = returnText;
     }
 
-    // Close add-view via CSS
-    // document.getElementById('addView').visible = 'hidden';
-    // document.getElementById('dayView').classList.add('active');
-    // document.getElementById('addView').classList.remove('active');
+    // Close add-view
     document.getElementById('addView').hidden = true;
     document.getElementById('dayView').hidden = false;
   }
 }
 
 function returnToDay() {
-  // document.getElementById('addView').visible = 'hidden';
-  // document.getElementById('dayView').classList.add('active');
-  // document.getElementById('addView').classList.remove('active');
   document.getElementById('addView').hidden = true;
   document.getElementById('dayView').hidden = false;
 }
@@ -1280,7 +1283,7 @@ function renderTracking() {
 
   // Remove old content
   const trackedItemsDiv = document.getElementById('trackedItemsDiv');
-  removeContentFrom (trackedItemsDiv);
+  removeContentFrom(trackedItemsDiv);
 
   const trackedItemsColourDiv = document.getElementById('trackedItemsColourDiv');
   removeContentFrom(trackedItemsColourDiv);
@@ -1408,7 +1411,21 @@ function addTrackedTask(buttonColour) {
     trackTaskList[text] = [chosenColour, '1'];
     renderTracking();
   } else {
-    displayMessage('Please add a task', 3000, track);
+    displayMessage('Please add a task', 3000, 'track');
+  }
+}
+
+function removeTracking() {
+  let answer = confirm('Do you want to remove tracking of all UNcheked tasks?');
+  if (answer) {
+    for (const key in trackTaskList) {
+      if (trackTaskList[key][1] === '0.25') {
+        delete trackTaskList[key];
+      }
+    }
+    renderTracking();
+  } else {
+    displayMessage('Nothing was changed', 3000, 'track');
   }
 }
 
@@ -1440,7 +1457,7 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   trackedItemCheckBox.name = item;
   trackedItemCheckBox.id = item;
 
-  if (Number(trackTaskList[item][1]) === 1) {
+  if (Number(trackTaskList[item][1]) === 1) {  // trackTaskList opacity determine if line is shown or greyed out
     trackedItemCheckBox.checked = true;
   } else {
     trackedItemCheckBox.checked = false;

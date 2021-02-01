@@ -628,7 +628,11 @@ html {
 }
 
 #trackViewSpacer {
-  height: 60px;
+  height: 30px;
+}
+
+#deleteTrackedButton {
+  font-size: 0.8em;
 }
 
 /* .trackContainer3 {
