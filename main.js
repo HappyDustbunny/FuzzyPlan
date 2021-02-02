@@ -1285,9 +1285,6 @@ function renderTracking() {
   const trackedItemsDiv = document.getElementById('trackedItemsDiv');
   removeContentFrom(trackedItemsDiv);
 
-  const trackedItemsColourDiv = document.getElementById('trackedItemsColourDiv');
-  removeContentFrom(trackedItemsColourDiv);
-
   const colourButtons = document.getElementById('colourButtons');
   removeContentFrom(colourButtons);
 
@@ -1303,14 +1300,14 @@ function renderTracking() {
 }
 
 
-function removeContentFrom(div) {
+function removeContentFrom(div) {  // Used by renderTracking
   while (div.firstChild) {
     div.removeChild(div.lastChild);
   }
 }
 
 
-function addColour(colour) {
+function addColour(colour) {  // Used by renderTracking
   let colourButtons = document.getElementById('colourButtons');
   let colourButton = document.createElement('button');
 
@@ -1340,37 +1337,11 @@ function colourPickerEvent(event) {
 }
 
 
-// function addTrackingOfTask(event) {
-//   if (event.key === 'Enter') {
-//     // TODO: Sanitize input
-//     let colourPickerInputBox = document.getElementById('colourPickerInputBox').value.trim();
-//     let chosenColour = colourPickerInputBox.value.trim();
-//     colourPickerInputBox.value = '';
-//
-//     let taskPickerInputBox = document.getElementById('taskPickerInputBox').value.trim();
-//     let task = taskPickerInputBox.value.trim();
-//     taskPickerInputBox.value = '';
-//
-//     document.getElementById('chosenColour').style.backgroundColor = chosenColour;
-//     document.getElementById('colourButtons').hidden = true;
-//
-//     addTrackedTask(task, chosenColour);
-//   }
-// }
-
-
 function colourButtonClicked(event) {
   let chosenColour = event.target.id;
-  // let task = document.getElementById('taskPickerInputBox').value.trim();
-  //
-  // document.getElementById('colourPickerInputBox').value = chosenColour;
-  // document.getElementById('chosenColour').style.backgroundColor = chosenColour;
-  // document.getElementById('colourButtons').hidden = true;
-
   addTrackedTask(chosenColour);
 }
 
-// TODO: Make removing tracked task possible idiviually and en masse
 // TODO: Make clear data in Settings work with nowButton and upButton
 
 function addTrackedTask(buttonColour) {
@@ -1416,7 +1387,7 @@ function addTrackedTask(buttonColour) {
 }
 
 function removeTracking() {
-  let answer = confirm('Do you want to remove tracking of all UNcheked tasks?');
+  let answer = confirm('Do you want to remove all UNcheked tasks from this list?\n (The same tasks elsewhere is not affected)');
   if (answer) {
     for (const key in trackTaskList) {
       if (trackTaskList[key][1] === '0.25') {
@@ -1462,20 +1433,15 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   } else {
     trackedItemCheckBox.checked = false;
   }
-
-  trackedItemCheckBox.style.gridArea = '1 / 0';
+  // trackedItemCheckBox.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemCheckBox);
 
-  // Create text
-  trackedItemButton = document.createElement('span');
-  trackedItemButton.classList.add(item);
-  let text = item.replace(/_/g, ' ');
-  trackedItemButton.textContent = text.charAt(0).toUpperCase() + text.slice(1);
-  trackedItemButton.style.opacity = trackTaskList[item][1];
-  trackedItemButton.style.gridArea = '1 / 0';
+  // Create spacer
+  trackedItemSpacer = document.createElement('span');
+  trackedItemSpacer.textContent = '\u00a0\u00a0';
 
-  trackedItem.appendChild(trackedItemButton);
+  trackedItem.appendChild(trackedItemSpacer);
 
   // Create colour
   trackedItemColour = document.createElement('span');
@@ -1483,10 +1449,23 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   trackedItemColour.style.backgroundColor = trackTaskList[item][0];
   trackedItemColour.textContent = '\u00a0\u00a0\u00a0\u00a0';
   trackedItemColour.style.opacity = trackTaskList[item][1];
-  trackedItemColour.style.gridArea = '2 / 0';
+  // trackedItemColour.style.gridArea = '1 / 0';
 
+  trackedItem.appendChild(trackedItemColour);
+
+  // Create text
+  trackedItemButton = document.createElement('span');
+  trackedItemButton.classList.add(item);
+  let text = item.replace(/_/g, ' ');
+  trackedItemButton.textContent = '\u00a0\u00a0\u00a0' + text.charAt(0).toUpperCase() + text.slice(1);
+  trackedItemButton.style.opacity = trackTaskList[item][1];
+  // trackedItemButton.style.gridArea = '1 / 0';
+
+  trackedItem.appendChild(trackedItemButton);
+
+  // TODO: Make colours match up with text - by moving Create Colour up to the top?
   document.getElementById('trackedItemsDiv').appendChild(trackedItem);
-  document.getElementById('trackedItemsColourDiv').appendChild(trackedItemColour);
+  // document.getElementById('trackedItemsColourDiv').appendChild(trackedItemColour);
 
   document.getElementById(item).addEventListener('click', function () { trackCheckboxClicked(event); });
 }

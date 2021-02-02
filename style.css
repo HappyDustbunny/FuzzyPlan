@@ -581,9 +581,9 @@ html {
   '. messages .';
 }
 
-.trackContainer2 {
+/* .trackContainer2 {
   display: grid;
-  grid-template-columns: 40px auto 25px 25px;
+  grid-template-columns: 5px auto 25px 25px;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
@@ -592,7 +592,7 @@ html {
   grid-template-areas:
   '. taskPicker colourPicker .'
   '. trackedItems trackedItemsColour .';
-}
+} */
 
 #trackMessage {
   grid-area: messages;
