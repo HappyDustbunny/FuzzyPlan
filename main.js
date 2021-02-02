@@ -45,6 +45,9 @@ let colours = [
 'ForestGreen','Green','DarkGreen','Lightgrey','Darkgrey','grey'
 ]
 
+///////// Storage-view ///////
+let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+let extraStoreNames = ['Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
 
 // Daylight saving time shenanigans
 let today = new Date();
@@ -534,7 +537,7 @@ function sayTic() {
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
-document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
+// document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
 document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
 document.getElementById('month').addEventListener('click', monthButtonClicked);
 
@@ -623,6 +626,11 @@ document.getElementById('taskPickerInputBox').addEventListener('keypress', funct
 document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
 
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
+
+////////////////// Eventlisteners for track-view ///////////////////////
+
+document.getElementById('storage').addEventListener('click', storageButtonClicked);
+
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -1268,7 +1276,7 @@ function monthClearBehavior() {
 //////////////////// Track-view code below ///////////////////////////
 
 function trackButtonClicked() {
-  storeLocally();  // TODO: Is this necessary? Wrote it just in case as a copy of monthButtonClicked
+  storeLocally();
 
   document.getElementById('trackView').hidden = false;
   document.getElementById('monthView').hidden = true;
@@ -1348,7 +1356,7 @@ function addTrackedTask(buttonColour) {
   // TODO: Sanitize inputs
   let taskPickerInputBox = document.getElementById('taskPickerInputBox');
   let text = taskPickerInputBox.value.trim();
-  if (text) {
+  if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) {
     taskPickerInputBox.value = '';
 
     let colourPickerInputBox = document.getElementById('colourPickerInputBox');
@@ -1381,6 +1389,9 @@ function addTrackedTask(buttonColour) {
     text = text.replace(/ /g, '_');  // The DOM can't handle spaces
     trackTaskList[text] = [chosenColour, '1'];
     renderTracking();
+  } else if (text != '') {
+    alert('Limit your charcters to letters and numbers, please.');
+    return;
   } else {
     displayMessage('Please add a task', 3000, 'track');
   }
@@ -1478,7 +1489,77 @@ function returnToMonth() {
 }
 
 
-//////////////////// Track-view code above ///////////////////////////
+//////////////////// Track-view code above ^^^ ///////////////////////////
+
+//////////////////// Storage-view code below ///////////////////////////
+
+
+function storageButtonClicked() {
+  storeLocally();
+
+  document.getElementById('dayView').hidden = true;
+  document.getElementById('storageView').hidden = false;
+
+  let stores = document.getElementById('stores');
+
+  // Create stores for 2 weeks
+  for (var weekNumber=0; weekNumber<2; weekNumber++) {
+    let week = document.createElement('span');
+    let thisWeekNumber = Number(weekNumber) + 1;
+    week.textContent = 'Week ' + thisWeekNumber;
+    week.classList.add('weekName');
+    document.getElementById('stores').appendChild(week);
+
+    for (var index in weekDays) {
+      let day = weekDays[index];
+      let storage = document.createElement('span');
+
+      let storageNumber = document.createElement('span');
+      let number = 1 + Number(index) + Number(weekNumber) * 7;
+      storageNumber.textContent = number + '\u00a0\u00a0';
+
+      let button = document.createElement('button');
+      button.id = weekNumber + day + index;
+      button.classList.add('controlButton', 'storage'); // TODO: Is this class a brigth idea for formatting?
+      button.textContent = day;
+
+      storage.appendChild(storageNumber);
+      storage.appendChild(button);
+
+      stores.appendChild(storage);
+    }
+  }
+
+  // Add space
+  let spacer = document.createElement('div');
+  spacer.textContent = '\u00a0';
+  document.getElementById('stores').appendChild(spacer);
+
+  for (var i=0; i<3; i++) {  // Create extra stores
+    let extra = document.createElement('span');
+
+    let extraNumber = document.createElement('span');
+    let number = Number(i) + 15;
+    extraNumber.textContent = number + '\u00a0\u00a0';
+
+    let button = document.createElement('button');
+    button.id = 'extraStore' + number;
+    button.classList.add('controlButton', 'storage');
+    button.textContent = extraStoreNames[i];
+
+    extra.appendChild(extraNumber);
+    extra.appendChild(button);
+
+    stores.appendChild(extra);
+  }
+
+
+}
+
+
+// function returnToDay() is under Add-view code
+
+//////////////////// Storage-view code above ^^^ ///////////////////////////
 
 
 function twoFingerNavigation(event) {
@@ -1491,7 +1572,7 @@ function twoFingerNavigation(event) {
     } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
       goToPage('storage.html');
     } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
-      goToPage('month.html');
+      goToPage('month.html'); // TODO: Fix twofingerNavigation
     }
   }
 }

@@ -688,7 +688,20 @@ html {
     /* position: relative; */
 /* } */
 
-/* track view css above */
+/* track view css above ^^^ */
+
+/* storage-view css below */
+
+#stores {
+  display: flex;
+  flex-direction: column;
+}
+
+.storage {
+  width: 250px;
+}
+
+/* storage-view css above ^^^ */
 
 
 .container2 {

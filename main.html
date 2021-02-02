@@ -294,7 +294,7 @@
 
           <span id='trackMessage' display='none'></span>
           <br>
-        </div>
+        </div>    <!-- trackContainer1 -->
 
         <span> <br> </span>
 
@@ -324,10 +324,7 @@
 
         <div class="topic">
           <span class="text">Tracked tasks</span>
-          <!-- <div class="trackContainer2"> -->
             <div id="trackedItemsDiv"></div>
-            <!-- <div id="trackedItemsColourDiv"></div> -->
-          <!-- </div> -->
 
           <span> <br> </span>
 
@@ -335,9 +332,41 @@
             UNcheked tasks from this list</button>
         </div>
 
-      </div>
+      </div>    <!-- trackView -->
 
-    </div>
+      <!-- Storage view ------------------------- -->
+
+      <div id="storageView" hidden>
+        <div class="storageContainer">
+          <h1 id='storageViewName' align='center'>
+            FuzzyPlan
+          </h1>
+
+          <h2 align='center'>Retrieve or store task lists</h2>
+
+          <button type="button" class="controlButton" id='day1' title="    Click to
+            get back to day-view">Day</button>
+          <span id='storageMessage' display='none'></span>
+
+          <br>
+
+        </div>     <!-- storageContainer -->
+
+        <span> <br> </span>
+
+        <button type="button" id="storeList" class=' storeList' title="To clear a stored list,
+          just store an empty list">Store list in</button>
+
+        <div id="stores"></div>
+
+        <span>   <br>   </span>
+
+        <button type="button" id="lastTaskList">Last discarded task list</button>
+
+      </div>    <!-- storageView -->
+
+
+    </div>    <!-- page -->
     <!-- <p>Supported browsers: Firefox, Vivaldi, Chrome, Ecosia app for Samsung</p> -->
   </body>
 </html>
