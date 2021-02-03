@@ -31,7 +31,7 @@ let drainGainLevel_add = 'd1';
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
-let pastDayList = {};
+let pastDayList = {};   // Old taskList is stored here on their relevant date {"4-1-21": [task, task,...]}
 let trackTaskList = {}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 // let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 let putBackId = '';
@@ -46,8 +46,9 @@ let colours = [
 ]
 
 ///////// Storage-view ///////
-let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-let extraStoreNames = ['Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
+// let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+// let extraStoreNames = ['Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
+let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
 
 // Daylight saving time shenanigans
 let today = new Date();
@@ -185,10 +186,14 @@ function storeLocally() {
   let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
   pastDayList[id] = deepCopyFunc(taskList);  //  Func is used to make a deep copy
 
-
   // Store pastDayList
   if (pastDayList) {
     localStorage.pastDayList = JSON.stringify(pastDayList);
+  }
+
+  // Store storageList
+  if (storageList) {
+    localStorage.storageList = JSON.stringify(storageList);
   }
 }
 
@@ -258,7 +263,6 @@ function retrieveLocallyStoredStuff() {
     monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
   }
 
-
   if (localStorage.getItem('trackTaskList')) {
     trackTaskList = JSON.parse(localStorage.getItem('trackTaskList'));
   }
@@ -274,11 +278,16 @@ function retrieveLocallyStoredStuff() {
     }
   }
 
-  // if (localStorage.getItem('tasksSentBetween')) {
-  //   tasksFromClickedDayInMonth = JSON.parse(localStorage.tasksSentBetween);
-  //   fillChooseBox();
-  //   localStorage.removeItem('tasksSentBetween');
-  // }
+  if (localStorage.getItem('storageList')) {
+    storageList = JSON.parse(localStorage.getItem('storageList'));
+    // Fix dates messed up by JSON.stringify
+    for (const key in storageList) {
+      for (const index in storageList[key][0]) {
+        storageList[key][0][index].date = new Date(storageList[key][0][index].date);
+        storageList[key][0][index].end = new Date(storageList[key][0][index].end);
+      }
+    }
+  }
 }
 
 function getDueRemindersFromLast3Months() {  // If the day in the list lies in the past kick tasks to chooseBox
@@ -627,10 +636,15 @@ document.getElementById('colourPickerInputBox').addEventListener('keypress', fun
 
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
 
-////////////////// Eventlisteners for track-view ///////////////////////
+////////////////// Eventlisteners for storage-view ///////////////////////
 
 document.getElementById('storage').addEventListener('click', storageButtonClicked);
 
+document.getElementById('day1').addEventListener('click', returnToDay);
+
+document.getElementById('storeList').addEventListener('click', storeList);
+
+document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -1497,67 +1511,98 @@ function returnToMonth() {
 function storageButtonClicked() {
   storeLocally();
 
+  storageList['memory1'] = [taskList, 'nytNavn'];
+
   document.getElementById('dayView').hidden = true;
   document.getElementById('storageView').hidden = false;
 
-  let stores = document.getElementById('stores');
+  for (var memoryCell in storageList) {
+    let node = document.getElementById(memoryCell);
+    node.classList.remove('notInUse');
+    node.textContent = storageList[memoryCell][1];
+  }
+}
 
-  // Create stores for 2 weeks
-  for (var weekNumber=0; weekNumber<2; weekNumber++) {
-    let week = document.createElement('span');
-    let thisWeekNumber = Number(weekNumber) + 1;
-    week.textContent = 'Week ' + thisWeekNumber;
-    week.classList.add('weekName');
-    document.getElementById('stores').appendChild(week);
+// function returnToDay() is under Add-view code
 
-    for (var index in weekDays) {
-      let day = weekDays[index];
-      let storage = document.createElement('span');
-
-      let storageNumber = document.createElement('span');
-      let number = 1 + Number(index) + Number(weekNumber) * 7;
-      storageNumber.textContent = number + '\u00a0\u00a0';
-
-      let button = document.createElement('button');
-      button.id = weekNumber + day + index;
-      button.classList.add('controlButton', 'storage'); // TODO: Is this class a brigth idea for formatting?
-      button.textContent = day;
-
-      storage.appendChild(storageNumber);
-      storage.appendChild(button);
-
-      stores.appendChild(storage);
+function storeList() {
+  let storeButtons = document.getElementsByClassName('store');
+  for (const button of storeButtons) {
+    if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
+      button.classList.add('highLighted');
     }
   }
-
-  // Add space
-  let spacer = document.createElement('div');
-  spacer.textContent = '\u00a0';
-  document.getElementById('stores').appendChild(spacer);
-
-  for (var i=0; i<3; i++) {  // Create extra stores
-    let extra = document.createElement('span');
-
-    let extraNumber = document.createElement('span');
-    let number = Number(i) + 15;
-    extraNumber.textContent = number + '\u00a0\u00a0';
-
-    let button = document.createElement('button');
-    button.id = 'extraStore' + number;
-    button.classList.add('controlButton', 'storage');
-    button.textContent = extraStoreNames[i];
-
-    extra.appendChild(extraNumber);
-    extra.appendChild(button);
-
-    stores.appendChild(extra);
-  }
-
-
 }
 
 
-// function returnToDay() is under Add-view code
+function storeHasBeenClicked(event) {
+  let id = event.target.id;
+  let text = '';
+  let clickedButton = document.getElementById(id);
+// TODO: Fix notInUse for the trashBin and make functionality for other buttons work. Currently they are a copy-paste from old storage.js
+  if (id === 'lastTaskList') {
+    // Restore stuff from trashBin
+    if (storageList['trashBin']) {
+      let trash = storageList['trashBin'];  // Retrieve content of trashBin
+      storageList['trashBin'] = taskList;   // Put current taskList into the trashBin
+      taskList = trash;  // Restore trash as taskList
+    } else {
+      displayMessage('No task has been discarded yet.\nNothing was changed.', 3000, 'storage');
+    }
+
+    gotoDay();
+    renderTasks();
+  }
+
+  // Ask for new label and tidy button up
+  if (clickedButton.classList.contains('highLighted')) {
+    if (clickedButton.classList[0] === 'notInUse') {
+      clickedButton.classList.remove('notInUse');
+    }
+    if (localStorage.taskListAsText != '[]') {
+      text = prompt('Change label of the stored list?', clickedButton.innerText);
+    }
+    if (text === '' || text === null) {
+      localStorage.setItem(id + 'label', clickedButton.innerText);
+    }
+    else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
+      text = text.slice(0, 1).toUpperCase() + text.slice(1, );
+      clickedButton.innerText = text;
+      localStorage.setItem(id + 'label', text);
+    } else if (text != '') {
+      alert('Limit your charcters to letters and numbers, please.');
+      return;
+    }
+    // Store stuff
+    localStorage.setItem(id, JSON.stringify(localStorage.taskListAsText));
+    if (localStorage.taskListAsText === '[]') {
+      clickedButton.classList.remove('inUse');
+      clickedButton.classList.add('notInUse');
+      clickedButton.innerText = weekDays[/\d/.exec(clickedButton.id) - 1]
+      displayMessage('Stored list is cleared', 3000)
+    } else {
+      displayMessage('Current task list stored in ' + clickedButton.innerText, 3000);
+    }
+    setTimeout(function() {window.location.assign('main.html');}, 3500);
+    // window.location.assign('main.html');
+  } else if (localStorage.getItem(id)) { // Get stuff
+    localStorage.setItem('lastTaskList', JSON.stringify(localStorage.taskListAsText)); // Move current tasklist to trash bin
+    localStorage.taskListAsText = JSON.parse(localStorage.getItem(id)); // Let current tasklist be chosen stored tasklist
+    window.location.assign('main.html');
+  } else {
+    displayMessage('This store is empty', 3000);
+  }
+
+  // Remove highlights
+  let storeButtons = document.getElementsByClassName('store');
+  for (const button of storeButtons) {
+    if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
+      button.classList.remove('highLighted');
+    }
+  }
+
+}
+
 
 //////////////////// Storage-view code above ^^^ ///////////////////////////
 
