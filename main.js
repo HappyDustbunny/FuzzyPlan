@@ -46,8 +46,9 @@ let colours = [
 ]
 
 ///////// Storage-view ///////
-// let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-// let extraStoreNames = ['Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
+let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+'Sunday', 'Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
 let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
 
 // Daylight saving time shenanigans
@@ -1540,57 +1541,56 @@ function storeHasBeenClicked(event) {
   let text = '';
   let clickedButton = document.getElementById(id);
 // TODO: Fix notInUse for the trashBin and make functionality for other buttons work. Currently they are a copy-paste from old storage.js
-  if (id === 'lastTaskList') {
+  if (id === 'trashBin') {
     // Restore stuff from trashBin
     if (storageList['trashBin']) {
-      let trash = storageList['trashBin'];  // Retrieve content of trashBin
-      storageList['trashBin'] = taskList;   // Put current taskList into the trashBin
+      let trash = storageList['trashBin'][0];  // Retrieve content of trashBin
+      storageList['trashBin'] = [taskList, 'Restore last discarded task list'];   // Put current taskList into the trashBin
       taskList = trash;  // Restore trash as taskList
+      gotoDayFromStorage();
     } else {
       displayMessage('No task has been discarded yet.\nNothing was changed.', 3000, 'storage');
     }
-
-    gotoDay();
-    renderTasks();
   }
 
   // Ask for new label and tidy button up
   if (clickedButton.classList.contains('highLighted')) {
-    if (clickedButton.classList[0] === 'notInUse') {
+    if (clickedButton.classList.contains('notInUse')) {
       clickedButton.classList.remove('notInUse');
+      clickedButton.classList.add('inUse');
     }
-    if (localStorage.taskListAsText != '[]') {
-      text = prompt('Change label of the stored list?', clickedButton.innerText);
-    }
+
+    text = prompt('Change label of the stored list?', clickedButton.innerText);
+
     if (text === '' || text === null) {
-      localStorage.setItem(id + 'label', clickedButton.innerText);
+      storageList[id] = [taskList, clickedButton.innerText];
     }
     else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
       text = text.slice(0, 1).toUpperCase() + text.slice(1, );
       clickedButton.innerText = text;
-      localStorage.setItem(id + 'label', text);
+      storageList[id] = [taskList, text];
     } else if (text != '') {
       alert('Limit your charcters to letters and numbers, please.');
       return;
     }
     // Store stuff
-    localStorage.setItem(id, JSON.stringify(localStorage.taskListAsText));
-    if (localStorage.taskListAsText === '[]') {
+    if (taskList.length === 2) {  // If taskList is empty except for dayStart and dayEnd...
       clickedButton.classList.remove('inUse');
       clickedButton.classList.add('notInUse');
-      clickedButton.innerText = weekDays[/\d/.exec(clickedButton.id) - 1]
-      displayMessage('Stored list is cleared', 3000)
+      clickedButton.innerText = weekDays[/\d+/.exec(clickedButton.id) - 1]
+      delete storageList[clickedButton.id];
+      displayMessage('Stored list is cleared', 3000, 'storage')
     } else {
-      displayMessage('Current task list stored in ' + clickedButton.innerText, 3000);
+      displayMessage('Current task list stored in ' + clickedButton.innerText, 3000, 'storage');
     }
-    setTimeout(function() {window.location.assign('main.html');}, 3500);
-    // window.location.assign('main.html');
-  } else if (localStorage.getItem(id)) { // Get stuff
-    localStorage.setItem('lastTaskList', JSON.stringify(localStorage.taskListAsText)); // Move current tasklist to trash bin
-    localStorage.taskListAsText = JSON.parse(localStorage.getItem(id)); // Let current tasklist be chosen stored tasklist
-    window.location.assign('main.html');
+    setTimeout(function() {gotoDayFromStorage();}, 3500);
+
+  // Get stuff
+  } else if (clickedButton.classList.contains('inUse')) {
+    storageList['trashBin'] = taskList; // Move current tasklist to trash bin
+    taskList = storageList[clickedButton.innerText][0]; // Let current tasklist be chosen stored tasklist
   } else {
-    displayMessage('This store is empty', 3000);
+    displayMessage('This store is empty', 3000, 'storage');
   }
 
   // Remove highlights
@@ -1603,6 +1603,12 @@ function storeHasBeenClicked(event) {
 
 }
 
+function gotoDayFromStorage() {
+  storeLocally();
+  document.getElementById('storageView').hidden = true;
+  document.getElementById('dayView').hidden = false;
+  renderTasks();
+}
 
 //////////////////// Storage-view code above ^^^ ///////////////////////////
 
@@ -1958,6 +1964,7 @@ function clearTextboxOrDay() {
 function clearDay() {
   let answer = confirm('Do you want to remove all tasks and start planning a new day?');
   if (answer == true) {
+    storageList['trashBin'] = [taskList, 'trashBin'];
     taskList = [];
     makeFirstTasks();
     resetInputBox('day');
@@ -2082,7 +2089,7 @@ function getStress(task) {
 
 
 function displayMessage(text, displayTime, view) {  // displayTime in milliseconds
-  console.log(text);
+  console.log(text, view);
   msg = document.getElementById(view + 'Message');
   msg.style.display = 'inline-block';
   msg.style.color = 'red';
