@@ -952,12 +952,20 @@ function gotoDay() {
 
 
 function fillMonthDateBar() {
+  // Remove old content
+  while (monthTaskDiv.firstChild) {
+    let monthTaskDiv = document.getElementById('monthTaskDiv');
+    monthTaskDiv.removeChild(monthTaskDiv.lastChild)
+  }
+
+
   let now = new Date();
   let nowMinus3Month = new Date();
   nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 1));
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
-
+  // TODO: Set scrollheight for monthView
+  // TODO: Set number of days shown based on data in pastDaylist?
   let thisMonth = now.getMonth();
 
   for (let i = nowMinus3Month; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
@@ -967,7 +975,7 @@ function fillMonthDateBar() {
       monthNameNode = document.createElement('button');
       monthNameNode.classList.add('monthName');
       monthNameNode.textContent = months[i.getMonth()];
-      document.getElementById('monthTaskDiv').appendChild(monthNameNode);
+      monthTaskDiv.appendChild(monthNameNode);
     }
 
     let newNode = document.createElement('button');
@@ -1006,7 +1014,7 @@ function fillMonthDateBar() {
     textPart = document.createElement('span');
     newNode.appendChild(textPart);
 
-    document.getElementById('monthTaskDiv').appendChild(newNode);
+    monthTaskDiv.appendChild(newNode);
   }
 }
 
@@ -1973,6 +1981,12 @@ function clearDay() {
     storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];
     document.getElementById('trashBin').classList.add('inUse');
     document.getElementById('trashBin').classList.remove('notInUse');
+    // Make sure all alternative views are turned off
+    document.getElementById('addView').hidden = true;
+    document.getElementById('monthView').hidden = true;
+    document.getElementById('trackView').hidden = true;
+    document.getElementById('storageView').hidden = true;
+    document.getElementById('dayView').hidden = false;
     // Clear stuff and reset
     taskList = [];
     makeFirstTasks();
