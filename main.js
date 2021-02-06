@@ -1512,19 +1512,20 @@ function returnToMonth() {
 function storageButtonClicked() {
   storeLocally();
 
-  storageList['memory1'] = [taskList, 'nytNavn'];
-
   document.getElementById('dayView').hidden = true;
   document.getElementById('storageView').hidden = false;
 
   for (var memoryCell in storageList) {
     let node = document.getElementById(memoryCell);
-    node.classList.remove('notInUse');
+    node.classList.remove('highLighted');
     node.textContent = storageList[memoryCell][1];
+    if (memoryCell) {
+      node.classList.add('inUse');
+      node.classList.remove('notInUse');
+    }
   }
 }
 
-// function returnToDay() is under Add-view code
 
 function storeList() {
   let storeButtons = document.getElementsByClassName('store');
@@ -1540,21 +1541,21 @@ function storeHasBeenClicked(event) {
   let id = event.target.id;
   let text = '';
   let clickedButton = document.getElementById(id);
-// TODO: Fix notInUse for the trashBin and make functionality for other buttons work. Currently they are a copy-paste from old storage.js
   if (id === 'trashBin') {
     // Restore stuff from trashBin
     if (storageList['trashBin']) {
-      let trash = storageList['trashBin'][0];  // Retrieve content of trashBin
-      storageList['trashBin'] = [taskList, 'Restore last discarded task list'];   // Put current taskList into the trashBin
+      let trash = deepCopyFunc(storageList['trashBin'][0]);  // Retrieve content of trashBin
+      if (2<taskList.length) {
+        storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];   // Put current taskList into the trashBin
+      }
       taskList = trash;  // Restore trash as taskList
+      document.getElementById('trashBin').classList.add('inUse');
+      document.getElementById('trashBin').classList.remove('notInUse');
       gotoDayFromStorage();
     } else {
       displayMessage('No task has been discarded yet.\nNothing was changed.', 3000, 'storage');
     }
-  }
-
-  // Ask for new label and tidy button up
-  if (clickedButton.classList.contains('highLighted')) {
+  } else if (clickedButton.classList.contains('highLighted')) {   // Ask for new label and tidy button up
     if (clickedButton.classList.contains('notInUse')) {
       clickedButton.classList.remove('notInUse');
       clickedButton.classList.add('inUse');
@@ -1587,8 +1588,12 @@ function storeHasBeenClicked(event) {
 
   // Get stuff
   } else if (clickedButton.classList.contains('inUse')) {
-    storageList['trashBin'] = taskList; // Move current tasklist to trash bin
-    taskList = storageList[clickedButton.innerText][0]; // Let current tasklist be chosen stored tasklist
+    storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list']; // Move current tasklist to trash bin
+    taskList = storageList[clickedButton.id][0]; // Let current tasklist be chosen stored tasklist
+    document.getElementById('trashBin').classList.add('inUse');
+    document.getElementById('trashBin').classList.remove('notInUse');
+    displayMessage('Retrieving list from the \"' + clickedButton.innerText + '\" storage.', 3000, 'storage');
+    setTimeout(function() {gotoDayFromStorage();}, 3500); // timeout necessary for displayMessage to finish
   } else {
     displayMessage('This store is empty', 3000, 'storage');
   }
@@ -1964,7 +1969,11 @@ function clearTextboxOrDay() {
 function clearDay() {
   let answer = confirm('Do you want to remove all tasks and start planning a new day?');
   if (answer == true) {
-    storageList['trashBin'] = [taskList, 'trashBin'];
+    // Move current taskList to trashBin
+    storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];
+    document.getElementById('trashBin').classList.add('inUse');
+    document.getElementById('trashBin').classList.remove('notInUse');
+    // Clear stuff and reset
     taskList = [];
     makeFirstTasks();
     resetInputBox('day');

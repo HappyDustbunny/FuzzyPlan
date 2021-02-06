@@ -998,7 +998,7 @@ div.tasksToSort #postpone {
   background-color: transparent;
   border: none;
   overflow-y: scroll;
-  grid-template-areas: '. header1 .' '. body .';
+  grid-template-areas: '. header1 .' '. messages .';
 }
 
 .storageContainer1 {
@@ -1014,6 +1014,10 @@ div.tasksToSort #postpone {
 
 .highLighted {
   border: 1px solid rgb(255, 50, 255);
+}
+
+#storageMessage {
+  grid-area: messages;
 }
 
 #stores {
