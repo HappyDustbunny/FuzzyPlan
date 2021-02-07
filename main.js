@@ -13,7 +13,7 @@ let defaultTaskDuration = 30;
 let wakeUpH = 7;  // The hour your day start according to settings. This is default first time the page is loaded
 let wakeUpM = 0;  // The minutes your day start according to settings
 let wakeUpOrNowClickedOnce = false;
-let wakeUpStress = 2;  // Stress level is a integer between 1 and 10 denoting percieved stress level with 1 as totally relaxed and 10 stress meltdown
+let wakeUpStress = 1;  // Stress level is a integer between 1 and 5 denoting percieved stress level with 1 as totally relaxed and 5 stress meltdown
 // let stressLevel = wakeUpStress;
 let tDouble = 240;  // Doubling time for stress level in minutes
 let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for messages
@@ -1260,6 +1260,8 @@ function monthRenderTasks() {
       }
     }
   }
+
+  document.getElementById('monthContainer').scrollTop = 500;
 }
 
 
@@ -1569,7 +1571,7 @@ function storeHasBeenClicked(event) {
       clickedButton.classList.add('inUse');
     }
 
-    text = prompt('Change label of the stored list?', clickedButton.innerText);
+    text = prompt('Change label of the stored list?\n(Clicking OK will erase earlier content)', clickedButton.innerText);
 
     if (text === '' || text === null) {
       storageList[id] = [taskList, clickedButton.innerText];
@@ -2369,11 +2371,6 @@ function jumpToNow() {
   let now = new Date()
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
   jumpToTime(nowMinusOneHour, false);
-  // if (document.getElementById('container') !== null  && taskList.length > 0) {
-  //   container = document.getElementById('container');
-  //   container.scrollTop = document.getElementById('nowSpan').offsetTop + 800 * zoom;
-  //   // document.getElementById('dayInputBox').focus();
-  // }
 }
 
 

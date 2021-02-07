@@ -122,8 +122,8 @@ function displayMessage(text, displayTime) {
 function applyStressModel() {
   // Set wakeup stress level
   let value = document.getElementById('stressLevel').value.trim();
-  if (isNaN(value) || value < 0 || 9 < value) {
-    displayMessage('Use only numbers between 0 and 9, please', 3000);
+  if (isNaN(value) || value < 0 || 5 < value) {
+    displayMessage('Use only numbers between 0 and 5, please', 3000);
     document.getElementById('stressLevel').select();
   } else {
     localStorage.wakeUpStress = value;

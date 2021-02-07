@@ -858,9 +858,7 @@ html {
   padding-left: 7px;
 }
 
-#message {
-  display: flex;
-  text-align: center;
+#dayMessage {
   grid-area: messages;
 }
 
