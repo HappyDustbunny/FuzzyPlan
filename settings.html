@@ -23,19 +23,50 @@
 
     <div class="container">
 
-      <h2>
+      <h2 lang="en">
         Settings
       </h2>
+      <h2 lang="da" hidden>
+        Indstillinger
+      </h2>
+
+      <div class="topic">
+        <div>
+          <h4 lang="en">Language</h4>
+          <h4 lang="da" hidden>Sprog</h4>
+
+          <input type="radio" id='en' class="language" name='language' value=0 checked='checked'>
+          <img src="./200px-Flag_of_the_United_Kingdom.png" alt="UK flag" height=15px>
+          <label for="en">English </label>
+          <br>
+          <input type="radio" id='da' class="language" name='language' value=1>
+          <img src="./200px-Flag_of_Denmark.png" alt="DK flag" height=15px>
+          <label for="da">&nbsp;&nbsp;Dansk</label>
+          <br>
+          <br>
+          <span id="apply0">
+            <button type="button" lang="en">Apply</button>
+            <button type="button" lang="da" hidden>Anvend</button>
+          </span>
+        </div>
+      </div>
+
+      <span>   <br>   </span>
 
       <div class='topic'>
         <div>
-          <h4>Default task duration</h4>
+          <h4 lang="en">Default task duration</h4>
+          <h4 lang="da" hidden>Standard opgave længde</h4>
 
-          Set default task duration in minutes:
+          <span lang="en">Set default task duration in minutes:</span>
+          <span lang="da" hidden>Sæt stadard opgavelængde i minutter</span>
           <input type="text" id='inputBoxM' value="30" alt='Set default task duration in minutes'>
           <br>
           <br>
-          <button type="button" id="apply1">Apply</button>
+          <span id='apply1'>
+            <button type="button" lang="en">Apply</button>
+            <button type="button" lang="da" hidden>Anvend</button>
+          </span>
         </div>
       </div>
 
@@ -46,7 +77,7 @@
           <h4>Play 'toc' sound</h4>
 
           <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
-          <label for=off"">Off</label> <br>
+          <label for="off">Off</label> <br>
           <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
           <label for="beginning">At the beginning of tasks (toc)</label> <br>
           <input type="radio" id='end' class="alarm" name='alarm' value="end">

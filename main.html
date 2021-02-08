@@ -17,19 +17,31 @@
       <div id="dayView" class="active">
         <div class="container1">
           <button type="button" class='controlButton' id="month" title='Click to
-          show month (or just swipe rigth with two fingers anywhere)'>
+          show month (or just swipe rigth with two fingers anywhere)' lang='en'>
           Month
           </button>
+          <button type="button" class='controlButton' id="month" title='Klik for
+          at vise måned (eller swipe til højre med to fingre)' lang='da'>
+          Måned
+          </button>
+
           <h1 id='name' align=center>
             FuzzyPlan
           </h1>
+
           <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
             ?
           </button>
+
           <button type="button" class='controlButton' id="storage" title='Click to
-          show the storage (or just swipe left with two fingers anywhere)'>
+          show the storage (or just swipe left with two fingers anywhere)' lang="en">
           Storage
           </button>
+          <button type="button" class='controlButton' id="storage" title='Klik for
+          at vise lagrene (eller swipe til venstre med to fingre)' lang="da" hidden>
+          Lagre
+          </button>
+
           <span id='heart'></span>
           <span id='dayMessage' display='none'></span>
           <br>
@@ -38,17 +50,32 @@
         <div class="centerWrapper">
           <div id="sortTask" class="noTasksToSort">
             <button type="button" id="postpone" class="controlButton" title="Click to move
-            content of input box to month (postpone task)">
+            content of input box to month (postpone task)" lang="en">
             &#x25C2;Postpone <!-- Black left-pointing small triangle  -->
             </button>
-            <button id='upButton' class="controlButton" type="button" title="Press to
-            insert a 15 minute planning period at the chosen wake up time">
+            <button type="button" id="postpone" class="controlButton" title="Klik for at sende
+            indholdet af indput-boxen til månedsvisningen (udskyd opgaven)" lang="da" hidden>
+            &#x25C2;Udskyd <!-- Black left-pointing small triangle  -->
+            </button>
+
+            <button id='upButton' class="controlButton" type="button" title="Click to
+            insert a 15 minute planning period at the chosen wake up time" lang="en">
             &#x25BE;7:00 <!-- Black Down-Pointing Small Triangle -->
             </button>
-            <button id='nowButton' class="controlButton" type="button" title='Press to
-            insert a 15 min planning period at current time'>
+            <button id='upButton' class="controlButton" type="button" title="Klik for at
+            indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid." lang="da" hidden>
+            &#x25BE;7:00 <!-- Black Down-Pointing Small Triangle -->
+            </button>
+
+            <button id='nowButton' class="controlButton" type="button" title='Click to
+            insert a 15 min planning period at current time' lang="en">
             &#x25BE;Now <!-- Black Down-Pointing Small Triangle -->
             </button>
+            <button id='nowButton' class="controlButton" type="button" title='Klik for at
+            indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.' lang="da" hidden>
+            &#x25BE;Nu <!-- Black Down-Pointing Small Triangle -->
+            </button>
+
           </div>
 
           <input type="text" id='dayInputBox' autofocus value="">

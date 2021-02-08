@@ -21,6 +21,7 @@ let taskAlarms = 'off'; // Turn alarms off by defalult
 let reminder = 'off'; // Turn reminders off by default
 let tasksFromClickedDayInMonth = null;
 let tasksSentBetween = [];
+let language = 0; // English: 0, Danish: 1
 
 ///////// Add-view /////////
 let taskText_add = '';

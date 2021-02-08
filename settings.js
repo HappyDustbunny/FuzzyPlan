@@ -5,6 +5,8 @@
 
 document.getElementById('day').addEventListener('click', goBack);
 
+document.getElementById('apply0').addEventListener('click', applyLanguage);
+
 document.getElementById('apply1').addEventListener('click', applyTaskDuration);
 
 document.getElementById('apply2').addEventListener('click', applyToc);
@@ -57,6 +59,41 @@ function inputBoxMGotFocus() {
 function inputBoxXGotFocus() {
   document.getElementById('inputBoxX').select();
 }
+
+
+function applyLanguage() {
+  radioButtonResult0 = document.getElementsByClassName('language');
+  for (var i=0; i<2; i++) {
+    if (radioButtonResult0[i].type === 'radio' && radioButtonResult0[i].checked) {
+      localStorage.language = radioButtonResult0[i].value;
+    }
+  }
+  renderLanguage();
+}
+
+
+function renderLanguage() {
+  let englishNodes = document.querySelectorAll('[lang="en"]');
+  for (index in englishNodes) {
+    if (0<index) { // index 0 is all html :-P
+      if (Number(localStorage.language) === 0) {
+        englishNodes[index].hidden = false;
+      } else {
+        englishNodes[index].hidden = true;
+      }
+    }
+  }
+
+  let danishNodes = document.querySelectorAll('[lang="da"]');
+  for (index in danishNodes) {
+    if (Number(localStorage.language) === 1) {
+      danishNodes[index].hidden = false;
+    } else {
+      danishNodes[index].hidden = true;
+    }
+  }
+}
+
 
 function applyTaskDuration() {
 
