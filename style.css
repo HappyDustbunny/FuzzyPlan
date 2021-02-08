@@ -690,6 +690,14 @@ html {
 
 /* track view css above ^^^ */
 
+/* settings view css below */
+
+.inputSettings {
+  width: 40px;
+}
+
+/* settings view css above ^^^ */
+
 
 .container2 {
   display: grid;

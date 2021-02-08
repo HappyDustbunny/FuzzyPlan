@@ -416,6 +416,215 @@
         </div>     <!-- storageContainer1 -->
       </div>    <!-- storageView -->
 
+      <!-- Settings view --------------------- -->
+
+      <div id="settingsView" hidden>
+        <div class="settingsContainer1">
+          <h1 id='name' align=center>
+            FuzzyPlan
+          </h1>
+
+          <span id=gotoDayFromSettings>
+            <button type="button" class='controlButton' title='  Click to
+            get back to day-view' lang="en">Day</button>
+            <button type="button" class='controlButton' title='  Klik for
+            at vende tilbage til dag-visning' lang="da" hidden>Day</button>
+          </span>
+
+          <span id='message' display='none'></span>
+
+          <br>
+        </div>    <!-- settingsContainer1 -->
+
+        <div class="settingsContainer2">
+
+          <h2 lang="en">
+            Settings
+          </h2>
+          <h2 lang="da" hidden>
+            Indstillinger
+          </h2>
+
+          <div class="topic">
+            <div>
+              <h4 lang="en">Language</h4>
+              <h4 lang="da" hidden>Sprog</h4>
+
+              <input type="radio" id='en' class="language" name='language' value=0 checked='checked'>
+              <img src="./200px-Flag_of_the_United_Kingdom.png" alt="UK flag" height=15px>
+              <label for="en">English </label>
+
+              <br>
+
+              <input type="radio" id='da' class="language" name='language' value=1>
+              <img src="./200px-Flag_of_Denmark.png" alt="DK flag" height=15px>
+              <label for="da">&nbsp;&nbsp;Dansk</label>
+
+              <br>
+              <br>
+
+              <span id="apply0">
+                <button type="button" class='controlButton' lang="en">Apply</button>
+                <button type="button" class='controlButton' lang="da" hidden>Anvend</button>
+              </span>
+            </div>
+          </div>
+
+          <span>   <br>   </span>
+
+          <div class='topic'>
+            <div>
+              <h4 lang="en">Default task duration</h4>
+              <h4 lang="da" hidden>Standard opgave længde</h4>
+
+              <span lang="en">Set default task duration in minutes:</span>
+              <span lang="da" hidden>Sæt stadard opgavelængde i minutter</span>
+              <input type="text" id='inputBoxM' class="inputSettings" value="30" alt='Set default task duration in minutes'>
+
+              <br>
+              <br>
+
+              <span id='apply1'>
+                <button type="button" class='controlButton' lang="en">Apply</button>
+                <button type="button" class='controlButton' lang="da" hidden>Anvend</button>
+              </span>
+            </div>
+          </div>
+
+          <span>   <br>   </span>
+<!-- TODO: Format hearth radiobuttons by class. Set the labels below to font-size 0.9em -->
+          <div class='topic'>
+            <div>
+              <h4 lang="en">Play 'toc' sound</h4>
+              <h4 lang="da">Afspil 'tac' lyd</h4>
+
+              <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
+              <label for="off" lang="en">Off</label>
+              <label for="off" lang="da" hidden>Fra</label> <br>
+
+              <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
+              <label for="beginning"lang="en">At the beginning of tasks (toc)</label>
+              <label for="beginning" lang="da" hidden>I begyndelsen af en opgave (tac)</label> <br>
+
+              <input type="radio" id='end' class="alarm" name='alarm' value="end">
+              <label for="end" lang="en">At the end of tasks (toc toc)</label>
+              <label for="end" lang="da" hidden>I slutningen af en opgave (tac tac)</label> <br>
+
+              <input type="radio" id='both' class="alarm" name='alarm' value="both">
+              <label for="both" lang="en">Both at beginning and end of tasks</label>
+              <label for="both" lang="da" hidden>Både i begyndelsen og slutningen af en opgave</label> <br>
+
+              <h4>Play 'tic' sound</h4>
+              <input type="radio" id='off' class="reminder" name='reminder' value="off" checked='checked'>
+              <label for=off"" lang="en">Off</label>
+              <label for=off"" lang="da" hidden>Fra</label> <br>
+
+              <input type="radio" id='regularly' class="reminder" name='reminder' value="regularly">
+              <label for="regularly" lang="en">Every X minutes</label>
+              <label for="regularly" lang="da" hidden>Hver X. minut</label> <br>
+
+              <input type="radio" id='rand' class="reminder" name='reminder' value="rand">
+              <label for="rand" lang="en">Randomly within every X minutes</label>
+              <label for="rand" lang="da" hidden>Tilfældigt indenfor X minutter</label> <br>
+              <br>
+
+              <span lang="en">Time interval X in minutes:</span>
+              <span lang="da" hidden>Tidsinterval X i minutter:</span>
+
+              <span id='inputBoxX'>
+                <input type="text" value="10" class="inputSettings" alt='Time interval X in minutes' lang="en">
+                <input type="text" value="10" class="inputSettings" alt='Tids interval X i minutter' lang="da" hidden>
+              </span>
+              <br>
+
+            </div>
+
+            <span>   <br>   </span>
+
+            <div>
+              <span id='apply2'>
+                <button type="button" class='controlButton' lang="en">Apply</button>
+                <button type="button" class='controlButton' lang="da" hidden>Anvend</button>
+              </span>
+            </div>
+            <br>
+            <br>
+            <span lang="en"> Note: The sound only play if the page has focus </span>
+            <span lang="da" hidden> Bemærk: Der afspilles kun lyd hvis siden har fokus </span>
+          </div>
+
+          <span>   <br>   </span>
+
+          <div class='topic'>
+            <h4>
+              <span lang="en"> Stress model </span>
+              <span lang="da" hidden> Stress model </span>
+
+              <button type="button" class='controlButton' id="info">
+                ?
+              </button>
+            </h4>
+
+            <span lang="en"> Set the stress level you experience <br>
+              when you wake up (1-5, 1 is low) &nbsp; </span>
+            <span lang="da" hidden> Angiv det stressniveau du oplever <br>
+               når du vågner (1-5, 1 is lavt) &nbsp; </span>
+
+            <span id='stressLevel'>
+              <input type="text" value="1" class="inputSettings" alt='Set stress level' lang="en">
+              <input type="text" value="1" class="inputSettings" alt='Sæt stressniveau' lang="da" hidden>
+            </span>
+            <br>
+            <br>
+
+            <span lang="en"> Set the time it approximately take <br>
+            for your stress level to double <br>
+            when working without pause &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+            <span lang="da" hidden> Sæt den tid det omtrent tager <br>
+            før dit stressniveau fordobles <br>
+            når du arbejder uden pause &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+
+            <span id='tDouble'>
+              <input type="text" value="240" class="inputSettings" alt='Set time for stress level doubling' lang="en">
+              <input type="text" value="240" class="inputSettings" alt='Sæt tid der giver en fordobling af stressniveau' lang="da" hidden>
+            </span>
+            <br>
+            <br>
+
+            <span id='apply3'>
+              <button type="button" class='controlButton' lang="en">Apply</button>
+              <button type="button" class='controlButton' lang="da" hidden>Anvend</button>
+            </span>
+          </div>
+
+          <span> <br> </span>
+
+          <div class='topic'>
+            <h4 lang="en">Clear data and preferences</h4>
+            <h4 lang="da" hidden>Slet data og indstillinger</h4>
+
+            <span id="clearAllData">
+              <button type="button" class='controlButton' lang="en">Clear all data</button>
+              <button type="button" class='controlButton' lang="da" hidden>Slet alle data</button>
+            </span>
+
+            <span id="clearEverything">
+              <button type="button" class='controlButton' lang="en">Clear all data and preferences</button>
+              <button type="button" class='controlButton' lang="da" hidden>Slet alle data og indstillinger</button>
+            </span>
+
+          </div>
+
+          <span>   <br>   </span>
+          <span id="goBack">
+            <button type="button" class='controlButton' lang="en">Go back</button>
+            <button type="button" class='controlButton' lang="da" hidden>Gå tilbage</button>
+          </span>
+          <span>   <br>   </span>
+
+        </div>    <!-- settingsContainer2 -->
+      </div>    <!-- settingsView -->
+
 
     </div>    <!-- page -->
     <!-- <p>Supported browsers: Firefox, Vivaldi, Chrome, Ecosia app for Samsung</p> -->
