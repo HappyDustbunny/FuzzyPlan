@@ -265,9 +265,9 @@ html {
   border-top: none;
 }
 
-#page {
+/* #page {
   height: 800px;
-}
+} */
 
 #gainDiv {
   display: inline-flex;
@@ -284,9 +284,18 @@ html {
 }
 
 #dayView {
-  /* visibility: hidden; */
-  position: relative; /* Needs to be relative in order for the add-button to have an absolute position with respect to the viewport and not the total page https://css-tricks.com/absolute-relative-fixed-positioining-how-do-they-differ/ */
-  transition: all 0.4s;
+  /* position: relative; */ /* Needs to be relative in order for the add-button to have an absolute position with respect to the viewport and not the total page https://css-tricks.com/absolute-relative-fixed-positioining-how-do-they-differ/ */ */
+  /* transition: all 0.4s; */
+
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto auto;
+  grid-gap: .3rem;
+  background-color: white;
+  border: none;
+  overflow-y: scroll;
+  grid-template-areas: 'head' 'wrap' 'cont';
+  position: fixed;
 }
 
 /* #dayView.active {
@@ -337,18 +346,20 @@ html {
   margin-top: 5px;
 }
 
-[type=radio] {
+/* [type=radio] { */
+[name=drain] {
   position: absolute;
   opacity: 0%;
   width: 0px;
   height: 0px;
 }
 
-[type=radio] + img {
+/* [type=radio] + img { */
+[name=drain] + img {
   opacity: 50%;
 }
 
-[type=radio]:checked + img {
+[name=drain]:checked + img {
   opacity: 100%;
   /* background-color: blue; */
 }
@@ -696,6 +707,10 @@ html {
   width: 40px;
 }
 
+label {  /* Used in settingsView */
+  font-size: 0.9em;
+}
+
 /* settings view css above ^^^ */
 
 
@@ -707,7 +722,7 @@ html {
   /* justify-items: center; */
   background-color: transparent;
   border: none;
-  height: 700px;
+  height: 640px;
   overflow-y: scroll;
   grid-template-areas:
   '. . . taskHeader .'

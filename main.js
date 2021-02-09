@@ -553,7 +553,7 @@ document.getElementById('info').addEventListener('click', function() {goToPage('
 document.getElementById('month').addEventListener('click', monthButtonClicked);
 
 // Unfold settings
-document.getElementById('settings').addEventListener('click', settings);
+document.getElementById('gotoSettings').addEventListener('click', gotoSettings);
 
 document.getElementById('postpone').addEventListener('click', postponeTask);
 
@@ -647,6 +647,11 @@ document.getElementById('day1').addEventListener('click', returnToDay);
 document.getElementById('storeList').addEventListener('click', storeList);
 
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
+
+////////////////// Eventlisteners for storage-view ///////////////////////
+
+document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
+document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -1628,6 +1633,17 @@ function gotoDayFromStorage() {
 
 //////////////////// Storage-view code above ^^^ ///////////////////////////
 
+//////////////////// Settings-view code below ///////////////////////////
+
+function gotoDayFromSettings() {
+  storeLocally();
+  document.getElementById('settingsView').hidden = true;
+  document.getElementById('dayView').hidden = false;
+  renderTasks();
+}
+
+//////////////////// Settings-view code above ^^^ ///////////////////////////
+
 
 function twoFingerNavigation(event) {
   if (sessionStorage.touchX && event.touches.length === 1) {
@@ -1689,13 +1705,13 @@ function goToPage(page) {
 // TODO: Move alert-box instructions to html pages.
 
 // Used by an eventListener. Display settings.
-function settings() {
-  goToPage('settings.html')
-  // Store a day from one session to another
-  // Store multiple days? One pr. calender day?
-  // Store wake up time (wakeUpH and wakeUpM)
+function gotoSettings() {
+  // goToPage('settings.html')
   // Ligth/Dark theme?
-  // Store variables descriping stress sensitivity (tHalf stressStart, ...)
+  storeLocally();
+
+  document.getElementById('dayView').hidden = true;
+  document.getElementById('settingsView').hidden = false;
 }
 
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
@@ -1727,8 +1743,10 @@ function nowButton() {
 
 function adjustNowAndWakeUpButtons() {
   let min = '';
-  let upBtn = document.getElementById('upButton');
-  let nowBtn = document.getElementById('nowButton');
+  // let upBtn = document.getElementById('upButton');
+  // let nowBtn = document.getElementById('nowButton');
+  let upButtons = document.getElementsByClassName('upButtonClass');
+  let nowButtons = document.getElementsByClassName('nowButtonClass');
 
   if (parseInt(wakeUpM) <= 9) { // Adjust minutes to two digits always
     min = '0' + parseInt(wakeUpM);
@@ -1737,18 +1755,26 @@ function adjustNowAndWakeUpButtons() {
   }
 
   if (!wakeUpOrNowClickedOnce) {
-    upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-    upBtn.textContent = wakeUpH + ':' + min + ' \u25BE';  // Black down-pointing small triangle
-    nowBtn.title = 'Press to insert a 15 min planning period now';
-    nowBtn.textContent = 'Now' + ' \u25BE';  // Black down-pointing small triangle
+    for (upBtn in upButtons) {
+      upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
+      upBtn.textContent = wakeUpH + ':' + min + ' \u25BE';  // Black down-pointing small triangle
+    }
+    for (nowBtn in nowButtons) {
+      nowBtn.title = 'Press to insert a 15 min planning period now';
+      nowBtn.textContent = 'Now' + ' \u25BE';  // Black down-pointing small triangle
+    }
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
-    upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;  // Black right-pointing small triangle
-    nowBtn.title = 'Jump to now';
-    nowBtn.textContent = '\u25B8' + 'Now';  // Black right-pointing small triangle
+    for (upBtn in upButtons) {
+      upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
+      upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;  // Black right-pointing small triangle
+    }
+    for (nowBtn in nowButtons) {
+      nowBtn.title = 'Jump to now';
+      nowBtn.textContent = '\u25B8' + 'Now';  // Black right-pointing small triangle
+    }
   }
   renderTasks();
   document.getElementById('dayInputBox').focus();
