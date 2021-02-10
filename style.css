@@ -78,7 +78,7 @@ html {
 
 .centerWrapper {
   display: grid;
-  grid-template-columns: 24% 47% 10% 6% 6%;
+  grid-template-columns: 24% 45% 10% 6% 6%;
   grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
@@ -104,7 +104,7 @@ html {
 
 .container1 {
   display: grid;
-  grid-template-columns: 40px auto 25px 40px;
+  grid-template-columns: 12% 65% 5% 11%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
@@ -161,6 +161,17 @@ html {
 }
 
 .topic {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  border-radius: 10px;
+  background-color: rgba(154, 219, 240, .25);
+  width: 90%;
+}
+
+/* Old .topic trying to compress addView above virtual keyboard */
+/* .topic {
   padding: 7px;
   margin-bottom: -15px;
   border-radius: 10px;
@@ -168,8 +179,11 @@ html {
   width: 90%;
   margin-left: auto;
   margin-right: auto;
-}
+} */
 
+.hearts {
+  font-size: 1.4em;
+}
 
 .durationContainer {
   display: grid;
@@ -709,6 +723,14 @@ html {
 
 label {  /* Used in settingsView */
   font-size: 0.9em;
+}
+
+.settingsContainer {
+  display: flex;
+  align-items: center;
+  /* align-content: space-between; */
+  flex-direction: column;
+  /* justify-content: space-between; */
 }
 
 /* settings view css above ^^^ */

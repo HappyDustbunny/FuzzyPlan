@@ -27,18 +27,20 @@
             FuzzyPlan
           </h1>
 
-          <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
+          <button type="button" class='controlButton' id="settingsInfo" title="info" title="Information and user manual">
             ?
           </button>
 
-          <button type="button" class='controlButton' id="storage" title='Click to
-          show the storage (or just swipe left with two fingers anywhere)' lang="en">
-          Storage
-          </button>
-          <button type="button" class='controlButton' id="storage" title='Klik for
-          at vise lagrene (eller swipe til venstre med to fingre)' lang="da" hidden>
-          Lagre
-          </button>
+          <span id="storage">
+            <button type="button" class='controlButton' title='Click to
+            show the storage (or just swipe left with two fingers anywhere)' lang="en">
+            Storage
+            </button>
+            <button type="button" class='controlButton' title='Klik for
+            at vise lagrene (eller swipe til venstre med to fingre)' lang="da" hidden>
+            Lagre
+            </button>
+          </span>
 
           <span id='heart'></span>
           <span id='dayMessage' display='none'></span>
@@ -87,9 +89,14 @@
           <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
           <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
 
-          <button id='clearButton' class="controlButton" type="button" title="Clear">
-            &#x25BE;Clear<!-- Black down-pointing small triangle  -->
-          </button>
+          <span id='clearButton'>
+            <button class="controlButton" type="button" title="Clear" lang="en">
+              &#x25BE;Clear<!-- Black down-pointing small triangle  -->
+            </button>
+            <button class="controlButton" type="button" title="Slet" lang="da" hidden>
+              &#x25BE;Slet<!-- Black down-pointing small triangle  -->
+            </button>
+          </span>
 
           <button id='gotoSettings' class="controlButton" type="button" title='Settings'>
             &#x2699;  <!-- Gear icon -->
@@ -116,15 +123,20 @@
       <div id='addView' hidden>
         <div class="addContainer1">
           <h1 align='center'>FuzzyPlan</h1>
-          <h2 align='center'>Add task</h2>
+          <h2 align='center' lang="en">Add task</h2>
+          <h2 align='center' lang="da" hidden>Tilføj opgave</h2>
           <span id='addMessage' display='none'></span>
         </div>
 
 
         <div class='topic'>
           <div>
-            <span class="text">Task text </span>
-            <input type="text" id='inputBox_add' autofocus value='' alt='Write task text' tabindex="1">
+            <span class="text" lang="en">Task text </span>
+            <span class="text" lang="da" hidden>Opave tekst </span>
+            <span id='inputBox_add'>
+              <input type="text" autofocus value='' title='Write task text' tabindex="1" lang="en">
+              <input type="text" autofocus value='' title='Skriv en opgavetekst' tabindex="1" lang="da" hidden>
+            </span>
           </div>
         </div>
 
@@ -133,29 +145,33 @@
         <div class='topic'>
           <div id="duration" class="durationContainer">
             <span id='text1'>
-              Duration
-              <input type="text" id='inputDurationBox' alt='Write duration here in minutes' tabindex="2" placeholder="0h30m"> <br>
+              <span lang="en">Duration</span>
+              <span lang="da" hidden>Varighed</span>
+              <span id='inputDurationBox'>
+                <input type="text" title='Write duration in minutes' tabindex="2" placeholder="0h30m"> <br>
+                <input type="text" title=""='Skriv varigheden i minutter' tabindex="2" placeholder="0h30m"> <br>
+              </span>
             </span>
             <div class="buttons">
               <div>
-                <button class='add timeAdjusterTop' type="button" id="durationPlus60m" alt='Plus 1 hour'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus60m" title='Plus 1 hour'>&#x25B4;</button>
                 <button class='add timeAdjusterMiddle' type="button" id="durationPlus60mMiddle" tabIndex = "-1">1h</button>
-                <button class='add timeAdjusterBottom' type="button" id="durationMinus60m" alt='Minus 1 hour'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus60m" title='Minus 1 hour'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="durationPlus30m" alt='Puls 30 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus30m" title='Plus 30 minutes'>&#x25B4;</button>
                 <button class='add timeAdjusterMiddle' type="button" id="durationPlus30mMiddle" tabIndex = "-1">30m</button>
-                <button class='add timeAdjusterBottom' type="button" id="durationMinus30m" alt='Minus 30 minutes'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus30m" title='Minus 30 minutes'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="durationPlus15m" alt='Puls 15 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus15m" title='Plus 15 minutes'>&#x25B4;</button>
                 <button class='add timeAdjusterMiddle' type="button" id="durationPlus15mMiddle" tabIndex = "-1">15m</button>
-                <button class='add timeAdjusterBottom' type="button" id="durationMinus15m" alt='Minus 15 minutes'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus15m" title='Minus 15 minutes'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="durationPlus5m" alt='Puls 5 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="durationPlus5m" title='Plus 5 minutes'>&#x25B4;</button>
                 <button class='add timeAdjusterMiddle' type="button" id="durationPlus5mMiddle" tabIndex = "-1">5m</button>
-                <button class='add timeAdjusterBottom' type="button" id="durationMinus5m" alt='Minus 5 minutes'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="durationMinus5m" title='Minus 5 minutes'>&#x25BE;</button>
               </div>
             </div>
           </div>
@@ -167,37 +183,37 @@
           <div id="time" class="timeContainer">
             <div class="timeButtons">
               <span class="text">Task starts at</span>
-              <input type="text" id='inputTimeBox' alt='Write time here' tabindex="3" placeholder="12:00">
+              <input type="text" id='inputTimeBox' title='Write time here' tabindex="3" placeholder="12:00">
               <span id='optional'>(optional)</span>
-              <button class="add" type="button" id="now" alt='Set time to now' tabindex="4">Now</button>
-              <button class="add" type="button" id="clear" alt='Clear time' tabindex="5">Clear</button>
+              <button class="add" type="button" id="now" title='Set time to now' tabindex="4">Now</button>
+              <button class="add" type="button" id="clear" title='Clear time' tabindex="5">Clear</button>
             </div>
 
             <div class="buttons">
               <div>
-                <button class='add timeAdjusterTop' type="button" id="timePlus300m" alt='Puls 5 hour'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="timePlus300m" title='Plus 5 hour'>&#x25B4;</button>
                 <td><button class='add timeAdjusterMiddle' type="button" id="timePlus5hMiddle" tabIndex = "-1">5h</button></td>
-                <button class='add timeAdjusterBottom' type="button" id="timeMinus300m" alt='Minus 5 hour'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus300m" title='Minus 5 hour'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="timePlus60m" alt='Puls 1 hour'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="timePlus60m" title='Plus 1 hour'>&#x25B4;</button>
                 <td><button class='add timeAdjusterMiddle' type="button" id="timePlus1hMiddle" tabIndex = "-1">1h</button></td>
-                <button class='add timeAdjusterBottom' type="button" id="timeMinus60m" alt='Minus 1 hour'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus60m" title='Minus 1 hour'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="timePlus30m" alt='Puls 30 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="timePlus30m" title='Plus 30 minutes'>&#x25B4;</button>
                 <td><button class='add timeAdjusterMiddle' type="button" id="timePlus30mMiddle" tabIndex = "-1">30m</button></td>
-                <button class='add timeAdjusterBottom' type="button" id="timeMinus30m" alt='Minus 30 minutes'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus30m" title='Minus 30 minutes'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="timePlus15m" alt='Puls 15 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="timePlus15m" title='Plus 15 minutes'>&#x25B4;</button>
                 <td><button class='add timeAdjusterMiddle' type="button" id="timePlus15mMiddle" tabIndex = "-1">15m</button></td>
-                <button class='add timeAdjusterBottom' type="button" id="timeMinus15m" alt='Minus 15 minutes'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus15m" title='Minus 15 minutes'>&#x25BE;</button>
               </div>
               <div>
-                <button class='add timeAdjusterTop' type="button" id="timePlus5m" alt='Puls 5 minutes'>&#x25B4;</button>
+                <button class='add timeAdjusterTop' type="button" id="timePlus5m" title='Plus 5 minutes'>&#x25B4;</button>
                 <td><button class='add timeAdjusterMiddle' type="button" id="timePlus5mMiddle" tabIndex = "-1">5m</button></td>
-                <button class='add timeAdjusterBottom' type="button" id="timeMinus5m" alt='Minus 5 minutes'>&#x25BE;</button>
+                <button class='add timeAdjusterBottom' type="button" id="timeMinus5m" title='Minus 5 minutes'>&#x25BE;</button>
               </div>
             </div>
           </div>
@@ -207,64 +223,70 @@
 
         <div class='topic'>
           <div class="addContainer2">
-            <div class="text">Drain level</div>
+            <div class="text" lang="en">&nbsp; Drain level</div>
+            <div class="text" lang="da" hidden>&nbsp; Dræningsniveau</div>
             <div id='gainDiv'>
-              <span class="text">Gain level</span>
-              <button type="button" class='controlButton' id="info" title="info" alt="Information and user manual">
+              <span class="text" lang="en">Gain level</span>
+              <span class="text" lang="da" hidden>Gavnlighedsniveau</span>
+              <button type="button" class='controlButton' id="addInfo" title="info" title="Information and user manual">
                  ?
               </button>
             </div>
 
             <div id='drainBand'>
-              <label>
+              <label class="hearts">
+                &nbsp;
                 <input type="radio" id='d1' class="drain" name='drain' value="d1" checked='checked'>
-                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='d2' class="drain" name='drain' value="d2">
-                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='d3' class="drain" name='drain' value="d3">
-                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='d4' class="drain" name='drain' value="d4">
-                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='d5' class="drain" name='drain' value="d5">
-                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" style="width: 16px; height: 16px;">
               </label>
             </div>
 
             <div id='gainBand'>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='g1' class="drain" name='drain' value="g1">
-                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" alt="red heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='g2' class="drain" name='drain' value="g2">
-                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" alt="red heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='g3' class="drain" name='drain' value="g3">
-                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" alt="red heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='g4' class="drain" name='drain' value="g4">
-                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" alt="red heart" style="width: 16px; height: 16px;">
               </label>
-              <label>
+              <label class="hearts">
                 <input type="radio" id='g5' class="drain" name='drain' value="g5">
-                <img src="16px-A_SVG_semicircle_heart.svg.png" style="width: 12px; height: 12px;">
+                <img src="16px-A_SVG_semicircle_heart.svg.png" alt="red heart" style="width: 16px; height: 16px;">
               </label>
             </div>
 
           </div>
 
           <div>
-            <button class="add" type="button" id="cancel" tabindex="6">Cancel</button>
+            <span id="cancel">
+              <button class="add" type="button" tabindex="6" lang="en">Cancel</button>
+              <button class="add" type="button" tabindex="6" lang="da" hidden>Afbryd</button>
+            </span>
             <button class="add" type="button" id="apply" tabindex="7">OK</button>
           </div>
         </div>
@@ -276,34 +298,58 @@
 
       <div id="monthView" hidden>
         <div class="monthContainer1">
-          <button type="button" class="controlButton" id='track' title='Choose which
-          task to track with colours'>Track</button>
+          <span id='track'>
+            <button type="button" class="controlButton" title='Choose which
+            task to track with colours' lang="en">Track</button>
+            <button type="button" class="controlButton" title='Vælg hvilke
+            opgaver der skal markeres med farver' lang="da" hidden>Følg</button>
+          </span>
 
           <h1 id='monthViewName' align=center>
             FuzzyPlan
           </h1>
 
-          <button type="button" class='controlButton' id="day" title='       Click to get back to day-view
-          (or just swipe left with two fingers anywhere)'>Day</button>
+          <span id="day">
+            <button type="button" class='controlButton' title='Click to get back to day-view
+            (or just swipe left with two fingers anywhere)' lang="en">Day</button>
+            <button type="button" class='controlButton' title='Klik for at gå tilbage
+            til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)' lang="da" hidden>Dag</button>
+          </span>
 
           <span id='monthMessage' display='none'></span>
           <br>
         </div>
 
         <div class="monthCenterWrapper">
-          <button id='monthClearButton' class="controlButton" type="button" title="Clear input box">
-            Clear&#x25B8;
-          </button>
+          <span id='monthClearButton'>
+            <button class="controlButton" type="button" title="Clear input box" lang="en">
+              Clear&#x25B8;
+            </button>
+            <button class="controlButton" type="button" title="Clear input box" lang="da" hidden>
+              Slet&#x25B8;
+            </button>
+          </span>
           <input type="text" id='monthInputBox' autofocus value="">
 
-          <button type="button" id="moveToDay" class="controlButton" title="Click to move content of input
-            box to today's plan">
+          <span id="moveToDay">
+            <button type="button" class="controlButton" title="Click to move content of input
+            box to today's plan" lang="en">
             Today&#x25B8;
-          </button>
+            </button>
+            <button type="button" class="controlButton" title="Klik for at flytte indholdet
+            af inputboxen til dagens plan" lang="da" hidden>
+            I dag&#x25B8;
+            </button>
+          </span>
 
-          <button type="button" id="putBack" class="controlButton" title="Put the tasks back">
-            Put back
-          </button>
+          <span id="putBack">
+            <button type="button" class="controlButton" title="Put the tasks back" lang="en">
+              Put back
+            </button>
+            <button type="button" class="controlButton" title="Sæt opgaverne tilbage" lang="da" hidden>
+              Sæt tilbage
+            </button>
+          </span>
           <div id='monthChooseBox'></div>
         </div>
 
@@ -320,10 +366,15 @@
           <h1 id='trackViewName' align='center'>
             FuzzyPlan
           </h1>
-          <h2 align='center'>Choose tasks to track</h2>
+          <h2 align='center' lang="en">Choose tasks to track</h2>
+          <h2 align='center' lang="da" hidden>Vælg hvilke opgaver der skal følges</h2>
 
-          <button type="button" class='controlButton' id="month1" title='       Click to
-          get back to month-view'>Month</button>
+          <span id="month1">
+            <button type="button" class='controlButton' title='Click to
+            get back to month-view' lang="en">Month</button>
+            <button type="button" class='controlButton' title='Klik for at komme
+            tilbage til månedsvisningen' lang="da" hidden>Måned</button>
+          </span>
 
           <span id='trackMessage' display='none'></span>
           <br>
@@ -333,9 +384,15 @@
 
         <div class='topic'>
           <div>
-            <span class="text">Track </span>
-            <input type="text" id='taskPickerInputBox' autofocus value="" alt='Write task
-            text for the task you want to track' tabindex="1" placeholder="exercise">
+            <span class="text" lang="en">Track </span>
+            <span class="text" lang="da" hidden>Følg </span>
+
+            <span id='taskPickerInputBox'>
+              <input type="text" autofocus value="" title='Write task text for the
+              task you want to track' tabindex="1" placeholder="exercise" lang="en">
+              <input type="text" autofocus value="" title='Skriv opgaveteksten for
+              den opgave du vil følge' tabindex="1" placeholder="exercise" lang="da" hidden>
+            </span>
           </div>
         </div>
 
@@ -343,9 +400,15 @@
 
         <div class='topic'>
           <div>
-            <span class="text">Colour </span>
-            <input type="text" id='colourPickerInputBox' autofocus value="" alt='Write colour
-            name, rgb-value or hex-value' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)">
+            <span class="text" lang="en">Colour </span>
+            <span class="text" lang="da">Farve </span>
+
+            <span id='colourPickerInputBox'>
+              <input type="text" autofocus value="" title='Write colour name, rgb-value or
+              hex-value' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)" lang="en">
+              <input type="text" autofocus value="" title='Skriv farvenavn, rgb-værdi eller
+              hex-værdi' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)" lang="da" hidden>
+            </span>
             <span id="chosenColour">&nbsp;</span>
           </div>
           <div id="colourButtons" hidden></div>
@@ -356,13 +419,18 @@
         <div id="trackViewSpacer"></div>
 
         <div class="topic">
-          <span class="text">Tracked tasks</span>
+          <span class="text" lang="en">Tracked tasks</span>
+          <span class="text" lang="da" hidden>Opgaver der følges</span>
             <div id="trackedItemsDiv"></div>
 
           <span> <br> </span>
 
-          <button type="button" id="deleteTrackedButton" class="controlButton">Remove
-            UNcheked tasks from this list</button>
+          <span id="deleteTrackedButton">
+            <button type="button" class="controlButton" lang="en">Remove
+              UNcheked tasks from this list</button>
+            <button type="button" class="controlButton" lang="da" hidden>Fjern
+              opgaver UDEN flueben fra denne liste</button>
+          </span>
         </div>
 
       </div>    <!-- trackView -->
@@ -376,9 +444,12 @@
           </h1>
 
           <!-- <h2 align='center'>Retrieve or store task lists</h2> -->
-
-          <button type="button" class="controlButton" id='day1' title="    Click to
-            get back to day-view">Day</button>
+          <span id='day1'>
+            <button type="button" class="controlButton" title="Click to
+            get back to day-view" lang="en">Day</button>
+            <button type="button" class="controlButton" title="Klik for at
+            komme tilbage til dagsvisning" lang="da" hidden>Dag</button>
+          </span>
           <span id='storageMessage' display='none'></span>
 
           <br>
@@ -387,11 +458,16 @@
 
         <div class="storageContainer1">
           <div>
-            <h3>
-              Retrive or store tasklists
-            </h3>
-            <button type="button" id="storeList" class='controlButton' title="To clear a
-            stored list, just store an empty list">Store list in</button>
+            <h3 lang="en"> Store or retrive tasklists </h3>
+            <h3 lang="da" hidden> Gem eller gendan opgavelister </h3>
+
+            <span id="storeList">
+              <button type="button" class='controlButton' title="To clear a
+              stored list, just store an empty list" lang="en">Store list in</button>
+              <button type="button" class='controlButton' title="Gem en tom liste
+              for at slette en gemt liste." lang="da" hidden>Gem liste i</button>
+            </span>
+
             <span>   <br>   </span>
             <span>   <br>   </span>
             <div id="stores">
@@ -416,7 +492,10 @@
               <span>16 <button type="button" id="memory16" class='notInUse store controlButton'>Extra store 2</button></span>
               <span>17 <button type="button" id="memory17" class='notInUse store controlButton'>Extra store 3</button></span>
               <span>   <br>   </span>
-              <button type="button" id="trashBin" class='notInUse trashBin controlButton'>Restore last discarded task list</button>
+              <span id="trashBin">
+                <button type="button" class='notInUse trashBin controlButton' lang="en">Restore last discarded task list</button>
+                <button type="button" class='notInUse trashBin controlButton' lang="da" hidden>Gendan sidste slettede liste</button>
+              </span>
             </div>   <!-- stores -->
           </div>
         </div>     <!-- storageContainer1 -->
@@ -425,7 +504,7 @@
       <!-- Settings view --------------------- -->
 
       <div id="settingsView" hidden>
-        <div class="settingsContainer1">
+        <div class="container1">
           <h1 id='name' align=center>
             FuzzyPlan
           </h1>
@@ -434,7 +513,7 @@
             <button type="button" class='controlButton' title='  Click to
             get back to day-view' lang="en">Day</button>
             <button type="button" class='controlButton' title='  Klik for
-            at vende tilbage til dag-visning' lang="da" hidden>Day</button>
+            at vende tilbage til dag-visning' lang="da" hidden>Dag</button>
           </span>
 
           <span id='message' display='none'></span>
@@ -442,7 +521,7 @@
           <br>
         </div>    <!-- settingsContainer1 -->
 
-        <div class="settingsContainer2">
+        <div class="settingsContainer">
 
           <h2 lang="en">
             Settings
@@ -485,7 +564,7 @@
 
               <span lang="en">Set default task duration in minutes:</span>
               <span lang="da" hidden>Sæt stadard opgavelængde i minutter</span>
-              <input type="text" id='inputBoxM' class="inputSettings" value="30" alt='Set default task duration in minutes'>
+              <input type="text" id='inputBoxM' class="inputSettings" value="30" title='Set default task duration in minutes'>
 
               <br>
               <br>
@@ -498,11 +577,11 @@
           </div>
 
           <span>   <br>   </span>
-<!-- TODO: Format hearth radiobuttons by class. Set the labels below to font-size 0.9em -->
+
           <div class='topic'>
             <div>
               <h4 lang="en">Play 'toc' sound</h4>
-              <h4 lang="da">Afspil 'tac' lyd</h4>
+              <h4 lang="da" hidden>Afspil 'tac' lyd</h4>
 
               <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
               <label for="off" lang="en">Off</label>
@@ -520,7 +599,9 @@
               <label for="both" lang="en">Both at beginning and end of tasks</label>
               <label for="both" lang="da" hidden>Både i begyndelsen og slutningen af en opgave</label> <br>
 
-              <h4>Play 'tic' sound</h4>
+              <h4 lang="en">Play 'tic' sound</h4>
+              <h4 lang="da" hidden>Afspil 'tic' lyd</h4>
+
               <input type="radio" id='off' class="reminder" name='reminder' value="off" checked='checked'>
               <label for=off"" lang="en">Off</label>
               <label for=off"" lang="da" hidden>Fra</label> <br>
@@ -538,8 +619,8 @@
               <span lang="da" hidden>Tidsinterval X i minutter:</span>
 
               <span id='inputBoxX'>
-                <input type="text" value="10" class="inputSettings" alt='Time interval X in minutes' lang="en">
-                <input type="text" value="10" class="inputSettings" alt='Tids interval X i minutter' lang="da" hidden>
+                <input type="text" value="10" class="inputSettings" title='Time interval X in minutes' lang="en">
+                <input type="text" value="10" class="inputSettings" title='Tids interval X i minutter' lang="da" hidden>
               </span>
               <br>
 
@@ -577,8 +658,8 @@
                når du vågner (1-5, 1 is lavt) &nbsp; </span>
 
             <span id='stressLevel'>
-              <input type="text" value="1" class="inputSettings" alt='Set stress level' lang="en">
-              <input type="text" value="1" class="inputSettings" alt='Sæt stressniveau' lang="da" hidden>
+              <input type="text" value="1" class="inputSettings" title='Set stress level' lang="en">
+              <input type="text" value="1" class="inputSettings" title='Sæt stressniveau' lang="da" hidden>
             </span>
             <br>
             <br>
@@ -591,8 +672,8 @@
             når du arbejder uden pause &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
 
             <span id='tDouble'>
-              <input type="text" value="240" class="inputSettings" alt='Set time for stress level doubling' lang="en">
-              <input type="text" value="240" class="inputSettings" alt='Sæt tid der giver en fordobling af stressniveau' lang="da" hidden>
+              <input type="text" value="240" class="inputSettings" title='Set time for stress level doubling' lang="en">
+              <input type="text" value="240" class="inputSettings" title='Sæt tid der giver en fordobling af stressniveau' lang="da" hidden>
             </span>
             <br>
             <br>

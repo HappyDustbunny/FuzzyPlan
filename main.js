@@ -50,6 +50,9 @@ let colours = [
 let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
 'Sunday', 'Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
+let ugeDage = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
+'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
+'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3']; // TODO: Fix weekdays translation
 let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
 
 // Daylight saving time shenanigans
@@ -109,6 +112,8 @@ function setUpFunc() {
   makeFirstTasks();
 
   retrieveLocallyStoredStuff();
+
+  resetViews();
 
   // adjustNowAndWakeUpButtons();
 
@@ -598,7 +603,7 @@ document.getElementById('clear').addEventListener('click', clearTimeBox);
 
 document.getElementById('now').addEventListener('click', setTimeNow);
 
-document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+document.getElementById('addInfo').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
 
 document.getElementById('cancel').addEventListener('click', returnToDay);
 
@@ -652,6 +657,23 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 
 document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
 document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
+
+document.getElementById('apply0').addEventListener('click', applyLanguage);
+
+document.getElementById('apply1').addEventListener('click', applyTaskDuration);
+
+document.getElementById('apply2').addEventListener('click', applyToc);
+
+document.getElementById('settingsInfo').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+
+document.getElementById('apply3').addEventListener('click', applyStressModel);
+
+document.getElementById('clearAllData').addEventListener('click', clearAllData);
+document.getElementById('clearEverything').addEventListener('click', clearEverything);
+
+document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
+
+document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -1635,6 +1657,189 @@ function gotoDayFromStorage() {
 
 //////////////////// Settings-view code below ///////////////////////////
 
+// Used by an eventListener. Display settings.
+function gotoSettings() {
+  // goToPage('settings.html')
+  // Ligth/Dark theme?
+  storeLocally();
+
+  setUpSettings();
+
+  document.getElementById('dayView').hidden = true;
+  document.getElementById('settingsView').hidden = false;
+}
+
+
+function setUpSettings() {
+  if (localStorage.defaultTaskDuration) {
+    document.getElementById('inputBoxM').value = localStorage.defaultTaskDuration;
+  }
+  if (localStorage.ticInterval) {
+    document.getElementById('inputBoxX').value = localStorage.ticInterval;
+  }
+  if (localStorage.radioButtonResultAlarm) {
+    document.getElementById(localStorage.radioButtonResultAlarm).checked = 'checked';
+  }
+  if (localStorage.radioButtonResultReminder) {
+    document.getElementById(localStorage.radioButtonResultReminder).checked = 'checked';
+  }
+  if (localStorage.wakeUpStress) {
+    document.getElementById('stressLevel').value = localStorage.wakeUpStress;
+  }
+  if (localStorage.tDouble) {
+    document.getElementById('tDouble').value = localStorage.tDouble;
+  }
+}
+
+function inputBoxMGotFocus() {
+  document.getElementById('inputBoxM').select();
+}
+
+function inputBoxXGotFocus() {
+  document.getElementById('inputBoxX').select();
+}
+
+
+function applyLanguage() {
+  radioButtonResult0 = document.getElementsByClassName('language');
+  for (var i=0; i<2; i++) {
+    if (radioButtonResult0[i].type === 'radio' && radioButtonResult0[i].checked) {
+      localStorage.language = radioButtonResult0[i].value;
+    }
+  }
+  renderLanguage();
+}
+
+
+function renderLanguage() {
+  let englishNodes = document.querySelectorAll('[lang="en"]');
+  for (index in englishNodes) {
+    // if (0<index) { // index 0 is all html :-P
+      if (Number(localStorage.language) === 0) {
+        englishNodes[index].hidden = false;
+      } else {
+        englishNodes[index].hidden = true;
+      }
+    // }
+  }
+
+  let danishNodes = document.querySelectorAll('[lang="da"]');
+  for (index in danishNodes) {
+    if (Number(localStorage.language) === 1) {
+      danishNodes[index].hidden = false;
+    } else {
+      danishNodes[index].hidden = true;
+    }
+  }
+}
+
+
+function applyTaskDuration() {
+
+  let min = document.getElementById('inputBoxM').value.trim();
+
+  if (isNaN(min) || min < 0 || 24*60 - 2 < min) { // TODO: Scroll to top or display message
+    displayMessage('Use only numbers between 0 and 1438, please.', 3000, settings);
+    document.getElementById('inputBoxM').select();
+    return;
+  }
+
+  localStorage.defaultTaskDuration = min;
+
+  window.location.assign('main.html');
+}
+
+
+function applyToc() {
+  let min = document.getElementById('inputBoxX').value.trim();
+
+  if (isNaN(min) || min < 0 || 59 < min) {
+    displayMessage('Use only numbers between 0 and 59, please.', 3000, settings);
+    document.getElementById('inputBoxX').select();
+    return;
+  }
+
+  localStorage.ticInterval = min;
+
+   let radioButtonResult1 = document.getElementsByClassName('alarm');
+   for (var i = 0; i < 4; i++) {
+     if (radioButtonResult1[i].type === 'radio' && radioButtonResult1[i].checked) {
+       localStorage.radioButtonResultAlarm = radioButtonResult1[i].value;
+     }
+   }
+
+   let radioButtonResult2 = document.getElementsByClassName('reminder');
+   for (var i = 0; i < 3; i++) {
+     if (radioButtonResult2[i].type === 'radio' && radioButtonResult2[i].checked) {
+       localStorage.radioButtonResultReminder = radioButtonResult2[i].value;
+     }
+   }
+
+   window.location.assign('main.html');
+}
+
+
+// function displayMessage(text, displayTime) {
+//   console.log(text);
+//   msg = document.getElementById('message');
+//   msg.style.display = 'inline-block';
+//   msg.style.color = 'red';
+//   msg.textContent = text;
+//
+//   setTimeout(function() {msg.style.display = 'none';}, displayTime)
+// }
+
+
+function applyStressModel() {
+  // Set wakeup stress level
+  let value = document.getElementById('stressLevel').value.trim();
+  if (isNaN(value) || value < 0 || 5 < value) {
+    displayMessage('Use only numbers between 0 and 5, please', 3000, settings);
+    document.getElementById('stressLevel').select();
+  } else {
+    localStorage.wakeUpStress = value;
+  }
+
+  // Set tDouble
+  let min = document.getElementById('tDouble').value.trim();
+  if (isNaN(min) || min < 0 || 24*60 < min) {
+    displayMessage('Use only numbers between 0 and 1438, please', 3000, settings);
+    document.getElementById('stressLevel').select();
+  } else {
+    localStorage.tDouble = min;
+  }
+
+  gotoDayFromSettings();
+}
+
+function clearAllData() {
+  let answer = confirm("The data can NOT be retrieved. Are you SURE "
+  + "you want to delete all data, including tasks on past days?")
+  if (answer) {
+    taskList = [];
+    localStorage.taskList = [];
+    localStorage.monthTaskList = [];
+    localStorage.pastDayList = [];
+    location.reload(true);
+  } else {
+    alert('Nothing was deleted.')
+  }
+}
+
+
+function clearEverything() {
+  let answer = confirm('All data and preferences will be cleared. \n\n'
+  + 'They can NOT be retrieved.\n\n'
+  + 'Are you SURE you want to delete everything?\n\n');
+  if (answer) {
+    localStorage.clear();
+    location.reload(true);
+  } else {
+    alert('Nothing was deleted')
+  }
+}
+
+
 function gotoDayFromSettings() {
   storeLocally();
   document.getElementById('settingsView').hidden = true;
@@ -1703,16 +1908,6 @@ function goToPage(page) {
 // }
 // TODO: Make addPause buttons 15m, 30m + ?
 // TODO: Move alert-box instructions to html pages.
-
-// Used by an eventListener. Display settings.
-function gotoSettings() {
-  // goToPage('settings.html')
-  // Ligth/Dark theme?
-  storeLocally();
-
-  document.getElementById('dayView').hidden = true;
-  document.getElementById('settingsView').hidden = false;
-}
 
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
 function wakeUpButton() {
@@ -2010,12 +2205,10 @@ function clearDay() {
     storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];
     document.getElementById('trashBin').classList.add('inUse');
     document.getElementById('trashBin').classList.remove('notInUse');
+
     // Make sure all alternative views are turned off
-    document.getElementById('addView').hidden = true;
-    document.getElementById('monthView').hidden = true;
-    document.getElementById('trackView').hidden = true;
-    document.getElementById('storageView').hidden = true;
-    document.getElementById('dayView').hidden = false;
+    resetViews();
+
     // Clear stuff and reset
     taskList = [];
     makeFirstTasks();
@@ -2033,6 +2226,15 @@ function clearDay() {
   } else {
     displayMessage('Nothing was changed', 3000, 'day');
   }
+}
+
+
+function resetViews() {
+  document.getElementById('addView').hidden = true;
+  document.getElementById('monthView').hidden = true;
+  document.getElementById('trackView').hidden = true;
+  document.getElementById('storageView').hidden = true;
+  document.getElementById('dayView').hidden = false;
 }
 
 
