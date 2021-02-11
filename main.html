@@ -27,7 +27,7 @@
             FuzzyPlan
           </h1>
 
-          <button type="button" class='controlButton' id="settingsInfo" title="info" title="Information and user manual">
+          <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
             ?
           </button>
 
@@ -535,15 +535,19 @@
               <h4 lang="en">Language</h4>
               <h4 lang="da" hidden>Sprog</h4>
 
-              <input type="radio" id='en' class="language" name='language' value=0 checked='checked'>
-              <img src="./200px-Flag_of_the_United_Kingdom.png" alt="UK flag" height=15px>
-              <label for="en">English </label>
+              <span id='eng'>
+                <input type="radio" id='en' class="language" name='language' value=0 checked='checked'>
+                <img src="./200px-Flag_of_the_United_Kingdom.png" alt="UK flag" height=15px>
+                <label for="en">English </label>
+              </span>
 
               <br>
 
-              <input type="radio" id='da' class="language" name='language' value=1>
-              <img src="./200px-Flag_of_Denmark.png" alt="DK flag" height=15px>
-              <label for="da">&nbsp;&nbsp;Dansk</label>
+              <span id='dan'>
+                <input type="radio" id='da' class="language" name='language' value=1>
+                <img src="./200px-Flag_of_Denmark.png" alt="DK flag" height=15px>
+                <label for="da">&nbsp;&nbsp;Dansk</label>
+              </span>
 
               <br>
               <br>
@@ -618,10 +622,7 @@
               <span lang="en">Time interval X in minutes:</span>
               <span lang="da" hidden>Tidsinterval X i minutter:</span>
 
-              <span id='inputBoxX'>
-                <input type="text" value="10" class="inputSettings" title='Time interval X in minutes' lang="en">
-                <input type="text" value="10" class="inputSettings" title='Tids interval X i minutter' lang="da" hidden>
-              </span>
+              <input type="text"  id='inputBoxX' value="10" class="inputSettings" title='Time interval X in minutes'>
               <br>
 
             </div>
@@ -647,7 +648,7 @@
               <span lang="en"> Stress model </span>
               <span lang="da" hidden> Stress model </span>
 
-              <button type="button" class='controlButton' id="info">
+              <button type="button" class='controlButton' id="settingsInfo">
                 ?
               </button>
             </h4>
@@ -657,10 +658,7 @@
             <span lang="da" hidden> Angiv det stressniveau du oplever <br>
                når du vågner (1-5, 1 is lavt) &nbsp; </span>
 
-            <span id='stressLevel'>
-              <input type="text" value="1" class="inputSettings" title='Set stress level' lang="en">
-              <input type="text" value="1" class="inputSettings" title='Sæt stressniveau' lang="da" hidden>
-            </span>
+            <input type="text"  id='stressLevel' value="1" class="inputSettings" title='Set stress level'>
             <br>
             <br>
 
@@ -671,10 +669,7 @@
             før dit stressniveau fordobles <br>
             når du arbejder uden pause &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
 
-            <span id='tDouble'>
-              <input type="text" value="240" class="inputSettings" title='Set time for stress level doubling' lang="en">
-              <input type="text" value="240" class="inputSettings" title='Sæt tid der giver en fordobling af stressniveau' lang="da" hidden>
-            </span>
+            <input type="text" id='tDouble' value="240" class="inputSettings" title='Set time for stress level doubling'>
             <br>
             <br>
 

@@ -115,6 +115,8 @@ function setUpFunc() {
 
   resetViews();
 
+  renderLanguage();
+
   // adjustNowAndWakeUpButtons();
 
   // Set uniqueIdOfLastTouche to the last task before 'Day end'
@@ -175,6 +177,8 @@ function storeLocally() {
   localStorage.tDouble = tDouble;
 
   localStorage.idOflastTouched = idOfLastTouched;
+
+  localStorage.language = language;   // Value 0:English 1:Danish
 
   // if (tasksSentBetween) { // TODO: Is this used?
   //   localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
@@ -264,6 +268,10 @@ function retrieveLocallyStoredStuff() {
 
   if (!localStorage.getItem('idOfLastTouched')) { // If NOT present...
     localStorage.idOfLastTouched = 0;
+  }
+
+  if (localStorage.getItem('language')) {
+    language = Number(localStorage.language);   // Value 0:English 1:Danish
   }
 
   if (localStorage.getItem('monthTaskList')) {
@@ -541,10 +549,12 @@ function updateHearts() {
   fillHearths(Math.round(10 - result));
 }
 
+
 function sayToc() {
   let sound = new Audio('429721__fellur__tic-alt.wav');
   sound.play();
 }
+
 
 function sayTic() {
   let sound = new Audio('448081__breviceps__tic-toc-click.wav');
@@ -554,7 +564,7 @@ function sayTic() {
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
 // document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
-document.getElementById('info').addEventListener('click', function() {goToPage('instructions.html');});
+document.getElementById('info').addEventListener('click', gotoInfo);
 document.getElementById('month').addEventListener('click', monthButtonClicked);
 
 // Unfold settings
@@ -603,9 +613,9 @@ document.getElementById('clear').addEventListener('click', clearTimeBox);
 
 document.getElementById('now').addEventListener('click', setTimeNow);
 
-document.getElementById('addInfo').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+document.getElementById('addInfo').addEventListener('click', gotoInfoStress);
 
-document.getElementById('cancel').addEventListener('click', returnToDay);
+document.getElementById('cancel').addEventListener('click', gotoDayFromAdd);
 
 document.getElementById('apply').addEventListener('click', apply);
 
@@ -647,16 +657,19 @@ document.getElementById('deleteTrackedButton').addEventListener('click', removeT
 
 document.getElementById('storage').addEventListener('click', storageButtonClicked);
 
-document.getElementById('day1').addEventListener('click', returnToDay);
+document.getElementById('day1').addEventListener('click', gotoDayFromStorage);
 
 document.getElementById('storeList').addEventListener('click', storeList);
 
 document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
 
-////////////////// Eventlisteners for storage-view ///////////////////////
+////////////////// Eventlisteners for settings-view ///////////////////////
 
 document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
 document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
+
+document.getElementById('eng').addEventListener('click', checkEnglishRadio)
+document.getElementById('dan').addEventListener('click', checkDanishRadio)
 
 document.getElementById('apply0').addEventListener('click', applyLanguage);
 
@@ -664,7 +677,7 @@ document.getElementById('apply1').addEventListener('click', applyTaskDuration);
 
 document.getElementById('apply2').addEventListener('click', applyToc);
 
-document.getElementById('settingsInfo').addEventListener('click', function() {goToPage('instructions.html#stressModel');});
+document.getElementById('settingsInfo').addEventListener('click', gotoInfoStress);
 
 document.getElementById('apply3').addEventListener('click', applyStressModel);
 
@@ -672,8 +685,9 @@ document.getElementById('clearAllData').addEventListener('click', clearAllData);
 document.getElementById('clearEverything').addEventListener('click', clearEverything);
 
 document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
-
 document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
+document.getElementById('stressLevel').addEventListener('focus', stressLevelGotFocus);
+document.getElementById('tDouble').addEventListener('focus', tDoubleGotFocus);
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -936,7 +950,7 @@ function apply() {
   }
 }
 
-function returnToDay() {
+function gotoDayFromAdd() {
   document.getElementById('addView').hidden = true;
   document.getElementById('dayView').hidden = false;
 }
@@ -1553,6 +1567,16 @@ function storageButtonClicked() {
   document.getElementById('dayView').hidden = true;
   document.getElementById('storageView').hidden = false;
 
+  let storages = document.getElementsByClassName('store');
+
+  for (var index in storages){
+    if (language === 0) {  // Value 0:English 1:Danish
+      storages[index].innerText = weekDays[index];
+    } else if (language === 1) {
+      storages[index].innerText = ugeDage[index];
+    }
+  }
+
   for (var memoryCell in storageList) {
     let node = document.getElementById(memoryCell);
     node.classList.remove('highLighted');
@@ -1616,9 +1640,13 @@ function storeHasBeenClicked(event) {
     if (taskList.length === 2) {  // If taskList is empty except for dayStart and dayEnd...
       clickedButton.classList.remove('inUse');
       clickedButton.classList.add('notInUse');
-      clickedButton.innerText = weekDays[/\d+/.exec(clickedButton.id) - 1]
+      if (language === 0) {  // Value 0:English 1:Danish
+        clickedButton.innerText = weekDays[/\d+/.exec(clickedButton.id) - 1];
+      } else if (language === 1) {
+        clickedButton.innerText = ugeDage[/\d+/.exec(clickedButton.id) - 1];
+      }
       delete storageList[clickedButton.id];
-      displayMessage('Stored list is cleared', 3000, 'storage')
+      displayMessage('Stored list is cleared', 3000, 'storage');
     } else {
       displayMessage('Current task list stored in ' + clickedButton.innerText, 3000, 'storage');
     }
@@ -1671,6 +1699,12 @@ function gotoSettings() {
 
 
 function setUpSettings() {
+  if (language === 0) {  // Value 0:English 1:Danish {
+    document.getElementById('en').checked = true;
+  } else if (language === 1) {
+    document.getElementById('da').checked = true;
+  }
+
   if (localStorage.defaultTaskDuration) {
     document.getElementById('inputBoxM').value = localStorage.defaultTaskDuration;
   }
@@ -1691,12 +1725,33 @@ function setUpSettings() {
   }
 }
 
+
 function inputBoxMGotFocus() {
   document.getElementById('inputBoxM').select();
 }
 
+
 function inputBoxXGotFocus() {
   document.getElementById('inputBoxX').select();
+}
+
+
+function stressLevelGotFocus() {
+  document.getElementById('stressLevel').select();
+}
+
+function tDoubleGotFocus() {
+  document.getElementById('tDouble').select();
+}
+
+
+function checkEnglishRadio() {
+  document.getElementById('en').checked = true;
+}
+
+
+function checkDanishRadio() {
+  document.getElementById('da').checked = true;
 }
 
 
@@ -1704,10 +1759,13 @@ function applyLanguage() {
   radioButtonResult0 = document.getElementsByClassName('language');
   for (var i=0; i<2; i++) {
     if (radioButtonResult0[i].type === 'radio' && radioButtonResult0[i].checked) {
-      localStorage.language = radioButtonResult0[i].value;
+      language = Number(radioButtonResult0[i].value);  // Value 0:English 1:Danish
+      localStorage.language = language;
     }
   }
   renderLanguage();
+
+  gotoDayFromSettings();
 }
 
 
@@ -1744,9 +1802,11 @@ function applyTaskDuration() {
     return;
   }
 
-  localStorage.defaultTaskDuration = min;
+  defaultTaskDuration = min;
+  localStorage.defaultTaskDuration = defaultTaskDuration;
 
-  window.location.assign('main.html');
+   gotoDayFromSettings();
+  // window.location.assign('main.html');
 }
 
 
@@ -1775,19 +1835,9 @@ function applyToc() {
      }
    }
 
-   window.location.assign('main.html');
+   gotoDayFromSettings();
+   // window.location.assign('main.html');
 }
-
-
-// function displayMessage(text, displayTime) {
-//   console.log(text);
-//   msg = document.getElementById('message');
-//   msg.style.display = 'inline-block';
-//   msg.style.color = 'red';
-//   msg.textContent = text;
-//
-//   setTimeout(function() {msg.style.display = 'none';}, displayTime)
-// }
 
 
 function applyStressModel() {
@@ -1797,7 +1847,8 @@ function applyStressModel() {
     displayMessage('Use only numbers between 0 and 5, please', 3000, settings);
     document.getElementById('stressLevel').select();
   } else {
-    localStorage.wakeUpStress = value;
+    wakeUpStress = value;
+    localStorage.wakeUpStress = wakeUpStress;
   }
 
   // Set tDouble
@@ -1806,7 +1857,8 @@ function applyStressModel() {
     displayMessage('Use only numbers between 0 and 1438, please', 3000, settings);
     document.getElementById('stressLevel').select();
   } else {
-    localStorage.tDouble = min;
+    tDouble = min;
+    localStorage.tDouble = tDouble;
   }
 
   gotoDayFromSettings();
@@ -1897,17 +1949,29 @@ function  fillHearths(currentStressLevel) {
   }
 }
 
+
+function gotoInfo() {
+  if (language === 0) {  // Value 0:English 1:Danish {
+    goToPage('instructions.html');
+  } else if (language === 1) {
+    goToPage('instructions_dk.html');
+  }
+}
+
+ function gotoInfoStress() {
+   if (language === 0) {  // Value 0:English 1:Danish {
+     goToPage('instructions.html#stressModel');
+   } else if (language === 1) {
+     goToPage('instructions_dk.html#stressModel');
+   }
+ }
+
 function goToPage(page) {
   storeLocally();
 
   window.location.assign(page);
 }
 
-// function info() {
-//   goToPage('instructions.html')
-// }
-// TODO: Make addPause buttons 15m, 30m + ?
-// TODO: Move alert-box instructions to html pages.
 
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
 function wakeUpButton() {
