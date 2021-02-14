@@ -16,31 +16,15 @@
 
       <div id="dayView" class="active">
         <div class="container1">
-          <span id="month">
-            <button type="button" class='controlButton' title='Click to show month (or
-             just swipe rigth with two fingers anywhere)' lang='en'> Month </button>
-            <button type="button" class='controlButton' title='Klik for at vise måned
-            (eller swipe til højre med to fingre)' lang='da' hidden> Måned </button>
-          </span>
+          <button type="button" id="month" class='controlButton'> </button>
 
           <h1 id='name' align=center>
             FuzzyPlan
           </h1>
 
-          <button type="button" class='controlButton' id="info" title="info" title="Information and user manual">
-            ?
-          </button>
+          <button type="button" class='controlButton' id="info"> </button>
 
-          <span id="storage">
-            <button type="button" class='controlButton' title='Click to
-            show the storage (or just swipe left with two fingers anywhere)' lang="en">
-            Storage
-            </button>
-            <button type="button" class='controlButton' title='Klik for
-            at vise lagrene (eller swipe til venstre med to fingre)' lang="da" hidden>
-            Lagre
-            </button>
-          </span>
+          <button type="button" id="storage" class='controlButton'> </button>
 
           <span id='heart'></span>
           <span id='dayMessage' display='none'></span>
@@ -49,62 +33,23 @@
 
         <div class="centerWrapper">
           <div id="sortTask" class="noTasksToSort">
-            <span id="postpone">
-              <button type="button" class="controlButton" title="Click to move
-              content of input box to month (postpone task)" lang="en">
-              &#x25C2;Postpone <!-- Black left-pointing small triangle  -->
-              </button>
-              <button type="button" class="controlButton" title="Klik for at sende
-              indholdet af indput-boxen til månedsvisningen (udskyd opgaven)" lang="da" hidden>
-              &#x25C2;Udskyd <!-- Black left-pointing small triangle  -->
-              </button>
-            </span>
+            <button type="button" id="postpone" class="controlButton"> </button>
 
-            <span id='upButton'>
-              <button class="controlButton upButtonClass" type="button" title="Click to
-              insert a 15 minute planning period at the chosen wake up time" lang="en">
-              &#x25BE;7:00 <!-- Black Down-Pointing Small Triangle -->
-              </button>
-              <button class="controlButton upButtonClass" type="button" title="Klik for at
-              indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid." lang="da" hidden>
-              &#x25BE;7:00 <!-- Black Down-Pointing Small Triangle -->
-              </button>
-            </span>
+            <button type="button" id='upButton' class="controlButton upButtonClass"> </button>
 
-            <span id='nowButton'>
-              <button class="controlButton nowButtonClass" type="button" title='Click to
-              insert a 15 min planning period at current time' lang="en">
-              &#x25BE;Now <!-- Black Down-Pointing Small Triangle -->
-              </button>
-              <button class="controlButton nowButtonClass" type="button" title='Klik for at
-              indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.' lang="da" hidden>
-              &#x25BE;Nu <!-- Black Down-Pointing Small Triangle -->
-              </button>
-            </span>
-
+            <button type="button" id='nowButton' class="controlButton nowButtonClass"> </button>
           </div>
 
-          <input type="text" id='dayInputBox' autofocus value="">
+          <input type="text" id='dayInputBox' class="inputBox" autofocus value="">
 
           <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
           <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
 
-          <span id='clearButton'>
-            <button class="controlButton" type="button" title="Clear" lang="en">
-              &#x25BE;Clear<!-- Black down-pointing small triangle  -->
-            </button>
-            <button class="controlButton" type="button" title="Slet" lang="da" hidden>
-              &#x25BE;Slet<!-- Black down-pointing small triangle  -->
-            </button>
-          </span>
+          <button type="button" id='clearButton' class="controlButton"> </button>
 
-          <button id='gotoSettings' class="controlButton" type="button" title='Settings'>
-            &#x2699;  <!-- Gear icon -->
-          </button>
+          <button type="button" id='gotoSettings' class="controlButton"> </button>
 
-          <button id='zoom' class="controlButton" type="button" title='Toggles zoom'>
-            &#x2350; <!-- ⍐ -->
-          </button>
+          <button type="button" id='zoom' class="controlButton"> </button>
 
           <div id="dayChooseBox"></div>
 
@@ -131,12 +76,8 @@
 
         <div class='topic'>
           <div>
-            <span class="text" lang="en">Task text </span>
-            <span class="text" lang="da" hidden>Opave tekst </span>
-            <span id='inputBox_add'>
-              <input type="text" autofocus value='' title='Write task text' tabindex="1" lang="en">
-              <input type="text" autofocus value='' title='Skriv en opgavetekst' tabindex="1" lang="da" hidden>
-            </span>
+            <span id='inputBox_add_text' class="text"> </span>
+            <input type="text" id='inputBox_add' class="inputBox" autofocus value='' tabindex="1">
           </div>
         </div>
 
@@ -145,12 +86,8 @@
         <div class='topic'>
           <div id="duration" class="durationContainer">
             <span id='text1'>
-              <span lang="en">Duration</span>
-              <span lang="da" hidden>Varighed</span>
-              <span id='inputDurationBox'>
-                <input type="text" title='Write duration in minutes' tabindex="2" placeholder="0h30m"> <br>
-                <input type="text" title=""='Skriv varigheden i minutter' tabindex="2" placeholder="0h30m"> <br>
-              </span>
+              <span id='inputDurationBox_text' class='text'></span>
+              <input type="text" id='inputDurationBox' class="inputBox" tabindex="2" placeholder="0h30m"> <br>
             </span>
             <div class="buttons">
               <div>
@@ -180,10 +117,10 @@
         <span>   <br>   </span>
 
         <div class='topic'>
-          <div id="time" class="timeContainer">
+          <div id="time" class="timeContainer"> <!-- TODO: Continue translation here -->
             <div class="timeButtons">
               <span class="text">Task starts at</span>
-              <input type="text" id='inputTimeBox' title='Write time here' tabindex="3" placeholder="12:00">
+              <input type="text" class="inputBox" id='inputTimeBox' title='Write time here' tabindex="3" placeholder="12:00">
               <span id='optional'>(optional)</span>
               <button class="add" type="button" id="now" title='Set time to now' tabindex="4">Now</button>
               <button class="add" type="button" id="clear" title='Clear time' tabindex="5">Clear</button>
@@ -329,7 +266,7 @@
               Slet&#x25B8;
             </button>
           </span>
-          <input type="text" id='monthInputBox' autofocus value="">
+          <input type="text" id='monthInputBox' class="inputBox" autofocus value="">
 
           <span id="moveToDay">
             <button type="button" class="controlButton" title="Click to move content of input
@@ -387,12 +324,8 @@
             <span class="text" lang="en">Track </span>
             <span class="text" lang="da" hidden>Følg </span>
 
-            <span id='taskPickerInputBox'>
-              <input type="text" autofocus value="" title='Write task text for the
-              task you want to track' tabindex="1" placeholder="exercise" lang="en">
-              <input type="text" autofocus value="" title='Skriv opgaveteksten for
-              den opgave du vil følge' tabindex="1" placeholder="exercise" lang="da" hidden>
-            </span>
+            <input type="text" id='taskPickerInputBox' class="inputBox" autofocus value="" title='Write task text for the
+            task you want to track' tabindex="1" placeholder="exercise">
           </div>
         </div>
 
@@ -403,12 +336,8 @@
             <span class="text" lang="en">Colour </span>
             <span class="text" lang="da">Farve </span>
 
-            <span id='colourPickerInputBox'>
-              <input type="text" autofocus value="" title='Write colour name, rgb-value or
-              hex-value' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)" lang="en">
-              <input type="text" autofocus value="" title='Skriv farvenavn, rgb-værdi eller
-              hex-værdi' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)" lang="da" hidden>
-            </span>
+            <input type="text" id='colourPickerInputBox' class="inputBox" autofocus value="" title='Write colour name, rgb-value or
+            hex-value' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)">
             <span id="chosenColour">&nbsp;</span>
           </div>
           <div id="colourButtons" hidden></div>
@@ -568,7 +497,7 @@
 
               <span lang="en">Set default task duration in minutes:</span>
               <span lang="da" hidden>Sæt stadard opgavelængde i minutter</span>
-              <input type="text" id='inputBoxM' class="inputSettings" value="30" title='Set default task duration in minutes'>
+              <input type="text" id='inputBoxM' class="inputBox inputSettings" value="30" title='Set default task duration in minutes'>
 
               <br>
               <br>
@@ -622,7 +551,7 @@
               <span lang="en">Time interval X in minutes:</span>
               <span lang="da" hidden>Tidsinterval X i minutter:</span>
 
-              <input type="text"  id='inputBoxX' value="10" class="inputSettings" title='Time interval X in minutes'>
+              <input type="text"  id='inputBoxX' class="inputBox" value="10" class="inputBox inputSettings" title='Time interval X in minutes'>
               <br>
 
             </div>
@@ -658,7 +587,7 @@
             <span lang="da" hidden> Angiv det stressniveau du oplever <br>
                når du vågner (1-5, 1 is lavt) &nbsp; </span>
 
-            <input type="text"  id='stressLevel' value="1" class="inputSettings" title='Set stress level'>
+            <input type="text"  id='stressLevel' value="1" class="inputBox inputSettings" title='Set stress level'>
             <br>
             <br>
 
@@ -669,7 +598,7 @@
             før dit stressniveau fordobles <br>
             når du arbejder uden pause &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
 
-            <input type="text" id='tDouble' value="240" class="inputSettings" title='Set time for stress level doubling'>
+            <input type="text" id='tDouble' value="240" class="inputBox inputSettings" title='Set time for stress level doubling'>
             <br>
             <br>
 

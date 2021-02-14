@@ -22,6 +22,7 @@ let reminder = 'off'; // Turn reminders off by default
 let tasksFromClickedDayInMonth = null;
 let tasksSentBetween = [];
 let language = 0; // English: 0, Danish: 1
+let lang = ['en', 'da'];
 
 ///////// Add-view /////////
 let taskText_add = '';
@@ -54,6 +55,47 @@ let ugeDage = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'S
 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
 'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3']; // TODO: Fix weekdays translation
 let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
+
+///////// Languages ///////
+let languagePack = {  // {'id': ['text', 'title']}
+     "month": [['Month', 'Click to show month (or just swipe rigth with two fingers anywhere)'],
+               ['Måned', 'Klik for at vise måned (eller swipe til højre med to fingre)']],
+     "storage": [['Storage', 'Click to show the storage (or just swipe left with two fingers anywhere)'],
+                 ['Lagre', 'Klik for at vise lagrene (eller swipe til venstre med to fingre)']],
+     'info': [['?', "Information and user manual"],
+        ['?', 'Information og brugsanvisning']],
+     "postpone": [['\u25C2 Postpone', "Click to move content of input box to month (postpone task)"], // &#x25C2; Black left-pointing small triangle
+                  ['\u25C2 Udskyd', "Klik for at sende indholdet af indput-boxen til månedsvisningen (udskyd opgaven)"]],
+     'upButton': [['\u25BE 7:00', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
+                  ['\u25BE 7:00', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid."]],
+     'nowButton': [['\u25BE Now', 'Click to insert a 15 min planning period at current time'],  // \u25BE <!-- Black Down-Pointing Small Triangle -->
+                  ['\u25BE Nu', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
+     'clearButton': [['\u25BEClear', "Clear"],  // <!-- Black down-pointing small triangle  -->
+                     ['\u25BE Slet', 'Slet']],
+     'gotoSettings': [['\u2699', 'Settings'],  // Gear icon
+                      ['\u2699', 'Indstillinger']],
+     'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
+              ['\u2350', 'Zoom ind og ud']],
+     'inputBox_add_text': [['Task text', ''],
+                           ['Opave tekst', '']],
+     'inputBox_add': [['', 'Write task text'],
+                      ['', 'Skriv en opgavetekst']],
+     'inputDurationBox_text': [['Duration\u00a0', ''],
+                               ['Varighed\u00a0', '']],
+     'inputDurationBox': [['', 'Write duration in minutes'],
+                          ['', 'Skriv varigheden i minutter']],
+     // : [[, ],
+     //    [, ]],
+     // : [[, ],
+     //    [, ]],
+     // : [[, ],
+     //    [, ]],
+     // : [[, ],
+     //    [, ]],
+     // : [[, ],
+     //    [, ]],
+};
+
 
 // Daylight saving time shenanigans
 let today = new Date();
@@ -1769,29 +1811,6 @@ function applyLanguage() {
 }
 
 
-function renderLanguage() {
-  let englishNodes = document.querySelectorAll('[lang="en"]');
-  for (index in englishNodes) {
-    // if (0<index) { // index 0 is all html :-P
-      if (Number(localStorage.language) === 0) {
-        englishNodes[index].hidden = false;
-      } else {
-        englishNodes[index].hidden = true;
-      }
-    // }
-  }
-
-  let danishNodes = document.querySelectorAll('[lang="da"]');
-  for (index in danishNodes) {
-    if (Number(localStorage.language) === 1) {
-      danishNodes[index].hidden = false;
-    } else {
-      danishNodes[index].hidden = true;
-    }
-  }
-}
-
-
 function applyTaskDuration() {
 
   let min = document.getElementById('inputBoxM').value.trim();
@@ -2299,6 +2318,42 @@ function resetViews() {
   document.getElementById('trackView').hidden = true;
   document.getElementById('storageView').hidden = true;
   document.getElementById('dayView').hidden = false;
+}
+
+
+function renderLanguage() {
+  let buttons = document.getElementsByClassName('controlButton');
+
+  for (var index in buttons){
+    let id = buttons[index].id;
+    if (languagePack[id]) {
+      buttons[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
+      buttons[index].title = languagePack[id][language][1];  // English: 0, Danish: 1
+      buttons[index].lang = lang[language];  // lang = ['en', 'da']
+    }
+  }
+
+  let inputBoxes = document.getElementsByClassName('inputBox');
+
+  for (var index in inputBoxes){
+    let id = inputBoxes[index].id;
+    if (languagePack[id]) {
+      inputBoxes[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
+      inputBoxes[index].title = languagePack[id][language][1];  // English: 0, Danish: 1
+      inputBoxes[index].lang = lang[language];  // lang = ['en', 'da']
+    }
+  }
+
+  let texts = document.getElementsByClassName('text');
+
+  for (var index in texts){
+    let id = texts[index].id;
+    if (languagePack[id]) {
+      texts[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
+      texts[index].title = languagePack[id][language][1];  // English: 0, Danish: 1
+      texts[index].lang = lang[language];  // lang = ['en', 'da']
+    }
+  }
 }
 
 
