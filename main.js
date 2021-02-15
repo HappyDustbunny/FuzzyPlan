@@ -58,6 +58,7 @@ let storageList = {};  // taskList and their names are stored in memory1-17  {'m
 
 ///////// Languages ///////
 let languagePack = {  // {'id': ['text', 'title']}
+   // Day view
      "month": [['Month', 'Click to show month (or just swipe rigth with two fingers anywhere)'],
                ['Måned', 'Klik for at vise måned (eller swipe til højre med to fingre)']],
      "storage": [['Storage', 'Click to show the storage (or just swipe left with two fingers anywhere)'],
@@ -76,6 +77,9 @@ let languagePack = {  // {'id': ['text', 'title']}
                       ['\u2699', 'Indstillinger']],
      'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
               ['\u2350', 'Zoom ind og ud']],
+    // Add view
+     'addTaskHeading': [['Add task', ''],
+                        ['Tilføj opgave', '']],
      'inputBox_add_text': [['Task text', ''],
                            ['Opave tekst', '']],
      'inputBox_add': [['', 'Write task text'],
@@ -84,16 +88,91 @@ let languagePack = {  // {'id': ['text', 'title']}
                                ['Varighed\u00a0', '']],
      'inputDurationBox': [['', 'Write duration in minutes'],
                           ['', 'Skriv varigheden i minutter']],
-     // : [[, ],
-     //    [, ]],
-     // : [[, ],
-     //    [, ]],
-     // : [[, ],
-     //    [, ]],
-     // : [[, ],
-     //    [, ]],
-     // : [[, ],
-     //    [, ]],
+     'inputTimeBoxText': [['Task starts at', ''],
+                          ['Opgaven starter kl', '']],
+     'inputTimeBox': [['', 'Write time here'],
+                      ['', 'Skriv tiden her']],
+     'optional': [['(optional)', ''],
+                  ['(Ikke påkrævet)', '']],
+     'now': [['Now', 'Set time to now'],
+             ['Nu', 'Sæt tiden til nu']],
+     'clear': [['Clear', 'Clear time'],
+               ['Slet', 'Slet tidspunkt']],
+     'drainLevelText': [['\u00a0 Drain level', ''],
+                        ['\u00a0 Dræningsniveau', '']],
+     'grainLevelText': [['Gain level', ''],
+                        ['Gavnlighedsniveau', '']],
+     'addInfo': [['?', 'Information and user manual'],
+        ['?', 'Information og brugsanvisning']],
+     'cancel': [['Cancel', ''],
+                ['Afbryd', '']],
+     'apply': [['OK', ''],
+        ['OK', '']],
+      // Month View
+     'track': [['Track', 'Choose which task to track with colours'],
+               ['Følg', 'Vælg hvilke opgaver der skal følges']],
+     'day': [['Day', 'Click to get back to day-view (or just swipe left with two fingers anywhere)'],
+             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)']],
+     'monthClearButton': [['Clear\u25B8', 'Clear input box'],
+        ['Slet \u25B8', 'Slet input boks']],
+     'monthInputBox': [['', 'Input tasks to store in month view'],
+                       ['', 'Skriv opgaver der skal gemmes i månedsvisningen']],
+     'moveToDay': [['Today \u25B8', 'Click to move content of input box to today\'s plan'],
+                   ['I dag \u25B8', 'Klik for at flytte indholdet af inputboxen til dagens plan']],
+     'putBack': [['Put back', 'Put the tasks back in month view'],
+        ['Fortryd', 'Sæt opgaverne tilbage i månedsvisningen']],
+     'trackViewHeading': [['Choose tasks to track', ''],
+                          ['Vælg opgaver der skal følges', '']],
+     'month1': [['Month', 'Click to get back to month-view'],
+                ['Måned', 'Klik for at komme tilbage til månedsvisningen']],
+     'trackText': [['Track\u00a0', ''],
+                   ['Følg\u00a0', '']],
+     'taskPickerInputBox': [['', 'Write task text for the task you want to track'],
+                            ['', 'Skriv opgaveteksten for den opgave du vil følge']],
+      'colourText': [['Colour\u00a0', ''],
+                     ['Farve\u00a0', '']],
+     'colourPickerInputBox': [['', 'Write colour name or rgb-value or hex-value'],
+                              ['', 'Skriv farvenavn (på engelsk) eller rgb-værdi eller hex-værdi for farven']],
+     'trackedItemsText': [['Tracked tasks', ''],
+                          ['Opgaver der følges', '']],
+     'deleteTrackedButton': [['Remove UNcheked tasks from this list', ''],
+                             ['Fjern opgaver UDEN flueben fra denne liste', '']],
+    // Storage view
+     'storageHeadingText': [['Store or retrive tasklists', ''],
+                            ['Gem eller gendan opgavelister', '']],
+     'storeList': [['Store list in', 'To clear a stored list, just store an empty list'],
+                   ['Gem liste i', 'Gem en tom liste for at slette en gemt liste.']],
+     'trashBin': [['Restore last discarded task list', ''],
+                  ['Gendan sidst slettede liste', '']],
+    // Settings view
+     'gotoDayFromSettings': [['Day', 'Click to get back to day-view'],
+                             ['Dag', 'Klik for at vende tilbage til dagsvisning']],
+     'settingsHeading': [['Settings', ''],
+                         ['Indstillinger', '']],
+     'languageHeading': [['Language', ''],
+                          ['Sprog', '']],
+     'apply0': [['Apply', ''],
+                ['Andvend', '']],
+     'taskDurationHeading': [['Default task duration', ''],
+                   ['Standard opgavelængde', '']],
+     'taskDurationText': [['Set default task duration in minutes:', ''],
+                          ['Sæt stadard opgavelængde i minutter', '']],
+     'inputBoxM': [['', 'Set default task duration in minutes'],
+                   ['', 'Sæt standardlængden for opgaver i minutter']],
+     'apply1': [['Apply', ''],
+                ['Andvend', '']],
+      // : [['', ''],
+      // ['', '']],
+      // : [['', ''],
+      // ['', '']],
+     // : [['', ''],
+     //    ['', '']],
+     // : [['', ''],
+     //    ['', '']],
+     // : [['', ''],
+     //    ['', '']],
+     // : [['', ''],
+     //    ['', '']],
 };
 
 
@@ -1644,73 +1723,78 @@ function storeList() {
 function storeHasBeenClicked(event) {
   let id = event.target.id;
   let text = '';
-  let clickedButton = document.getElementById(id);
-  if (id === 'trashBin') {
+
+  if (id != '') {
+    let clickedButton = document.getElementById(id);
+    if (id === 'trashBin') {
     // Restore stuff from trashBin
-    if (storageList['trashBin']) {
-      let trash = deepCopyFunc(storageList['trashBin'][0]);  // Retrieve content of trashBin
-      if (2<taskList.length) {
-        storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];   // Put current taskList into the trashBin
+      if (storageList['trashBin']) {
+        let trash = deepCopyFunc(storageList['trashBin'][0]);  // Retrieve content of trashBin
+        if (2<taskList.length) {
+          storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];   // Put current taskList into the trashBin
+        }
+        taskList = trash;  // Restore trash as taskList
+        document.getElementById('trashBin').classList.add('inUse');
+        document.getElementById('trashBin').classList.remove('notInUse');
+        gotoDayFromStorage();
+      } else {
+        displayMessage('No task has been discarded yet.\nNothing was changed.', 3000, 'storage');
       }
-      taskList = trash;  // Restore trash as taskList
+    // If a store is clicked...
+    // Store current day if clicked store not in use
+    } else if (clickedButton.classList.contains('highLighted')) {
+      if (clickedButton.classList.contains('notInUse')) {
+        clickedButton.classList.remove('notInUse');
+        clickedButton.classList.add('inUse');
+      }
+
+      text = prompt('Change label of the stored list?\n(Clicking OK will erase earlier content)', clickedButton.innerText);
+
+      if (text === '' || text === null) {
+        storageList[id] = [taskList, clickedButton.innerText];
+      }
+      else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
+        text = text.slice(0, 1).toUpperCase() + text.slice(1, );
+        clickedButton.innerText = text;
+        storageList[id] = [taskList, text];
+      } else if (text != '') {
+        alert('Limit your charcters to letters and numbers, please.');
+        return;
+      }
+      // Store stuff
+      if (taskList.length === 2) {  // If taskList is empty except for dayStart and dayEnd...
+        clickedButton.classList.remove('inUse');
+        clickedButton.classList.add('notInUse');
+        if (language === 0) {  // Value 0:English 1:Danish
+          clickedButton.innerText = weekDays[/\d+/.exec(clickedButton.id) - 1];
+        } else if (language === 1) {
+          clickedButton.innerText = ugeDage[/\d+/.exec(clickedButton.id) - 1];
+        }
+        delete storageList[clickedButton.id];
+        displayMessage('Stored list is cleared', 3000, 'storage');
+      } else {
+        displayMessage('Current task list stored in ' + clickedButton.innerText, 3000, 'storage');
+      }
+      setTimeout(function() {gotoDayFromStorage();}, 3500);
+
+      // ... else get stuff
+    } else if (clickedButton.classList.contains('inUse')) {
+      storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list']; // Move current tasklist to trash bin
+      taskList = storageList[clickedButton.id][0]; // Let current tasklist be chosen stored tasklist
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
-      gotoDayFromStorage();
+      displayMessage('Retrieving list from the \"' + clickedButton.innerText + '\" storage.', 3000, 'storage');
+      setTimeout(function() {gotoDayFromStorage();}, 3500); // timeout necessary for displayMessage to finish
     } else {
-      displayMessage('No task has been discarded yet.\nNothing was changed.', 3000, 'storage');
-    }
-  } else if (clickedButton.classList.contains('highLighted')) {   // Ask for new label and tidy button up
-    if (clickedButton.classList.contains('notInUse')) {
-      clickedButton.classList.remove('notInUse');
-      clickedButton.classList.add('inUse');
+      displayMessage('This store is empty', 3000, 'storage');
     }
 
-    text = prompt('Change label of the stored list?\n(Clicking OK will erase earlier content)', clickedButton.innerText);
-
-    if (text === '' || text === null) {
-      storageList[id] = [taskList, clickedButton.innerText];
-    }
-    else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
-      text = text.slice(0, 1).toUpperCase() + text.slice(1, );
-      clickedButton.innerText = text;
-      storageList[id] = [taskList, text];
-    } else if (text != '') {
-      alert('Limit your charcters to letters and numbers, please.');
-      return;
-    }
-    // Store stuff
-    if (taskList.length === 2) {  // If taskList is empty except for dayStart and dayEnd...
-      clickedButton.classList.remove('inUse');
-      clickedButton.classList.add('notInUse');
-      if (language === 0) {  // Value 0:English 1:Danish
-        clickedButton.innerText = weekDays[/\d+/.exec(clickedButton.id) - 1];
-      } else if (language === 1) {
-        clickedButton.innerText = ugeDage[/\d+/.exec(clickedButton.id) - 1];
+    // Remove highlights
+    let storeButtons = document.getElementsByClassName('store');
+    for (const button of storeButtons) {
+      if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
+        button.classList.remove('highLighted');
       }
-      delete storageList[clickedButton.id];
-      displayMessage('Stored list is cleared', 3000, 'storage');
-    } else {
-      displayMessage('Current task list stored in ' + clickedButton.innerText, 3000, 'storage');
-    }
-    setTimeout(function() {gotoDayFromStorage();}, 3500);
-
-  // Get stuff
-  } else if (clickedButton.classList.contains('inUse')) {
-    storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list']; // Move current tasklist to trash bin
-    taskList = storageList[clickedButton.id][0]; // Let current tasklist be chosen stored tasklist
-    document.getElementById('trashBin').classList.add('inUse');
-    document.getElementById('trashBin').classList.remove('notInUse');
-    displayMessage('Retrieving list from the \"' + clickedButton.innerText + '\" storage.', 3000, 'storage');
-    setTimeout(function() {gotoDayFromStorage();}, 3500); // timeout necessary for displayMessage to finish
-  } else {
-    displayMessage('This store is empty', 3000, 'storage');
-  }
-
-  // Remove highlights
-  let storeButtons = document.getElementsByClassName('store');
-  for (const button of storeButtons) {
-    if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
-      button.classList.remove('highLighted');
     }
   }
 

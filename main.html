@@ -68,7 +68,7 @@
       <div id='addView' hidden>
         <div class="addContainer1">
           <h1 align='center'>FuzzyPlan</h1>
-          <h2 align='center' lang="en">Add task</h2>
+          <h2 id="addTaskHeading"align='center' lang="en">Add task</h2>
           <h2 align='center' lang="da" hidden>Tilføj opgave</h2>
           <span id='addMessage' display='none'></span>
         </div>
@@ -117,13 +117,13 @@
         <span>   <br>   </span>
 
         <div class='topic'>
-          <div id="time" class="timeContainer"> <!-- TODO: Continue translation here -->
+          <div id="time" class="timeContainer">
             <div class="timeButtons">
-              <span class="text">Task starts at</span>
-              <input type="text" class="inputBox" id='inputTimeBox' title='Write time here' tabindex="3" placeholder="12:00">
-              <span id='optional'>(optional)</span>
-              <button class="add" type="button" id="now" title='Set time to now' tabindex="4">Now</button>
-              <button class="add" type="button" id="clear" title='Clear time' tabindex="5">Clear</button>
+              <span id='inputTimeBoxText' class="text">Task starts at</span>
+              <input id='inputTimeBox' type="text" class="inputBox" tabindex="3" placeholder="12:00">
+              <span id='optional'> </span>
+              <button type="button" id="now" class="controlButton add" tabindex="4"> </button>
+              <button type="button" id="clear" class="controlButton add" tabindex="5"> </button>
             </div>
 
             <div class="buttons">
@@ -160,14 +160,11 @@
 
         <div class='topic'>
           <div class="addContainer2">
-            <div class="text" lang="en">&nbsp; Drain level</div>
-            <div class="text" lang="da" hidden>&nbsp; Dræningsniveau</div>
+
+            <span id="drainLevelText" class="text"> </span>
             <div id='gainDiv'>
-              <span class="text" lang="en">Gain level</span>
-              <span class="text" lang="da" hidden>Gavnlighedsniveau</span>
-              <button type="button" class='controlButton' id="addInfo" title="info" title="Information and user manual">
-                 ?
-              </button>
+              <span id="grainLevelText" class="text"></span>
+              <button type="button" id="addInfo" class='controlButton'> </button>
             </div>
 
             <div id='drainBand'>
@@ -220,11 +217,8 @@
           </div>
 
           <div>
-            <span id="cancel">
-              <button class="add" type="button" tabindex="6" lang="en">Cancel</button>
-              <button class="add" type="button" tabindex="6" lang="da" hidden>Afbryd</button>
-            </span>
-            <button class="add" type="button" id="apply" tabindex="7">OK</button>
+            <button type="button" id="cancel" class="controlButton add" tabindex="6"></button>
+            <button type="button" id="apply" class="controlButton add" tabindex="7"></button>
           </div>
         </div>
 
@@ -235,20 +229,13 @@
 
       <div id="monthView" hidden>
         <div class="monthContainer1">
-          <span id='track'>
-            <button type="button" class="controlButton" title='Choose which
-            task to track with colours' lang="en">Track</button>
-            <button type="button" class="controlButton" title='Vælg hvilke
-            opgaver der skal markeres med farver' lang="da" hidden>Følg</button>
-          </span>
+          <button type="button" id='track' class="controlButton"></button>
 
           <h1 id='monthViewName' align=center>
             FuzzyPlan
           </h1>
 
-          <span id="day">
-            <button type="button" class='controlButton' title='Click to get back to day-view
-            (or just swipe left with two fingers anywhere)' lang="en">Day</button>
+          <button type="button" id="day" class='controlButton'></button>
             <button type="button" class='controlButton' title='Klik for at gå tilbage
             til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)' lang="da" hidden>Dag</button>
           </span>
@@ -258,40 +245,16 @@
         </div>
 
         <div class="monthCenterWrapper">
-          <span id='monthClearButton'>
-            <button class="controlButton" type="button" title="Clear input box" lang="en">
-              Clear&#x25B8;
-            </button>
-            <button class="controlButton" type="button" title="Clear input box" lang="da" hidden>
-              Slet&#x25B8;
-            </button>
-          </span>
+          <button type="button" id='monthClearButton' class="controlButton"> </button>
           <input type="text" id='monthInputBox' class="inputBox" autofocus value="">
 
-          <span id="moveToDay">
-            <button type="button" class="controlButton" title="Click to move content of input
-            box to today's plan" lang="en">
-            Today&#x25B8;
-            </button>
-            <button type="button" class="controlButton" title="Klik for at flytte indholdet
-            af inputboxen til dagens plan" lang="da" hidden>
-            I dag&#x25B8;
-            </button>
-          </span>
+          <button type="button" id="moveToDay" class="controlButton"> </button>
 
-          <span id="putBack">
-            <button type="button" class="controlButton" title="Put the tasks back" lang="en">
-              Put back
-            </button>
-            <button type="button" class="controlButton" title="Sæt opgaverne tilbage" lang="da" hidden>
-              Sæt tilbage
-            </button>
-          </span>
+          <button type="button" id="putBack" class="controlButton"> </button>
           <div id='monthChooseBox'></div>
         </div>
 
         <div id='monthContainer' class="monthContainer2">
-          <!-- <div id='dateDiv'> </div> -->
           <div id='monthTaskDiv'> </div>
         </div>
       </div>
@@ -303,15 +266,10 @@
           <h1 id='trackViewName' align='center'>
             FuzzyPlan
           </h1>
-          <h2 align='center' lang="en">Choose tasks to track</h2>
-          <h2 align='center' lang="da" hidden>Vælg hvilke opgaver der skal følges</h2>
 
-          <span id="month1">
-            <button type="button" class='controlButton' title='Click to
-            get back to month-view' lang="en">Month</button>
-            <button type="button" class='controlButton' title='Klik for at komme
-            tilbage til månedsvisningen' lang="da" hidden>Måned</button>
-          </span>
+          <h2 id='trackViewHeading' align='center'> </h2>
+
+          <button type="button" id="month1" class='controlButton'> </button>
 
           <span id='trackMessage' display='none'></span>
           <br>
@@ -321,11 +279,10 @@
 
         <div class='topic'>
           <div>
-            <span class="text" lang="en">Track </span>
-            <span class="text" lang="da" hidden>Følg </span>
+            <span id="trackText" class="text" lang="en"></span>
 
-            <input type="text" id='taskPickerInputBox' class="inputBox" autofocus value="" title='Write task text for the
-            task you want to track' tabindex="1" placeholder="exercise">
+            <input type="text" id='taskPickerInputBox' class="inputBox"
+            autofocus value="" tabindex="1" placeholder="pause">
           </div>
         </div>
 
@@ -333,11 +290,10 @@
 
         <div class='topic'>
           <div>
-            <span class="text" lang="en">Colour </span>
-            <span class="text" lang="da">Farve </span>
+            <span id="colourText" class="text"> </span>
 
-            <input type="text" id='colourPickerInputBox' class="inputBox" autofocus value="" title='Write colour name, rgb-value or
-            hex-value' tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)">
+            <input type="text" id='colourPickerInputBox' class="inputBox" autofocus
+            value="" tabindex="2" placeholder="magenta/#FF00FF/rgb(255,0,255)">
             <span id="chosenColour">&nbsp;</span>
           </div>
           <div id="colourButtons" hidden></div>
@@ -348,18 +304,12 @@
         <div id="trackViewSpacer"></div>
 
         <div class="topic">
-          <span class="text" lang="en">Tracked tasks</span>
-          <span class="text" lang="da" hidden>Opgaver der følges</span>
-            <div id="trackedItemsDiv"></div>
+          <span id="trackedItemsText" class="text"> </span>
+          <div id="trackedItemsDiv"></div>
 
           <span> <br> </span>
 
-          <span id="deleteTrackedButton">
-            <button type="button" class="controlButton" lang="en">Remove
-              UNcheked tasks from this list</button>
-            <button type="button" class="controlButton" lang="da" hidden>Fjern
-              opgaver UDEN flueben fra denne liste</button>
-          </span>
+          <button type="button" id="deleteTrackedButton" class="controlButton"></button>
         </div>
 
       </div>    <!-- trackView -->
@@ -387,15 +337,9 @@
 
         <div class="storageContainer1">
           <div>
-            <h3 lang="en"> Store or retrive tasklists </h3>
-            <h3 lang="da" hidden> Gem eller gendan opgavelister </h3>
+            <h3 id="storageHeadingText">  </h3>
 
-            <span id="storeList">
-              <button type="button" class='controlButton' title="To clear a
-              stored list, just store an empty list" lang="en">Store list in</button>
-              <button type="button" class='controlButton' title="Gem en tom liste
-              for at slette en gemt liste." lang="da" hidden>Gem liste i</button>
-            </span>
+            <button type="button" id="storeList" class='controlButton'> </button>
 
             <span>   <br>   </span>
             <span>   <br>   </span>
@@ -407,8 +351,9 @@
               <span>&nbsp; 5 <button type="button" id="memory5" class='notInUse store controlButton'>Friday</button></span>
               <span>&nbsp; 6 <button type="button" id="memory6" class='notInUse store controlButton'>Saturday</button></span>
               <span>&nbsp; 7 <button type="button" id="memory7" class='notInUse store controlButton'>Sunday</button></span>
+
               <span> <br> </span>
-              <span style="align-self: center"> Week 2 </span>
+
               <span>&nbsp; 8 <button type="button" id="memory8" class='notInUse store controlButton'>Monday</button></span>
               <span>&nbsp; 9 <button type="button" id="memory8" class='notInUse store controlButton'>Tuesday</button></span>
               <span>10 <button type="button" id="memory10" class='notInUse store controlButton'>Wednesday</button></span>
@@ -416,15 +361,18 @@
               <span>12 <button type="button" id="memory12" class='notInUse store controlButton'>Friday</button></span>
               <span>13 <button type="button" id="memory13" class='notInUse store controlButton'>Saturday</button></span>
               <span>14 <button type="button" id="memory14" class='notInUse store controlButton'>Sunday</button></span>
+
               <span> <br> </span>
+
               <span>15 <button type="button" id="memory15" class='notInUse store controlButton'>Extra store 1</button></span>
               <span>16 <button type="button" id="memory16" class='notInUse store controlButton'>Extra store 2</button></span>
               <span>17 <button type="button" id="memory17" class='notInUse store controlButton'>Extra store 3</button></span>
+
               <span>   <br>   </span>
-              <span id="trashBin">
-                <button type="button" class='notInUse trashBin controlButton' lang="en">Restore last discarded task list</button>
-                <button type="button" class='notInUse trashBin controlButton' lang="da" hidden>Gendan sidste slettede liste</button>
-              </span>
+
+              <button type="button" id="trashBin" class='notInUse trashBin controlButton'></button>
+
+              <span>   <br>   </span>
             </div>   <!-- stores -->
           </div>
         </div>     <!-- storageContainer1 -->
@@ -438,12 +386,7 @@
             FuzzyPlan
           </h1>
 
-          <span id=gotoDayFromSettings>
-            <button type="button" class='controlButton' title='  Click to
-            get back to day-view' lang="en">Day</button>
-            <button type="button" class='controlButton' title='  Klik for
-            at vende tilbage til dag-visning' lang="da" hidden>Dag</button>
-          </span>
+          <button type="button" id='gotoDayFromSettings' class='controlButton'> </button>
 
           <span id='message' display='none'></span>
 
@@ -452,17 +395,11 @@
 
         <div class="settingsContainer">
 
-          <h2 lang="en">
-            Settings
-          </h2>
-          <h2 lang="da" hidden>
-            Indstillinger
-          </h2>
+          <h2 id="settingsHeading" class="text"> </h2>
 
           <div class="topic">
             <div>
-              <h4 lang="en">Language</h4>
-              <h4 lang="da" hidden>Sprog</h4>
+              <h4 id="languageHeading" class="text"> </h4>
 
               <span id='eng'>
                 <input type="radio" id='en' class="language" name='language' value=0 checked='checked'>
@@ -481,10 +418,7 @@
               <br>
               <br>
 
-              <span id="apply0">
-                <button type="button" class='controlButton' lang="en">Apply</button>
-                <button type="button" class='controlButton' lang="da" hidden>Anvend</button>
-              </span>
+              <button type="button" id="apply0" class='controlButton'> </button>
             </div>
           </div>
 
@@ -492,26 +426,21 @@
 
           <div class='topic'>
             <div>
-              <h4 lang="en">Default task duration</h4>
-              <h4 lang="da" hidden>Standard opgave længde</h4>
+              <h4 id="taskDurationHeading" class="text"></h4>
 
-              <span lang="en">Set default task duration in minutes:</span>
-              <span lang="da" hidden>Sæt stadard opgavelængde i minutter</span>
-              <input type="text" id='inputBoxM' class="inputBox inputSettings" value="30" title='Set default task duration in minutes'>
+              <span id="taskDurationText"></span>
+              <input type="text" id='inputBoxM' class="inputBox inputSettings" value="30">
 
               <br>
               <br>
 
-              <span id='apply1'>
-                <button type="button" class='controlButton' lang="en">Apply</button>
-                <button type="button" class='controlButton' lang="da" hidden>Anvend</button>
-              </span>
+              <button type="button" id="apply1" class='controlButton'> </button>
             </div>
           </div>
 
           <span>   <br>   </span>
 
-          <div class='topic'>
+          <div class='topic'> <!-- TODO: Continue translation -->
             <div>
               <h4 lang="en">Play 'toc' sound</h4>
               <h4 lang="da" hidden>Afspil 'tac' lyd</h4>
