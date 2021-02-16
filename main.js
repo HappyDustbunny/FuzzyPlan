@@ -161,18 +161,54 @@ let languagePack = {  // {'id': ['text', 'title']}
                    ['', 'Sæt standardlængden for opgaver i minutter']],
      'apply1': [['Apply', ''],
                 ['Andvend', '']],
-      // : [['', ''],
-      // ['', '']],
-      // : [['', ''],
-      // ['', '']],
-     // : [['', ''],
-     //    ['', '']],
-     // : [['', ''],
-     //    ['', '']],
-     // : [['', ''],
-     //    ['', '']],
-     // : [['', ''],
-     //    ['', '']],
+     'playTocText': [['Play \'toc\' sound', ''],
+                     ['Afspil \'tac\' lyd', '']],
+      'tocLabelOff': [['Off', ''],
+                      ['Fra', '']],
+     'tocLabelStart': [['At the beginning of tasks (toc)', ''],
+                       ['I begyndelsen af en opgave (tac)', '']],
+     'tocLabelEnd': [['At the end of tasks (toc toc)', ''],
+                     ['I slutningen af en opgave (tac tac)', '']],
+     'tocLabelBoth': [['Both at beginning and end of tasks', ''],
+                      ['Både når opgaven starter og slutter', '']],
+     'playTicText': [['Play \'tic\' sound', ''],
+                     ['Afspil \'tic\' lyd', '']],
+     'ticLabelOff': [['Off', ''],
+                     ['Fra', '']],
+     'ticLabelEachX': [['Every X minutes', ''],
+                       ['Hver X. minut', '']],
+     'ticLabelRandom': [['Randomly within every X minutes', ''],
+                        ['Tilfældigt indenfor X minutter', '']],
+     'ticSpanInterval': [['Time interval X in minutes:', ''],
+                         ['Tidsinterval X i minutter:', '']],
+     'inputBoxX': [['', 'Time interval X in minutes'],
+                   ['', 'Tidsinterval X i minutter']],
+     'apply2': [['Apply', ''],
+                ['Anvend', '']],
+     'noteSpan': [['Note:\r\nThe sound only play if the page has focus', ''],
+                  ['Bemærk:\r\nLyd afspilles kun hvis siden har fokus', '']],
+     'stressModelHeading': [['Stress Model', ''],
+                       ['Stress Model', '']],
+     'settingsInfo': [['?', 'Information about the stress model'],
+                       ['?', 'Information om stressmodellen']],
+     'stressLevelText': [['Set the stress level you experience\r\nwhen you wake up (1-5, 1 is low)\u00a0', ''],
+                         ['Angiv det stressniveau du oplever\r\nnår du vågner (1-5, 1 er lavt)\u00a0', '']],
+     'stressLevelDoubleText': [['Set the approximately time for\r\nyour stress level to '
+                                + 'double\r\nwhen working without pause', ''],
+                               ['Sæt den tid det omtrent tager\r\nfør dit stressniveau '
+                                + 'fordobles,\r\nnår du arbejder uden pause', '']],
+      'apply3': [['Apply', ''],
+      ['Anvend', '']],
+     'clearDataHeading': [['Clear data and preferences', ''],
+                          ['Slet data og indstillinger', '']],
+     'clearAllData': [['Clear all data', ''],
+                      ['Slet alle data', '']],
+     'clearEverything': [['Clear all data and preferences', ''],
+                         ['Slet alle data og indstillinger', '']],
+     'gotoDayFromSettings1': [['Go back', ''],
+                       ['Gå tilbage', '']],
+     // '': [['', ''],
+     //                   ['', '']],
 };
 
 
@@ -2436,6 +2472,17 @@ function renderLanguage() {
       texts[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
       texts[index].title = languagePack[id][language][1];  // English: 0, Danish: 1
       texts[index].lang = lang[language];  // lang = ['en', 'da']
+    }
+  }
+
+  let labelTexts = document.getElementsByClassName('labelText');
+
+  for (var index in labelTexts){
+    let id = labelTexts[index].id;
+    if (languagePack[id]) {
+      labelTexts[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
+      labelTexts[index].title = languagePack[id][language][1];  // English: 0, Danish: 1
+      labelTexts[index].lang = lang[language];  // lang = ['en', 'da']
     }
   }
 }

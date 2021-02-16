@@ -733,6 +733,19 @@ label {  /* Used in settingsView */
   /* justify-content: space-between; */
 }
 
+.stressContainer {
+	display: grid;
+	grid-template-columns: auto 30px;
+}
+
+#noteSpan {
+  white-space: pre;
+}
+
+#stressLevelText {
+  white-space: pre;
+}
+
 /* settings view css above ^^^ */
 
 
