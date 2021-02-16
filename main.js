@@ -207,8 +207,75 @@ let languagePack = {  // {'id': ['text', 'title']}
                          ['Slet alle data og indstillinger', '']],
      'gotoDayFromSettings1': [['Go back', ''],
                        ['Gå tilbage', '']],
-     // '': [['', ''],
-     //                   ['', '']],
+    // Messages
+     'dontUse': [['Please don\'t use ' , ' for task description'],
+                 ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
+     'format1h30m': ['Please use the format 1h30m for 1 hour and 30 minutes',
+                     'Brug formatet 1h30m for 1 time og 30 minutter'],
+     'format1200': ['Please use the format 12:00 or 1200',
+                    'Brug formatet 12:00 eller 1200'],
+     'taskTextMsg': ['Please write a task text',
+                     'Skriv en opgavetekst'],
+     'noPastDates': ['Past dates can not be assigned tasks until a time machine has been invented',
+                     'Datoer i fortiden kan ikke tildeles opgaver før der bliver opfundet en tidsmaskine'],
+     'useDayView': ['Use Day-view for today\'s tasks',
+                    'Brug dagsvisning for dagens opgaver'],
+     'finishTaskFirst': ['Please finish the current edit \nbefore starting a new',
+                         'Afslut redigeringen før du starter en ny opgave'],
+     'notADate': ['Not a date.\nPlease fix date or remove the back-slash',
+                  'Det er ikke en dato.\nVær venlig at angive en rigtig dato eller fjern skråstregen'],
+     'addATask': ['Please add a task',
+                  'Tilføj venligst en opgave'],
+     'removeUnchecked?': ['Do you want to remove all UNcheked tasks from this list?\n (The same tasks elsewhere is not affected)',
+                          'Vil du fjerne alle opgaver UDEN flueben fra denne liste?\n (Dette påvirker ikke opgaverne andre steder)'],
+     'nothingChanged': ['Nothing was changed',
+                        'Der skete ingen ændringer'],
+     'nothingIsDiscarded': ['No task has been discarded yet.\nNothing was changed.',
+                            'Ingen opgaver er blevet smidt ud endnu\nIntet er ændret'],
+     'changeLabel?': ['Change label of the stored list?\n(Clicking OK will erase earlier content)',
+                      'Vil du ændre navnet på den gemte liste?\n(Tidligere indhold vil blive slettet hvis du klikker OK)'],
+     'onlyAlphaNumerics': ['Limit your charcters to letters and numbers, please.',
+                           'Brug venligst kun bogstaver og tal'],
+     'listCleared': ['Stored list is cleared',
+                     'Den gemte liste er slettet'],
+     'listStoredIn': ['Current task list stored in ',
+                      'Dagens liste er gemt i '],
+     'restoreLast': ['Restore last discarded task list',
+                     'Genskab den sidst forkastede liste'],
+     'retrieveFrom': [['Retrieving list from the \"', '\" storage'],
+                      ['Henter listen fra lageret \"', '\"']],
+     'storeIsEmpty': ['This store is empty',
+                      'Dette lager er tomt'],
+     'only0-1438': ['Use only numbers between 0 and 1438, please.',
+                    'Brug venligst kun tal mellem 0 og 1438'],
+     'only0-59': ['Use only numbers between 0 and 59, please.',
+                  'Brug venligst kun tal mellem  0 og 59'],
+     'only0-5': ['Use only numbers between 0 and 5, please',
+                 'Brug venligst kun tal mellem 0 og 5'],
+     'formatReminder': ['The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n800 or 1230',
+                        'Formatet bør være \n1200 1h30m tekst ELLER\n1200 tekst ELLER\n tekst ELLER \n800 eller 1230'],
+     'startWithFixed': ['\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n',
+                        '\nStart dagen med en opgave med fast tid\n\nTryk enten på "Nu" knappen eller tilføj\n en opgave kl 6:00 ved \nat skrive "600 15m planlægning"'],
+     'notEnoughRoom': ['Not enough room. \nPlease clear some space',
+                       'Der er ikke plads til en opgave\naf den længde her'],
+     'overlap': ['There is an overlap with another fixed time',
+                 'Der er et overlap med en anden opgave med fast tid'],
+     'fixedTaskClicked': ['One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.',
+                          'En af de klikkede opgaver har fast tid\nOpgaver med fast tid kan ikke byttes rundt\nRet opgaven med fast tid før der byttes'],
+     'jumpedTo': ['Jumped to ',
+                  'Sprang til '],
+     'numberNotRecognized': ['Number not recognised as a time',
+                             'Tallet blev ikke genkendt som en tid'],
+     'sureYouWannaClear?': ['The data can NOT be retrieved. Are you SURE you want to delete all data, including tasks on past days?',
+                            'Dataene kan IKKE genskabes. Er du SIKKER på at du vil slette alle data, inklusive opgaver i fortiden?'],
+     'reallySure?': ['All data and preferences will be cleared. \n\nThey can NOT be retrieved.\n\nAre you SURE you want to delete everything?\n\n',
+                     'Alle data og indstillinger vil blive slettet\n\nDe kan IKKE blive gendannet.\n\nEr du SIKKER på at du vil slette alt?\n\n'],
+     'nothingWasDeleted': ['Nothing was deleted.',
+                           'Intet blev slettet'],
+     'removeAllTasks?': ['Do you want to remove all tasks and start planning a new day?',
+                         'Vil du fjerne alle opgaver og starte planlægning af en ny dag?'],
+     'removeAllReminder': ['If you want to remove all tasks and settings go to Settings (Gear symbol in Day View)',
+                           'Hvis du vil fjerne alle opgaver og indstillinger, så gå til Indstillinger (Tandhjulssymbolet i Dagsvisning)'],
 };
 
 
@@ -1013,7 +1080,7 @@ function readTaskText() {
   let contentInputBox = document.getElementById('inputBox_add').value.trim();
   let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please don\'t use ' + badCharacters + ' for task description.', 3000, 'add');
+    displayMessage(languagePack['dontUse'][language][0] + badCharacters + languagePack['dontUse'][language][1], 3000, 'add');
   } else {
     taskText_add = contentInputBox;
   }
@@ -1024,7 +1091,7 @@ function readDurationTime() {
   let contentInputBox = document.getElementById('inputDurationBox').value.trim();
   let badCharacters = /[^0-9hm]/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please use the format 1h30m for 1 hour and 30 minutes', 3000, 'add');
+    displayMessage(languagePack['format1h30m'][language], 3000, 'add');
   } else {
     let timeH = 0;
     let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString(); // TODO: Check if numbers are too big
@@ -1043,7 +1110,7 @@ function readTaskStartTime() {
   let contentInputBox = document.getElementById('inputTimeBox').value.trim();
   let badCharacters = /[^0-9:]/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage('Please use the format 12:00 or 1200', 3000, 'day');
+    displayMessage(languagePack['format1200'][language], 3000, 'day');
   } else {
     let timeH = /[0-9][0-9]/.exec(contentInputBox);
     contentInputBox = contentInputBox.replace(timeH, '');
@@ -1088,7 +1155,7 @@ function formatTask() {
 function apply() {
   let taskText = document.getElementById('inputBox_add');
   if (taskText === '') {
-    displayMessage('Please write a task text', 3000, 'day');
+    displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');
   } else {
     readTaskText()
     readDurationTime();
@@ -1227,10 +1294,10 @@ function monthTaskHasBeenClicked(event) {
   let day =  document.getElementById(myId);
 
   if (day.classList.contains('pastDateButton')) {
-    displayMessage('Past dates can not be assigned tasks until a time machine has been invented', 3000, 'month');
+    displayMessage(languagePack['noPastDates'][language], 3000, 'month');
     return
   } else if (day.classList.contains('todayButton')) {
-    displayMessage("Use Day-view for today's tasks", 3000, 'month');
+    displayMessage(languagePack['useDayView'][language], 3000, 'month');
     return
   }
 
@@ -1271,7 +1338,7 @@ function monthTaskHasBeenClicked(event) {
     // No text in inputBox and a clicked date. Effectively a doubleclick
   } else if (contentInputBox === '' && day.classList.contains('isClicked')) {
     if (document.getElementById('monthChooseBox').classList.contains('active')) {
-      displayMessage('Please finish the current edit \nbefore starting a new', 3000, 'month');
+      displayMessage(languagePack['finishTaskFirst'][language], 3000, 'month');
     } else {
       putBackId = myId;
 
@@ -1334,7 +1401,7 @@ function monthInputAtEnter(event) {
             }
 
         } else {
-          displayMessage('Not a date. Please fix date or remove the back-slash', 4000, 'month');
+          displayMessage(languagePack['notADate'][language], 4000, 'month');
           return;
         }
 
@@ -1484,9 +1551,7 @@ function putBack() { // TODO: Fix putBack.
 
 function monthClearBehavior() {
   if (document.getElementById('monthInputBox').value === '') {
-    alert('To clear all information in this calendar, clear your browser data (Site data).\n\n' +
-    'Go to your browsers Settings or Options and look for Delete cookies and site data.\n\n' +
-    'This option may be under Privacy or Security.');
+    alert(languagePack['removeAllReminder'][language]);
   } else {
     resetInputBox('month');
   }
@@ -1614,15 +1679,15 @@ function addTrackedTask(buttonColour) {
     trackTaskList[text] = [chosenColour, '1'];
     renderTracking();
   } else if (text != '') {
-    alert('Limit your charcters to letters and numbers, please.');
+    alert(languagePack['onlyAlphaNumerics'][language]);
     return;
   } else {
-    displayMessage('Please add a task', 3000, 'track');
+    displayMessage(languagePack['addATask'][language], 3000, 'track');
   }
 }
 
 function removeTracking() {
-  let answer = confirm('Do you want to remove all UNcheked tasks from this list?\n (The same tasks elsewhere is not affected)');
+  let answer = confirm(languagePack['removeUnchecked?'][language]);
   if (answer) {
     for (const key in trackTaskList) {
       if (trackTaskList[key][1] === '0.25') {
@@ -1631,7 +1696,7 @@ function removeTracking() {
     }
     renderTracking();
   } else {
-    displayMessage('Nothing was changed', 3000, 'track');
+    displayMessage(languagePack['nothingChanged'][language], 3000, 'track');
   }
 }
 
@@ -1774,7 +1839,7 @@ function storeHasBeenClicked(event) {
         document.getElementById('trashBin').classList.remove('notInUse');
         gotoDayFromStorage();
       } else {
-        displayMessage('No task has been discarded yet.\nNothing was changed.', 3000, 'storage');
+        displayMessage(languagePack['nothingIsDiscarded'][language], 3000, 'storage');
       }
     // If a store is clicked...
     // Store current day if clicked store not in use
@@ -1784,7 +1849,7 @@ function storeHasBeenClicked(event) {
         clickedButton.classList.add('inUse');
       }
 
-      text = prompt('Change label of the stored list?\n(Clicking OK will erase earlier content)', clickedButton.innerText);
+      text = prompt(languagePack['changeLabel?'][language], clickedButton.innerText);
 
       if (text === '' || text === null) {
         storageList[id] = [taskList, clickedButton.innerText];
@@ -1794,7 +1859,7 @@ function storeHasBeenClicked(event) {
         clickedButton.innerText = text;
         storageList[id] = [taskList, text];
       } else if (text != '') {
-        alert('Limit your charcters to letters and numbers, please.');
+        alert(languagePack['onlyAlphaNumerics'][language]);
         return;
       }
       // Store stuff
@@ -1807,22 +1872,22 @@ function storeHasBeenClicked(event) {
           clickedButton.innerText = ugeDage[/\d+/.exec(clickedButton.id) - 1];
         }
         delete storageList[clickedButton.id];
-        displayMessage('Stored list is cleared', 3000, 'storage');
+        displayMessage(languagePack['listCleared'][language], 3000, 'storage');
       } else {
-        displayMessage('Current task list stored in ' + clickedButton.innerText, 3000, 'storage');
+        displayMessage(languagePack['listStoredIn'][language] + clickedButton.innerText, 3000, 'storage');
       }
       setTimeout(function() {gotoDayFromStorage();}, 3500);
 
       // ... else get stuff
     } else if (clickedButton.classList.contains('inUse')) {
-      storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list']; // Move current tasklist to trash bin
+      storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]]; // Move current tasklist to trash bin
       taskList = storageList[clickedButton.id][0]; // Let current tasklist be chosen stored tasklist
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
-      displayMessage('Retrieving list from the \"' + clickedButton.innerText + '\" storage.', 3000, 'storage');
+      displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'storage');
       setTimeout(function() {gotoDayFromStorage();}, 3500); // timeout necessary for displayMessage to finish
     } else {
-      displayMessage('This store is empty', 3000, 'storage');
+      displayMessage(languagePack['storeIsEmpty'][language], 3000, 'storage');
     }
 
     // Remove highlights
@@ -1936,7 +2001,7 @@ function applyTaskDuration() {
   let min = document.getElementById('inputBoxM').value.trim();
 
   if (isNaN(min) || min < 0 || 24*60 - 2 < min) { // TODO: Scroll to top or display message
-    displayMessage('Use only numbers between 0 and 1438, please.', 3000, settings);
+    displayMessage(languagePack['only0-1438'][language], 3000, settings);
     document.getElementById('inputBoxM').select();
     return;
   }
@@ -1953,7 +2018,7 @@ function applyToc() {
   let min = document.getElementById('inputBoxX').value.trim();
 
   if (isNaN(min) || min < 0 || 59 < min) {
-    displayMessage('Use only numbers between 0 and 59, please.', 3000, settings);
+    displayMessage(languagePack['only0-59'][language], 3000, settings);
     document.getElementById('inputBoxX').select();
     return;
   }
@@ -1983,7 +2048,7 @@ function applyStressModel() {
   // Set wakeup stress level
   let value = document.getElementById('stressLevel').value.trim();
   if (isNaN(value) || value < 0 || 5 < value) {
-    displayMessage('Use only numbers between 0 and 5, please', 3000, settings);
+    displayMessage(languagePack['only0-5'][language], 3000, settings);
     document.getElementById('stressLevel').select();
   } else {
     wakeUpStress = value;
@@ -1993,7 +2058,7 @@ function applyStressModel() {
   // Set tDouble
   let min = document.getElementById('tDouble').value.trim();
   if (isNaN(min) || min < 0 || 24*60 < min) {
-    displayMessage('Use only numbers between 0 and 1438, please', 3000, settings);
+    displayMessage(languagePack['only0-1438'][language], 3000, settings);
     document.getElementById('stressLevel').select();
   } else {
     tDouble = min;
@@ -2004,8 +2069,7 @@ function applyStressModel() {
 }
 
 function clearAllData() {
-  let answer = confirm("The data can NOT be retrieved. Are you SURE "
-  + "you want to delete all data, including tasks on past days?")
+  let answer = confirm(languagePack['sureYouWannaClear?'][language])
   if (answer) {
     taskList = [];
     localStorage.taskList = [];
@@ -2013,20 +2077,18 @@ function clearAllData() {
     localStorage.pastDayList = [];
     location.reload(true);
   } else {
-    alert('Nothing was deleted.')
+    alert(languagePack['nothingWasDeleted'][language]);
   }
 }
 
 
 function clearEverything() {
-  let answer = confirm('All data and preferences will be cleared. \n\n'
-  + 'They can NOT be retrieved.\n\n'
-  + 'Are you SURE you want to delete everything?\n\n');
+  let answer = confirm(languagePack['reallySure?'][language]);
   if (answer) {
     localStorage.clear();
     location.reload(true);
   } else {
-    alert('Nothing was deleted')
+    alert(languagePack['nothingWasDeleted'][language]);
   }
 }
 
@@ -2193,7 +2255,7 @@ function inputAtEnter(event) {
         resetInputBox('day');
         jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
-        displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200 or 1230', 6000, 'day')
+        displayMessage(languagePack['formatReminder'][language], 6000, 'day')
         resetInputBox('day');
       }
     }
@@ -2211,12 +2273,12 @@ function inputFixedTask(contentInputBox) {
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
   if (taskList.length == 1 && parsedList[0] == '') {
-    displayMessage('\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n', 5000, 'day');
+    displayMessage(languagePack['startWithFixed'][language], 5000, 'day');
   } else {
     let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
 
     if (!succes) {
-      displayMessage('Not enough room. \nPlease clear some space', 3000, 'day');  // TODO: This just drop a new task if there is not room. Oups.
+      displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');  // TODO: This just drop a new task if there is not room. Oups.
       document.getElementById('dayInputBox').value = contentInputBox;
     }
     renderTasks();
@@ -2278,7 +2340,7 @@ function addTaskBefore(myId, task) {
   task.date = new Date(taskList[id].date.getTime() - task.duration);
   task.end = taskList[id].date;
   if (taskList[id].fuzzyness != 'isFuzzy' && taskList[id - 1].end > task.date) {
-    displayMessage('Not enough rooom here', 3000, 'day');
+    displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');
     return false;
   } else {
     if (taskList[id].fuzzyness === 'isNotFuzzy') {
@@ -2305,7 +2367,7 @@ function addFixedTask(task) {
 
   overlap = isThereASoftOverlap(task);
   if (overlap === 'hardOverlap') {
-    displayMessage('There is an overlap with another fixed time', 3000, 'day');
+    displayMessage(languagePack['overlap'][language], 3000, 'day');
     return false;
   } else if (overlap === 'softOverlap') {
     overlappingTasks = removeFuzzyOverlap(task);
@@ -2402,10 +2464,10 @@ function clearTextboxOrDay() {
 
 
 function clearDay() {
-  let answer = confirm('Do you want to remove all tasks and start planning a new day?');
+  let answer = confirm(languagePack['removeAllTasks?'][language]);
   if (answer == true) {
     // Move current taskList to trashBin
-    storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];
+    storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]];
     document.getElementById('trashBin').classList.add('inUse');
     document.getElementById('trashBin').classList.remove('notInUse');
 
@@ -2427,7 +2489,7 @@ function clearDay() {
     document.getElementById('addTaskButton').textContent = '+';
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    displayMessage('Nothing was changed', 3000, 'day');
+    displayMessage(languagePack['nothingChanged'][language], 3000, 'day');
   }
 }
 
@@ -2641,7 +2703,7 @@ function taskHasBeenClicked(event) {
       handleChoosebox('day');
 
     } else {
-      displayMessage('The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n1200', 6000, 'day')
+      displayMessage(languagePack['formatReminder'][language], 6000, 'day')
     }
     document.getElementById('addTaskButton').textContent = '+';
     if (!document.getElementById('dayChooseBox').classList.contains('active')) {
@@ -2670,7 +2732,7 @@ function taskHasBeenClicked(event) {
       document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
       document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
-      displayMessage('One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.', 3000, 'day');
+      displayMessage(languagePack['fixedTaskClicked'][language], 3000, 'day');
       taskList[chosenId].isClicked = 'isNotClicked';
       taskList[id].isClicked = 'isNotClicked';
     } else if (taskList[chosenId].fuzzyness === 'isFuzzy' && taskList[id].fuzzyness === 'isFuzzy') {
@@ -2869,10 +2931,10 @@ function jumpToTime(time, showMessage) {
     if (timeDiv) {
       container.scrollTop = timeDiv.offsetTop - 180 * zoom;
       if (showMessage) {
-        displayMessage('Jumped to ' + hours + ':' + min, 700, 'day');
+        displayMessage(languagePack['jumpedTo'][language] + hours + ':' + min, 700, 'day');
       }
     } else {
-      displayMessage('Number not recognised as a time', 1000, 'day')
+      displayMessage(languagePack['numberNotRecognized'][language], 1000, 'day')
     }
   }
 }
