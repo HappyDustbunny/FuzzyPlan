@@ -72,7 +72,7 @@ let languagePack = {  // {'id': ['text', 'title']}
      'nowButton': [['\u25BE Now', 'Click to insert a 15 min planning period at current time'],  // \u25BE <!-- Black Down-Pointing Small Triangle -->
                   ['\u25BE Nu', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
      'clearButton': [['\u25BEClear', "Clear"],  // <!-- Black down-pointing small triangle  -->
-                     ['\u25BE Slet', 'Slet']],
+                     ['\u25BESlet', 'Slet']],
      'gotoSettings': [['\u2699', 'Settings'],  // Gear icon
                       ['\u2699', 'Indstillinger']],
      'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
@@ -252,8 +252,8 @@ let languagePack = {  // {'id': ['text', 'title']}
                   'Brug venligst kun tal mellem  0 og 59'],
      'only0-5': ['Use only numbers between 0 and 5, please',
                  'Brug venligst kun tal mellem 0 og 5'],
-     'formatReminder': ['The format should be \n1200 1h30m text OR\n1200 text OR\n text OR \n800 or 1230',
-                        'Formatet bør være \n1200 1h30m tekst ELLER\n1200 tekst ELLER\n tekst ELLER \n800 eller 1230'],
+     'formatReminder': ['The format should be \r\n1200 1h30m text OR\r\n1200 text OR\r\n text OR \r\n800 or 1230',
+                        'Formatet bør være \r\n1200 1h30m tekst ELLER\r\n1200 tekst ELLER\r\n tekst ELLER \r\n800 eller 1230'],
      'startWithFixed': ['\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n',
                         '\nStart dagen med en opgave med fast tid\n\nTryk enten på "Nu" knappen eller tilføj\n en opgave kl 6:00 ved \nat skrive "600 15m planlægning"'],
      'notEnoughRoom': ['Not enough room. \nPlease clear some space',
@@ -2001,7 +2001,7 @@ function applyTaskDuration() {
   let min = document.getElementById('inputBoxM').value.trim();
 
   if (isNaN(min) || min < 0 || 24*60 - 2 < min) { // TODO: Scroll to top or display message
-    displayMessage(languagePack['only0-1438'][language], 3000, settings);
+    displayMessage(languagePack['only0-1438'][language], 3000, 'settings');
     document.getElementById('inputBoxM').select();
     return;
   }
@@ -2018,7 +2018,7 @@ function applyToc() {
   let min = document.getElementById('inputBoxX').value.trim();
 
   if (isNaN(min) || min < 0 || 59 < min) {
-    displayMessage(languagePack['only0-59'][language], 3000, settings);
+    displayMessage(languagePack['only0-59'][language], 3000, 'settings');
     document.getElementById('inputBoxX').select();
     return;
   }
@@ -2048,8 +2048,9 @@ function applyStressModel() {
   // Set wakeup stress level
   let value = document.getElementById('stressLevel').value.trim();
   if (isNaN(value) || value < 0 || 5 < value) {
-    displayMessage(languagePack['only0-5'][language], 3000, settings);
+    displayMessage(languagePack['only0-5'][language], 3000, 'settings');
     document.getElementById('stressLevel').select();
+    return;
   } else {
     wakeUpStress = value;
     localStorage.wakeUpStress = wakeUpStress;
@@ -2058,8 +2059,9 @@ function applyStressModel() {
   // Set tDouble
   let min = document.getElementById('tDouble').value.trim();
   if (isNaN(min) || min < 0 || 24*60 < min) {
-    displayMessage(languagePack['only0-1438'][language], 3000, settings);
+    displayMessage(languagePack['only0-1438'][language], 3000, 'settings');
     document.getElementById('stressLevel').select();
+    return;
   } else {
     tDouble = min;
     localStorage.tDouble = tDouble;
@@ -2658,7 +2660,7 @@ function displayMessage(text, displayTime, view) {  // displayTime in millisecon
   console.log(text, view);
   msg = document.getElementById(view + 'Message');
   msg.style.display = 'inline-block';
-  msg.style.color = 'red';
+  // msg.style.color = 'red';
   msg.textContent = text;
 
   // Add an eventListener to stop annoying messages by clicking anywhere
@@ -2666,12 +2668,12 @@ function displayMessage(text, displayTime, view) {  // displayTime in millisecon
 
   msgTimeOutID = setTimeout(function() {
     msg.style.display = 'none';
-      document.removeEventListener('click', stopTimeout);
-    }, displayTime)
+    document.removeEventListener('click', stopTimeout);
+  }, displayTime)
 }
 
 function stopTimeout() {  // To remove an eventListener anonymous functions can't be used
-  clearTimeout(msgTimeOutID);
+  clearTimeout(msgTimeOutID);  // clearTimeOut is an inbuildt function.
   msg.style.display = 'none';
   document.removeEventListener('click', stopTimeout);
 }
