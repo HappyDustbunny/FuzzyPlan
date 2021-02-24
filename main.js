@@ -454,20 +454,34 @@ function deepCopyFunc(original) {
 }
 
 
+function fixDatesInList(list) {
+  let now = new Date();
+  for (const [index, task] of list.entries()) {
+    task.date = new Date(task.date);
+    if (!task.date) {debugger};
+    task.date.setDate(now.getDate());
+    task.end = new Date(task.end);
+    task.end.setDate(now.getDate());
+  }
+  return list
+}
+
+
 function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('taskList')) {
-    taskList = JSON.parse(localStorage.taskList);
+    let list = JSON.parse(localStorage.taskList);
+    taskList = fixDatesInList(list);
     // Fix dates messed up by JSON.stringify - and bring them up to current date
-    let now = new Date();
-    for (const [index, task] of taskList.entries()) {
-      task.date = new Date(task.date);
-      task.date.setDate(now.getDate());
-      task.end = new Date(task.end);
-      task.end.setDate(now.getDate());
-    }
-
+    // let now = new Date();
+    // for (const [index, task] of taskList.entries()) {
+    //   task.date = new Date(task.date);
+    //   task.date.setDate(now.getDate());
+    //   task.end = new Date(task.end);
+    //   task.end.setDate(now.getDate());
+    // }
   }
+
   if (localStorage.getItem('wakeUpOrNowClickedOnce') == 'true') {
     wakeUpOrNowClickedOnce = true;
   } else {
@@ -510,21 +524,24 @@ function retrieveLocallyStoredStuff() {
     pastDayList = JSON.parse(localStorage.getItem('pastDayList'));
     // Fix dates messed up by JSON.stringify
     for (const key in pastDayList) {
-      for (const index in pastDayList[key]) {
-        pastDayList[key][index].date = new Date(pastDayList[key][index].date);
-        pastDayList[key][index].end = new Date(pastDayList[key][index].end);
-      }
+      pastDayList[key] = fixDatesInList(pastDayList[key]);
+      // for (const index in pastDayList[key]) {
+      //   pastDayList[key][index].date = new Date(pastDayList[key][index].date);
+      //   pastDayList[key][index].end = new Date(pastDayList[key][index].end);
+      // }
     }
   }
 
   if (localStorage.getItem('storageList')) {
     storageList = JSON.parse(localStorage.getItem('storageList'));
+    console.log(storageList);
     // Fix dates messed up by JSON.stringify
     for (const key in storageList) {
-      for (const index in storageList[key][0]) {
-        storageList[key][0][index].date = new Date(storageList[key][0][index].date);
-        storageList[key][0][index].end = new Date(storageList[key][0][index].end);
-      }
+      storageList[key][0] = fixDatesInList(storageList[key][0]);
+      // for (const index in storageList[key][0]) {
+      //   storageList[key][0][index].date = new Date(storageList[key][0][index].date);
+      //   storageList[key][0][index].end = new Date(storageList[key][0][index].end);
+      // }
     }
   }
 }
@@ -1834,6 +1851,7 @@ function storeHasBeenClicked(event) {
         if (2<taskList.length) {
           storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];   // Put current taskList into the trashBin
         }
+        // taskList = fixDatesInList(trash);  // Restore trash as taskList
         taskList = trash;  // Restore trash as taskList
         document.getElementById('trashBin').classList.add('inUse');
         document.getElementById('trashBin').classList.remove('notInUse');
@@ -1881,7 +1899,7 @@ function storeHasBeenClicked(event) {
       // ... else get stuff
     } else if (clickedButton.classList.contains('inUse')) {
       storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]]; // Move current tasklist to trash bin
-      taskList = storageList[clickedButton.id][0]; // Let current tasklist be chosen stored tasklist
+      taskList = fixDatesInList(storageList[clickedButton.id][0]); // Let current tasklist be chosen stored tasklist - after dates are fixed...
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
       displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'storage');

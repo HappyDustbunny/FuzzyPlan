@@ -1083,6 +1083,7 @@ div.tasksToSort #postpone {
 
 #storageMessage {
   grid-area: messages;
+  color: red;
 }
 
 #stores {
