@@ -68,11 +68,19 @@ let languagePack = {  // {'id': ['text', 'title']}
      "postpone": [['\u25C2 Postpone', "Click to move content of input box to month (postpone task)"], // &#x25C2; Black left-pointing small triangle
                   ['\u25C2 Udskyd', "Klik for at sende indholdet af indput-boxen til månedsvisningen (udskyd opgaven)"]],
      'upButton': [['\u25BE 7:00', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
-                  ['\u25BE 7:00', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid."]],
-     'nowButton': [['\u25BE Now', 'Click to insert a 15 min planning period at current time'],  // \u25BE <!-- Black Down-Pointing Small Triangle -->
-                  ['\u25BE Nu', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
-     'clearButton': [['\u25BEClear', "Clear"],  // <!-- Black down-pointing small triangle  -->
-                     ['\u25BESlet', 'Slet']],
+                  ['\u25BE 7:00', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid "]],
+     'upButtonRegular': [['\u25BE ', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
+                  ['\u25BE ', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid "]],
+     'upButtonJump': [['\u25B8 ', "Click to jump to the chosen wake up time"],  // &#x25B8; Black Right-Pointing Small Triangle
+                  ['\u25B8 ', "Klik for at hoppe til den valgte opvågningstid "]],
+     'nowButton': [['Now \u25BE', 'Click to insert a 15 min planning period at current time'],  // \u25BE <!-- Black Down-Pointing Small Triangle -->
+                  ['Nu \u25BE', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
+     'nowButtonJump': [['\u25B8 Now', 'Click to jump to current time'],  // \u25B8 <!-- Black Right-Pointing Small Triangle -->
+                  ['\u25B8 Nu', 'Klik for at hoppe til nuværende tidspunkt.']],
+     'clearButton': [['\u25BEClear', "Clear all tasks"],  // <!-- Black down-pointing small triangle  -->
+                     ['\u25BESlet', 'Slet alle opgaver']],
+     'clearButtonText': [['\u25C2Clear', "Clear textbox"],  // Black left-pointing small triangle
+                     ['\u25C2Slet', 'Slet inputbox']],
      'gotoSettings': [['\u2699', 'Settings'],  // Gear icon
                       ['\u2699', 'Indstillinger']],
      'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
@@ -113,11 +121,11 @@ let languagePack = {  // {'id': ['text', 'title']}
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
      'day': [['Day', 'Click to get back to day-view (or just swipe left with two fingers anywhere)'],
              ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)']],
-     'monthClearButton': [['Clear\u25B8', 'Clear input box'],
+     'monthClearButton': [['Clear\u25B8', 'Clear input box'], // Black right-pointing small triangle
         ['Slet \u25B8', 'Slet input boks']],
      'monthInputBox': [['', 'Input tasks to store in month view'],
                        ['', 'Skriv opgaver der skal gemmes i månedsvisningen']],
-     'moveToDay': [['Today \u25B8', 'Click to move content of input box to today\'s plan'],
+     'moveToDay': [['Today \u25B8', 'Click to move content of input box to today\'s plan'], // Black right-pointing small triangle
                    ['I dag \u25B8', 'Klik for at flytte indholdet af inputboxen til dagens plan']],
      'putBack': [['Put back', 'Put the tasks back in month view'],
         ['Fortryd', 'Sæt opgaverne tilbage i månedsvisningen']],
@@ -534,7 +542,6 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('storageList')) {
     storageList = JSON.parse(localStorage.getItem('storageList'));
-    console.log(storageList);
     // Fix dates messed up by JSON.stringify
     for (const key in storageList) {
       storageList[key][0] = fixDatesInList(storageList[key][0]);
@@ -2225,8 +2232,8 @@ function adjustNowAndWakeUpButtons() {
   let min = '';
   // let upBtn = document.getElementById('upButton');
   // let nowBtn = document.getElementById('nowButton');
-  let upButtons = document.getElementsByClassName('upButtonClass');
-  let nowButtons = document.getElementsByClassName('nowButtonClass');
+  let upBtn = document.getElementById('upButton');
+  let nowBtn = document.getElementById('nowButton');
 
   if (parseInt(wakeUpM) <= 9) { // Adjust minutes to two digits always
     min = '0' + parseInt(wakeUpM);
@@ -2235,26 +2242,21 @@ function adjustNowAndWakeUpButtons() {
   }
 
   if (!wakeUpOrNowClickedOnce) {
-    for (upBtn in upButtons) {
-      upBtn.title='Press to insert a 15 min planning period at ' + wakeUpH + ':' + min;
-      upBtn.textContent = wakeUpH + ':' + min + ' \u25BE';  // Black down-pointing small triangle
-    }
-    for (nowBtn in nowButtons) {
-      nowBtn.title = 'Press to insert a 15 min planning period now';
-      nowBtn.textContent = 'Now' + ' \u25BE';  // Black down-pointing small triangle
-    }
+    upBtn.title=  languagePack['upButtonRegular'][language][1] + wakeUpH + ':' + min;
+    upBtn.textContent = wakeUpH + ':' + min + languagePack['upButtonRegular'][language][0] ; //' \u25BE';  // Black down-pointing small triangle
+
+    nowBtn.title = languagePack['nowButton'][language][1]; // 'Click to insert a 15 min planning period at current time';
+    nowBtn.textContent = languagePack['nowButton'][language][0]; // 'Now' + ' \u25BE';  // Black down-pointing small triangle
+
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    for (upBtn in upButtons) {
-      upBtn.title = 'Jump to ' + wakeUpH + ':' + min;
-      upBtn.textContent = '\u25B8' + wakeUpH + ':' + min;  // Black right-pointing small triangle
-    }
-    for (nowBtn in nowButtons) {
-      nowBtn.title = 'Jump to now';
-      nowBtn.textContent = '\u25B8' + 'Now';  // Black right-pointing small triangle
-    }
+    upBtn.title = languagePack['upButtonJump'][language][1] + wakeUpH + ':' + min;  // 'Jumpt to'
+    upBtn.textContent = languagePack['upButtonJump'][language][0] + wakeUpH + ':' + min;  // '\u25B8' Black right-pointing small triangle
+
+    nowBtn.title = languagePack['nowButtonJump'][language][1] // 'Jump to now';
+    nowBtn.textContent = languagePack['nowButtonJump'][language][0] // '\u25B8' + 'Now';  // Black right-pointing small triangle
   }
   renderTasks();
   document.getElementById('dayInputBox').focus();
@@ -2263,6 +2265,7 @@ function adjustNowAndWakeUpButtons() {
 
 // Used by an eventListener. Makes pressing Enter add task
 function inputAtEnter(event) {
+  let button = document.getElementById('clearButton');
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('dayInputBox').value.trim();
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
@@ -2279,11 +2282,15 @@ function inputAtEnter(event) {
         resetInputBox('day');
       }
     }
-    document.getElementById('clearButton').textContent = '\u25BEClear'; // Black down-pointing small triangle
+    // Ready buttons for next task
+    button.textContent = languagePack['clearButton'][language][0]; //'\u25BEClear'; // Black down-pointing small triangle
+    button.title = languagePack['clearButton'][language][1]; //'\u25BEClear'; // Black down-pointing small triangle
     document.getElementById('addTaskButton').textContent = '+';
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   } else {
-    document.getElementById('clearButton').textContent = '\u25C2Clear'; // Black left-pointing small triangle
+    // Ready buttons for clearing or editing current text in inputbox
+    button.textContent = languagePack['clearButtonText'][language][0]; // '\u25C2Clear'; // Black left-pointing small triangle
+    button.title = languagePack['clearButtonText'][language][1]; // '\u25C2Clear'; // Black left-pointing small triangle
     document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
     document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
   }
