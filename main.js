@@ -300,7 +300,7 @@ class Task {
     this.duration = duration; // Duration in milliseconds
     this.text = text;
     this.drain = Number(drain);  // drain is a number between -5 and 5. Gain is negative drain.
-    this.uniqueId = this.giveAUniqueId();
+    this.uniqueId = this.giveAUniqueId(); // nullTimes will end up generating unique ids in uniqueIdList which is not used because they get their predecessors id+n. And new nullTimes is generated with each redraw
     this.end = this.end();
     this.height = this.height();
     this.isClicked = 'isNotClicked'
@@ -2503,6 +2503,7 @@ function clearDay() {
 
     // Clear stuff and reset
     taskList = [];
+    uniqueIdList = [];
     makeFirstTasks();
     resetInputBox('day');
     wakeUpOrNowClickedOnce = false;
