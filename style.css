@@ -64,12 +64,6 @@ html {
   background-color: white;
 }
 
-@media screen and (min-width: 400px) {
-  html {
-    background-color: black;
-  }
-}
-
 .button-disabled{
   cursor: not-allowed;
   K  /* pointer-events: none; */
@@ -756,7 +750,7 @@ label {  /* Used in settingsView */
 /* settings view css above ^^^ */
 
 
-.container2 {
+#container {
   display: grid;
   grid-template-columns: 1% 10% 1% 83% 1%;
   grid-template-rows: auto auto auto;
@@ -764,7 +758,7 @@ label {  /* Used in settingsView */
   /* justify-items: center; */
   background-color: transparent;
   border: none;
-  height: 640px;
+  height: 640px;  /* Change via @media*/
   overflow-y: scroll;
   grid-template-areas:
   '. . . taskHeader .'
@@ -1102,3 +1096,13 @@ button[id*='memory'] {
 }
 
 /* storage-view css above ^^^ */
+
+@media screen and (min-width: 400px) {
+  html {
+    background-color: black;
+  }
+
+  /* #container {
+    height: 500px;
+  } */
+}

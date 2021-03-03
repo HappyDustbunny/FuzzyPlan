@@ -337,9 +337,17 @@ class Task {
 }
 
 
+function setViewSize() {
+  let height = window.screen.availHeight - 210;
+  document.getElementById('container').style.height = height + 'px'
+}
+
+
 // Runs when the page is loaded:
 function setUpFunc() {
   taskList = [];
+
+  setViewSize();
 
   makeFirstTasks();
 
