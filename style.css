@@ -854,10 +854,30 @@ label {  /* Used in settingsView */
   border-radius: 10px;
 }
 
+#toDoButton {
+  position: absolute;
+  /* bottom: 60%;
+  left: 30%; */
+  margin-top: 50%;
+  margin-left: 31%;
+  font-size: x-large;
+  line-height: 0.1em;
+  text-align: center;
+  padding: 0.1em;
+  background-image: linear-gradient(#08e22a, #0bfb31, #0bfb31, #0bfb31, #08e22a);
+  height: 1.7em;
+  width: 5.7em;
+  border-radius: 25px;
+  border: 1px solid rgb(108, 168, 48);
+  z-index: 10;
+}
+
 #addTaskButton {
   position: absolute;
-  bottom: 10%;
-  left: 80%;
+  /* bottom: 10%;
+  left: 80%; */
+  margin-top: 150%;
+  margin-left: 75%;
   font-size: x-large;
   line-height: 0.1em;
   text-align: center;
