@@ -201,7 +201,7 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
      'apply2': [['Apply', ''],
                 ['Anvend', '']],
      'noteSpan': [['Note:\r\nThe sound only play if the page has focus', ''],
-                  ['Bemærk:\r\nLyd afspilles kun hvis siden har fokus', '']],
+                  ['Bemærk:\r\nLyd afspilles kun, hvis siden har fokus', '']],
      'stressModelHeading': [['Stress Model', ''],
                        ['Stress Model', '']],
      'settingsInfo': [['?', 'Information about the stress model'],
@@ -675,6 +675,8 @@ function postponeTask() {
   }
   anneal();
   renderTasks();
+  handleChoosebox('day');
+  fixClearButtonArrow();
   resetInputBox('day');
 }
 
@@ -697,7 +699,7 @@ function resetInputBox(whichView) { // whichView can be 'day' or 'month'
 function handleChoosebox(whichView) {  // TODO: If task is edited and inserted while choosebox is active it forget all about chooseBox
   let chooseBox = document.getElementById(whichView + 'ChooseBox');
 
-  if (chooseBox.classList.contains('active')) {
+  if (chooseBox && chooseBox.classList.contains('active')) {
     if (chooseBox.hasChildNodes()) {
       document.getElementById(whichView + 'InputBox').value = chooseBox.firstChild.innerText;
       chooseBox.firstChild.remove();
@@ -826,7 +828,7 @@ function updateHearts() {
   fillHearths(Math.round(10 - result));
 }
 
-
+// TODO: Remove sounds?
 function sayToc() {
   let sound = new Audio('429721__fellur__tic-alt.wav');
   sound.play();
@@ -2832,7 +2834,6 @@ function getIndexFromUniqueId(uniqueId) {
     nullTimeClicked = false;
   }
   for (const [index, task] of taskList.entries()) {
-    // console.log('get', index, task, task.uniqueId, uniqueId);
     if (task.uniqueId.toString() === uniqueId.toString()) {
       return index
     }
