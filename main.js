@@ -90,6 +90,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                       ['\u2699', 'Indstillinger']],
      'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
               ['\u2350', 'Zoom ind og ud']],
+     'spacerText': [['This space is to allow scrolling to the end of the day when the screen keyboard is active.', ''],
+              ['Dette blanke område er for at man kan scrolle til slutningen af dagen, når skærmtastaturet er aktivt.', '']],
     // Add view
      'addTaskHeading': [['Add task', ''],
                         ['Tilføj opgave', '']],
