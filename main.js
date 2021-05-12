@@ -665,7 +665,8 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
 
 }
 
-
+// TODO: Postponing a Todo-task eats the following task AND look at drain hearts in Add view: are they logical? (No)
+// TODO: Make Pause automatically g2 and Relax automatically g5
 function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
   let parsedList = parseText(contentInputBox);
@@ -3255,3 +3256,6 @@ function showTaskListTimes() {
     console.log(n, 'Start:', taskList[n].date.getHours(), taskList[n].date.getMinutes(), 'End: ', taskList[n].end.getHours(), taskList[n].end.getMinutes(), taskList[n].text);
   }
 }
+
+// For debugging tasksSentBetween in the browser:
+// rap = monthTaskList['15-4-2021']; monthTaskList['12-4-2021'] = rap; monthRenderTasks()
