@@ -676,11 +676,10 @@ function postponeTask() {
   if (!document.getElementById('dayChooseBox').classList.contains('active')) {
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
   }
+  resetInputBox('day');
   anneal();
   renderTasks();
-  handleChoosebox('day');
   fixClearButtonArrow();
-  resetInputBox('day');
 }
 
 function moveToDay() {
