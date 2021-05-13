@@ -665,7 +665,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
 
 }
 
-// TODO: Postponing a Todo-task eats the following task AND look at drain hearts in Add view: are they logical? (No)
+// TODO: Look at drain hearts in Add view: are they logical? (No)
 // TODO: Make Pause automatically g2 and Relax automatically g5
 function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
@@ -698,7 +698,7 @@ function resetInputBox(whichView) { // whichView can be 'day' or 'month'
 }
 
 
-function handleChoosebox(whichView) {  // TODO: If task is edited and inserted while choosebox is active it forget all about chooseBox
+function handleChoosebox(whichView) {
   let chooseBox = document.getElementById(whichView + 'ChooseBox');
 
   if (chooseBox && chooseBox.classList.contains('active')) {
