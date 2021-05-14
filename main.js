@@ -293,6 +293,11 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                          'Vil du fjerne alle opgaver og starte planlægning af en ny dag?'],
      'removeAllReminder': ['If you want to remove all tasks and settings go to Settings (Gear symbol in Day View)',
                            'Hvis du vil fjerne alle opgaver og indstillinger, så gå til Indstillinger (Tandhjulssymbolet i Dagsvisning)'],
+      // Auto replace
+      'pause': ['pause', 'pause'],
+      'rest': ['rest', 'hvile'],
+      'relax': ['relax', 'slappe af'],
+      'splatte': ['bliss out', 'splatte'],
 };
 
 
@@ -1699,7 +1704,6 @@ function colourButtonClicked(event) {
   addTrackedTask(chosenColour);
 }
 
-// TODO: Make clear data in Settings work with nowButton and upButton
 
 function addTrackedTask(buttonColour) {
   // TODO: Sanitize inputs
@@ -2308,13 +2312,17 @@ function inputAtEnter(event) {
     if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
       inputFixedTask(contentInputBox);
     } else {
-      if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') { // If there is a chosen task AND text it must be an error
+      if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') {
+        // If there is a chosen task AND text it must be an error
         nullifyClick();
+      } else if (contentInputBox === '') {
+        null;
       } else if (/\d[0-5][0-9]/.exec(contentInputBox) != null || /[1-2]\d[0-5][0-9]/.exec(contentInputBox) != null) {
         // If there is 3-4 numbers, jump to the time indicated
         resetInputBox('day');
         jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
+        console.log(contentInputBox);
         displayMessage(languagePack['formatReminder'][language], 6000, 'day')
         resetInputBox('day');
       }
@@ -3178,14 +3186,12 @@ function parseText(rawText) {
     taskStart = '';
   };
 
-
   let drain = /d+[-]*[1-5]+/.exec(rawText);
   if (/d+[-]*[1-5]+/.exec(drain)) {
     drain = /[-]*[1-5]/.exec(drain).toString();
     rawText = rawText.replace('d' + drain, '');
   } else {
     drain = '1';
-    // rawText = rawText.replace('d', '');
   };
 
   let gain = /g+[-]*[1-5]+/.exec(rawText); // Gain counts double as the assumption is consious relaxation
@@ -3194,6 +3200,12 @@ function parseText(rawText) {
     drain = '-' + gain;
     rawText = rawText.replace('g' + gain, '');
   };
+
+
+  if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
+  if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
+  if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
+  if (rawText.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
 
   let text = rawText.trim();
   text = text.slice(0, 1).toUpperCase() + text.slice(1, );
