@@ -124,7 +124,7 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
      'apply': [['OK', ''],
         ['OK', '']],
      'applyButtonText': [['Ok (Then tap where this task should be)', ''],
-        ['OK (Klik der hvor opgaven skal inds&aelig;ttes)', '']],
+        ['OK (Klik der hvor opgaven skal indsættes)', '']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -670,8 +670,6 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
 
 }
 
-// TODO: Look at drain hearts in Add view: are they logical? (No)
-// TODO: Make Pause automatically g2 and Relax automatically g5
 function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
   let parsedList = parseText(contentInputBox);

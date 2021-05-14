@@ -356,8 +356,14 @@ html {
   font-size: 0.6em;
 }
 
+#applyDiv {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: space-between;
+}
+
 #apply {
-  width: 250px;
+  width: 220px;
 }
 
 #cancel {
@@ -375,7 +381,7 @@ html {
 }
 
 [name=drain] + img {
-  opacity: 0%;
+  opacity: 10%;
 }
 
 [name=drain]:checked + img {
