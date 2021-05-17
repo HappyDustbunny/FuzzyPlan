@@ -874,6 +874,7 @@ document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
 document.getElementById('dayInputBox').addEventListener('keypress', function () { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
 document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
