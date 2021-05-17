@@ -23,7 +23,8 @@ let msgTimeOutID = null; // Used in stopTimeout() for removing a timeout for mes
 let taskAlarms = 'off'; // Turn alarms off by defalult
 let reminder = 'off'; // Turn reminders off by default
 let tasksFromClickedDayInMonth = null;
-let tasksSentBetween = [];
+let tasksSentToDay = [];
+let tasksSentToMonth = [];
 let language = 0; // English: 0, Danish: 1
 let lang = ['en', 'da'];
 
@@ -350,7 +351,6 @@ class Task {
   }
 }
 
-// TODO: Fix the way tasks from monthView show up in dayView at the start of a new planning period
 // TODO: Make weekends stand out in the past too in month-view
 
 function setViewSize() {
@@ -435,10 +435,6 @@ function storeLocally() {
   localStorage.idOflastTouched = idOfLastTouched;
 
   localStorage.language = language;   // Value 0:English 1:Danish
-
-  // if (tasksSentBetween) { // TODO: Is this used?
-  //   localStorage.tasksSentBetween = JSON.stringify(tasksSentBetween);
-  // }
 
   if (monthTaskList) {
     localStorage.monthTaskList = JSON.stringify(monthTaskList);
@@ -585,6 +581,7 @@ function toDoButtonClicked() {
   toDoButton.textContent = languagePack['toDoButton'][language][0];
 }
 
+
 function getDueRemindersFromLast3Months() {  // If the day in the list lies in the past kick tasks to chooseBox
   let now = new Date();
   now = new Date(now.setDate(now.getDate() + 1)); // To include today in the next for-loop
@@ -594,21 +591,22 @@ function getDueRemindersFromLast3Months() {  // If the day in the list lies in t
   for (let i = nowMinus3Month; i < now; i.setDate(i.getDate() + 1)) {
     let myId = i.getDate().toString() + '-' + i.getMonth().toString()  + '-' + i.getFullYear().toString();
 
+    // Stuff the currently processed day into tasksSentToDay
     if (monthTaskList[myId]) {
       thisDay = monthTaskList[myId];
-      if (0 < tasksSentBetween.length) {
-        Object.assign(tasksSentBetween, thisDay); // Joins two objects by modifying the first with the added values https://attacomsian.com/blog/javascript-merge-objects
+      if (0 < tasksSentToDay.length) {
+        Object.assign(tasksSentToDay, thisDay); // Joins two objects by modifying the first with the added values https://attacomsian.com/blog/javascript-merge-objects
       } else {
-        tasksSentBetween = thisDay;
+        tasksSentToDay = thisDay;
       }
 
       delete monthTaskList[myId];
     }
   }
 
-  if (0 < tasksSentBetween.length) {
+  // If there is tasksSentToDay show toDoButton
+  if (0 < tasksSentToDay.length) {
     document.getElementById('toDoButton').hidden = false;
-    // fillChooseBox('day');
   }
 }
 
@@ -622,8 +620,9 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     document.getElementById('putBack').classList.add('active');
     document.getElementById('moveToDay').classList.add('active');
 
-    if (0 < tasksSentBetween.length) {
-      tasks = tasksSentBetween;
+    if (0 < tasksSentToMonth.length) {
+      tasks = tasksSentToMonth;
+      tasksSentToMonth = [];
     } else if (0 < tasksFromClickedDayInMonth.length) {
       tasks = tasksFromClickedDayInMonth ;
     } else {
@@ -633,7 +632,8 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   } else {  // whichView is 'day'
     document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Nope. Should it be?
 
-    tasks = tasksSentBetween;
+    tasks = tasksSentToDay;
+    tasksSentToDay = [];
 
     if (tasks.length === 0) {
       document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
@@ -664,7 +664,6 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     clearButton.title = languagePack['clearButtonText'][language][1];
   }
 
-  tasksSentBetween = [];
   // tasksFromClickedDayInMonth = [];  // If this is emptied here putBack will have nothing to put back. It should be emptied elsewhere. Or after a test here
   // TODO: Postpone can leave tasks with an end that doesn't match duration and start time
 
@@ -674,7 +673,15 @@ function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-  tasksSentBetween.push(task);
+
+  // Store task in tomorrow of pastDayList
+  let now = new Date();
+  let tomorrowId = (now.getDate() + 1).toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
+  if (monthTaskList[tomorrowId]) {
+    monthTaskList[tomorrowId].push(task);
+  } else {
+    monthTaskList[tomorrowId] = [task];
+  }
 
   if (!document.getElementById('dayChooseBox').classList.contains('active')) {
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
@@ -689,7 +696,8 @@ function moveToDay() {
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-  tasksSentBetween.push(task);
+  console.log(tasksSentToDay);
+  tasksSentToDay.push(task);
   resetInputBox('month');
 }
 
@@ -1260,7 +1268,7 @@ function monthButtonClicked() {
 
   monthRenderTasks();
 
-  if (0 < tasksSentBetween.length) {
+  if (0 < tasksSentToMonth.length) {
     fillChooseBox('month');
   }
 
@@ -1383,7 +1391,7 @@ function monthTaskHasBeenClicked(event) {
       if (document.getElementById('monthChooseBox').classList.contains('active')) {
         if (tasksFromClickedDayInMonth) {
           tasksFromClickedDayInMonth.shift();  // Removes task from list of tasks being handled in chooseBox in order to make putBack() function as expected
-        } // tasksSentBetween does not need this shift. I think. As it behaves as expected for now.
+        }
       }
 
       resetInputBox('month');
@@ -2133,6 +2141,32 @@ function applyStressModel() {
 
   gotoDayFromSettings();
 }
+
+
+function storeBackup() { // TODO: Finish this
+  // Wrap up data from localStorage in a blob
+  let data = JSON.stringify(localStorage.taskList);
+  let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+
+  // Make filename
+  let now = new Date();
+  let date = now.getDate().toString() + '-' + (now.getMonth() + 1).toString() + '-' + now.getFullYear().toString();
+  let fileName = 'FuzzyPlanBackup_' + date + '.txt';
+
+  // Store the blob by creating an element, clicking it and removing it again
+  let url = window.URL.createObjectURL(blob);
+
+  let element = window.document.createElement('a');
+  element.href = url;
+  element.download = fileName;
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+
+  // Clean up
+  window.URL.revokeObjectURL(url);
+}
+
 
 function clearAllData() {
   let answer = confirm(languagePack['sureYouWannaClear?'][language])
@@ -3266,5 +3300,5 @@ function showTaskListTimes() {
   }
 }
 
-// For debugging tasksSentBetween in the browser:
+// For debugging tasksSentToDay in the browser:
 // rap = monthTaskList['15-4-2021']; monthTaskList['12-4-2021'] = rap; monthRenderTasks()
