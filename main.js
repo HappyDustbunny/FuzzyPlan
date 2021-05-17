@@ -297,7 +297,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
       // Auto replace
       'pause': ['pause', 'pause'],
       'rest': ['rest', 'hvile'],
-      'relax': ['relax', 'slappe af'],
+      'relax': ['relax', 'afspænding'],
+      'meditate': ['meditate', 'meditere'],
       'splatte': ['bliss out', 'splatte'],
 };
 
@@ -886,10 +887,12 @@ document.getElementById('zoom').addEventListener('click', zoomFunc);
 document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
 
 document.getElementById('toDoButton').addEventListener('click', toDoButtonClicked);
+
 ////////// Eventlisteners for Add-view   /////////////////////
 
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
 
+document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
 document.getElementById('inputBox_add').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readTaskText(); } });
 document.getElementById('inputDurationBox').addEventListener('keypress',
@@ -987,6 +990,7 @@ document.getElementById('tDouble').addEventListener('focus', tDoubleGotFocus);
 
 function addTaskButtonClicked() {
   storeLocally();
+  drainGainLevel_add = 'd1';
 
   // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
   // Trigger animation via CSS
@@ -1005,26 +1009,90 @@ function addTaskButtonClicked() {
   let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
 
-  if (inputBox.value != '') {  // Parse the value and fill relevant boxes
-    parsedList = parseText(inputBox.value); // parsedList = [taskStart, duration, text, drain];
+  inputBox_add.value = inputBox.value;
+
+  readInputBox_add();
+
+  // if (text != '') {  // Parse the value and fill relevant boxes
+  //   parsedList = parseText(text); // parsedList = [taskStart, duration, text, drain];
+  //   inputBox_add.value = parsedList[2];
+  //   inputBox_add.blur();
+  //   fillDurationBox(parsedList[1] / 60000);
+  //   if (parsedList[0] != '') {  // This will never trigger because fixed times are currently stripped when double clicking a task to edit
+  //     fillTimeBox(parsedList[0]);
+  //   }
+  //
+  //
+  //   let drain = Number(parsedList[3]);
+  //   if (drain = 1) {
+  //     if (text.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
+  //     if (text.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
+  //     if (text.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
+  //     if (text.toLowerCase().includes(languagePack['meditate'][language])) {drain = '-5'};
+  //     if (text.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
+  //   }
+  //
+  //   if (0 < drain) {
+  //     document.getElementsByClassName('drain')[5 - drain].checked = true;
+  //   } else {
+  //     document.getElementsByClassName('drain')[4 - drain].checked = true;
+  //   }
+
+  // } else {
+  if (inputBox_add.value == '') {
+    inputBox_add.value = '';
+    inputBox_add.focus();
+  }
+}
+
+
+function readInputBox_add() {
+  let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
+
+  let text = inputBox_add.value;
+
+  if (text != '') {  // Parse the value and fill relevant boxes
+    parsedList = parseText(text); // parsedList = [taskStart, duration, text, drain];
     inputBox_add.value = parsedList[2];
     inputBox_add.blur();
     fillDurationBox(parsedList[1] / 60000);
     if (parsedList[0] != '') {  // This will never trigger because fixed times are currently stripped when double clicking a task to edit
       fillTimeBox(parsedList[0]);
     }
+
     let drain = Number(parsedList[3]);
+
+    if (drain = 1) { // Check for keywords
+      if (text.toLowerCase().includes(languagePack['pause'][language])) {
+        drain = '-1';
+        document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
+      };
+      if (text.toLowerCase().includes(languagePack['rest'][language])) {
+        drain = '-3';
+        document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
+      };
+      if (text.toLowerCase().includes(languagePack['relax'][language])) {
+        drain = '-5';
+        document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
+      };
+      if (text.toLowerCase().includes(languagePack['meditate'][language])) {
+        drain = '-5';
+        document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
+      };
+      if (text.toLowerCase().includes(languagePack['splatte'][language])) {
+        drain = '-5';
+        document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
+      };
+    }
+
+    if (0 < drain) {
       document.getElementsByClassName('drain')[5 - drain].checked = true;
-      if (0 < drain) {
     } else {
       document.getElementsByClassName('drain')[4 - drain].checked = true;
     }
-
-  } else {
-    inputBox_add.value = '';
-    inputBox_add.focus();
   }
 }
+
 
 function addDuration(event) {
   let btnId = event.target.id;  // btnId is in the form 'durationPlus30m'
@@ -1243,6 +1311,8 @@ function apply() {
     // Close add-view
     document.getElementById('addView').hidden = true;
     document.getElementById('dayView').hidden = false;
+
+    document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
   }
 }
 
@@ -3234,11 +3304,13 @@ function parseText(rawText) {
     rawText = rawText.replace('g' + gain, '');
   };
 
-
-  if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
-  if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
-  if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
-  if (rawText.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
+  if (drain == 1) {
+    if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
+    if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
+    if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
+    if (rawText.toLowerCase().includes(languagePack['meditate'][language])) {drain = '-5'};
+    if (rawText.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
+  }
 
   let text = rawText.trim();
   text = text.slice(0, 1).toUpperCase() + text.slice(1, );
