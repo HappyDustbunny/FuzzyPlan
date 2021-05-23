@@ -888,6 +888,10 @@ document.getElementById('taskDiv').addEventListener('click', function () { taskH
 
 document.getElementById('toDoButton').addEventListener('click', toDoButtonClicked);
 
+////////// Eventlisteners for Play-view   /////////////////////
+
+document.getElementById('playButton').addEventListener('click', playButtonClicked);
+
 ////////// Eventlisteners for Add-view   /////////////////////
 
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
@@ -999,6 +1003,9 @@ function addTaskButtonClicked() {
   document.getElementById('addView').hidden = false;
   document.getElementById('dayView').hidden = true;
 
+  document.getElementsByClassName('playTopic').hidden = true;
+  document.getElementsByClassName('timeTopic').hidden = false;
+
   fillDurationBox(defaultTaskDuration);
 
   clearTimeBox();
@@ -1013,32 +1020,6 @@ function addTaskButtonClicked() {
 
   readInputBox_add();
 
-  // if (text != '') {  // Parse the value and fill relevant boxes
-  //   parsedList = parseText(text); // parsedList = [taskStart, duration, text, drain];
-  //   inputBox_add.value = parsedList[2];
-  //   inputBox_add.blur();
-  //   fillDurationBox(parsedList[1] / 60000);
-  //   if (parsedList[0] != '') {  // This will never trigger because fixed times are currently stripped when double clicking a task to edit
-  //     fillTimeBox(parsedList[0]);
-  //   }
-  //
-  //
-  //   let drain = Number(parsedList[3]);
-  //   if (drain = 1) {
-  //     if (text.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
-  //     if (text.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
-  //     if (text.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
-  //     if (text.toLowerCase().includes(languagePack['meditate'][language])) {drain = '-5'};
-  //     if (text.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
-  //   }
-  //
-  //   if (0 < drain) {
-  //     document.getElementsByClassName('drain')[5 - drain].checked = true;
-  //   } else {
-  //     document.getElementsByClassName('drain')[4 - drain].checked = true;
-  //   }
-
-  // } else {
   if (inputBox_add.value == '') {
     inputBox_add.value = '';
     inputBox_add.focus();
@@ -1322,6 +1303,85 @@ function gotoDayFromAdd() {
 }
 
 //////////////////// Add-view button code above ///////////////////////////
+
+
+//////////////////// Play-view button code below ///////////////////////////
+
+function playButtonClicked() {
+  storeLocally();
+  drainGainLevel_add = 'd1';
+
+  // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
+  // Trigger animation via CSS
+  // document.getElementById('addView').classList.add('active');
+  // document.getElementById('dayView').classList.remove('active');
+  document.getElementById('addView').hidden = false;
+  document.getElementById('dayView').hidden = true;
+
+  // fillDurationBox(defaultTaskDuration);
+
+  // clearTimeBox();
+  document.getElementsByClassName('timeTopic').hidden = true;
+  document.getElementsByClassName('playTopic').hidden = false;
+
+  document.getElementById('d1').checked = 'checked';
+  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+
+  let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
+  let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
+
+  inputBox_add.value = inputBox.value;
+
+  readInputBox_add();
+
+  if (inputBox_add.value == '') {
+    inputBox_add.value = '';
+    inputBox_add.focus();
+  }
+
+  document.getElementById('inputDurationBox').value = '';
+
+  if (document.getElementById('inputDurationBox').value != '') {
+    var playTimer = setInterval(function () {playUpdate(100);}, 1000);
+  }
+
+}
+
+function playUpdate(deltaTime) {
+	let hourglassSize = 50;  // Half the width of the hourglass in px
+	let borderSize = 0;
+
+	elem = document.getElementById('hourglassDiv');
+	text = document.getElementById('hourglassText');
+
+	if (typeof playUpdate.counter == 'undefined') {
+		playUpdate.counter = 0;
+	}
+
+	if (playUpdate.counter < 100) {
+		playUpdate.counter += 100 / deltaTime;
+		w = Math.trunc(playUpdate.counter / 2) - Math.trunc(playUpdate.counter / 2)%2;
+		borderSize = hourglassSize - w + 2;  // Plus 2 for last border
+
+    console.log(playUpdate.counter, w, borderSize, 2*w + 2*borderSize);
+
+		elem.style.width = Math.trunc(2 * w)  + 'px';
+		elem.style.height = Math.trunc(2 * w) + 'px';
+		elem.style.borderLeft = borderSize + 'px solid rgba(154, 219, 240, 0.6)';
+		elem.style.borderRight = borderSize + 'px solid rgba(154, 219, 240, 0.6)';
+		elem.style.borderTop = borderSize + 'px solid rgba(154, 219, 240, 1.0)';
+		elem.style.borderBottom = borderSize + 'px solid rgba(154, 219, 240, 1.0)';
+		text.innerHTML = Math.trunc(playUpdate.counter) + '%';
+		text.style.color = 'rgba(4, 177, 217, 1.0)'
+		text.style.fontSize = Math.trunc(playUpdate.counter / 4) + 'px';
+		text.style.opacity = Math.trunc(playUpdate.counter / 2 + 35) + '%';
+	} else if (typeof playTimer != 'undefined') {
+		clearInterval(playTimer);
+		playUpdate.counter = 0
+	}
+}
+
+//////////////////// Play-view button code above ///////////////////////////
 
 
 //////////////////// Month-view code below ///////////////////////////
@@ -2216,8 +2276,9 @@ function applyStressModel() {
 
 function storeBackup() { // TODO: Finish this
   // Wrap up data from localStorage in a blob
-  let data = JSON.stringify(localStorage.taskList);
+  let data = JSON.stringify(localStorage.pastDayList);
   let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+  console.log(blob);
 
   // Make filename
   let now = new Date();
@@ -2226,6 +2287,7 @@ function storeBackup() { // TODO: Finish this
 
   // Store the blob by creating an element, clicking it and removing it again
   let url = window.URL.createObjectURL(blob);
+  console.log(url);
 
   let element = window.document.createElement('a');
   element.href = url;

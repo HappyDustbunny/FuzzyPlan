@@ -42,8 +42,8 @@
 
           <input type="text" id='dayInputBox' class="inputBox" autofocus value="">
 
-          <button id="addTaskButton" class="controlButton">+</button>  <!-- This button is placed in lower right corner by CSS -->
-          <!-- <button type="button" class="addTaskButton">&#x270d;</button> --> <!-- Writing Hand -->
+          <button type="button" id='playButton'>&#x25B8;</button>  <!-- This button is placed in lower left corner by CSS -->
+          <button type="button" id="addTaskButton" >+</button>  <!-- This button is placed in lower right corner by CSS -->
 
           <button type="button" id='toDoButton' class="controlButton" hidden> </button>
 
@@ -88,11 +88,21 @@
 
         <span>   <br>   </span>
 
+        <div class="topic playTopic">
+          <div id="hourglass" class="hourglassContainer">
+            <div id="hourglassDiv" style='width: 100px; height: 100px;  border: 2px solid rgba(154, 219, 240, 1.0)'>
+              <div id="hourglassText">	</div>
+            </div>
+          </div>
+        </div>
+
+        <span class="playTopic">   <br>   </span>
+
         <div class='topic'>
           <div id="duration" class="durationContainer">
             <span id='text1'>
               <span id='inputDurationBox_text' class='text'></span>
-              <input type="text" id='inputDurationBox' class="inputBox" tabindex="2" placeholder="0h30m"> <br>
+              <input type="text" id='inputDurationBox' class="inputBox" tabindex="2"> <br>
             </span>
             <div class="buttons">
               <div>
@@ -119,9 +129,9 @@
           </div>
         </div>
 
-        <span>   <br>   </span>
+        <span class="timeTopic">   <br>   </span>
 
-        <div class='topic'>
+        <div class='topic timeTopic'>
           <div id="time" class="timeContainer">
             <div class="timeButtons">
               <span id='inputTimeBoxText' class="text">Task starts at</span>
