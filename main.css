@@ -159,6 +159,7 @@ html {
   padding-right: 15px;
   padding-bottom: 10px;
   padding-top: 10px;
+  margin-left: 10px;
   border-radius: 10px;
   background-color: rgba(154, 219, 240, .25);
   width: 90%;
@@ -292,9 +293,17 @@ html {
   height: 800px;
 } */
 
-#gainDiv {
+#inputBox_add {
+  width: 175px;
+}
+
+/* #gainDiv {
   display: inline-flex;
   justify-content: space-between;
+} */
+
+#addInfo {
+  width: 20px;
 }
 
 #info {
@@ -362,7 +371,7 @@ html {
   justify-content: space-between;
 }
 
-#apply {
+#applyAdd {
   width: 220px;
 }
 
@@ -370,7 +379,7 @@ html {
   width: 15%;
 }
 
-#apply, #cancel {
+#applyAdd, #cancel {
   font-size: 0.6em;
   margin-top: 5px;
 }
@@ -895,6 +904,21 @@ label {  /* Used in settingsView */
 	display: table-cell;
 	text-align: center;
 	vertical-align: middle;
+}
+
+#stopButton {
+  font-size: large;
+  line-height: 0.1em;
+  text-align: center;
+  padding: .1em 0.2em .3em .15em;
+  /* background-image: linear-gradient(#b00505, #fb0b0b, #fb0b0b, #fb0b0b, #fb0b0b, #b00505); */
+  background-image: linear-gradient(#b93604, #fb4e0b, #fb4e0b, #fb4e0b, #fb4e0b, #a43206);
+  /* background-image: linear-gradient(#05b020, #0bfb31, #0bfb31, #0bfb31, #0bfb31, #05b020); */
+  height: 2em;
+  width: 2em;
+  border-radius: 25px;
+  border: 1px solid rgb(108, 168, 48);
+  z-index: 10;
 }
 
 #playButton {

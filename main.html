@@ -79,7 +79,7 @@
         </div>
 
 
-        <div class='topic'>
+        <div class='topic addView playView'>
           <div>
             <span id='inputBox_add_text' class="text"> </span>
             <input type="text" id='inputBox_add' class="inputBox" autofocus value='' tabindex="1">
@@ -88,17 +88,22 @@
 
         <span>   <br>   </span>
 
-        <div class="topic playTopic">
-          <div id="hourglass" class="hourglassContainer">
-            <div id="hourglassDiv" style='width: 100px; height: 100px;  border: 2px solid rgba(154, 219, 240, 1.0)'>
-              <div id="hourglassText">	</div>
-            </div>
-          </div>
+        <div class="topic playView" hidden>
+          <span id="playText" class="text"></span>
+          <span id="nowText"></span>
+          <span id="toText" class="text" hidden></span>
+          <span id="untilText"></span>
         </div>
 
-        <span class="playTopic">   <br>   </span>
+        <span class="playView" hidden>   <br>   </span>
 
-        <div class='topic'>
+        <div id='playControlsQueryDiv' class="topic playView" hidden>
+          <button type="button" id="playControlsQuery" class="controlButton add" tabindex="6"></button>
+        </div>
+
+        <span id="playTopicSpan" hidden>   <br>   </span>
+
+        <div class='topic addView playControl'>
           <div id="duration" class="durationContainer">
             <span id='text1'>
               <span id='inputDurationBox_text' class='text'></span>
@@ -127,11 +132,16 @@
               </div>
             </div>
           </div>
+          <div id="hourglass" class="hourglassContainer" hidden>
+            <div id="hourglassDiv" style='width: 100px; height: 100px;  border: 2px solid rgba(154, 219, 240, 1.0)'>
+              <div id="hourglassText">	</div>
+            </div>
+          </div>
         </div>
 
-        <span class="timeTopic">   <br>   </span>
+        <span class="addView" hidden>   <br>   </span>
 
-        <div class='topic timeTopic'>
+        <div class='topic addView' hidden>
           <div id="time" class="timeContainer">
             <div class="timeButtons">
               <span id='inputTimeBoxText' class="text">Task starts at</span>
@@ -171,16 +181,13 @@
           </div>
         </div>
 
-        <span>   <br>   </span>
+        <span class="addView playControl" hidden>   <br>   </span>
 
-        <div class='topic'>
+        <div class='topic addView playControl'>
           <div class="addContainer2">
 
             <span id="drainLevelText" class="text"> </span>
-            <div id='gainDiv'>
-              <span id="grainLevelText" class="text"></span>
-              <button type="button" id="addInfo" class='controlButton'> </button>
-            </div>
+            <button type="button" id="addInfo" class='controlButton'> </button>
 
             <div id='drainBand'>
               <label class="hearts">
@@ -228,17 +235,21 @@
                 <img class="heartImg" src="16px-A_SVG_semicircle_heart.svg.png" alt="red heart">
               </label>
             </div>
-
-          </div>
-
-          <div id="applyDiv">
-            <button type="button" id="cancel" class="controlButton add" tabindex="6"></button>
-            <button type="button" id="apply" class="controlButton add" tabindex="7"></button>
           </div>
         </div>
 
         <span>   <br>   </span>
+
+        <div class="topic addView playView">
+          <div id="applyDiv">
+            <button type="button" id="cancel" class="controlButton add" tabindex="6"></button>
+            <button type="button" id="applyAdd" class="controlButton add" tabindex="7" hidden></button>
+            <button type="button" id="stopButton" class="controlButton add" tabindex="7" hidden>&#x25A0;</button>
+          </div>
+        </div>
       </div>
+
+      <span class="addView playView" hidden>   <br>   </span>
 
       <!-- Month view ---------------------- -->
 

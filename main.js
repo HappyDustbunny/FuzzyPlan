@@ -1,4 +1,4 @@
-// TODO: anneal() after double-clicking task?
+'applyAdd'// TODO: anneal() after double-clicking task?
 
 
 let taskList = [];  // List of all tasks
@@ -114,10 +114,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
              ['Nu', 'Sæt tiden til nu']],
      'clear': [['Clear', 'Clear time'],
                ['Slet', 'Slet tidspunkt']],
-     'drainLevelText': [['\u00a0 Drain level', ''],
-                        ['\u00a0 Dræningsniveau', '']],
-     'grainLevelText': [['Gain level', ''],
-                        ['Gavnlighedsniveau', '']],
+     'drainLevelText': [['\u00a0 Stress level', ''],
+                        ['\u00a0 Stressniveau', '']],
      'addInfo': [['?', 'Information and user manual'],
         ['?', 'Information og brugsanvisning']],
      'cancel': [['Cancel', ''],
@@ -126,6 +124,13 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
         ['OK', '']],
      'applyButtonText': [['Ok (Then tap where this task should be)', ''],
         ['OK (Klik der hvor opgaven skal indsættes)', '']],
+      // Play View
+      'playText': [['Task running from', ''],
+                 ['Opgave løber fra', '']],
+      'toText': [[' to ', ''],
+                 [' til ', '']],
+      'playControlsQuery': [['Set duration or stress level?', ''],
+                 ['Sæt varighed eller stressniveau?', '']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -891,6 +896,7 @@ document.getElementById('toDoButton').addEventListener('click', toDoButtonClicke
 ////////// Eventlisteners for Play-view   /////////////////////
 
 document.getElementById('playButton').addEventListener('click', playButtonClicked);
+document.getElementById('playControlsQuery').addEventListener('click', playControlsQuery);
 
 ////////// Eventlisteners for Add-view   /////////////////////
 
@@ -918,7 +924,7 @@ document.getElementById('addInfo').addEventListener('click', gotoInfoStress);
 
 document.getElementById('cancel').addEventListener('click', gotoDayFromAdd);
 
-document.getElementById('apply').addEventListener('click', apply);
+document.getElementById('applyAdd').addEventListener('click', apply);
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
@@ -1003,15 +1009,23 @@ function addTaskButtonClicked() {
   document.getElementById('addView').hidden = false;
   document.getElementById('dayView').hidden = true;
 
-  document.getElementsByClassName('playTopic').hidden = true;
-  document.getElementsByClassName('timeTopic').hidden = false;
+  hideDisplayClass('playView', 'none');
+  hideDisplayClass('addView', 'block');
+  // document.getElementById('playTopic').hidden = true;
+  // document.getElementById('playTopicSpan').hidden = true;
+  // document.getElementById('timeTopic').hidden = false;
+  // document.getElementById('timeTopicSpan').hidden = false;
 
   fillDurationBox(defaultTaskDuration);
 
   clearTimeBox();
 
   document.getElementById('d1').checked = 'checked';
-  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
+
+  document.getElementById('applyAdd').hidden = false;
+  document.getElementById('stopButton').hidden = true;
+
+  // document.getElementById('applyAdd').textContent = 'Ok (then tap where this task should be)';
 
   let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
@@ -1125,7 +1139,7 @@ function time_add(event) {
     fillTimeBox(taskTime_add);
   } else if (btnId === 'clear') {
     document.getElementById('inputTimeBox').value = '';
-    let applyButton = document.getElementById('apply');
+    let applyButton = document.getElementById('applyAdd');
     applyButton.textContent = languagePack['applyButtonText'][language][0];
     applyButton.title = languagePack['applyButtonText'][language][1];
   } else if (btnId === 'inputTimeBox') {
@@ -1162,7 +1176,7 @@ function fillTimeBox(time) {  // time in Date-format
 
   document.getElementById('inputTimeBox').value = prettyTaskTime;
 
-  document.getElementById('apply').textContent = 'Ok'; // Remove instruction from return-button as the task will be added the right place automatically
+  document.getElementById('applyAdd').textContent = 'Ok'; // Remove instruction from return-button as the task will be added the right place automatically
 }
 
 
@@ -1174,7 +1188,7 @@ function setTimeNow() {
 
 function clearTimeBox() {
   document.getElementById('inputTimeBox').value = '';
-  document.getElementById('apply').textContent = languagePack['applyButtonText'][language][0];
+  document.getElementById('applyAdd').textContent = languagePack['applyButtonText'][language][0];
   taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
 }
 
@@ -1304,6 +1318,14 @@ function gotoDayFromAdd() {
 
 //////////////////// Add-view button code above ///////////////////////////
 
+// Helper function for Add-view and Play-view
+function hideDisplayClass(className, displayStatus) {  // displaystatus can be 'none' or 'block'
+  let members = document.getElementsByClassName(className);
+
+  for (var i = 0; i < members.length; i++) {
+    members[i].style.display = displayStatus;
+  }
+}
 
 //////////////////// Play-view button code below ///////////////////////////
 
@@ -1318,13 +1340,22 @@ function playButtonClicked() {
   document.getElementById('addView').hidden = false;
   document.getElementById('dayView').hidden = true;
 
+  hideDisplayClass('addView', 'none');
+  hideDisplayClass('playView', 'block');
+
   // fillDurationBox(defaultTaskDuration);
 
   // clearTimeBox();
-  document.getElementsByClassName('timeTopic').hidden = true;
-  document.getElementsByClassName('playTopic').hidden = false;
+  // document.getElementById('timeTopic').hidden = true;
+  // document.getElementById('timeTopicSpan').hidden = true;
+  // document.getElementById('playTopic').hidden = false;
+  // document.getElementById('playTopicSpan').hidden = false;
+  //
+  // document.getElementById('d1').checked = 'checked';
+  //
+  document.getElementById('stopButton').hidden = false;
+  document.getElementById('applyAdd').hidden = true;
 
-  document.getElementById('d1').checked = 'checked';
   // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
   let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
@@ -1339,6 +1370,10 @@ function playButtonClicked() {
     inputBox_add.focus();
   }
 
+  let now = new Date();
+  document.getElementById('nowText').innerText = now.getHours() + ':' + now.getMinutes(); // TODO: Pad with zeros for 0-9 minutes
+
+  // Shall the timer start?
   document.getElementById('inputDurationBox').value = '';
 
   if (document.getElementById('inputDurationBox').value != '') {
@@ -1379,6 +1414,19 @@ function playUpdate(deltaTime) {
 		clearInterval(playTimer);
 		playUpdate.counter = 0
 	}
+}
+
+function playControlsQuery() {  // Turn of the playControlQuery div and shows Duration and Stress level controls
+  document.getElementById('playControlsQueryDiv').style.display = 'none';
+  document.getElementById('toText').style.display = 'inline-block';
+  hideDisplayClass('playControl', 'block');
+  fillDurationBox(defaultTaskDuration);
+
+}
+
+
+function changeInDurationPlayView() {
+  document.getElementById('untilText').innerText = 'A lot of // TODO: here...'
 }
 
 //////////////////// Play-view button code above ///////////////////////////
