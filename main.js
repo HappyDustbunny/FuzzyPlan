@@ -30,9 +30,14 @@ let lang = ['en', 'da'];
 
 ///////// Add-view /////////
 let taskText_add = '';
-let taskDuration_add = defaultTaskDuration;
+let taskDuration_add = defaultTaskDuration;  // In minutes
 let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
 let drainGainLevel_add = 'd1';
+
+///////// Play-view /////////
+let startTime_play = new Date();
+let endTime_play = new Date();
+let playViewActive = false;
 
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1009,8 +1014,8 @@ function addTaskButtonClicked() {
   document.getElementById('addView').hidden = false;
   document.getElementById('dayView').hidden = true;
 
-  hideDisplayClass('playView', 'none');
-  hideDisplayClass('addView', 'block');
+  hideOrDisplayClass('playView', 'none');
+  hideOrDisplayClass('addView', 'block');
   // document.getElementById('playTopic').hidden = true;
   // document.getElementById('playTopicSpan').hidden = true;
   // document.getElementById('timeTopic').hidden = false;
@@ -1057,7 +1062,7 @@ function readInputBox_add() {
 
     let drain = Number(parsedList[3]);
 
-    if (drain = 1) { // Check for keywords
+    if (drain = 1) { // Check for keywords and add appropriate number of hearts
       if (text.toLowerCase().includes(languagePack['pause'][language])) {
         drain = '-1';
         document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
@@ -1113,6 +1118,10 @@ function addDuration(event) {
       taskDuration_add = 0;
     }
     fillDurationBox(taskDuration_add);
+
+    if (playViewActive) {
+      durationTimeChangeInPlayView();
+    }
   }
 }
 
@@ -1319,7 +1328,7 @@ function gotoDayFromAdd() {
 //////////////////// Add-view button code above ///////////////////////////
 
 // Helper function for Add-view and Play-view
-function hideDisplayClass(className, displayStatus) {  // displaystatus can be 'none' or 'block'
+function hideOrDisplayClass(className, displayStatus) {  // displaystatus can be 'none' or 'block'
   let members = document.getElementsByClassName(className);
 
   for (var i = 0; i < members.length; i++) {
@@ -1340,23 +1349,13 @@ function playButtonClicked() {
   document.getElementById('addView').hidden = false;
   document.getElementById('dayView').hidden = true;
 
-  hideDisplayClass('addView', 'none');
-  hideDisplayClass('playView', 'block');
+  playViewActive = true;
 
-  // fillDurationBox(defaultTaskDuration);
+  hideOrDisplayClass('addView', 'none');
+  hideOrDisplayClass('playView', 'block');
 
-  // clearTimeBox();
-  // document.getElementById('timeTopic').hidden = true;
-  // document.getElementById('timeTopicSpan').hidden = true;
-  // document.getElementById('playTopic').hidden = false;
-  // document.getElementById('playTopicSpan').hidden = false;
-  //
-  // document.getElementById('d1').checked = 'checked';
-  //
   document.getElementById('stopButton').hidden = false;
   document.getElementById('applyAdd').hidden = true;
-
-  // document.getElementById('apply').textContent = 'Ok (then tap where this task should be)';
 
   let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
@@ -1370,8 +1369,9 @@ function playButtonClicked() {
     inputBox_add.focus();
   }
 
-  let now = new Date();
-  document.getElementById('nowText').innerText = now.getHours() + ':' + now.getMinutes(); // TODO: Pad with zeros for 0-9 minutes
+  startTime_play = new Date();
+  let nowTime = prettifyTime(startTime_play);
+  document.getElementById('nowText').innerText = nowTime;
 
   // Shall the timer start?
   document.getElementById('inputDurationBox').value = '';
@@ -1419,14 +1419,25 @@ function playUpdate(deltaTime) {
 function playControlsQuery() {  // Turn of the playControlQuery div and shows Duration and Stress level controls
   document.getElementById('playControlsQueryDiv').style.display = 'none';
   document.getElementById('toText').style.display = 'inline-block';
-  hideDisplayClass('playControl', 'block');
+  hideOrDisplayClass('playControl', 'block');
   fillDurationBox(defaultTaskDuration);
-
+  durationTimeChangeInPlayView();
 }
 
 
-function changeInDurationPlayView() {
-  document.getElementById('untilText').innerText = 'A lot of // TODO: here...'
+function durationTimeChangeInPlayView() {
+  readDurationTime();  // This updates taskDuration_add which is in minutes
+
+  let startTime = startTime_play.getTime();
+  endTime_play = new Date(startTime + 60000 * taskDuration_add);
+
+  let now = new Date();
+  if (endTime_play < now) {
+    taskDuration_add = now - startTime_play;
+    fillDurationBox(Math.trunc(taskDuration_add/60000));
+  }
+
+  document.getElementById('untilText').innerText = prettifyTime(endTime_play);
 }
 
 //////////////////// Play-view button code above ///////////////////////////
