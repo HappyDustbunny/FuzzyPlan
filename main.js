@@ -37,7 +37,8 @@ let drainGainLevel_add = 'd1';
 ///////// Play-view /////////
 let startTime_play = new Date();
 let endTime_play = new Date();
-let playViewActive = false;
+let playViewActive = false;  // Helps styling the Add-view elements for Play-view to recycle code
+let fixedPlayInterval = false;  // Keeps tracks of if a fixed interval has been chosen in Play View
 
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -136,6 +137,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                  [' til ', '']],
       'playControlsQuery': [['Set duration or stress level?', ''],
                  ['Sæt varighed eller stressniveau?', '']],
+      'cutPlayingTaskShort?': [['Confirming will insert the task at the start time with a shorter duration than '],
+                 ['Bekræft for at indsætte opgaven ved starttidspunktet med en kortere varighed end ']],
+      'isAShortTimeOK?': [['The time since the task started is less than 10 minutes. Go ahead and insert a short task?'],
+                 ['Der er gået mindre end 10 minutter. Fortsæt og indsæt en kort opgave?']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -931,6 +936,11 @@ document.getElementById('cancel').addEventListener('click', gotoDayFromAdd);
 
 document.getElementById('applyAdd').addEventListener('click', apply);
 
+////////////////// Eventlisteners for Play-view ///////////////////////
+
+document.getElementById('stopButton').addEventListener('click', stopButtonPressed);
+
+
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
 document.getElementById('track').addEventListener('click', trackButtonClicked);
@@ -1223,6 +1233,7 @@ function prettifyTime(time) {
 function readTaskText() {
   let contentInputBox = document.getElementById('inputBox_add').value.trim();
   let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
+
   if (badCharacters) {
     displayMessage(languagePack['dontUse'][language][0] + badCharacters + languagePack['dontUse'][language][1], 3000, 'add');
   } else {
@@ -1303,9 +1314,10 @@ function apply() {
   } else {
     readTaskText()
     readDurationTime();
-    let startTime = readTaskStartTime();
     readDrainGainRadioButtons();
-    returnText = formatTask();
+    let returnText = formatTask();
+
+    let startTime = readTaskStartTime();
     if (startTime) {
       inputFixedTask(returnText);
     } else {
@@ -1316,7 +1328,7 @@ function apply() {
     document.getElementById('addView').hidden = true;
     document.getElementById('dayView').hidden = false;
 
-    document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
+    // document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
   }
 }
 
@@ -1422,6 +1434,7 @@ function playControlsQuery() {  // Turn of the playControlQuery div and shows Du
   hideOrDisplayClass('playControl', 'block');
   fillDurationBox(defaultTaskDuration);
   durationTimeChangeInPlayView();
+  fixedPlayInterval = true;
 }
 
 
@@ -1439,6 +1452,57 @@ function durationTimeChangeInPlayView() {
 
   document.getElementById('untilText').innerText = prettifyTime(endTime_play);
 }
+
+
+function stopButtonPressed() {
+  let contentInputBox = document.getElementById('inputBox_add').value;
+  if (contentInputBox === '') {
+    displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');  // TODO: Message  not shown due to formatting
+  } else {
+    let now = new Date();
+    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+
+    // Chance to opt out from inserting the current task with current length
+    if (fixedPlayInterval) {
+      let answer = confirm(languagePack['cutPlayingTaskShort?'][language] + taskDuration_add + 'm');
+      if (!answer) {
+        return;
+      }
+
+      if (deltaTime < 10) {
+        let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language]);
+        if (!isAShortTimeOKAnswer) {
+          return;
+        }
+      }
+    }
+
+    // Insert task
+    readTaskText();
+    taskDuration_add = deltaTime;
+    readDrainGainRadioButtons();
+    let returnText = formatTask() + ' ' + prettifyTime(startTime_play).replace(':', '');
+    inputFixedTask(returnText);
+
+
+    console.log(taskText_add, taskDuration_add, drainGainLevel_add);
+
+    // Reset Play-View
+    playViewActive = false;
+    fixedPlayInterval = false;
+    hideOrDisplayClass('playControl', 'none');
+    document.getElementById('toText').innerText = '';
+    document.getElementById('untilText').innerText = '';
+
+
+    // Close add-view
+    document.getElementById('addView').hidden = true;
+    document.getElementById('dayView').hidden = false;
+  }
+
+
+}
+
 
 //////////////////// Play-view button code above ///////////////////////////
 
