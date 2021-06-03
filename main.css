@@ -1008,10 +1008,11 @@ label {  /* Used in settingsView */
   padding-left: 7px;
 }
 
-#dayMessage {
+#dayMessage, #addMessage {
   grid-area: messages;
   color: red;
-  white-space: pre;
+  text-align: center;
+  white-space: pre;  /* Render text as predefined without wrapping */
 }
 
 /* TODO: There are two #month */

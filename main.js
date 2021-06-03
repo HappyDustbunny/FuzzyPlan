@@ -139,8 +139,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                  ['Sæt varighed eller stressniveau?', '']],
       'cutPlayingTaskShort?': [['Confirming will insert the task at the start time with a shorter duration than '],
                  ['Bekræft for at indsætte opgaven ved starttidspunktet med en kortere varighed end ']],
-      'isAShortTimeOK?': [['The time since the task started is less than 10 minutes. Go ahead and insert a short task?'],
-                 ['Der er gået mindre end 10 minutter. Fortsæt og indsæt en kort opgave?']],
+      'isAShortTimeOK?': [['The time since the task started is less than 10 minutes. Go ahead and insert a short task? ('],
+                 ['Der er gået mindre end 10 minutter. Fortsæt og indsæt en kort opgave? (']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -1072,7 +1072,7 @@ function readInputBox_add() {
 
     let drain = Number(parsedList[3]);
 
-    if (drain = 1) { // Check for keywords and add appropriate number of hearts
+    if (drain == 1) { // Check for keywords and add appropriate number of hearts
       if (text.toLowerCase().includes(languagePack['pause'][language])) {
         drain = '-1';
         document.getElementById('inputBox_add').removeEventListener('focusout', readInputBox_add);
@@ -1292,17 +1292,30 @@ function readDrainGainRadioButtons() {
 
 function formatTask() {
   let returnText = '';
-  if (document.getElementById('inputTimeBox').value.trim() === '') {
+
+  readTaskText();
+  readDrainGainRadioButtons();
+
+  let prettyTaskTime = '';
+  if (playViewActive) {
+    prettyTaskTime = prettifyTime(startTime_play);
+    let now = new Date();
+    taskDuration_add = Math.trunc((now - startTime_play) / 60000);
+  } else if (document.getElementById('inputTimeBox').value.trim() === '') {
     returnText =  taskText_add + ' '
-                + taskDuration_add + 'm '
-                + drainGainLevel_add;
+    + taskDuration_add + 'm '
+    + drainGainLevel_add;
+    return returnText;
   } else {
-    let prettyTaskTime = prettifyTime(taskTime_add);
-    returnText =  taskText_add + ' '
-                + prettyTaskTime.replace(':', '') + ' '
-                + taskDuration_add + 'm '
-                + drainGainLevel_add;
+    prettyTaskTime = prettifyTime(taskTime_add);
+    readDurationTime();
   }
+
+  returnText =  taskText_add + ' '
+  + prettyTaskTime.replace(':', '') + ' '
+  + taskDuration_add + 'm '
+  + drainGainLevel_add;
+
   return returnText;
 }
 
@@ -1310,13 +1323,12 @@ function formatTask() {
 function apply() {
   let taskText = document.getElementById('inputBox_add');
   if (taskText === '') {
-    displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');
+    displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');  // Please write a task text
   } else {
-    readTaskText()
-    readDurationTime();
-    readDrainGainRadioButtons();
+
     let returnText = formatTask();
 
+    // Insert directly if starttime or send returnText to dayInputBox to be manually inserted
     let startTime = readTaskStartTime();
     if (startTime) {
       inputFixedTask(returnText);
@@ -1374,7 +1386,7 @@ function playButtonClicked() {
 
   inputBox_add.value = inputBox.value;
 
-  readInputBox_add();
+  readInputBox_add();  // TODO: If a duration is in the inputbox playControlQuery should fire (?)
 
   if (inputBox_add.value == '') {
     inputBox_add.value = '';
@@ -1428,6 +1440,8 @@ function playUpdate(deltaTime) {
 	}
 }
 
+// TODO: Make Cancel button reset Play View
+
 function playControlsQuery() {  // Turn of the playControlQuery div and shows Duration and Stress level controls
   document.getElementById('playControlsQueryDiv').style.display = 'none';
   document.getElementById('toText').style.display = 'inline-block';
@@ -1457,35 +1471,37 @@ function durationTimeChangeInPlayView() {
 function stopButtonPressed() {
   let contentInputBox = document.getElementById('inputBox_add').value;
   if (contentInputBox === '') {
-    displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');  // TODO: Message  not shown due to formatting
+    displayMessage(languagePack['taskTextMsg'][language], 3000, 'add');  // Please write a task text
   } else {
-    let now = new Date();
-    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
-
     // Chance to opt out from inserting the current task with current length
     if (fixedPlayInterval) {
       let answer = confirm(languagePack['cutPlayingTaskShort?'][language] + taskDuration_add + 'm');
+      // 'Confirming will insert the task at the start time with a shorter duration than'
       if (!answer) {
         return;
       }
+    }
 
-      if (deltaTime < 10) {
-        let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language]);
-        if (!isAShortTimeOKAnswer) {
-          return;
-        }
+    let now = new Date();
+    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+
+    // Chance to opt out if the task is too small
+    if (deltaTime < 10) {
+      let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language] + deltaTime + 'm)');
+      // 'The time since the task started is less than 10 minutes. Go ahead and insert a short task?'
+      if (!isAShortTimeOKAnswer) {
+        return;
       }
     }
 
-    // Insert task
-    readTaskText();
     taskDuration_add = deltaTime;
-    readDrainGainRadioButtons();
-    let returnText = formatTask() + ' ' + prettifyTime(startTime_play).replace(':', '');
+
+    // Insert task with current length
+    let returnText = formatTask();
     inputFixedTask(returnText);
 
 
-    console.log(taskText_add, taskDuration_add, drainGainLevel_add);
+    console.log(taskText_add, taskDuration_add, drainGainLevel_add, returnText);
 
     // Reset Play-View
     playViewActive = false;
