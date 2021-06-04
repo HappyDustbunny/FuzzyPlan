@@ -901,9 +901,16 @@ label {  /* Used in settingsView */
 }
 
 #hourglassDiv {
-	display: table-cell;
-	text-align: center;
-	vertical-align: middle;
+  box-sizing: content-box; /* Suspend the border-box used in the rest of the project */
+	display: flex;
+  margin: 0 auto;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+#hourglassText {
+  display: flex;
+  align-self: center;
 }
 
 #stopButton {

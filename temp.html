@@ -4,7 +4,11 @@
 	<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+* {
+    box-sizing: border-box;  /* Include margin, padding and border in box sizes */
+  }
 #hourglassDiv {
+	box-sizing: content-box;
 	display: table-cell;
 	text-align: center;
 	vertical-align: middle;
@@ -21,7 +25,7 @@
 </body>
 
 <script>
-var timer = setInterval(function () {update(5);}, 1000);
+var timer = setInterval(function () {update(50);}, 1000);
 
 function update(deltaTime) {
 	let hourglassSize = 50;  // Half the width of the hourglass in px
@@ -41,6 +45,8 @@ function update(deltaTime) {
 
 		elem.style.width = Math.trunc(2 * w)  + 'px';
 		elem.style.height = Math.trunc(2 * w) + 'px';
+		// elem.style.width = hourglassSize + 'px';
+		// elem.style.height = hourglassSize + 'px';
 		elem.style.borderLeft = borderSize + 'px solid rgba(154, 219, 240, 0.6)';
 		elem.style.borderRight = borderSize + 'px solid rgba(154, 219, 240, 0.6)';
 		elem.style.borderTop = borderSize + 'px solid rgba(154, 219, 240, 1.0)';

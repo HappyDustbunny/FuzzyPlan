@@ -1062,6 +1062,10 @@ function readInputBox_add() {
   let text = inputBox_add.value;
 
   if (text != '') {  // Parse the value and fill relevant boxes
+    if (playViewActive) {
+      playControlsQuery();
+    }
+
     parsedList = parseText(text); // parsedList = [taskStart, duration, text, drain];
     inputBox_add.value = parsedList[2];
     inputBox_add.blur();
@@ -1398,7 +1402,7 @@ function playButtonClicked() {
   document.getElementById('nowText').innerText = nowTime;
 
   // Shall the timer start?
-  document.getElementById('inputDurationBox').value = '';
+  // document.getElementById('inputDurationBox').value = '';
 
   if (document.getElementById('inputDurationBox').value != '') {
     var playTimer = setInterval(function () {playUpdate(100);}, 1000);
@@ -1409,6 +1413,8 @@ function playButtonClicked() {
 function playUpdate(deltaTime) {
 	let hourglassSize = 50;  // Half the width of the hourglass in px
 	let borderSize = 0;
+
+  document.getElementById('hourglass').style.display = 'block';
 
 	elem = document.getElementById('hourglassDiv');
 	text = document.getElementById('hourglassText');
