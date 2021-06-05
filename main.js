@@ -1062,15 +1062,18 @@ function readInputBox_add() {
   let text = inputBox_add.value;
 
   if (text != '') {  // Parse the value and fill relevant boxes
-    if (playViewActive) {
-      playControlsQuery();
-    }
 
     parsedList = parseText(text); // parsedList = [taskStart, duration, text, drain];
     inputBox_add.value = parsedList[2];
     inputBox_add.blur();
+
     fillDurationBox(parsedList[1] / 60000);
-    if (parsedList[0] != '') {  // This will never trigger because fixed times are currently stripped when double clicking a task to edit
+
+    if (playViewActive && /[0-9]+h/.exec(text) != null && /[0-9]+m/.exec(text) != null) {
+      playControlsQuery();
+    }
+
+    if (parsedList[0] != '') {  // This will rarely trigger because fixed times are currently stripped when double clicking a task to edit
       fillTimeBox(parsedList[0]);
     }
 
@@ -1400,17 +1403,9 @@ function playButtonClicked() {
   startTime_play = new Date();
   let nowTime = prettifyTime(startTime_play);
   document.getElementById('nowText').innerText = nowTime;
-
-  // Shall the timer start?
-  // document.getElementById('inputDurationBox').value = '';
-
-  if (document.getElementById('inputDurationBox').value != '') {
-    var playTimer = setInterval(function () {playUpdate(100);}, 1000);
-  }
-
 }
 
-function playUpdate(deltaTime) {
+function playUpdate(deltaTime) {  // deltaTime in minutes
 	let hourglassSize = 50;  // Half the width of the hourglass in px
 	let borderSize = 0;
 
@@ -1424,11 +1419,11 @@ function playUpdate(deltaTime) {
 	}
 
 	if (playUpdate.counter < 100) {
-		playUpdate.counter += 100 / deltaTime;
+		playUpdate.counter += 100 /  Math.trunc(deltaTime * 60);
 		w = Math.trunc(playUpdate.counter / 2) - Math.trunc(playUpdate.counter / 2)%2;
 		borderSize = hourglassSize - w + 2;  // Plus 2 for last border
 
-    console.log(playUpdate.counter, w, borderSize, 2*w + 2*borderSize);
+    // console.log(playUpdate.counter, w, borderSize, 2*w + 2*borderSize);
 
 		elem.style.width = Math.trunc(2 * w)  + 'px';
 		elem.style.height = Math.trunc(2 * w) + 'px';
@@ -1471,6 +1466,14 @@ function durationTimeChangeInPlayView() {
   }
 
   document.getElementById('untilText').innerText = prettifyTime(endTime_play);
+
+  let deltaTime = (endTime_play - startTime_play) / 60000;
+  console.log(deltaTime);
+
+  // Start timer
+  if (document.getElementById('inputDurationBox').value != '') {
+    var playTimer = setInterval(function () {playUpdate(deltaTime);}, 1000);
+  }
 }
 
 
