@@ -39,6 +39,7 @@ let startTime_play = new Date();
 let endTime_play = new Date();
 let playViewActive = false;  // Helps styling the Add-view elements for Play-view to recycle code
 let fixedPlayInterval = false;  // Keeps tracks of if a fixed interval has been chosen in Play View
+let playTimer = '';
 
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1409,6 +1410,10 @@ function playUpdate(deltaTime) {  // deltaTime in minutes
 	let hourglassSize = 50;  // Half the width of the hourglass in px
 	let borderSize = 0;
 
+  if (deltaTime < 1) {
+    deltaTime = 1;
+  }
+
   document.getElementById('hourglass').style.display = 'block';
 
 	elem = document.getElementById('hourglassDiv');
@@ -1423,6 +1428,7 @@ function playUpdate(deltaTime) {  // deltaTime in minutes
 		w = Math.trunc(playUpdate.counter / 2) - Math.trunc(playUpdate.counter / 2)%2;
 		borderSize = hourglassSize - w + 2;  // Plus 2 for last border
 
+    // console.log(deltaTime, playUpdate.counter);
     // console.log(playUpdate.counter, w, borderSize, 2*w + 2*borderSize);
 
 		elem.style.width = Math.trunc(2 * w)  + 'px';
@@ -1437,7 +1443,8 @@ function playUpdate(deltaTime) {  // deltaTime in minutes
 		text.style.opacity = Math.trunc(playUpdate.counter / 2 + 35) + '%';
 	} else if (typeof playTimer != 'undefined') {
 		clearInterval(playTimer);
-		playUpdate.counter = 0
+		playUpdate.counter = 0;
+    insertTask();
 	}
 }
 
@@ -1468,11 +1475,14 @@ function durationTimeChangeInPlayView() {
   document.getElementById('untilText').innerText = prettifyTime(endTime_play);
 
   let deltaTime = (endTime_play - startTime_play) / 60000;
-  console.log(deltaTime);
 
   // Start timer
   if (document.getElementById('inputDurationBox').value != '') {
-    var playTimer = setInterval(function () {playUpdate(deltaTime);}, 1000);
+    // Kill previous timers
+    clearInterval(playTimer);
+
+    playTimer = setInterval(function () {playUpdate(deltaTime);}, 1000);
+    console.log(playTimer);
   }
 }
 
@@ -1491,41 +1501,43 @@ function stopButtonPressed() {
       }
     }
 
-    let now = new Date();
-    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+    insertTask();
+  }
+}
 
-    // Chance to opt out if the task is too small
-    if (deltaTime < 10) {
-      let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language] + deltaTime + 'm)');
-      // 'The time since the task started is less than 10 minutes. Go ahead and insert a short task?'
-      if (!isAShortTimeOKAnswer) {
-        return;
-      }
+function insertTask() {
+  let now = new Date();
+  let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+
+  // Chance to opt out if the task is too small
+  if (deltaTime < 10) {
+    let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language] + deltaTime + 'm)');
+    // 'The time since the task started is less than 10 minutes. Go ahead and insert a short task?'
+    if (!isAShortTimeOKAnswer) {
+      return;
     }
-
-    taskDuration_add = deltaTime;
-
-    // Insert task with current length
-    let returnText = formatTask();
-    inputFixedTask(returnText);
-
-
-    console.log(taskText_add, taskDuration_add, drainGainLevel_add, returnText);
-
-    // Reset Play-View
-    playViewActive = false;
-    fixedPlayInterval = false;
-    hideOrDisplayClass('playControl', 'none');
-    document.getElementById('toText').innerText = '';
-    document.getElementById('untilText').innerText = '';
-
-
-    // Close add-view
-    document.getElementById('addView').hidden = true;
-    document.getElementById('dayView').hidden = false;
   }
 
+  taskDuration_add = deltaTime;
 
+  // Insert task with current length
+  let returnText = formatTask();
+  inputFixedTask(returnText);
+
+
+  console.log(taskText_add, taskDuration_add, drainGainLevel_add, returnText);
+
+  // Reset Play-View
+  playViewActive = false;
+  fixedPlayInterval = false;
+  hideOrDisplayClass('playControl', 'none');
+  document.getElementById('toText').innerText = '';
+  document.getElementById('untilText').innerText = '';
+
+
+  // Close add-view
+  document.getElementById('addView').hidden = true;
+  document.getElementById('dayView').hidden = false;
 }
 
 
