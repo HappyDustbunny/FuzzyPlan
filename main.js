@@ -142,6 +142,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                  ['Bekræft for at indsætte opgaven ved starttidspunktet med en kortere varighed end ']],
       'isAShortTimeOK?': [['The time since the task started is less than 10 minutes. Go ahead and insert a short task? ('],
                  ['Der er gået mindre end 10 minutter. Fortsæt og indsæt en kort opgave? (']],
+      'soundOrNot': [['Play sound when time is up? (Gong)', ''],
+                     ['Spil lyd når tiden er gået? (Gong)', '']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -197,8 +199,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                 ['Andvend', '']],
      'playTocText': [['Play \'toc\' sound', ''],
                      ['Afspil \'tac\' lyd', '']],
-      'tocLabelOff': [['Off', ''],
-                      ['Fra', '']],
+     'tocLabelOff': [['Off', ''],
+                     ['Fra', '']],
      'tocLabelStart': [['At the beginning of tasks (toc)', ''],
                        ['I begyndelsen af en opgave (tac)', '']],
      'tocLabelEnd': [['At the end of tasks (toc toc)', ''],
@@ -858,15 +860,20 @@ function updateHearts() {
   fillHearths(Math.round(10 - result));
 }
 
-// TODO: Remove sounds?
-function sayToc() {
+function sayToc() { // Sound credit https://freesound.org/people/fellur/sounds/429721/
   let sound = new Audio('429721__fellur__tic-alt.wav');
   sound.play();
 }
 
 
-function sayTic() {
+function sayTic() {  // Sound credit https://freesound.org/people/Breviceps/sounds/448081/
   let sound = new Audio('448081__breviceps__tic-toc-click.wav');
+  sound.play();
+}
+
+
+function sayGong() {  // Sound credit https://freesound.org/people/Q.K./sounds/56241/
+  let sound = new Audio('56241__q-k__gong-center-mute.wav');
   sound.play();
 }
 
@@ -1070,8 +1077,8 @@ function readInputBox_add() {
 
     fillDurationBox(parsedList[1] / 60000);
 
-    if (playViewActive && /[0-9]+h/.exec(text) != null && /[0-9]+m/.exec(text) != null) {
-      playControlsQuery();
+    if (playViewActive && /[0-9]+h/.exec(text) != null || /[0-9]+m/.exec(text) != null) {
+      playControlsQuery(false);
     }
 
     if (parsedList[0] != '') {  // This will rarely trigger because fixed times are currently stripped when double clicking a task to edit
@@ -1445,16 +1452,24 @@ function playUpdate(deltaTime) {  // deltaTime in minutes
 		clearInterval(playTimer);
 		playUpdate.counter = 0;
     insertTask();
+
+    // Say Gong three times?
+    if (document.getElementById('soundOrNot')) {
+      sayGong(); setTimeout(function () {sayGong(); setTimeout(function () {sayGong()}, 300)}, 300)
+    }
 	}
 }
 
-// TODO: Make Cancel button reset Play View
 
-function playControlsQuery() {  // Turn of the playControlQuery div and shows Duration and Stress level controls
+function playControlsQuery(useDefault) {  // Turn of the playControlQuery div and shows Duration and Stress level controls
   document.getElementById('playControlsQueryDiv').style.display = 'none';
   document.getElementById('toText').style.display = 'inline-block';
+  document.getElementById('inputDurationBox').style.backgroundColor = '#d3d3d31c';
+  document.getElementById('inputDurationBox').disabled = 'true';
   hideOrDisplayClass('playControl', 'block');
-  fillDurationBox(defaultTaskDuration);
+  if (useDefault) {
+    fillDurationBox(defaultTaskDuration);
+  }
   durationTimeChangeInPlayView();
   fixedPlayInterval = true;
 }
@@ -1482,7 +1497,6 @@ function durationTimeChangeInPlayView() {
     clearInterval(playTimer);
 
     playTimer = setInterval(function () {playUpdate(deltaTime);}, 1000);
-    console.log(playTimer);
   }
 }
 
@@ -1500,25 +1514,25 @@ function stopButtonPressed() {
         return;
       }
     }
+    // Chance to opt out if the task is too small
+    let now = new Date();
+    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+
+    taskDuration_add = deltaTime;
+
+    if (deltaTime < 10) {
+      let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language] + deltaTime + 'm)');
+      // 'The time since the task started is less than 10 minutes. Go ahead and insert a short task?'
+      if (!isAShortTimeOKAnswer) {
+        return;
+      }
+    }
 
     insertTask();
   }
 }
 
 function insertTask() {
-  let now = new Date();
-  let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
-
-  // Chance to opt out if the task is too small
-  if (deltaTime < 10) {
-    let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language] + deltaTime + 'm)');
-    // 'The time since the task started is less than 10 minutes. Go ahead and insert a short task?'
-    if (!isAShortTimeOKAnswer) {
-      return;
-    }
-  }
-
-  taskDuration_add = deltaTime;
 
   // Insert task with current length
   let returnText = formatTask();
