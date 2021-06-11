@@ -221,8 +221,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                    ['', 'Tidsinterval X i minutter']],
      'apply2': [['Apply', ''],
                 ['Anvend', '']],
-     'noteSpan': [['Note:\r\nThe sound only play if the page has focus', ''],
+     'soundIfFocus': [['Note:\r\nThe sound only play if the page has focus', ''],
                   ['Bemærk:\r\nLyd afspilles kun, hvis siden har fokus', '']],
+     'soundIfFocusPlayView': [['Note: The sound only play if the page has focus', ''],
+                  ['Bemærk: Lyd afspilles kun, hvis siden har fokus', '']],
      'stressModelHeading': [['Stress Model', ''],
                        ['Stress Model', '']],
      'settingsInfo': [['?', 'Information about the stress model'],
@@ -1454,19 +1456,20 @@ function playUpdate(deltaTime) {  // deltaTime in minutes
     insertTask();
 
     // Say Gong three times?
-    if (document.getElementById('soundOrNot')) {
-      sayGong(); setTimeout(function () {sayGong(); setTimeout(function () {sayGong()}, 300)}, 300)
+    if (document.getElementById('sound').checked) {
+      sayGong(); setTimeout(function () {sayGong(); setTimeout(function () {sayGong()}, 300)}, 600);
     }
 	}
 }
 
 
-function playControlsQuery(useDefault) {  // Turn of the playControlQuery div and shows Duration and Stress level controls
+function playControlsQuery(useDefault) {  // Turn off the playControlQuery div and shows Duration and Stress level controls
   document.getElementById('playControlsQueryDiv').style.display = 'none';
   document.getElementById('toText').style.display = 'inline-block';
   document.getElementById('inputDurationBox').style.backgroundColor = '#d3d3d31c';
   document.getElementById('inputDurationBox').disabled = 'true';
   hideOrDisplayClass('playControl', 'block');
+
   if (useDefault) {
     fillDurationBox(defaultTaskDuration);
   }

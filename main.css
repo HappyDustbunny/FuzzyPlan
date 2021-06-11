@@ -767,8 +767,13 @@ label {  /* Used in settingsView */
   white-space: pre;
 }
 
-#noteSpan {
+#soundIfFocus {
   white-space: pre;
+}
+
+#soundIfFocusPlayView {
+  white-space: pre;
+  font-size: 0.8em;
 }
 
 #stressLevelText {
