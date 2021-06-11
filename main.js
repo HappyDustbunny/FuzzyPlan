@@ -235,8 +235,22 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                                 + 'double\r\nwhen working without pause', ''],
                                ['Sæt den tid det omtrent tager\r\nfør dit stressniveau '
                                 + 'fordobles,\r\nnår du arbejder uden pause', '']],
-      'apply3': [['Apply', ''],
-      ['Anvend', '']],
+     'apply3': [['Apply', ''],
+                ['Anvend', '']],
+
+     'backupHeading': [['Backup', ''],
+                ['Tag backup', '']],
+     'backup': [['Backup', ''],
+                ['Tag backup', '']],
+     'restoreBackupInputText': [['Open the text file with your backup. Copy ALL the gibberish into the textbox', ''],
+                ['Åben tekstfilen med din backup. Kopier AL den skræmmende tekst ind i tekstboksen', '']],
+     'restoreBackup': [['Restore backup', ''],
+                       ['Gendan backup', '']],
+     'confirmRestoreBackup': [['Confirm restore of backup', ''],
+                       ['Bekræft gendanlse af backup', '']],
+     'cancelRestoreBackup': [['Cancel backup', ''],
+                       ['Afbryd backup', '']],
+
      'clearDataHeading': [['Clear data and preferences', ''],
                           ['Slet data og indstillinger', '']],
      'clearAllData': [['Clear all data', ''],
@@ -574,10 +588,6 @@ function retrieveLocallyStoredStuff() {
     // Fix dates messed up by JSON.stringify
     for (const key in pastDayList) {
       pastDayList[key] = fixDatesInList(pastDayList[key]);
-      // for (const index in pastDayList[key]) {
-      //   pastDayList[key][index].date = new Date(pastDayList[key][index].date);
-      //   pastDayList[key][index].end = new Date(pastDayList[key][index].end);
-      // }
     }
   }
 
@@ -1020,6 +1030,10 @@ document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus
 document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
 document.getElementById('stressLevel').addEventListener('focus', stressLevelGotFocus);
 document.getElementById('tDouble').addEventListener('focus', tDoubleGotFocus);
+
+document.getElementById('backup').addEventListener('click', storeBackup);
+document.getElementById('restoreBackup').addEventListener('click', restoreBackup);
+document.getElementById('confirmRestoreBackup').addEventListener('click', confirmRestoreBackup);
 
 //////////////////// Add-view code below ///////////////////////////
 
@@ -1541,8 +1555,6 @@ function insertTask() {
   let returnText = formatTask();
   inputFixedTask(returnText);
 
-
-  console.log(taskText_add, taskDuration_add, drainGainLevel_add, returnText);
 
   // Reset Play-View
   playViewActive = false;
@@ -2462,7 +2474,7 @@ function storeBackup() { // TODO: Finish this
   let date = now.getDate().toString() + '-' + (now.getMonth() + 1).toString() + '-' + now.getFullYear().toString();
   let fileName = 'FuzzyPlanBackup_' + date + '.txt';
 
-  // Store the blob by creating an element, clicking it and removing it again
+  // Store the blob by creating a link element, clicking it and removing it again
   let url = window.URL.createObjectURL(blob);
   console.log(url);
 
@@ -2475,6 +2487,36 @@ function storeBackup() { // TODO: Finish this
 
   // Clean up
   window.URL.revokeObjectURL(url);
+}
+
+function restoreBackup() {
+  document.getElementById('backup').hidden = true;
+  document.getElementById('restoreBackup').hidden = true;
+
+  document.getElementById('restoreBackupInputText').hidden = false;
+  document.getElementById('restoreBackupInput').hidden = false;
+  document.getElementById('confirmRestoreBackup').hidden = false;
+}
+
+
+function confirmRestoreBackup() {
+  // TODO: Make a confirm dialog
+  document.getElementById('backup').hidden = false;
+  document.getElementById('restoreBackup').hidden = false;
+
+  document.getElementById('restoreBackupInputText').hidden = true;
+  document.getElementById('restoreBackupInput').hidden = true;
+  document.getElementById('confirmRestoreBackup').hidden = true;
+
+  let backupText = document.getElementById('restoreBackupInput').value;
+  pastDayList = JSON.parse(backupText);
+  pastDayList = JSON.parse(pastDayList); // ... because Blops are strange
+  // Fix dates messed up by JSON.stringify
+  for (const key in pastDayList) {
+    pastDayList[key] = fixDatesInList(pastDayList[key]);
+  }
+
+  localStorage.pastDayList = pastDayList;
 }
 
 
