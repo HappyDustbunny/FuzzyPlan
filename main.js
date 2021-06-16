@@ -240,6 +240,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
 
      'backupHeading': [['Backup', ''],
                 ['Tag backup', '']],
+     'backupText': [['Backup the lists stored in Month View.\r\nNote that this backup also can restore the past days in Month View in another browser.', ''],
+                ['Tag backup af de gamle opgavelister gemt i Månedsvisningen.\r\nBemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser.', '']],
      'backup': [['Backup', ''],
                 ['Tag backup', '']],
      'restoreBackupInputText': [['Open the text file with your backup. Copy ALL the gibberish into the textbox', ''],
@@ -253,10 +255,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
 
      'clearDataHeading': [['Clear data and preferences', ''],
                           ['Slet data og indstillinger', '']],
-     'clearAllData': [['Clear all data', ''],
-                      ['Slet alle data', '']],
-     'clearEverything': [['Clear all data and preferences', ''],
-                         ['Slet alle data og indstillinger', '']],
+     'clearAllData': [['Clear current day', ''],
+                      ['Slet alle dagens opgaver', '']],
+     'clearEverything': [['Clear ALL data and preferences', ''],
+                         ['Slet ALLE data og indstillinger', '']],
      'gotoDayFromSettings1': [['Go back', ''],
                        ['Gå tilbage', '']],
     // Messages
@@ -937,8 +939,10 @@ document.getElementById('inputBox_add').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readTaskText(); } });
 document.getElementById('inputDurationBox').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readDurationTime(); } });
-document.getElementById('inputTimeBox').addEventListener('keypress',
-        function () { if (event.key === 'Enter') { readTaskStartTime(); } });
+document.getElementById('inputTimeBox').addEventListener('focusout',
+        function () {readTaskStartTime(); fillTimeBox(taskTime_add);});
+// document.getElementById('inputTimeBox').addEventListener('keypress',
+//         function () { if (event.key === 'Enter') { readTaskStartTime(); } });
 
 document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
@@ -1050,10 +1054,7 @@ function addTaskButtonClicked() {
 
   hideOrDisplayClass('playView', 'none');
   hideOrDisplayClass('addView', 'block');
-  // document.getElementById('playTopic').hidden = true;
-  // document.getElementById('playTopicSpan').hidden = true;
-  // document.getElementById('timeTopic').hidden = false;
-  // document.getElementById('timeTopicSpan').hidden = false;
+  hideOrDisplayClass('hourglassTimer', 'none');  // Inelegant to turn the hourglassTimer off just after turning it on, but the logic is cleaner
 
   fillDurationBox(defaultTaskDuration);
 
@@ -1293,14 +1294,20 @@ function readDurationTime() {
 
 
 function readTaskStartTime() {
+  let timeH = '';
+  let timeM = '';
   let contentInputBox = document.getElementById('inputTimeBox').value.trim();
   let badCharacters = /[^0-9:]/.exec(contentInputBox);
   if (badCharacters) {
-    displayMessage(languagePack['format1200'][language], 3000, 'day');
+    displayMessage(languagePack['format1200'][language], 3000, 'add');
   } else {
-    let timeH = /[0-9][0-9]/.exec(contentInputBox);
+    if (contentInputBox.length == 3) {
+      timeH = /[0-9]/.exec(contentInputBox).toString();
+    } else {
+      timeH = /[0-9][0-9]/.exec(contentInputBox).toString();
+    }
     contentInputBox = contentInputBox.replace(timeH, '');
-    let timeM = /[0-9][0-9]/.exec(contentInputBox);
+    timeM = /[0-9][0-9]/.exec(contentInputBox).toString();
     let now = new Date();
     taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
     if (0 < timeH || 0 < timeM) {
@@ -1356,11 +1363,11 @@ function apply() {
   if (taskText === '') {
     displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');  // Please write a task text
   } else {
+    // Insert directly if starttime or send returnText to dayInputBox to be manually inserted
+    let startTime = readTaskStartTime();
 
     let returnText = formatTask();
 
-    // Insert directly if starttime or send returnText to dayInputBox to be manually inserted
-    let startTime = readTaskStartTime();
     if (startTime) {
       inputFixedTask(returnText);
     } else {
@@ -1376,6 +1383,19 @@ function apply() {
 }
 
 function gotoDayFromAdd() {
+  // Reset Play-View
+  playViewActive = false;
+  fixedPlayInterval = false;
+
+  document.getElementById('toText').innerText = '';
+  document.getElementById('untilText').innerText = '';
+  // document.getElementById('hourglass').hidden = true; // TODO: This shows up in Add View after a cancelation of Play View
+  // document.getElementById('soundDiv').hidden = true;
+
+  hideOrDisplayClass('hourglassTimer', 'none');
+  hideOrDisplayClass('playControl', 'none');
+
+  // Close add-view
   document.getElementById('addView').hidden = true;
   document.getElementById('dayView').hidden = false;
 }
@@ -1429,6 +1449,7 @@ function playButtonClicked() {
   document.getElementById('nowText').innerText = nowTime;
 }
 
+
 function playUpdate(deltaTime) {  // deltaTime in minutes
 	let hourglassSize = 50;  // Half the width of the hourglass in px
 	let borderSize = 0;
@@ -1438,6 +1459,7 @@ function playUpdate(deltaTime) {  // deltaTime in minutes
   }
 
   document.getElementById('hourglass').style.display = 'block';
+  document.getElementById('soundDiv').style.display = 'block';
 
 	elem = document.getElementById('hourglassDiv');
 	text = document.getElementById('hourglassText');
@@ -1487,7 +1509,11 @@ function playControlsQuery(useDefault) {  // Turn off the playControlQuery div a
   if (useDefault) {
     fillDurationBox(defaultTaskDuration);
   }
-  durationTimeChangeInPlayView();
+
+  if (playViewActive) {
+    durationTimeChangeInPlayView();
+  }
+
   fixedPlayInterval = true;
 }
 
@@ -1546,6 +1572,8 @@ function stopButtonPressed() {
     }
 
     insertTask();
+
+    clearInterval(playTimer);
   }
 }
 
@@ -1555,18 +1583,7 @@ function insertTask() {
   let returnText = formatTask();
   inputFixedTask(returnText);
 
-
-  // Reset Play-View
-  playViewActive = false;
-  fixedPlayInterval = false;
-  hideOrDisplayClass('playControl', 'none');
-  document.getElementById('toText').innerText = '';
-  document.getElementById('untilText').innerText = '';
-
-
-  // Close add-view
-  document.getElementById('addView').hidden = true;
-  document.getElementById('dayView').hidden = false;
+  gotoDayFromAdd();
 }
 
 
@@ -2517,6 +2534,8 @@ function confirmRestoreBackup() {
   }
 
   localStorage.pastDayList = pastDayList;
+
+  location.reload(true);
 }
 
 

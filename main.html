@@ -132,13 +132,13 @@
               </div>
             </div>
           </div>
-          <div id="hourglass" class="hourglassContainer" hidden>
+          <div id="hourglass" class="hourglassTimer" hidden>
             <div id="hourglassDiv" style='width: 100px; height: 100px;  border: 2px solid rgba(154, 219, 240, 1.0)'>
               <div id="hourglassText">	</div>
             </div>
           </div>
-          <span> <br> </span>
-          <div>
+          <span class="hourglassTimer"> <br> </span>
+          <div id='soundDiv' class="hourglassTimer" hidden>
             <input id='sound' type="checkbox" name="soundOrNot">
             <label  id="soundOrNot" for="soundOrNots" class="labelText"></label>
             <br>
@@ -546,6 +546,11 @@
           <div class='topic'>
             <h4 id='backupHeading' class="text"> </h4>
 
+            <span id="backupText" class="labelText">  </span>
+
+            <span> <br> </span>
+            <span> <br> </span>
+
             <button type="button" id="backup" class='controlButton'></button>
 
             <button type="button"  id="restoreBackup" class='controlButton'></button>
@@ -561,6 +566,8 @@
 
           <div class='topic'>
             <h4  id='clearDataHeading' class="text"> </h4>
+
+            <span>   <br>   </span>
 
             <button type="button" id="clearAllData" class='controlButton'></button>
 
