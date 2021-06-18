@@ -264,8 +264,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
     // Messages
      'dontUse': [['Please don\'t use ' , ' for task description'],
                  ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
-     'format1h30m': ['Please use the format 1h30m for 1 hour and 30 minutes',
-                     'Brug formatet 1h30m for 1 time og 30 minutter'],
+     'format1h30m': ['Please use the format 1h30m\r\n for 1 hour and 30 minutes',
+                     'Brug formatet 1h30m\r\n for 1 time og 30 minutter'],
      'format1200': ['Please use the format 12:00 or 1200',
                     'Brug formatet 12:00 eller 1200'],
      'taskTextMsg': ['Please write a task text',
@@ -2578,13 +2578,15 @@ function twoFingerNavigation(event) {
   if (sessionStorage.touchX && event.touches.length === 1) {
     sessionStorage.touchX = '';
   }
-  if (event.touches.length > 1) {
+  if (event.touches.length > 0) {
     if (!sessionStorage.touchX) {
       sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
     } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
-      goToPage('storage.html');
+      // goToPage('storage.html');
+      storageButtonClicked();
     } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
-      goToPage('month.html'); // TODO: Fix twofingerNavigation
+      // goToPage('month.html'); // TODO: Fix twofingerNavigation
+      monthButtonClicked();
     }
   }
 }
