@@ -501,7 +501,7 @@ function storeLocally() {
 function deepCopyFunc(original) {
   if (typeof original != 'object' || original === null || // typeof null is 'object', hence the latter check
     Object.prototype.toString.call(original) === '[object Date]') { // Dates have to be returned as-is
-    return original
+    return original;
   }
 
   let deepCopy = {};  // Assume deepCopy is an object
@@ -515,7 +515,7 @@ function deepCopyFunc(original) {
     deepCopy[key] = deepCopyFunc(value);  // Recursively travel the object for objects
   }
 
-  return deepCopy
+  return deepCopy;
 }
 
 
@@ -528,7 +528,7 @@ function fixDatesInList(list) {
     task.end = new Date(task.end);
     task.end.setDate(now.getDate());
   }
-  return list
+  return list;
 }
 
 
@@ -1258,7 +1258,7 @@ function prettifyTime(time) {
   }
   let prettyTaskTime = nils[0] + taskTimeHours + ':' + nils[1] + taskTimeMinutes;
 
-  return prettyTaskTime
+  return prettyTaskTime;
 }
 
 
@@ -1303,8 +1303,10 @@ function readTaskStartTime() {
   } else {
     if (contentInputBox.length == 3) {
       timeH = /[0-9]/.exec(contentInputBox).toString();
-    } else {
+    } else if (contentInputBox.length == 4) {
       timeH = /[0-9][0-9]/.exec(contentInputBox).toString();
+    } else {
+      return;
     }
     contentInputBox = contentInputBox.replace(timeH, '');
     timeM = /[0-9][0-9]/.exec(contentInputBox).toString();
@@ -1312,7 +1314,7 @@ function readTaskStartTime() {
     taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
     if (0 < timeH || 0 < timeM) {
       fillTimeBox(taskTime_add);
-      return taskTime_add
+      return taskTime_add;
     }
   }
 }
@@ -1625,6 +1627,30 @@ function gotoDay() {
 }
 
 
+function findFirstDateInPastDayListAndReturnNumberOfMonthsSince() {
+  let oldestDate = new Date();
+
+  let dateKeys = Object.keys(pastDayList);
+
+  for (key of dateKeys) {
+    let year = /\d\d\d\d\b/.exec(key)[0];
+    let month = /-.+-/.exec(key)[0].replace(/-/g, '');
+    let thisDate = new Date(year, month);
+
+    if (thisDate < oldestDate) {
+      oldestDate = thisDate;
+    }
+  }
+
+  let deltaMonths = Math.trunc((new Date() - oldestDate) / (30 * 24 * 3600000)) + 1;
+  if (deltaMonths < 1) {
+    deltaMonths = 1;
+  }
+
+  return deltaMonths;
+}
+
+
 function fillMonthDateBar() {
   // Remove old content
   while (monthTaskDiv.firstChild) {
@@ -1634,15 +1660,15 @@ function fillMonthDateBar() {
 
 
   let now = new Date();
-  let nowMinus3Month = new Date();
-  nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 1));
+  let nowMinusSomeMonths = new Date();
+  let someMonths = findFirstDateInPastDayListAndReturnNumberOfMonthsSince();
+  nowMinusSomeMonths = new Date(nowMinusSomeMonths.setMonth(nowMinusSomeMonths.getMonth() - someMonths));
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
-  // TODO: Set scrollheight for monthView
   // TODO: Set number of days shown based on data in pastDaylist?
   let thisMonth = now.getMonth();
 
-  for (let i = nowMinus3Month; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
+  for (let i = nowMinusSomeMonths; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
     // Insert monthnames before each the 1th
     if (thisMonth < i.getMonth() || (thisMonth === 11 && i.getMonth() === 0)) {  // Month 0 is january
       thisMonth = i.getMonth();
@@ -1935,7 +1961,10 @@ function monthRenderTasks() {
     }
   }
 
-  document.getElementById('monthContainer').scrollTop = 500;
+  // document.getElementById('monthContainer').scrollTop = 500;
+  let monthContainer = document.getElementById('monthContainer');
+  let scrollTop = monthContainer.scrollHeight - 2085; // 2085 is the pixel height of 3 monht in the future
+  monthContainer.scrollTop = scrollTop;
 }
 
 
@@ -2893,7 +2922,7 @@ function isThereASoftOverlap(task) {
         }
       }
       if (n === len - 1 && overlap === 'softOverlap') {
-        return overlap
+        return overlap;
       }
   }
 
@@ -2923,7 +2952,7 @@ function removeFuzzyOverlap(task) {
       }
     }
   }
-  return overlappingTasks
+  return overlappingTasks;
 }
 
 // Used by an eventListener. Govern the Edit/Clear button
@@ -3127,7 +3156,7 @@ function createDisplayList(sourceList) {
   }
 
   uniqueIdOfLastTouched = jumpToId;
-  return displayList
+  return displayList;
 }
 
 
@@ -3250,7 +3279,7 @@ function getIndexFromUniqueId(uniqueId) {
   }
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId.toString() === uniqueId.toString()) {
-      return index
+      return index;
     }
   }
 }
@@ -3483,7 +3512,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
     text = text1 + nils[2] + endH + ':' + nils[3] + endM + ' ' + text;
   }
 
-  return text
+  return text;
 }
 
 
