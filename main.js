@@ -2743,7 +2743,7 @@ function inputAtEnter(event) {
   let button = document.getElementById('clearButton');
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('dayInputBox').value.trim();
-    if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null && chosenTaskId === '') {
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       inputFixedTask(contentInputBox);
     } else {
       if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') {
@@ -3212,7 +3212,7 @@ function taskHasBeenClicked(event) {
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    if (/[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null) {
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       if (nullTimeClicked) {
