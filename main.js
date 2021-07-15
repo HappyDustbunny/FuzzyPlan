@@ -262,8 +262,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
      'gotoDayFromSettings1': [['Go back', ''],
                        ['Gå tilbage', '']],
     // Messages
-     'dontUse': [['Please don\'t use ' , ' for task description'],
-                 ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
+     // 'dontUse': [['Please don\'t use ' , ' for task description'],  // Fossile code. May be needed, but most probably not
+     //             ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
      'format1h30m': ['Please use the format 1h30m\r\n for 1 hour and 30 minutes',
                      'Brug formatet 1h30m\r\n for 1 time og 30 minutter'],
      'format1200': ['Please use the format 12:00 or 1200',
@@ -1264,13 +1264,18 @@ function prettifyTime(time) {
 
 function readTaskText() {
   let contentInputBox = document.getElementById('inputBox_add').value.trim();
-  let badCharacters = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
+  taskText_add = contentInputBox;
 
-  if (badCharacters) {
-    displayMessage(languagePack['dontUse'][language][0] + badCharacters + languagePack['dontUse'][language][1], 3000, 'add');
-  } else {
-    taskText_add = contentInputBox;
-  }
+  // Test for bad characters dropped because no characters will harm functionality afik - and it is a bitch to get working with allowing emojies
+
+//   let badCharactersFirstPass = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
+//   let badCharacters = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(badCharactersFirstPass);
+// // TODO: This doesn't work in add-view. Just drop test for bad characters?
+//   if (badCharacters) {
+//     displayMessage(languagePack['dontUse'][language][0] + badCharacters + languagePack['dontUse'][language][1], 3000, 'add');
+//   } else {
+//     taskText_add = contentInputBox;
+//   }
 }
 
 
@@ -1301,9 +1306,9 @@ function readTaskStartTime() {
   if (badCharacters) {
     displayMessage(languagePack['format1200'][language], 3000, 'add');
   } else {
-    if (contentInputBox.length == 3) {
+    if (contentInputBox.length == 4) { // Not 3 because of colon...
       timeH = /[0-9]/.exec(contentInputBox).toString();
-    } else if (contentInputBox.length == 4) {
+    } else if (contentInputBox.length == 5) { // Not 4 because of colon...
       timeH = /[0-9][0-9]/.exec(contentInputBox).toString();
     } else {
       return;
