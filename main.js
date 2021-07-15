@@ -2790,7 +2790,7 @@ function inputFixedTask(contentInputBox) {
     let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
 
     if (!succes) {
-      displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');  // TODO: This just drop a new task if there is not room. Oups.
+      displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');
       document.getElementById('dayInputBox').value = contentInputBox;
     }
     renderTasks();
@@ -2821,8 +2821,8 @@ function addWhereverAfter(uniqueId, task) {
   let myId = getIndexFromUniqueId(uniqueId);
   for (var id=myId; id<taskList.length - 1; id++) {
     succes = addTaskAfter(taskList[id].uniqueId, task);
-    looseInputBoxFocus('day');
     if (succes) {
+      looseInputBoxFocus('day');
       break;
     }
   }
@@ -3220,9 +3220,13 @@ function taskHasBeenClicked(event) {
     if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
+      anneal();
       if (nullTimeClicked) {
         nullTimeClicked = false;
-        addWhereverAfter(myUniqueId, task);  // Nulltimes shares id with the task before the nulltime
+        let succes = addWhereverAfter(myUniqueId, task);  // Nulltimes shares id with the task before the nulltime
+        if (!succes) {
+          displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');
+        }
       } else {
         addTaskBefore(myUniqueId, task);
       }
