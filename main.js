@@ -1306,9 +1306,14 @@ function readTaskStartTime() {
   if (badCharacters) {
     displayMessage(languagePack['format1200'][language], 3000, 'add');
   } else {
-    if (contentInputBox.length == 4) { // Not 3 because of colon...
+    let colonPresent = /:/.exec(contentInputBox);
+    let colonOffset = 0;
+    if (colonPresent) {
+      colonOffset = 1;
+    }
+    if (contentInputBox.length == 3 + colonOffset) { // Not 3 because of colon...
       timeH = /[0-9]/.exec(contentInputBox).toString();
-    } else if (contentInputBox.length == 5) { // Not 4 because of colon...
+    } else if (contentInputBox.length == 4 + colonOffset) { // Not 4 because of colon...
       timeH = /[0-9][0-9]/.exec(contentInputBox).toString();
     } else {
       return;
