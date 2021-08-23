@@ -98,6 +98,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                       ['\u2699', 'Indstillinger']],
      'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
               ['\u2350', 'Zoom ind og ud']],
+     'planning': [['Planning', ''],
+              ['Planlægning', '']],
      'spacerText': [['This space is to allow scrolling to the end of the day when the screen keyboard is active.', ''],
               ['Dette blanke område er for at man kan scrolle til slutningen af dagen, når skærmtastaturet er aktivt.', '']],
     // Add view
@@ -296,8 +298,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                       'Dagens liste er gemt i '],
      'restoreLast': ['Restore last discarded task list',
                      'Genskab den sidst forkastede liste'],
-     'retrieveFrom': [['Retrieving list from the \"', '\" storage'],
-                      ['Henter listen fra lageret \"', '\"']],
+     'retrieveFrom': [['Retrieved list from the \"', '\" storage'],
+                      ['Listen hentet fra lageret \"', '\"']],
      'storeIsEmpty': ['This store is empty',
                       'Dette lager er tomt'],
      'only0-1438': ['Use only numbers between 0 and 1438, please.',
@@ -2324,16 +2326,20 @@ function storeHasBeenClicked(event) {
       } else {
         displayMessage(languagePack['listStoredIn'][language] + clickedButton.innerText, 3000, 'storage');
       }
-      setTimeout(function() {gotoDayFromStorage();}, 3500);
+      setTimeout(function() {gotoDayFromStorage();}, 2500);
 
       // ... else get stuff
     } else if (clickedButton.classList.contains('inUse')) {
       storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]]; // Move current tasklist to trash bin
-      taskList = fixDatesInList(storageList[clickedButton.id][0]); // Let current tasklist be chosen stored tasklist - after dates are fixed...
+
+      taskList = deepCopyFunc(storageList[clickedButton.id][0]); // Let current tasklist be chosen stored tasklist
+      taskList = fixDatesInList(taskList); // -- after dates are fixed...
+
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
-      displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'storage');
-      setTimeout(function() {gotoDayFromStorage();}, 3500); // timeout necessary for displayMessage to finish
+      setTimeout(function() {gotoDayFromStorage();}, 500); // timeout necessary for displayMessage to finish
+      displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'day');
+      // displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'storage');
     } else {
       displayMessage(languagePack['storeIsEmpty'][language], 3000, 'storage');
     }
@@ -2692,7 +2698,7 @@ function wakeUpButton() {
   let now = new Date();
   let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
   let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
-  let task = new Task(taskStart, 15 * 60000, 'Planning', 1);
+  let task = new Task(taskStart, 15 * 60000, languagePack['planning'][language], 1);
   succes = addFixedTask(task);
   if (!succes) {
     console.log('wakeUpButton failed to insert a task');
@@ -2705,7 +2711,7 @@ function wakeUpButton() {
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
 function nowButton() {
-  let task = new Task(new Date(), 15 * 60000, 'Planning', 1);
+  let task = new Task(new Date(), 15 * 60000, languagePack['planning'][language], 1);
   addFixedTask(task);
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
   wakeUpOrNowClickedOnce = true;
@@ -2715,8 +2721,7 @@ function nowButton() {
 
 function adjustNowAndWakeUpButtons() {
   let min = '';
-  // let upBtn = document.getElementById('upButton');
-  // let nowBtn = document.getElementById('nowButton');
+
   let upBtn = document.getElementById('upButton');
   let nowBtn = document.getElementById('nowButton');
 
