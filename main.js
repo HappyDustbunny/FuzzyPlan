@@ -48,6 +48,7 @@ let pastDayList = {};   // Old taskList is stored here on their relevant date {"
 let trackTaskList = {}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 // let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 let putBackId = '';
+let dontShowTrackedAsTooltip = false;
 
 ///////// Track-view ////////
 let colours = [
@@ -163,11 +164,12 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                           ['Vælg opgaver der skal følges', '']],
      'month1': [['Month', 'Click to get back to month-view'],
                 ['Måned', 'Klik for at komme tilbage til månedsvisningen']],
+    // Track view
      'trackText': [['Track\u00a0', ''],
                    ['Følg\u00a0', '']],
      'taskPickerInputBox': [['', 'Write task text for the task you want to track'],
                             ['', 'Skriv opgaveteksten for den opgave du vil følge']],
-      'colourText': [['Colour\u00a0', ''],
+     'colourText': [['Colour\u00a0', ''],
                      ['Farve\u00a0', '']],
      'colourPickerInputBox': [['', 'Write colour name or rgb-value or hex-value'],
                               ['', 'Skriv farvenavn (på engelsk) eller rgb-værdi eller hex-værdi for farven']],
@@ -175,6 +177,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                           ['Opgaver der følges', '']],
      'deleteTrackedButton': [['Remove UNcheked tasks from this list', ''],
                              ['Fjern opgaver UDEN flueben fra denne liste', '']],
+     'showTrackedItemsInTooltip': [['Show/hide routine tasks', ''],
+                                   ['Vis/skjul rutineopgaver', '']],
+     'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
+                      ['Vis opgaver der følges i tool tip i månedsvisningen', 'Fjern hakket for at gøre det lettere at se hvad der gør en dag særlig (rutineopgaverne bliver ikke vist så)']],
     // Storage view
      'storageHeadingText': [['Store or retrive tasklists', ''],
                             ['Gem eller gendan opgavelister', '']],
@@ -486,7 +492,8 @@ function storeLocally() {
   // Store today in pastDayList
   let now = new Date();
   let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
-  pastDayList[id] = deepCopyFunc(taskList);  //  Func is used to make a deep copy
+  // pastDayList[id] = deepCopyFunc(taskList);  //  Func is used to make a deep copy
+  pastDayList[id] = taskListExtractor();  //  Func is used to make a deep copy
 
   // Store pastDayList
   if (pastDayList) {
@@ -589,10 +596,10 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('pastDayList')) {
     pastDayList = JSON.parse(localStorage.getItem('pastDayList'));
-    // Fix dates messed up by JSON.stringify
-    for (const key in pastDayList) {
-      pastDayList[key] = fixDatesInList(pastDayList[key]);
-    }
+    // Fix dates messed up by JSON.stringify  // Not necessary with new pastDayList -- I hope...
+    // for (const key in pastDayList) {
+    //   pastDayList[key] = fixDatesInList(pastDayList[key]);
+    // }
   }
 
   if (localStorage.getItem('storageList')) {
@@ -1000,6 +1007,8 @@ document.getElementById('taskPickerInputBox').addEventListener('keypress', funct
 document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
 
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
+
+document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrackedTasksInTooltip);
 
 ////////////////// Eventlisteners for storage-view ///////////////////////
 
@@ -1893,47 +1902,76 @@ function monthRenderTasks() {
 
   // Fill in and colour days in the past according to taskList for each day
   for (var myId in pastDayList) {
-    let tasks = createDisplayList(pastDayList[myId]);
+    // let tasks = createDisplayList(pastDayList[myId]);
+    let tasks = pastDayList[myId];
 
     let gradient = '';
     let taskColour = 'white';
+    let startPercent = 0;
+    let endPercent = 0;
 
     // Make gradient for the day currently being processed
-    for (var n in tasks) {
-      // Find the percent needed to be coloured (from startPercent to endPercent)
-      startPercent = parseInt((tasks[n].date.getHours() * 60 + tasks[n].date.getMinutes()) / (24 * 60) * 100);
-      endPercent = parseInt(startPercent + (tasks[n].duration / 60000) / (24 * 60) * 100);
+    let firstTaskDate = parseText(tasks[0])[0];
+    let nowTime = firstTaskDate;
 
-      if (n == 0) {  // Avoid dayStart, but add white at start of the day
-        gradient += 'white ' + parseInt((tasks[1].date.getHours() * 60
-        + tasks[1].date.getMinutes()) / (24 * 60) * 100) + '%';
-        continue;
+    for (var n in tasks) {
+      let parsedTxt = parseText(tasks[n]);
+      taskDuration = parsedTxt[1];
+
+      if (parsedTxt[0] != '' && Object.keys(trackTaskList).length != 0) {
+        taskDate = parsedTxt[0];
+        nowTime = new Date(taskDate.getTime());
+        if (0 < n) {  // TODO: The first task in pastDayList is not rendered
+          gradient += ', white ' + ' ' + Number(endPercent + 0.3) + '%, white ' + ' '
+          + Number( parseInt((taskDate.getHours() * 60
+          + taskDate.getMinutes()) / (24 * 60) * 100) - 0.3)  + '%';
+        } else if (n == 0) {
+          taskColour = trackTaskList[parseText(tasks[0])[2].replace(/ /g, '_')][0];
+          startPercent = parseInt((taskDate.getHours() * 60 + taskDate.getMinutes()) / (24 * 60) * 100);
+          endPercent = parseInt(startPercent + (taskDuration / 60000) / (24 * 60) * 100);
+
+          gradient += 'white 0%, ' + 'white' + ' ' + startPercent
+          + '% ' ;
+        }
+      } else {
+        taskDate = nowTime;
       }
+
+      nowTime = new Date(nowTime.getTime() + taskDuration);
+      let taskText = parsedTxt[2];
+
+      // Find the percent needed to be coloured (from startPercent to endPercent)
+
+      startPercent = parseInt((taskDate.getHours() * 60 + taskDate.getMinutes()) / (24 * 60) * 100);
+      endPercent = parseInt(startPercent + (taskDuration / 60000) / (24 * 60) * 100);
 
 
       // Find colour value if text is in trackTaskList
-      let string = tasks[n].text;
+      let string = taskText;
       string = string.replace(/ /g, '_');
 
       for (var trackedTaskText in trackTaskList) {
-        taskColour = '#DED';  // Default task colour if not watched
+        taskColour = '#DED';  // Default task colour if not watched  #DED is dirtywhite with a green tinge
         if (string == '') {
           taskColour = 'white'; // nullTime is made white
           break;
         } else if (string == trackedTaskText) {
-          if (Number(trackTaskList[trackedTaskText][1]) === 1) {
+          if (Number(trackTaskList[trackedTaskText][1]) === 1) { // If tracked ...
             taskColour = trackTaskList[trackedTaskText][0];
           }
           break;
         }
       }
 
-      gradient += ', ' + taskColour + ' ' + startPercent
-      + '%, ' + taskColour + ' ' + Number(endPercent - 0.3)  + '%, '
-      + 'black ' + Number(endPercent - 0.3) + '%, black ' + endPercent + '%';
+      // Add to gradient and pad with black
+      gradient += ', black ' + Number(startPercent - 0.2) + '%, ' + taskColour + ' ' + startPercent
+      + '%, ' + taskColour + ' ' + Number(endPercent - 0.6)  + '%, '
+      + 'black ' + Number(endPercent - 0.3)  + '%';
 
       taskColour = 'white';
     }
+
+    gradient += ', white ' + endPercent + '%'; // Make the rest of the day white
 
     // Find button, set gradient and write to tooltip
     let button = document.getElementById(myId);
@@ -1942,14 +1980,24 @@ function monthRenderTasks() {
       button.setAttribute('style', 'background-image: linear-gradient(to right, ' + gradient + ')');
       // Set tool-tip to show the tasks of the day
       let children = button.childNodes;
-      let rawTasks = pastDayList[myId];
-      if (rawTasks != '') {
-        for (var task of rawTasks) {
-          if (task.text == 'Day start' || task.text == 'Day end') {
+      // let tasks = pastDayList[myId];
+      if (tasks != '') {
+        for (var task of tasks) {
+          let isTracked = 0;
+          let txt = parseText(task)[2].replace(/ /g, '_');
+          if (txt == 'Day start' || txt == 'Day end') {
             continue;
           }
 
-          children[1].innerHTML += ' \u25CF ' + task.text + '&nbsp;' + '<br>'; // Write to tooltip
+          if (txt in trackTaskList) {
+            isTracked = trackTaskList[txt][1];
+          }
+          console.log(isTracked, txt);
+
+          if (dontShowTrackedAsTooltip && isTracked == 1) {
+            continue;
+          }
+          children[1].innerHTML += ' \u25CF ' + txt + '&nbsp;' + '<br>'; // Write to tooltip
         }
       }
     }
@@ -1961,8 +2009,8 @@ function monthRenderTasks() {
 
     if (button != null) {
       let children = button.childNodes;  // datePart, toolTip and text
-
       let tasks = monthTaskList[myId];
+
 
       if (tasks != '') {
         for (var task of tasks) {
@@ -2224,6 +2272,10 @@ function returnToMonth() {
   document.getElementById('trackView').hidden = true;
   document.getElementById('monthView').hidden = false;
   monthRenderTasks();
+}
+
+function showOrHideTrackedTasksInTooltip() {
+  dontShowTrackedAsTooltip = !document.getElementById('showTTChkbox').checked;
 }
 
 
@@ -2574,9 +2626,9 @@ function confirmRestoreBackup() {
   pastDayList = JSON.parse(backupText);
   pastDayList = JSON.parse(pastDayList); // ... because Blops are strange
   // Fix dates messed up by JSON.stringify
-  for (const key in pastDayList) {
-    pastDayList[key] = fixDatesInList(pastDayList[key]);
-  }
+  // for (const key in pastDayList) {
+  //   pastDayList[key] = fixDatesInList(pastDayList[key]);
+  // }
 
   localStorage.pastDayList = pastDayList;
 
@@ -3654,7 +3706,7 @@ function parseText(rawText) {
     rawText = rawText.replace('g' + gain, '');
   };
 
-  if (drain == 1) {
+  if (drain == 1) { // TODO: If rawText is undefined .toLowerCase() will throw an error
     if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
     if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
     if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
