@@ -675,7 +675,7 @@ html {
   align-self: center;
 }
 
-#trackViewSpacer {
+#trackViewSpacer, #selectAllOrNoneDiv{
   height: 30px;
 }
 

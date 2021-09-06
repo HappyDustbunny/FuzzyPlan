@@ -175,6 +175,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                               ['', 'Skriv farvenavn (på engelsk) eller rgb-værdi eller hex-værdi for farven']],
      'trackedItemsText': [['Tracked tasks', ''],
                           ['Opgaver der følges', '']],
+     'selectAllOrNoneLabel': [['Select all or none', ''],
+                          ['Vælg alle eller ingen', '']],
      'deleteTrackedButton': [['Remove UNcheked tasks from this list', ''],
                              ['Fjern opgaver UDEN flueben fra denne liste', '']],
      'showTrackedItemsInTooltip': [['Show/hide routine tasks', ''],
@@ -1001,6 +1003,8 @@ document.getElementById('colourButtons').addEventListener('click', function () {
 document.getElementById('colourPickerInputBox').addEventListener('focus', function () {
   document.getElementById('colourButtons').hidden = false;
 });
+
+document.getElementById('selectAllOrNoneChkbox').addEventListener('click', selectAllOrNone);
 
 document.getElementById('taskPickerInputBox').addEventListener('keypress', function () { taskPickerEvent(event); });
 
@@ -1926,7 +1930,11 @@ function monthRenderTasks() {
           + Number( parseInt((taskDate.getHours() * 60
           + taskDate.getMinutes()) / (24 * 60) * 100) - 0.3)  + '%';
         } else if (n == 0) {
-          taskColour = trackTaskList[parseText(tasks[0])[2].replace(/ /g, '_')][0];
+
+          let key = parseText(tasks[0])[2].replace(/ /g, '_');
+          if (trackTaskList[key]) {
+            taskColour = trackTaskList[key][0];
+          }
           startPercent = parseInt((taskDate.getHours() * 60 + taskDate.getMinutes()) / (24 * 60) * 100);
           endPercent = parseInt(startPercent + (taskDuration / 60000) / (24 * 60) * 100);
 
@@ -1989,15 +1997,14 @@ function monthRenderTasks() {
             continue;
           }
 
-          if (txt in trackTaskList) {
+          if (txt in trackTaskList) {  // Makes sure it makes sense to look in trackTaskList
             isTracked = trackTaskList[txt][1];
           }
-          console.log(isTracked, txt);
 
-          if (dontShowTrackedAsTooltip && isTracked == 1) {
+          if (dontShowTrackedAsTooltip && isTracked == 1) { // Skip writing task to tooltip if the flag is false. Flag is toggled in trackview by checkbox
             continue;
           }
-          children[1].innerHTML += ' \u25CF ' + txt + '&nbsp;' + '<br>'; // Write to tooltip
+          children[1].innerHTML += ' \u25CF ' + txt.replace(/_/g, ' ') + '&nbsp;' + '<br>'; // Write to tooltip
         }
       }
     }
@@ -2197,11 +2204,32 @@ function removeTracking() {
   }
 }
 
+function selectAllOrNone() {
+  let trackedChkboxes = document.getElementsByClassName('trackedTask');
+  let allOrNone = document.getElementById('selectAllOrNoneChkbox');
+
+  for (var el of trackedChkboxes) {
+    el.checked = allOrNone.checked;
+  }
+
+  for (var trackedTask in trackTaskList) {
+    let element = document.getElementsByClassName(trackedTask);
+    // Set opacity according to checked status
+    if (allOrNone.checked) {
+      trackTaskList[trackedTask][1] = "1";
+      element[0].style.opacity = 1;
+      element[1].style.opacity = 1;
+    } else {
+      trackTaskList[trackedTask][1] = "0.25";
+      element[0].style.opacity = 0.25;
+      element[1].style.opacity = 0.25;
+    }
+  }
+}
 
 function trackCheckboxClicked(event) {
   let trackedTask = event.target.id;
   let element = document.getElementsByClassName(trackedTask);
-  // TODO: Add functionality aside greying out line
 
   // Set opacity according to checked status
   if (event.target.checked) {
@@ -2222,6 +2250,7 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   // Create checkbox
   let trackedItemCheckBox = document.createElement('input');
   trackedItemCheckBox.type = 'checkbox';
+  trackedItemCheckBox.classList.add('trackedTask');
   trackedItemCheckBox.name = item;
   trackedItemCheckBox.id = item;
 
@@ -2260,9 +2289,7 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 
   trackedItem.appendChild(trackedItemButton);
 
-  // TODO: Make colours match up with text - by moving Create Colour up to the top?
   document.getElementById('trackedItemsDiv').appendChild(trackedItem);
-  // document.getElementById('trackedItemsColourDiv').appendChild(trackedItemColour);
 
   document.getElementById(item).addEventListener('click', function () { trackCheckboxClicked(event); });
 }
@@ -3763,8 +3790,12 @@ function textListToTaskList(taskListAsText) {  // Used by debugExamples()
       if (!succes) {console.log('Retrieval got wrong at index ', index);}
     }
   }
-  // TODO: Fix uniqueIdOfLastTouched. It can't be stored as stuff is redrawn
-  uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
+
+  if (localStorage.indexOfLastTouched) {
+    uniqueIdOfLastTouched = taskList[localStorage.indexOfLastTouched].uniqueId;
+  } else {
+    uniqueIdOfLastTouched = 0;
+  }
 }
 
 // For debugging only:
