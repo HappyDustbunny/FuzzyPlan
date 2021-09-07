@@ -45,6 +45,7 @@ let playTimer = '';
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
 let pastDayList = {};   // Old taskList is stored here on their relevant date {"4-1-21": [task, task,...]}
+let pastDayListBackUp = {}; // Inelegant way of moving data from one function to the next
 let trackTaskList = {}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 // let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 let putBackId = '';
@@ -250,12 +251,12 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
 
      'backupHeading': [['Backup', ''],
                 ['Tag backup', '']],
-     'backupText': [['Backup the lists stored in Month View.\r\nNote that this backup also can restore the past days in Month View in another browser.', ''],
-                ['Tag backup af de gamle opgavelister gemt i Månedsvisningen.\r\nBemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser.', '']],
+     'backupText': [['Backup the lists stored in Month View.\r\n(Note that this backup also can restore the past days in Month View in another browser)', ''],
+                ['Tag backup af de gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
      'backup': [['Backup', ''],
                 ['Tag backup', '']],
-     'restoreBackupInputText': [['Open the text file with your backup. Copy ALL the gibberish into the textbox', ''],
-                ['Åben tekstfilen med din backup. Kopier AL den skræmmende tekst ind i tekstboksen', '']],
+     'restoreBackupInputText': [['Open the text file with your backup', ''],
+                ['Åben tekstfilen med din backup', '']],
      'restoreBackup': [['Restore backup', ''],
                        ['Gendan backup', '']],
      'confirmRestoreBackup': [['Confirm restore of backup', ''],
@@ -1909,6 +1910,10 @@ function monthRenderTasks() {
     // let tasks = createDisplayList(pastDayList[myId]);
     let tasks = pastDayList[myId];
 
+    if (!tasks || tasks.length == 0) {  // Skip empty entries
+      continue;
+    }
+
     let gradient = '';
     let taskColour = 'white';
     let startPercent = 0;
@@ -2637,29 +2642,39 @@ function restoreBackup() {
   document.getElementById('restoreBackupInputText').hidden = false;
   document.getElementById('restoreBackupInput').hidden = false;
   document.getElementById('confirmRestoreBackup').hidden = false;
+
+  document.getElementById('restoreBackupInput').addEventListener('change', readFile, false);
 }
 
 
+function readFile(event) {
+  let file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+
+  let reader = new FileReader();
+  reader.onload = function(event) {
+    pastDayListBackUp =  JSON.parse(event.target.result);
+  }
+
+  reader.readAsText(file);
+}
+
+// TODO: Make restoring data behave expectedly: Go back after a message. Clean up layout around backup
+// TODO: Look into why restored data isn't rendered with colour in Month View
+
+
 function confirmRestoreBackup() {
-  // TODO: Make a confirm dialog
-  document.getElementById('backup').hidden = false;
-  document.getElementById('restoreBackup').hidden = false;
+    // TODO: Make a confirm dialog
+    document.getElementById('backup').hidden = false;
+    document.getElementById('restoreBackup').hidden = false;
 
-  document.getElementById('restoreBackupInputText').hidden = true;
-  document.getElementById('restoreBackupInput').hidden = true;
-  document.getElementById('confirmRestoreBackup').hidden = true;
+    document.getElementById('restoreBackupInputText').hidden = true;
+    document.getElementById('restoreBackupInput').hidden = true;
+    document.getElementById('confirmRestoreBackup').hidden = true;
 
-  let backupText = document.getElementById('restoreBackupInput').value;
-  pastDayList = JSON.parse(backupText);
-  pastDayList = JSON.parse(pastDayList); // ... because Blops are strange
-  // Fix dates messed up by JSON.stringify
-  // for (const key in pastDayList) {
-  //   pastDayList[key] = fixDatesInList(pastDayList[key]);
-  // }
-
-  localStorage.pastDayList = pastDayList;
-
-  location.reload(true);
+    pastDayList = JSON.parse(pastDayListBackUp);
 }
 
 
