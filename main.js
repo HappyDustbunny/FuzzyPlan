@@ -1005,6 +1005,10 @@ document.getElementById('colourPickerInputBox').addEventListener('focus', functi
   document.getElementById('colourButtons').hidden = false;
 });
 
+document.getElementById('colourPickerInputBox').addEventListener('blur', function () {
+  document.getElementById('colourButtons').hidden = true;
+});
+
 document.getElementById('selectAllOrNoneChkbox').addEventListener('click', selectAllOrNone);
 
 document.getElementById('taskPickerInputBox').addEventListener('keypress', function () { taskPickerEvent(event); });
@@ -1927,10 +1931,11 @@ function monthRenderTasks() {
       let parsedTxt = parseText(tasks[n]);
       taskDuration = parsedTxt[1];
 
-      if (parsedTxt[0] != '' && Object.keys(trackTaskList).length != 0) {
+      if (parsedTxt[0] != '') {
+      // if (parsedTxt[0] != '' && Object.keys(trackTaskList).length != 0) {
         taskDate = parsedTxt[0];
         nowTime = new Date(taskDate.getTime());
-        if (0 < n) {  // TODO: The first task in pastDayList is not rendered
+        if (0 < n) {
           gradient += ', white ' + ' ' + Number(endPercent + 0.3) + '%, white ' + ' '
           + Number( parseInt((taskDate.getHours() * 60
           + taskDate.getMinutes()) / (24 * 60) * 100) - 0.3)  + '%';
@@ -1963,8 +1968,8 @@ function monthRenderTasks() {
       let string = taskText;
       string = string.replace(/ /g, '_');
 
+      taskColour = '#DED';  // Default task colour if not watched  #DED is dirtywhite with a green tinge
       for (var trackedTaskText in trackTaskList) {
-        taskColour = '#DED';  // Default task colour if not watched  #DED is dirtywhite with a green tinge
         if (string == '') {
           taskColour = 'white'; // nullTime is made white
           break;
@@ -2138,6 +2143,7 @@ function taskPickerEvent(event) {
 function colourPickerEvent(event) {
   if (event.key === 'Enter') {
     addTrackedTask(null);
+    document.getElementById('taskPickerInputBox').focus();
   }
 
 }
@@ -2660,10 +2666,7 @@ function readFile(event) {
 
   reader.readAsText(file);
 }
-
-// TODO: Make restoring data behave expectedly: Go back after a message. Clean up layout around backup
-// TODO: Look into why restored data isn't rendered with colour in Month View
-
+// TODO: Save more data than just past days?
 
 function confirmRestoreBackup() {
     // TODO: Make a confirm dialog
@@ -2674,7 +2677,9 @@ function confirmRestoreBackup() {
     document.getElementById('restoreBackupInput').hidden = true;
     document.getElementById('confirmRestoreBackup').hidden = true;
 
-    pastDayList = JSON.parse(pastDayListBackUp);
+    localStorage.pastDayList = pastDayListBackUp;
+
+    location.reload(true);
 }
 
 
