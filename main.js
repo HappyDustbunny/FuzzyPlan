@@ -1,4 +1,4 @@
-'applyAdd'// TODO: anneal() after double-clicking task?
+// 'applyAdd'// TODO: anneal() after double-clicking task?
 
 
 let taskList = [];  // List of all tasks
@@ -2321,6 +2321,7 @@ function showOrHideTrackedTasksInTooltip() {
 
 //////////////////// Storage-view code below ///////////////////////////
 
+// TODO: The two first tasklist saved to storage seems linked, but not subsequent stored tasklist???
 
 function storageButtonClicked() {
   storeLocally();
@@ -2617,7 +2618,8 @@ function applyStressModel() {
 
 function storeBackup() { // TODO: Finish this
   // Wrap up data from localStorage in a blob
-  let data = JSON.stringify(localStorage.pastDayList);
+  let data = JSON.stringify(localStorage);
+  // let data = JSON.stringify(localStorage.pastDayList);
   let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
   console.log(blob);
 
@@ -2677,7 +2679,9 @@ function confirmRestoreBackup() {
     document.getElementById('restoreBackupInput').hidden = true;
     document.getElementById('confirmRestoreBackup').hidden = true;
 
-    localStorage.pastDayList = pastDayListBackUp;
+    for (item in pastDayListBackUp) {
+      localStorage[item] = pastDayListBackUp[item];
+    }
 
     location.reload(true);
 }
@@ -3395,11 +3399,18 @@ function getIndexFromUniqueId(uniqueId) {
   } else {
     nullTimeClicked = false;
   }
+
+  let nextToLastIndex = 0;
+  let len = taskList.length;
   for (const [index, task] of taskList.entries()) {
     if (task.uniqueId.toString() === uniqueId.toString()) {
       return index;
     }
+    if (index == len - 2) { // Store the next to last index in case no uniqueId is found
+      nextToLastIndex = index;
+    }
   }
+  return nextToLastIndex; // If no uniqueId is found, return next to last index in list
 }
 
 
