@@ -1,5 +1,3 @@
-// 'applyAdd'// TODO: anneal() after double-clicking task?
-
 
 let taskList = [];  // List of all tasks
 let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
@@ -66,7 +64,7 @@ let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturda
 'Sunday', 'Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
 let ugeDage = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
-'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3']; // TODO: Fix weekdays translation
+'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3']; // TODO: Fix weekdays translation when a storage is in use(?)
 let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
 
 ///////// Languages ///////
@@ -399,19 +397,11 @@ class Task {
   }
 }
 
-// TODO: Make weekends stand out in the past too in month-view
-
-function setViewSize() {
-  let height = window.screen.availHeight - 220;
-  document.getElementById('container').style.height = height + 'px'
-}
-
+// TODO: Make weekends stand out in the past too in month-view. Update: They do, but is it understandable?
 
 // Runs when the page is loaded:
 function setUpFunc() {
   taskList = [];
-
-  // setViewSize();  // TODO: Remove this function?
 
   makeFirstTasks();
 
@@ -2393,16 +2383,17 @@ function storeHasBeenClicked(event) {
       text = prompt(languagePack['changeLabel?'][language], clickedButton.innerText);
 
       if (text === '' || text === null) {
-        storageList[id] = [taskList, clickedButton.innerText];
+        storageList[id] = [deepCopyFunc(taskList), clickedButton.innerText];
       }
       else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
         text = text.slice(0, 1).toUpperCase() + text.slice(1, );
         clickedButton.innerText = text;
-        storageList[id] = [taskList, text];
+        storageList[id] = [deepCopyFunc(taskList), text];
       } else if (text != '') {
         alert(languagePack['onlyAlphaNumerics'][language]);
         return;
       }
+
       // Store stuff
       if (taskList.length === 2) {  // If taskList is empty except for dayStart and dayEnd...
         clickedButton.classList.remove('inUse');
@@ -2879,7 +2870,7 @@ function inputAtEnter(event) {
         resetInputBox('day');
       }
     }
-    // // Ready buttons for next task // TODO: Check if ChooseBox is active
+    // // Ready buttons for next task
     // button.textContent = languagePack['clearButton'][language][0];  // Black down-pointing small triangle
     // button.title = languagePack['clearButton'][language][1];
     fixClearButtonArrow();
@@ -2900,7 +2891,7 @@ function inputFixedTask(contentInputBox) {
   if (taskList.length == 1 && parsedList[0] == '') {
     displayMessage(languagePack['startWithFixed'][language], 5000, 'day');
   } else {
-    let succes = addTask(uniqueIdOfLastTouched, task); // TODO: The unique id changes when jumping between pages...
+    let succes = addTask(uniqueIdOfLastTouched, task); // Note: The unique id changes when jumping between pages...
 
     if (!succes) {
       displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');
@@ -3086,6 +3077,8 @@ function clearTextboxOrDay() {
     }
   }
   resetInputBox('day');
+  anneal();
+  renderTasks();
 }
 
 function fixClearButtonArrow() {
@@ -3244,9 +3237,7 @@ function createDisplayList(sourceList) {
   sourceList[0].stressGradient = currentStressLevel;
 
   let len = sourceList.length;
-  for (var n=1; n<len; n++) {  // TODO: Fix Add-button position again again. Fix duration in add-view
-    // if (sourceList[n - 1].end) { // This condition makes dayStart and dayEnd collapse // TODO: Fix this and insert before a fixed task. Maybe run task.end() somewhere appropriate
-      // let duration = sourceList[n].date.getTime() - sourceList[n-1].end.getTime();
+  for (var n=1; n<len; n++) {
     let duration = sourceList[n].date.getTime() - (sourceList[n - 1].date.getTime() + sourceList[n - 1].duration);
     // }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
@@ -3343,7 +3334,7 @@ function taskHasBeenClicked(event) {
       } else {
         addTaskBefore(myUniqueId, task);
       }
-      // // TODO: Check if ChooseBox is active
+
       // clearButton.textContent = languagePack['clearButton'][language][0]; // Black down-pointing small triangle
       // clearButton.title = languagePack['clearButton'][language][1];
       handleChoosebox('day');
@@ -3366,7 +3357,7 @@ function taskHasBeenClicked(event) {
     // No text in inputBox and no chosenTaskId: Getting ready to edit or delete
     chosenTask = document.getElementById(myUniqueId);
     let myId = getIndexFromUniqueId(myUniqueId);
-    taskList[myId].isClicked = 'isClicked'; // TODO: Unclick later
+    taskList[myId].isClicked = 'isClicked';
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
 
@@ -3414,7 +3405,7 @@ function getIndexFromUniqueId(uniqueId) {
 }
 
 
-function swapTasks(myId) { // TODO: Fix swap by allowing inserting task by moving fuzzy tasks
+function swapTasks(myId) {
     let id1 = getIndexFromUniqueId(chosenTaskId);
     let id2 = getIndexFromUniqueId(myId);
     taskList[id1].isClicked = 'isNotClicked';
