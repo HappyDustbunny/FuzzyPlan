@@ -151,6 +151,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
      'day': [['Day', 'Click to get back to day-view (or just swipe left with two fingers anywhere)'],
              ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)']],
+     'day1': [['Day', 'Click to get back to day-view (or just swipe right with two fingers anywhere)'],
+             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til højre med to fingre hvorsomhelst)']],
      'monthClearButton': [['Clear\u25B8', 'Clear input box'], // Black right-pointing small triangle
         ['Slet \u25B8', 'Slet input boks']],
      'monthInputBox': [['', 'Input tasks to store in month view'],
@@ -275,6 +277,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
      //             ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
      'format1h30m': ['Please use the format 1h30m\r\n for 1 hour and 30 minutes',
                      'Brug formatet 1h30m\r\n for 1 time og 30 minutter'],
+     'max23h': ['Durations longer than 23 hours is not possible',
+                'Varihed længere end 23 timer er ikke muligt'],
      'format1200': ['Please use the format 12:00 or 1200',
                     'Brug formatet 12:00 eller 1200'],
      'taskTextMsg': ['Please write a task text',
@@ -397,7 +401,6 @@ class Task {
   }
 }
 
-// TODO: Make weekends stand out in the past too in month-view. Update: They do, but is it understandable?
 
 // Runs when the page is loaded:
 function setUpFunc() {
@@ -411,8 +414,6 @@ function setUpFunc() {
 
   renderLanguage();
 
-  // adjustNowAndWakeUpButtons();
-
   // Set uniqueIdOfLastTouche to the last task before 'Day end'
   uniqueIdOfLastTouched = taskList[taskList.length - 2].uniqueId;
 
@@ -422,10 +423,7 @@ function setUpFunc() {
 
   updateTimeMarker();
 
-  // debugExamples(); // Make debug example tasks. Run from commandline if needed. DO NOT UNCOMMENT
-
-  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks()
-  // renderTasks();  // Is in adjustNowAndWakeUpButtons
+  adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks() // renderTasks() Is in adjustNowAndWakeUpButtons
 
   getDueRemindersFromLast3Months();
 
@@ -700,7 +698,6 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   }
 
   // tasksFromClickedDayInMonth = [];  // If this is emptied here putBack will have nothing to put back. It should be emptied elsewhere. Or after a test here
-  // TODO: Postpone can leave tasks with an end that doesn't match duration and start time
 
 }
 
@@ -937,16 +934,27 @@ document.getElementById('playControlsQuery').addEventListener('click', playContr
 document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
 
 document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
+
 document.getElementById('inputBox_add').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readTaskText(); } });
+
+document.getElementById('inputDurationBox').addEventListener('focus',
+        function() {document.getElementById('inputDurationBox').select();} );
+document.getElementById('inputTimeBox').addEventListener('focus',
+        function() {document.getElementById('inputTimeBox').select();} );
+
 document.getElementById('inputDurationBox').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readDurationTime(); } });
-document.getElementById('inputTimeBox').addEventListener('focusout',
-        function () {readTaskStartTime(); fillTimeBox(taskTime_add);});
-// document.getElementById('inputTimeBox').addEventListener('keypress',
-//         function () { if (event.key === 'Enter') { readTaskStartTime(); } });
 
-document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+document.getElementById('inputTimeBox').addEventListener('focusout',
+        function () {readTaskStartTime(); fillTimeBox(taskTime_add);
+        document.getElementById('inputTimeBox').blur;} );
+
+document.getElementById('inputDurationBox').addEventListener('focusout',
+        function () {readDurationTime(); fillDurationBox(taskDuration_add);
+        document.getElementById('inputTimeBox').blur;} );
+
+// document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
 
 document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
 
@@ -1024,8 +1032,11 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
 document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
 
-document.getElementById('eng').addEventListener('click', checkEnglishRadio)
-document.getElementById('dan').addEventListener('click', checkDanishRadio)
+document.getElementById('eng').addEventListener('click',
+          function () { document.getElementById('en').checked = true; } );
+
+document.getElementById('dan').addEventListener('click',
+          function () { document.getElementById('da').checked = true; } );
 
 document.getElementById('apply0').addEventListener('click', applyLanguage);
 
@@ -1040,13 +1051,22 @@ document.getElementById('apply3').addEventListener('click', applyStressModel);
 document.getElementById('clearAllData').addEventListener('click', clearAllData);
 document.getElementById('clearEverything').addEventListener('click', clearEverything);
 
-document.getElementById('inputBoxM').addEventListener('focus', inputBoxMGotFocus);
-document.getElementById('inputBoxX').addEventListener('focus', inputBoxXGotFocus);
-document.getElementById('stressLevel').addEventListener('focus', stressLevelGotFocus);
-document.getElementById('tDouble').addEventListener('focus', tDoubleGotFocus);
+document.getElementById('inputBoxM').addEventListener('focus',
+          function () { document.getElementById('inputBoxM').select(); });
+
+document.getElementById('inputBoxX').addEventListener('focus',
+          function () { document.getElementById('inputBoxX').select(); });
+
+document.getElementById('stressLevel').addEventListener('focus',
+          function () { document.getElementById('stressLevel').select(); });
+
+document.getElementById('tDouble').addEventListener('focus',
+          function () { document.getElementById('tDouble').select(); });
 
 document.getElementById('backup').addEventListener('click', storeBackup);
+
 document.getElementById('restoreBackup').addEventListener('click', restoreBackup);
+
 document.getElementById('confirmRestoreBackup').addEventListener('click', confirmRestoreBackup);
 
 //////////////////// Add-view code below ///////////////////////////
@@ -1276,16 +1296,7 @@ function readTaskText() {
   let contentInputBox = document.getElementById('inputBox_add').value.trim();
   taskText_add = contentInputBox;
 
-  // Test for bad characters dropped because no characters will harm functionality afik - and it is a bitch to get working with allowing emojies
-
-//   let badCharactersFirstPass = /[^a-zA-ZæøåÆØÅ\s\.\,\?\!\(\)\"]+/.exec(contentInputBox);
-//   let badCharacters = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(badCharactersFirstPass);
-// // TODO: This doesn't work in add-view. Just drop test for bad characters?
-//   if (badCharacters) {
-//     displayMessage(languagePack['dontUse'][language][0] + badCharacters + languagePack['dontUse'][language][1], 3000, 'add');
-//   } else {
-//     taskText_add = contentInputBox;
-//   }
+  // Test for bad characters dropped because no characters will harm functionality afik - and it is a bitch to get working while allowing emojies
 }
 
 
@@ -1296,7 +1307,7 @@ function readDurationTime() {
     displayMessage(languagePack['format1h30m'][language], 3000, 'add');
   } else {
     let timeH = 0;
-    let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString(); // TODO: Check if numbers are too big
+    let timeM = /\d{1,4}m?$/.exec(contentInputBox).toString();
     timeM = Number(timeM.replace('m', ''));
     if (/h/.exec(contentInputBox)) {
       timeH = /[0-9]+h/.exec(contentInputBox).toString();
@@ -1304,6 +1315,11 @@ function readDurationTime() {
       timeH = Number(timeH.replace('h', ''));
     }
     taskDuration_add = timeH * 60 + timeM;
+    if (23*60 < taskDuration_add) {
+      displayMessage(languagePack['max23h'][language], 3000, 'add');
+      taskDuration_add = 30;
+      fillDurationBox(taskDuration_add);
+    }
   }
 }
 
@@ -2489,35 +2505,6 @@ function setUpSettings() {
 }
 
 
-function inputBoxMGotFocus() {
-  document.getElementById('inputBoxM').select();
-}
-
-
-function inputBoxXGotFocus() {
-  document.getElementById('inputBoxX').select();
-}
-
-
-function stressLevelGotFocus() {
-  document.getElementById('stressLevel').select();
-}
-
-function tDoubleGotFocus() {
-  document.getElementById('tDouble').select();
-}
-
-
-function checkEnglishRadio() {
-  document.getElementById('en').checked = true;
-}
-
-
-function checkDanishRadio() {
-  document.getElementById('da').checked = true;
-}
-
-
 function applyLanguage() {
   radioButtonResult0 = document.getElementsByClassName('language');
   for (var i=0; i<2; i++) {
@@ -2713,22 +2700,23 @@ function gotoDayFromSettings() {
 
 //////////////////// Settings-view code above ^^^ ///////////////////////////
 
-function twoFingerNavigation(event) {
-  if (sessionStorage.touchX && event.touches.length === 1) {
-    sessionStorage.touchX = '';
-  }
-  if (event.touches.length > 0) {
-    if (!sessionStorage.touchX) {
-      sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
-    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
-      // goToPage('storage.html');
-      storageButtonClicked();
-    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
-      // goToPage('month.html'); // TODO: Fix twofingerNavigation
-      monthButtonClicked();
-    }
-  }
-}
+// function twoFingerNavigation(event) {
+//   if (sessionStorage.touchX && event.touches.length === 1) {
+//     sessionStorage.touchX = '';
+//   }
+//
+//   if (event.touches.length > 0) {
+//     if (!sessionStorage.touchX) {
+//       sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
+//     } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
+//       // goToPage('storage.html');
+//       storageButtonClicked();
+//     } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
+//       // goToPage('month.html'); // TODO: Fix twofingerNavigation?
+//       monthButtonClicked();
+//     }
+//   }
+// }
 
 function  fillHearths(currentStressLevel) {
   const heartSpan = document.getElementById('heart');
@@ -3122,6 +3110,7 @@ function clearDay() {
   document.getElementById('dayInputBox').value = '';
   document.getElementById('addTaskButton').textContent = '+';
   document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+  document.getElementById('dayInputBox').focus();
 }
 
 

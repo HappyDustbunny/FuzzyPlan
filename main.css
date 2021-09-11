@@ -534,8 +534,7 @@ html {
 }
 
 .pastDateButton.weekend {
-	/* background-color: rgba(160, 179, 185, 0.25);
-  border-color: rgba(160, 179, 185, 1); */
+	background-color: rgba(172, 185, 220, 0.2);
   border: 3px solid rgb(160, 179, 185);
 }
 
