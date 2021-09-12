@@ -997,15 +997,15 @@ document.getElementById('month1').addEventListener('click', returnToMonth);
 
 ////////////////// Eventlisteners for track-view ///////////////////////
 
-document.getElementById('colourButtons').addEventListener('click', function () { colourButtonClicked(event);});
-
 document.getElementById('colourPickerInputBox').addEventListener('focus', function () {
   document.getElementById('colourButtons').hidden = false;
 });
 
-document.getElementById('colourPickerInputBox').addEventListener('blur', function () {
-  document.getElementById('colourButtons').hidden = true;
-});
+// document.getElementById('colourPickerInputBox').addEventListener('blur', function () {
+//   document.getElementById('colourButtons').hidden = true;
+// });
+
+document.getElementById('colourButtons').addEventListener('click', function () { colourButtonClicked(event);});
 
 document.getElementById('selectAllOrNoneChkbox').addEventListener('click', selectAllOrNone);
 
