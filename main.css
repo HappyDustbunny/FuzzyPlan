@@ -48,6 +48,7 @@ input {
   width: auto;
   padding-left: 8px;
   border-radius: 10px;
+  border: 2px inset rgba(96, 139, 168, 0.6);
 }
 
 p {
