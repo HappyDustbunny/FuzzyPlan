@@ -3,7 +3,7 @@
   }
 
 body {
-  max-width: 400px;
+  /* max-width: 400px; */
   min-width: 340px;
   margin-left: auto;
   margin-right: auto;
@@ -98,16 +98,16 @@ html {
 
 .container1 {
   display: grid;
-  grid-template-columns: 12% 65% 5% 11%;
+  grid-template-columns: 1% 10% auto 5% 12% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'month header1 info storage'
-  '. hearts . .'
-  '. messages . .';
+  '. month header1 info storage .'
+  '. . hearts . . .'
+  '. . messages . . .';
 }
 
 /* add view css below */
@@ -289,9 +289,12 @@ html {
   border-top: none;
 }
 
-/* #page {
-  height: 800px;
-} */
+#page {
+  position: sticky;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 #inputBox_add {
   width: 175px;
@@ -308,7 +311,9 @@ html {
 
 #info {
   width: 22px;
-  border-radius: 20px;M
+  border-radius: 20px;
+  align-self: center;
+  grid-area: info;
 }
 
 #d1, #g1 {
@@ -327,7 +332,7 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas: 'head' 'wrap' 'cont';
-  position: fixed;
+  /* position: fixed; */
 }
 
 /* #dayView.active {
@@ -438,15 +443,15 @@ html {
 
 .monthContainer1 {
   display: grid;
-  grid-template-columns: 40px auto 45px;
+  grid-template-columns: 1% 10% auto 5% 12% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  'track header day'
-  '. messages .';
+  '. track header . day .'
+  '. . messages . . .';
 }
 
 
@@ -551,6 +556,7 @@ html {
 
 #track {
   grid-area: track;
+  align-self: center;
 }
 
 #monthClearButton {
@@ -563,11 +569,13 @@ html {
 
 #month {
   grid-area: month;
-  justify-self: end;
+  /* justify-self: end; */
+  align-self: center;
 }
 
 #day {
   grid-area: day;
+  align-self: center;
 }
 
 #dayChooseBox {
@@ -616,16 +624,16 @@ html {
 /* track view css below */
 .trackContainer1 {
   display: grid;
-  grid-template-columns: 40px auto 45px;
+  grid-template-columns: 1% 10% auto 5% 12% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. header1 month1'
-  '. header2 .'
-  '. messages .';
+  '. . header1 . month1 .'
+  '. . header2 . . .'
+  '. . messages . . .';
 }
 
 /* .trackContainer2 {
@@ -784,7 +792,7 @@ label {  /* Used in settingsView */
 
 #container {
   display: grid;
-  grid-template-columns: 1% 10% 1% 83% 1%;
+  grid-template-columns: 1% 10% 1% 80% 1%;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
   /* justify-items: center; */
@@ -934,8 +942,8 @@ label {  /* Used in settingsView */
 
 #playButton {
 	position: absolute;
-	/* bottom: 10%; */
-	/* left: 80%; */
+	bottom: 10%;
+	/* left: 80px; */
 	/* margin-top: 150%; */
 	/* margin-left: 75%; */
 	margin-top: 450px;
@@ -954,12 +962,13 @@ label {  /* Used in settingsView */
 
 #addTaskButton {
   position: absolute;
-  /* bottom: 10%;
-  left: 80%; */
+  right: 80px;
+  bottom: 10%;
+  /* left: 80%; */
   /* margin-top: 150%;
   margin-left: 75%; */
   margin-top: 450px;
-  margin-left: 275px;
+  /* margin-left: 275px; */
   font-size: x-large;
   line-height: 0.1em;
   text-align: center;
@@ -1027,12 +1036,12 @@ label {  /* Used in settingsView */
 }
 
 /* TODO: There are two #month */
-#month {
+/* #month {
   grid-area: month;
   justify-self: end;
   margin-top: 2px;
   margin-right: 2px;
-}
+} */
 
 #name {
   /* Put FuzzyPlan header in right place */
@@ -1098,6 +1107,7 @@ div.tasksToSort #postpone {
   grid-area: storage;
   margin-top: 2px;
   margin-left: 2px;
+  align-self: center;
 }
 
 #stressDiv {
@@ -1154,13 +1164,13 @@ div.tasksToSort #postpone {
 
 .storageContainer {
   display: grid;
-  grid-template-columns: 10% auto 10%;
+  grid-template-columns: 1% 10% auto 5% 12% 1%;
   grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
-  grid-template-areas: '. header1 .' '. messages .';
+  grid-template-areas: '. day1 header1 . . .' '. . messages . . .';
 }
 
 .storageContainer1 {
@@ -1186,10 +1196,12 @@ div.tasksToSort #postpone {
 #stores {
   display: flex;
   flex-direction: column;
+  grid-area: day1;
 }
 
 #day1 {
   align-self: center;
+  grid-area: day1;
 }
 
 button[id*='memory'] {
@@ -1202,7 +1214,7 @@ button[id*='memory'] {
 
 @media screen and (min-width: 400px) {
   html {
-    background-color: black;
+    background-color: white;
   }
 
   #blankBottom {

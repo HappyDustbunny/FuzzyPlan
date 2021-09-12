@@ -431,6 +431,7 @@ function setUpFunc() {
 
   updateHearts(); // Update hearts to current time
 
+  document.getElementById('container').style.height = window.innerHeight - 110 +'px';
   document.getElementById('dayInputBox').focus();
 }
 
@@ -892,7 +893,6 @@ function sayGong() {  // Sound credit https://freesound.org/people/Q.K./sounds/5
 
 ////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
 
-// document.getElementById('storage').addEventListener('click', function() {goToPage('storage.html');});
 document.getElementById('info').addEventListener('click', gotoInfo);
 document.getElementById('month').addEventListener('click', monthButtonClicked);
 
