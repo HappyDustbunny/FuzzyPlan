@@ -73,31 +73,32 @@ html {
 
 .centerWrapper {
   display: grid;
-  grid-template-columns: 24% 45% 10% 6% 6%;
+  grid-template-columns: 6% 18% 45% 10% 6% 6%;
   grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. . . . .'
-  '. chooseBox . . .'
+  '. cwl cwcen cwr1 cwr2 cwr3'
+  '. . chooseBox . . .'
 }
 
-.monthCenterWrapper {
-  display: grid;
-  grid-template-columns: 6px 40px auto 40px 6px;
-  grid-template-rows: auto auto;
-  grid-gap: .6rem;
-  background-color: transparent;
-  border: none;
-  overflow-y: scroll;
-  grid-template-areas:
-  '. clear inputbox moveToDay .'
-  '. putback monthChooseBox . .'
+#sortTask {
+  display: flex;
+  grid-area: cwl;
 }
 
-.container1 {
+#storageHeadingText {
+  grid-area: cwcen;
+  font-size: 12px;
+}
+
+#dayInputBox {
+  grid-area: cwcen;
+}
+
+.headContainer {
   display: grid;
   grid-template-columns: 1% 10% auto 5% 12% 1%;
   grid-template-rows: auto auto auto;
@@ -106,7 +107,7 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas:
-  '. month header1 info storage .'
+  '. hcl header hcr1 hcr2 .'
   '. . hearts . . .'
   '. . messages . . .';
 }
@@ -464,7 +465,7 @@ html {
   /* justify-items: center; */
   background-color: transparent;
   border: none;
-  height: 700px;
+  height: 640px;
   overflow-y: scroll;
   grid-template-areas:
   '. taskHeader .'
@@ -556,27 +557,37 @@ html {
 }
 
 #track {
-  grid-area: track;
+  grid-area: hcl;
   align-self: center;
 }
 
-#monthClearButton {
-  grid-area: clear;
+#clearButton {
+  grid-area: cwr1;
+}
+
+#putBackClearDiv {
+  display: flex;
+  justify-content: end;
+  grid-area: cwl;
 }
 
 #monthInputBox {
-  grid-area: inputbox;
+  grid-area: cwcen;
 }
 
 #month {
-  grid-area: month;
+  grid-area: hcl;
   /* justify-self: end; */
   align-self: center;
 }
 
 #day {
-  grid-area: day;
+  grid-area: hcr2;
   align-self: center;
+}
+
+#gotoSettings {
+  grid-area: cwr2;
 }
 
 #dayChooseBox {
@@ -585,7 +596,7 @@ html {
 
 #moveToDay {
   display: none;
-  grid-area: moveToDay;
+  grid-area: cwr1;
 }
 
 #moveToDay.active {
@@ -602,7 +613,7 @@ html {
 
 #monthChooseBox {
   display: none;
-  grid-area: monthChooseBox;
+  grid-area: ChooseBox;
 }
 
 #monthChooseBox.active {
@@ -613,7 +624,6 @@ html {
   display: none;
 	line-height: 0.8em;
 	padding-top: 2px;
-  grid-area: putback;
 }
 
 #putBack.active {
@@ -679,7 +689,7 @@ html {
 }
 
 #month1 {
-  grid-area: month1;
+  grid-area: hcr2;
   align-self: center;
 }
 
@@ -767,6 +777,10 @@ label {  /* Used in settingsView */
 .stressContainer {
 	display: grid;
 	grid-template-columns: auto 30px;
+}
+
+#gotoDayFromSettings {
+  grid-area: hcl;
 }
 
 #settingsMessage {
@@ -1027,6 +1041,14 @@ label {  /* Used in settingsView */
   margin-top: 2px;
   font-size: 0.8em;
   padding-left: 7px;
+  grid-area: hcr1;
+}
+
+#settingsHeading, #trackViewHeading {
+  display: none;
+  justify-content: center;
+  grid-area: cwcen;
+  font-size: 13px;
 }
 
 #dayMessage, #addMessage {
@@ -1047,7 +1069,7 @@ label {  /* Used in settingsView */
 #name {
   /* Put FuzzyPlan header in right place */
   justify-content: center;
-  grid-area: header1;
+  grid-area: header;
 }
 
 #nowSpan {
@@ -1058,6 +1080,10 @@ label {  /* Used in settingsView */
 
 div.tasksToSort {
   display: grid;
+}
+
+#upButton, #nowButton {
+  grid-area: cwl;
 }
 
 div.tasksToSort #upButton {
@@ -1105,7 +1131,7 @@ div.tasksToSort #postpone {
 }
 
 #storage {
-  grid-area: storage;
+  grid-area: hcr2;
   margin-top: 2px;
   margin-left: 2px;
   align-self: center;
@@ -1148,6 +1174,7 @@ div.tasksToSort #postpone {
   text-align: center;
   width: auto;
   font-size: 15px;
+  grid-area: cwr3;
 }
 
 
@@ -1202,7 +1229,7 @@ div.tasksToSort #postpone {
 
 #day1 {
   align-self: center;
-  grid-area: day1;
+  grid-area: hcl;
 }
 
 button[id*='memory'] {

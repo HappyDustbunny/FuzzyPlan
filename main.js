@@ -432,6 +432,7 @@ function setUpFunc() {
   updateHearts(); // Update hearts to current time
 
   document.getElementById('container').style.height = window.innerHeight - 110 +'px';
+  document.getElementById('monthContainer').style.height = window.innerHeight - 110 +'px';
   document.getElementById('dayInputBox').focus();
 }
 
@@ -1081,6 +1082,8 @@ function addTaskButtonClicked() {
   // document.getElementById('dayView').classList.remove('active');
   document.getElementById('addView').hidden = false;
   document.getElementById('dayView').hidden = true;
+  hideOrDisplayClass('addView', 'none');
+   hideOrDisplayClass('dayView', 'grid');
 
   hideOrDisplayClass('playView', 'none');
   hideOrDisplayClass('addView', 'block');
@@ -1415,6 +1418,8 @@ function apply() {
     // Close add-view
     document.getElementById('addView').hidden = true;
     document.getElementById('dayView').hidden = false;
+    hideOrDisplayClass('addView', 'none');
+     hideOrDisplayClass('dayView', 'grid');
 
     // document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
   }
@@ -1436,6 +1441,8 @@ function gotoDayFromAdd() {
   // Close add-view
   document.getElementById('addView').hidden = true;
   document.getElementById('dayView').hidden = false;
+  hideOrDisplayClass('addView', 'none');
+   hideOrDisplayClass('dayView', 'grid');
 }
 
 //////////////////// Add-view button code above ///////////////////////////
@@ -1460,7 +1467,9 @@ function playButtonClicked() {
   // document.getElementById('addView').classList.add('active');
   // document.getElementById('dayView').classList.remove('active');
   document.getElementById('addView').hidden = false;
-  document.getElementById('dayView').hidden = true;
+  document.getElementById('dayView').hidden = true; 
+  hideOrDisplayClass('addView', 'block');
+  hideOrDisplayClass('dayView', 'none');
 
   playViewActive = true;
 
@@ -1638,6 +1647,9 @@ function monthButtonClicked() {
   // document.getElementById('dayView').classList.remove('active');
   document.getElementById('monthView').hidden = false;
   document.getElementById('dayView').hidden = true;
+  hideOrDisplayClass('monthView', 'block');
+  hideOrDisplayClass('dayView', 'none');
+
 
   fillMonthDateBar();
 
@@ -1658,6 +1670,8 @@ function gotoDay() {
   // document.getElementById('dayView').classList.add('active');
   document.getElementById('monthView').hidden = true;
   document.getElementById('dayView').hidden = false;
+  hideOrDisplayClass('monthView', 'none');
+   hideOrDisplayClass('dayView', 'grid');
 
   fillChooseBox('day');
 }
@@ -2089,6 +2103,8 @@ function trackButtonClicked() {
 
   document.getElementById('trackView').hidden = false;
   document.getElementById('monthView').hidden = true;
+  hideOrDisplayClass('trackView', 'block');
+  hideOrDisplayClass('monthView', 'none');
 
   renderTracking();
 }
@@ -2315,6 +2331,8 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 function returnToMonth() {
   document.getElementById('trackView').hidden = true;
   document.getElementById('monthView').hidden = false;
+  hideOrDisplayClass('trackView', 'none');
+  hideOrDisplayClass('monthView', 'block');
   monthRenderTasks();
 }
 
@@ -2334,6 +2352,8 @@ function storageButtonClicked() {
 
   document.getElementById('dayView').hidden = true;
   document.getElementById('storageView').hidden = false;
+  hideOrDisplayClass('dayView', 'none');
+  hideOrDisplayClass('storageView', 'block');
 
   let storages = document.getElementsByClassName('store');
 
@@ -2457,6 +2477,8 @@ function gotoDayFromStorage() {
   storeLocally();
   document.getElementById('storageView').hidden = true;
   document.getElementById('dayView').hidden = false;
+  hideOrDisplayClass('storageView', 'none');
+   hideOrDisplayClass('dayView', 'grid');
   renderTasks();
 }
 
@@ -2474,6 +2496,8 @@ function gotoSettings() {
 
   document.getElementById('dayView').hidden = true;
   document.getElementById('settingsView').hidden = false;
+  hideOrDisplayClass('dayView', 'none');
+  hideOrDisplayClass('settingsView', 'block');
 }
 
 
@@ -2695,6 +2719,8 @@ function gotoDayFromSettings() {
   storeLocally();
   document.getElementById('settingsView').hidden = true;
   document.getElementById('dayView').hidden = false;
+  hideOrDisplayClass('settingsView', 'none');
+   hideOrDisplayClass('dayView', 'grid');
   renderTasks();
 }
 
@@ -3083,6 +3109,7 @@ function fixClearButtonArrow() {
     document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
     id = '';
   }
+  adjustNowAndWakeUpButtons();
 }
 
 

@@ -12,52 +12,82 @@
   <body onload="setUpFunc()">
     <div id="page">
 
+      <div class="headContainer">
+        <button type="button" id="month" class='controlButton dayView'> </button>
+
+        <h1 id='name' align=center> FuzzyPlan </h1>
+
+        <button type="button" id="info" class='controlButton dayView'> </button>
+
+        <button type="button" id="storage" class='controlButton dayView'> </button>
+
+        <span id='heart'></span>
+        <span id='dayMessage' hidden></span>
+
+        <!-- monht view -->
+        <button type="button" id='track' class="controlButton monthView" hidden></button>
+        <button type="button" id="day" class='controlButton monthView' hidden></button>
+        <!-- storage view -->
+        <button type="button" id="day1" class='controlButton storageView' hidden> </button>
+        <!-- settings view -->
+        <button type="button" id='gotoDayFromSettings' class='controlButton settingsView' hidden> </button>
+        <!-- track view -->
+        <button type="button" id="month1" class='controlButton trackView' hidden> </button>
+        <br>
+      </div>
+
+      <div class="centerWrapper">
+        <div id="sortTask" class="noTasksToSort">
+          <button type="button" id="postpone" class="controlButton"> </button>
+
+          <button type="button" id='upButton' class="controlButton dayView"> </button>
+
+          <button type="button" id='nowButton' class="controlButton dayView"> </button>
+        </div>
+
+        <input type="text" id='dayInputBox' class="inputBox dayView" autofocus value="">
+
+        <button type="button" id='playButton' class="dayView">&#x25B8;</button>  <!-- This button is placed in lower left corner by CSS -->
+        <button type="button" id="addTaskButton" class="dayView">+</button>  <!-- This button is placed in lower right corner by CSS -->
+
+        <button type="button" id='toDoButton' class="controlButton" hidden> </button>
+
+        <button type="button" id='clearButton' class="controlButton dayView"> </button>
+
+        <button type="button" id='gotoSettings' class="controlButton dayView"> </button>
+
+        <button type="button" id='zoom' class="controlButton dayView"> </button>
+
+        <div id="dayChooseBox"></div>
+
+        <!-- monht view -->
+        <div id="putBackClearDiv" class="monthView" hidden>
+          <button type="button" id="putBack" class="controlButton"> </button>
+          <button type="button" id='monthClearButton' class="controlButton"> </button>
+        </div>
+        <input type="text" id='monthInputBox' class="inputBox monthView" autofocus value="" hidden>
+
+        <button type="button" id="moveToDay" class="controlButton" hidden> </button>
+
+        <div id='monthChooseBox' hidden></div>
+
+        <!-- TODO: Hmmm. The hidden property is not great for toggling visibility -->
+
+        <!-- add view -->
+        <h2 id="addTaskHeading" class="text addView" align='center' lang="en" hidden>Add task</h2>
+
+        <!-- track view -->
+        <h2 id='trackViewHeading' class='text trackView' align='center' hidden> </h2>
+        <!-- storage view -->
+        <h4 id="storageHeadingText" class="text storageView" hidden>  </h4>
+        <!-- settings view -->
+        <h2 id="settingsHeading" class="text settingsView " hidden> </h2>
+      </div>
+
       <!-- Day view ------------------------ -->
-
       <div id="dayView" class="active">
-        <div class="container1">
-          <button type="button" id="month" class='controlButton'> </button>
 
-          <h1 id='name' align=center>
-            FuzzyPlan
-          </h1>
-
-          <button type="button" class='controlButton' id="info"> </button>
-
-          <button type="button" id="storage" class='controlButton'> </button>
-
-          <span id='heart'></span>
-          <span id='dayMessage' hidden></span>
-          <br>
-        </div>
-
-        <div class="centerWrapper">
-          <div id="sortTask" class="noTasksToSort">
-            <button type="button" id="postpone" class="controlButton"> </button>
-
-            <button type="button" id='upButton' class="controlButton"> </button>
-
-            <button type="button" id='nowButton' class="controlButton"> </button>
-          </div>
-
-          <input type="text" id='dayInputBox' class="inputBox" autofocus value="">
-
-          <button type="button" id='playButton'>&#x25B8;</button>  <!-- This button is placed in lower left corner by CSS -->
-          <button type="button" id="addTaskButton" >+</button>  <!-- This button is placed in lower right corner by CSS -->
-
-          <button type="button" id='toDoButton' class="controlButton" hidden> </button>
-
-          <button type="button" id='clearButton' class="controlButton"> </button>
-
-          <button type="button" id='gotoSettings' class="controlButton"> </button>
-
-          <button type="button" id='zoom' class="controlButton"> </button>
-
-          <div id="dayChooseBox"></div>
-
-        </div>
-
-        <div id='container' class="container2">
+        <div id='container' class="container2 dayView">
           <div id='stressDiv'> </div>
           <div id='timeDiv'> </div>
           <div id='taskDiv'> </div>
@@ -71,12 +101,10 @@
       <!-- Add-task view ---------------------- -->
 
       <div id='addView' hidden>
-        <div class="addContainer1">
+        <!-- <div class="addContainer1">
           <h1 align='center'>FuzzyPlan</h1>
-          <h2 id="addTaskHeading"align='center' lang="en">Add task</h2>
-          <h2 align='center' lang="da" hidden>Tilføj opgave</h2>
           <span id='addMessage' hidden></span>
-        </div>
+        </div> -->
 
 
         <div class='topic addView playView'>
@@ -261,31 +289,22 @@
       <!-- Month view ---------------------- -->
 
       <div id="monthView" hidden>
-        <div class="monthContainer1">
-          <button type="button" id='track' class="controlButton"></button>
+        <!-- <div class="monthContainer1">
 
           <h1 id='monthViewName' align=center>
             FuzzyPlan
           </h1>
 
-          <button type="button" id="day" class='controlButton'></button>
             <button type="button" class='controlButton' title='Klik for at gå tilbage
             til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)' lang="da" hidden>Dag</button>
           </span>
 
           <span id='monthMessage' hidden></span>
           <br>
-        </div>
+        </div> -->
 
-        <div class="monthCenterWrapper">
-          <button type="button" id='monthClearButton' class="controlButton"> </button>
-          <input type="text" id='monthInputBox' class="inputBox" autofocus value="">
-
-          <button type="button" id="moveToDay" class="controlButton"> </button>
-
-          <button type="button" id="putBack" class="controlButton"> </button>
-          <div id='monthChooseBox'></div>
-        </div>
+        <!-- <div class="monthCenterWrapper">
+        </div> -->
 
         <div id='monthContainer' class="monthContainer2">
           <div id='monthTaskDiv'> </div>
@@ -295,14 +314,12 @@
       <!-- Track view ---------------------- -->
 
       <div id="trackView" hidden>
-        <div class="trackContainer1">
+        <!-- <div class="trackContainer1">
           <h1 id='trackViewName' align='center'>
             FuzzyPlan
           </h1>
 
-          <h2 id='trackViewHeading' align='center'> </h2>
 
-          <button type="button" id="month1" class='controlButton'> </button>
 
           <span id='trackMessage' hidden></span>
           <br>
@@ -370,12 +387,11 @@
       <!-- Storage view ------------------------- -->
 
       <div id="storageView" hidden>
-        <div class="storageContainer">
+        <!-- <div class="storageContainer">
           <h1 id='storageViewName' align='center'>
             FuzzyPlan
           </h1>
 
-          <button type="button" id="day1" class='controlButton'> </button>
 
           <span id='storageMessage' hidden></span>
 
@@ -385,7 +401,6 @@
 
         <div class="storageContainer1">
           <div>
-            <h3 id="storageHeadingText">  </h3>
 
             <button type="button" id="storeList" class='controlButton'> </button>
 
@@ -429,21 +444,19 @@
       <!-- Settings view --------------------- -->
 
       <div id="settingsView" hidden>
-        <div class="container1">
+
+        <!-- <div class="container1">
           <h1 id='name' align=center>
             FuzzyPlan
           </h1>
 
-          <button type="button" id='gotoDayFromSettings' class='controlButton'> </button>
 
           <span id='settingsMessage' hidden></span>
 
           <br>
-        </div>    <!-- settingsContainer1 -->
+        </div>    <!-- settingsContainer1 --> -->
 
         <div class="settingsContainer">
-
-          <h2 id="settingsHeading" class="text"> </h2>
 
           <div class="topic">
             <div>
