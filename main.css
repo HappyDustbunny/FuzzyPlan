@@ -41,7 +41,7 @@ h1 {
 
 h2 {
   margin: 0px;
-  grid-area: header2;
+  grid-area: cwcen;
 }
 
 input {
@@ -65,10 +65,20 @@ html {
   background-color: white;
 }
 
-.button-disabled{
-  cursor: not-allowed;
-  K  /* pointer-events: none; */
+
+
+.headContainer {
+  display: grid;
+  grid-template-columns: 1% 10% auto 5% 12% 1%;
+  grid-template-rows: auto auto auto;
+  grid-gap: .3rem;
+  background-color: transparent;
   border: none;
+  overflow-y: scroll;
+  grid-template-areas:
+  '. hcl header hcr1 hcr2 .'
+  '. . hearts . . .'
+  '. . messages . . .';
 }
 
 .centerWrapper {
@@ -85,8 +95,13 @@ html {
 }
 
 #sortTask {
+  display: none;
+}
+
+#sortTask.active {
   display: flex;
   grid-area: cwl;
+  justify-content: flex-end;
 }
 
 #storageHeadingText {
@@ -95,30 +110,23 @@ html {
 }
 
 #dayInputBox {
+  display: none;
+}
+
+#dayInputBox.active {
+  display: block;
   grid-area: cwcen;
 }
 
-.headContainer {
-  display: grid;
-  grid-template-columns: 1% 10% auto 5% 12% 1%;
-  grid-template-rows: auto auto auto;
-  grid-gap: .3rem;
-  background-color: transparent;
-  border: none;
-  overflow-y: scroll;
-  grid-template-areas:
-  '. hcl header hcr1 hcr2 .'
-  '. . hearts . . .'
-  '. . messages . . .';
-}
 
 /* add view css below */
 
 /* Har denne en funktion? */
-::placeholder {
-  color: #788793; /* Lighter gray*/
+/* ::placeholder { */
+  /* Lighter gray*/
+  /* color: #788793;
   color: rgb(150, 150, 150);
-}
+} */
 
 .buttons {
   display: grid;
@@ -443,7 +451,7 @@ html {
 /* } */
 
 
-.monthContainer1 {
+/* .monthContainer1 {
   display: grid;
   grid-template-columns: 1% 10% auto 5% 12% 1%;
   grid-template-rows: auto auto auto;
@@ -454,7 +462,7 @@ html {
   grid-template-areas:
   '. track header . day .'
   '. . messages . . .';
-}
+} */
 
 
 .monthContainer2 {
@@ -556,37 +564,72 @@ html {
   margin: 5px;
 }
 
+
 #track {
-  grid-area: hcl;
+  display: none;
+}
+
+#track.active {
+  display: block;
   align-self: center;
+  grid-area: hcl;
 }
 
 #clearButton {
+  display: none;
+}
+
+#clearButton.active {
+  display: block;
   grid-area: cwr1;
 }
 
 #putBackClearDiv {
+  display: none;
+}
+
+#putBackClearDiv.active {
   display: flex;
-  justify-content: end;
   grid-area: cwl;
+  justify-content: end;
 }
 
 #monthInputBox {
+  display: none;
+}
+
+#monthInputBox.active {
+  display: block;
   grid-area: cwcen;
 }
 
 #month {
+  display: none;
   grid-area: hcl;
   /* justify-self: end; */
+}
+
+#month.active {
+  display: block;
   align-self: center;
 }
 
 #day {
-  grid-area: hcr2;
+  display: none;
+}
+
+#day.active {
+  display: block;
   align-self: center;
+  grid-area: hcr2;
 }
 
 #gotoSettings {
+  display: none;
+}
+
+#gotoSettings.active {
+  display: block;
   grid-area: cwr2;
 }
 
@@ -600,9 +643,9 @@ html {
 }
 
 #moveToDay.active {
+  display: grid;
   line-height: 0.8em;
   padding-top: 5px;
-  display: grid;
 }
 
 #monthViewName {
@@ -613,7 +656,7 @@ html {
 
 #monthChooseBox {
   display: none;
-  grid-area: ChooseBox;
+  grid-area: chooseBox;
 }
 
 #monthChooseBox.active {
@@ -689,6 +732,11 @@ html {
 }
 
 #month1 {
+  display: none;
+}
+
+#month1.active {
+  display: block;
   grid-area: hcr2;
   align-self: center;
 }
@@ -956,6 +1004,11 @@ label {  /* Used in settingsView */
 }
 
 #playButton {
+  display: none;
+}
+
+#playButton.active {
+  display: block;
 	position: absolute;
 	bottom: 10%;
 	/* left: 80px; */
@@ -976,6 +1029,11 @@ label {  /* Used in settingsView */
 }
 
 #addTaskButton {
+  display: none;
+}
+
+#addTaskButton.active {
+  display: block;
   position: absolute;
   right: 80px;
   bottom: 10%;
@@ -1036,12 +1094,17 @@ label {  /* Used in settingsView */
 }
 
 #info {
+  display: none;
+  grid-area: hcr1;
+}
+
+#info.active {
+  display: block;
   width: 22px;
   border-radius: 20px;
   margin-top: 2px;
   font-size: 0.8em;
   padding-left: 7px;
-  grid-area: hcr1;
 }
 
 #settingsHeading, #trackViewHeading {
@@ -1051,11 +1114,12 @@ label {  /* Used in settingsView */
   font-size: 13px;
 }
 
-#dayMessage, #addMessage {
-  grid-area: messages;
+#message {
+  display: grid;
   color: red;
   text-align: center;
   white-space: pre;  /* Render text as predefined without wrapping */
+  grid-area: messages;
 }
 
 /* TODO: There are two #month */
@@ -1095,11 +1159,9 @@ div.tasksToSort #nowButton {
 }
 
 div.tasksToSort #postpone {
+  display: flex;
   line-height: 0.8em;
   padding-top: 5px;
-  display: grid;
-  justify-self: end;
-  /* background-image: linear-gradient(#18ee4491, #a5ff987a, #a5ff987a, #a5ff987a, #18ee4491) */
 }
 
 #postpone {
@@ -1131,7 +1193,12 @@ div.tasksToSort #postpone {
 }
 
 #storage {
+  display: none;
   grid-area: hcr2;
+}
+
+#storage.active {
+  display: block;
   margin-top: 2px;
   margin-left: 2px;
   align-self: center;
@@ -1169,11 +1236,17 @@ div.tasksToSort #postpone {
   grid-area: timeBar;
 }
 
-
 #zoom {
+  display: none;
+}
+
+#zoom.active {
+  display: block;
   text-align: center;
   width: auto;
   font-size: 15px;
+  padding-top: 0px;
+  padding-bottom: 2px;
   grid-area: cwr3;
 }
 
@@ -1228,6 +1301,11 @@ div.tasksToSort #postpone {
 }
 
 #day1 {
+  display: none;
+}
+
+#day1.active {
+  display: block;
   align-self: center;
   grid-area: hcl;
 }
@@ -1262,3 +1340,10 @@ button[id*='memory'] {
     top: 50%;
   }
 }
+
+
+/* .button-disabled{
+  cursor: not-allowed;
+  pointer-events: none;
+  border: none;
+} */

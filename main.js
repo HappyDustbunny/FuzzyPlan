@@ -671,9 +671,9 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     tasksSentToDay = [];
 
     if (tasks.length === 0) {
-      document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+      document.getElementById('sortTask').classList.remove('tasksToSort');
     } else {
-      document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
+      document.getElementById('sortTask').classList.toggle('tasksToSort',true); // Add the class tasksToSort due to 'true' flag
     }
 
   }
@@ -718,13 +718,14 @@ function postponeTask() {
   }
 
   if (!document.getElementById('dayChooseBox').classList.contains('active')) {
-    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
   }
   resetInputBox('day');
   anneal();
   renderTasks();
   fixClearButtonArrow();
 }
+// TODO: Postpone does not appear when more than one task from monhtView is sorted in dayView
 
 function moveToDay() {
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
@@ -1078,16 +1079,12 @@ function addTaskButtonClicked() {
 
   // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
   // Trigger animation via CSS
-  // document.getElementById('addView').classList.add('active');
-  // document.getElementById('dayView').classList.remove('active');
-  document.getElementById('addView').hidden = false;
-  document.getElementById('dayView').hidden = true;
-  hideOrDisplayClass('addView', 'none');
-   hideOrDisplayClass('dayView', 'grid');
+  displayClass('addView', true);
+  displayClass('dayView', false);
 
-  hideOrDisplayClass('playView', 'none');
-  hideOrDisplayClass('addView', 'block');
-  hideOrDisplayClass('hourglassTimer', 'none');  // Inelegant to turn the hourglassTimer off just after turning it on, but the logic is cleaner
+  // displayClass('playView', true);
+  // displayClass('addView', false);
+  // displayClass('hourglassTimer', false);  // Inelegant to turn the hourglassTimer off just after turning it on, but the logic is cleaner
 
   fillDurationBox(defaultTaskDuration);
 
@@ -1418,8 +1415,8 @@ function apply() {
     // Close add-view
     document.getElementById('addView').hidden = true;
     document.getElementById('dayView').hidden = false;
-    hideOrDisplayClass('addView', 'none');
-     hideOrDisplayClass('dayView', 'grid');
+    displayClass('addView', false);
+    displayClass('dayView', true);
 
     // document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
   }
@@ -1435,24 +1432,32 @@ function gotoDayFromAdd() {
   // document.getElementById('hourglass').hidden = true; // TODO: This shows up in Add View after a cancelation of Play View
   // document.getElementById('soundDiv').hidden = true;
 
-  hideOrDisplayClass('hourglassTimer', 'none');
-  hideOrDisplayClass('playControl', 'none');
+  displayClass('hourglassTimer', true); // TODO: This can't be right
+  displayClass('playControl', true);
 
   // Close add-view
-  document.getElementById('addView').hidden = true;
-  document.getElementById('dayView').hidden = false;
-  hideOrDisplayClass('addView', 'none');
-   hideOrDisplayClass('dayView', 'grid');
+  displayClass('addView', false);
+  displayClass('dayView', true);
 }
 
 //////////////////// Add-view button code above ///////////////////////////
 
 // Helper function for Add-view and Play-view
-function hideOrDisplayClass(className, displayStatus) {  // displaystatus can be 'none' or 'block'
-  let members = document.getElementsByClassName(className);
+function displayClass(className, displayStatus) {  // displaystatus can be 'true' or 'false'
 
+  // Check if the className is used as id and if so, turn the element with this id on or off
+  let id = document.getElementById(className);
+  if (id) {
+    id.hidden = !displayStatus; // hidden is false if something should be displayed, hence !displayStatus
+  }
+
+  let members = document.getElementsByClassName(className);
   for (var i = 0; i < members.length; i++) {
-    members[i].style.display = displayStatus;
+    if (displayStatus) {
+      members[i].classList.add('active');
+    } else {
+      members[i].classList.remove('active');
+    }
   }
 }
 
@@ -1464,17 +1469,13 @@ function playButtonClicked() {
 
   // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
   // Trigger animation via CSS
-  // document.getElementById('addView').classList.add('active');
-  // document.getElementById('dayView').classList.remove('active');
-  document.getElementById('addView').hidden = false;
-  document.getElementById('dayView').hidden = true; 
-  hideOrDisplayClass('addView', 'block');
-  hideOrDisplayClass('dayView', 'none');
+  displayClass('addView', true); // TODO: Disentangel play and add view?
+  displayClass('dayView', false);
 
   playViewActive = true;
 
-  hideOrDisplayClass('addView', 'none');
-  hideOrDisplayClass('playView', 'block');
+  displayClass('addView', false);
+  displayClass('playView', true);
 
   document.getElementById('stopButton').hidden = false;
   document.getElementById('applyAdd').hidden = true;
@@ -1551,7 +1552,7 @@ function playControlsQuery(useDefault) {  // Turn off the playControlQuery div a
   document.getElementById('toText').style.display = 'inline-block';
   document.getElementById('inputDurationBox').style.backgroundColor = '#d3d3d31c';
   document.getElementById('inputDurationBox').disabled = 'true';
-  hideOrDisplayClass('playControl', 'block');
+  displayClass('playControl', true);
 
   if (useDefault) {
     fillDurationBox(defaultTaskDuration);
@@ -1642,13 +1643,8 @@ function insertTask() {
 function monthButtonClicked() {
   storeLocally();
 
-  // Trigger animation via CSS
-  // document.getElementById('monthView').classList.add('active');
-  // document.getElementById('dayView').classList.remove('active');
-  document.getElementById('monthView').hidden = false;
-  document.getElementById('dayView').hidden = true;
-  hideOrDisplayClass('monthView', 'block');
-  hideOrDisplayClass('dayView', 'none');
+  displayClass('monthView', true);
+  displayClass('dayView', false);
 
 
   fillMonthDateBar();
@@ -1665,13 +1661,8 @@ function monthButtonClicked() {
 
 
 function gotoDay() {
-  // Trigger animation via CSS
-  // document.getElementById('monthView').classList.remove('active');
-  // document.getElementById('dayView').classList.add('active');
-  document.getElementById('monthView').hidden = true;
-  document.getElementById('dayView').hidden = false;
-  hideOrDisplayClass('monthView', 'none');
-   hideOrDisplayClass('dayView', 'grid');
+  displayClass('monthView', false);
+  displayClass('dayView', true);
 
   fillChooseBox('day');
 }
@@ -2101,10 +2092,8 @@ function monthClearBehavior() {
 function trackButtonClicked() {
   storeLocally();
 
-  document.getElementById('trackView').hidden = false;
-  document.getElementById('monthView').hidden = true;
-  hideOrDisplayClass('trackView', 'block');
-  hideOrDisplayClass('monthView', 'none');
+  displayClass('trackView', true);
+  displayClass('monthView', false);
 
   renderTracking();
 }
@@ -2329,10 +2318,8 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 
 
 function returnToMonth() {
-  document.getElementById('trackView').hidden = true;
-  document.getElementById('monthView').hidden = false;
-  hideOrDisplayClass('trackView', 'none');
-  hideOrDisplayClass('monthView', 'block');
+  displayClass('trackView', false);
+  displayClass('monthView', true);
   monthRenderTasks();
 }
 
@@ -2350,10 +2337,8 @@ function showOrHideTrackedTasksInTooltip() {
 function storageButtonClicked() {
   storeLocally();
 
-  document.getElementById('dayView').hidden = true;
-  document.getElementById('storageView').hidden = false;
-  hideOrDisplayClass('dayView', 'none');
-  hideOrDisplayClass('storageView', 'block');
+  displayClass('dayView', false);
+  displayClass('storageView', true);
 
   let storages = document.getElementsByClassName('store');
 
@@ -2475,10 +2460,10 @@ function storeHasBeenClicked(event) {
 
 function gotoDayFromStorage() {
   storeLocally();
-  document.getElementById('storageView').hidden = true;
-  document.getElementById('dayView').hidden = false;
-  hideOrDisplayClass('storageView', 'none');
-   hideOrDisplayClass('dayView', 'grid');
+
+  displayClass('storageView', false);
+  displayClass('dayView', true);
+
   renderTasks();
 }
 
@@ -2494,10 +2479,8 @@ function gotoSettings() {
 
   setUpSettings();
 
-  document.getElementById('dayView').hidden = true;
-  document.getElementById('settingsView').hidden = false;
-  hideOrDisplayClass('dayView', 'none');
-  hideOrDisplayClass('settingsView', 'block');
+  displayClass('dayView', false);
+  displayClass('settingsView', true);
 }
 
 
@@ -2717,10 +2700,8 @@ function clearEverything() {
 
 function gotoDayFromSettings() {
   storeLocally();
-  document.getElementById('settingsView').hidden = true;
-  document.getElementById('dayView').hidden = false;
-  hideOrDisplayClass('settingsView', 'none');
-   hideOrDisplayClass('dayView', 'grid');
+  displayClass('settingsView', false);
+  displayClass('dayView', true);
   renderTasks();
 }
 
@@ -2848,7 +2829,7 @@ function adjustNowAndWakeUpButtons() {
 
     document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
     document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
-    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
   } else {
     upBtn.title = languagePack['upButtonJump'][language][1] + wakeUpH + ':' + min;  // 'Jumpt to'
     upBtn.textContent = languagePack['upButtonJump'][language][0] + wakeUpH + ':' + min;  // '\u25B8' Black right-pointing small triangle
@@ -2889,13 +2870,13 @@ function inputAtEnter(event) {
     // button.title = languagePack['clearButton'][language][1];
     fixClearButtonArrow();
     document.getElementById('addTaskButton').textContent = '+';
-    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
   } else {
     // Ready buttons for clearing or editing current text in inputbox
     button.textContent = languagePack['clearButtonText'][language][0]; // Black left-pointing small triangle
     button.title = languagePack['clearButtonText'][language][1];
     document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
-    document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
+    document.getElementById('sortTask').classList.toggle('tasksToSort', true);  // Add class tasksToSort due to 'true' flag
   }
 }
 
@@ -3106,7 +3087,7 @@ function fixClearButtonArrow() {
     clearButton.textContent = languagePack['clearButton'][language][0]; // Black down-pointing small triangle
     clearButton.title = languagePack['clearButton'][language][1];
     document.getElementById('addTaskButton').textContent = '+';
-    document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
     id = '';
   }
   adjustNowAndWakeUpButtons();
@@ -3136,7 +3117,7 @@ function clearDay() {
   setUpFunc();
   document.getElementById('dayInputBox').value = '';
   document.getElementById('addTaskButton').textContent = '+';
-  document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+  document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
   document.getElementById('dayInputBox').focus();
 }
 
@@ -3303,7 +3284,7 @@ function getStress(task) {
 
 function displayMessage(text, displayTime, view) {  // displayTime in milliseconds
   console.log(text, view);
-  msg = document.getElementById(view + 'Message');
+  msg = document.getElementById('message');
   msg.style.display = 'inline-block';
   // msg.style.color = 'red';
   msg.textContent = text;
@@ -3361,7 +3342,7 @@ function taskHasBeenClicked(event) {
     }
     document.getElementById('addTaskButton').textContent = '+';
     if (!document.getElementById('dayChooseBox').classList.contains('active')) {
-      document.getElementById('sortTask').setAttribute('class', 'noTasksToSort');
+      document.getElementById('sortTask').classList.toggle('tasksToSort', false); // Remove class tasksToSort due to 'false' flag
     }
 
   } else if (contentInputBox !== '' && chosenTaskId){
@@ -3384,7 +3365,7 @@ function taskHasBeenClicked(event) {
     } else if (chosenTaskId === myUniqueId) {
       editTask();
       document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
-      document.getElementById('sortTask').setAttribute('class', 'tasksToSort');
+      document.getElementById('sortTask').classList.toggle('tasksToSort', true);
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
       displayMessage(languagePack['fixedTaskClicked'][language], 3000, 'day');
       taskList[chosenId].isClicked = 'isNotClicked';

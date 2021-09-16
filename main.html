@@ -13,16 +13,16 @@
     <div id="page">
 
       <div class="headContainer">
-        <button type="button" id="month" class='controlButton dayView'> </button>
+        <button type="button" id="month" class='controlButton dayView active'> </button>
 
         <h1 id='name' align=center> FuzzyPlan </h1>
 
-        <button type="button" id="info" class='controlButton dayView'> </button>
+        <button type="button" id="info" class='controlButton dayView active'> </button>
 
-        <button type="button" id="storage" class='controlButton dayView'> </button>
+        <button type="button" id="storage" class='controlButton dayView active'> </button>
 
         <span id='heart'></span>
-        <span id='dayMessage' hidden></span>
+        <span id='message' hidden></span>
 
         <!-- monht view -->
         <button type="button" id='track' class="controlButton monthView" hidden></button>
@@ -37,41 +37,40 @@
       </div>
 
       <div class="centerWrapper">
-        <div id="sortTask" class="noTasksToSort">
+        <div id="sortTask" class="noTasksToSort dayView active">
           <button type="button" id="postpone" class="controlButton"> </button>
 
-          <button type="button" id='upButton' class="controlButton dayView"> </button>
+          <button type="button" id='upButton' class="controlButton"> </button>
 
-          <button type="button" id='nowButton' class="controlButton dayView"> </button>
+          <button type="button" id='nowButton' class="controlButton"> </button>
         </div>
 
-        <input type="text" id='dayInputBox' class="inputBox dayView" autofocus value="">
+        <input type="text" id='dayInputBox' class="inputBox dayView active" autofocus value="">
 
-        <button type="button" id='playButton' class="dayView">&#x25B8;</button>  <!-- This button is placed in lower left corner by CSS -->
-        <button type="button" id="addTaskButton" class="dayView">+</button>  <!-- This button is placed in lower right corner by CSS -->
+        <button type="button" id='playButton' class="dayView active">&#x25B8;</button>  <!-- This button is placed in lower left corner by CSS -->
+        <button type="button" id="addTaskButton" class="dayView active">+</button>  <!-- This button is placed in lower right corner by CSS -->
 
         <button type="button" id='toDoButton' class="controlButton" hidden> </button>
 
-        <button type="button" id='clearButton' class="controlButton dayView"> </button>
+        <button type="button" id='clearButton' class="controlButton dayView active"> </button>
 
-        <button type="button" id='gotoSettings' class="controlButton dayView"> </button>
+        <button type="button" id='gotoSettings' class="controlButton dayView active"> </button>
 
-        <button type="button" id='zoom' class="controlButton dayView"> </button>
+        <button type="button" id='zoom' class="controlButton dayView active"> </button>
 
         <div id="dayChooseBox"></div>
 
         <!-- monht view -->
-        <div id="putBackClearDiv" class="monthView" hidden>
+        <div id="putBackClearDiv" class="monthView">
           <button type="button" id="putBack" class="controlButton"> </button>
-          <button type="button" id='monthClearButton' class="controlButton"> </button>
+          <button type="button" id='monthClearButton' class="controlButton monthView"> </button>
         </div>
-        <input type="text" id='monthInputBox' class="inputBox monthView" autofocus value="" hidden>
+
+        <input type="text" id='monthInputBox' class="inputBox monthView" autofocus value="">
 
         <button type="button" id="moveToDay" class="controlButton" hidden> </button>
 
         <div id='monthChooseBox' hidden></div>
-
-        <!-- TODO: Hmmm. The hidden property is not great for toggling visibility -->
 
         <!-- add view -->
         <h2 id="addTaskHeading" class="text addView" align='center' lang="en" hidden>Add task</h2>
@@ -84,8 +83,10 @@
         <h2 id="settingsHeading" class="text settingsView " hidden> </h2>
       </div>
 
+
       <!-- Day view ------------------------ -->
-      <div id="dayView" class="active">
+
+      <div id="dayView">
 
         <div id='container' class="container2 dayView">
           <div id='stressDiv'> </div>
