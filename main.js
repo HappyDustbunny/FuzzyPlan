@@ -133,6 +133,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
         ['OK', '']],
      'applyButtonText': [['Ok (Then tap where this task should be)', ''],
         ['OK (Klik der hvor opgaven skal indsættes)', '']],
+      'taskPastEndOfDay': [['Oups, a task were pushed past midnight\nPlease put back', ''],
+        ['Ups, en opgave blev skubbet forbi midnat\nGeninsæt den venligst', '']],
       // Play View
       'playText': [['Task running from', ''],
                  ['Opgave løber fra', '']],
@@ -474,6 +476,8 @@ function storeLocally() {
 
   localStorage.language = language;   // Value 0:English 1:Danish
 
+  localStorage.dontShowTrackedAsTooltip = dontShowTrackedAsTooltip;
+
   if (monthTaskList) {
     localStorage.monthTaskList = JSON.stringify(monthTaskList);
   }
@@ -579,6 +583,10 @@ function retrieveLocallyStoredStuff() {
     language = Number(localStorage.language);   // Value 0:English 1:Danish
   }
 
+  if (localStorage.getItem('dontShowTrackedAsTooltip')) {
+    dontShowTrackedAsTooltip = (localStorage.dontShowTrackedAsTooltip);
+  }
+
   if (localStorage.getItem('monthTaskList')) {
     monthTaskList = JSON.parse(localStorage.getItem('monthTaskList'));
   }
@@ -682,11 +690,11 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     let counter = 0;
     for (var task of tasks) {
       if (counter === 0) {
-        document.getElementById(whichView + 'InputBox').value = task.text;
+        document.getElementById(whichView + 'InputBox').value = task.text + ' ' + task.duration/60000 + 'm';
       } else {
         newButton = document.createElement('button');
         newButton.classList.add('floatingTask');
-        newButton.textContent = task.text;
+        newButton.textContent = task.text + ' ' + task.duration/60000 + 'm';
         newButton.setAttribute('id', 'task' + counter);
 
         document.getElementById(whichView + 'ChooseBox').appendChild(newButton);
@@ -698,9 +706,6 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     clearButton.textContent = languagePack['clearButtonText'][language][0];  // Black left-pointing small triangle
     clearButton.title = languagePack['clearButtonText'][language][1];
   }
-
-  // tasksFromClickedDayInMonth = [];  // If this is emptied here putBack will have nothing to put back. It should be emptied elsewhere. Or after a test here
-
 }
 
 function postponeTask() {
@@ -1433,7 +1438,7 @@ function gotoDayFromAdd() {
   // document.getElementById('soundDiv').hidden = true;
 
   displayClass('hourglassTimer', true); // TODO: This can't be right
-  displayClass('playControl', true);
+  displayClass('playControl', true);  // TODO: Should playControl be playView??
 
   // Close add-view
   displayClass('addView', false);
@@ -1469,12 +1474,12 @@ function playButtonClicked() {
 
   // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
   // Trigger animation via CSS
-  displayClass('addView', true); // TODO: Disentangel play and add view?
+  // displayClass('addView', true); // TODO: Disentangel play and add view?
   displayClass('dayView', false);
 
   playViewActive = true;
 
-  displayClass('addView', false);
+  // displayClass('addView', false);
   displayClass('playView', true);
 
   document.getElementById('stopButton').hidden = false;
@@ -1929,13 +1934,16 @@ function monthRenderTasks() {
       continue;
     }
 
-    let gradient = '';
+    let gradient = 'white 0%, ' + 'white' + ' ';
     let taskColour = 'white';
     let startPercent = 0;
     let endPercent = 0;
 
     // Make gradient for the day currently being processed
     let firstTaskDate = parseText(tasks[0])[0];
+    if (firstTaskDate == '') {
+      firstTaskDate = new Date(2000, 5, 5, 0, 5, 0); // Necessary if first task is at 0:00 in the morning
+    }
     let nowTime = firstTaskDate;
 
     for (var n in tasks) {
@@ -1959,8 +1967,7 @@ function monthRenderTasks() {
           startPercent = parseInt((taskDate.getHours() * 60 + taskDate.getMinutes()) / (24 * 60) * 100);
           endPercent = parseInt(startPercent + (taskDuration / 60000) / (24 * 60) * 100);
 
-          gradient += 'white 0%, ' + 'white' + ' ' + startPercent
-          + '% ' ;
+          gradient +=  startPercent + '% ' ;
         }
       } else {
         taskDate = nowTime;
@@ -1980,6 +1987,7 @@ function monthRenderTasks() {
       string = string.replace(/ /g, '_');
 
       taskColour = '#DED';  // Default task colour if not watched  #DED is dirtywhite with a green tinge
+
       for (var trackedTaskText in trackTaskList) {
         if (string == '') {
           taskColour = 'white'; // nullTime is made white
@@ -2787,7 +2795,7 @@ function wakeUpButton() {
   let now = new Date();
   let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
   let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
-  let task = new Task(taskStart, 15 * 60000, languagePack['planning'][language], 1);
+  let task = new Task(taskStart, 15 * 60000, languagePack['planning'][0][language], 1);
   succes = addFixedTask(task);
   if (!succes) {
     console.log('wakeUpButton failed to insert a task');
@@ -2800,7 +2808,7 @@ function wakeUpButton() {
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
 function nowButton() {
-  let task = new Task(new Date(), 15 * 60000, languagePack['planning'][language], 1);
+  let task = new Task(new Date(), 15 * 60000, languagePack['planning'][0][language], 1);
   addFixedTask(task);
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
   wakeUpOrNowClickedOnce = true;
@@ -3016,8 +3024,8 @@ function isThereASoftOverlap(task) {
   let len = taskList.length;
 
   for (var n=0; n<len; n++) {
-    if ((taskList[n].date < task.date && task.date < taskList[n].end)
-      || (taskList[n].date < task.end && task.end < taskList[n].end)) {
+    if ((taskList[n].date <= task.date && task.date <= taskList[n].end)
+      || (taskList[n].date <= task.end && task.end <= taskList[n].end)) {
         if (taskList[n].fuzzyness === 'isNotFuzzy') {
           overlap = 'hardOverlap';
           return overlap;
@@ -3345,7 +3353,7 @@ function taskHasBeenClicked(event) {
       document.getElementById('sortTask').classList.toggle('tasksToSort', false); // Remove class tasksToSort due to 'false' flag
     }
 
-  } else if (contentInputBox !== '' && chosenTaskId){
+  } else if (contentInputBox !== '' && chosenTaskId) {
     // Text in inputbox and a chosenTaskId. Should not happen.
     nullifyClick();
     console.log('Text in inputbox and a chosenTaskId. Should not happen.');
@@ -3357,6 +3365,12 @@ function taskHasBeenClicked(event) {
     taskList[myId].isClicked = 'isClicked';
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
+
+    if (nullTimeClicked && document.activeElement.id == 'dayInputBox') {
+      document.getElementById('dayInputBox').blur()
+    } else {
+      document.getElementById('dayInputBox').focus()
+    }
 
   } else if (contentInputBox == '' && chosenTaskId) {
     // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
@@ -3423,12 +3437,58 @@ function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is
       [taskList[n], taskList[n + 1]] = [taskList[n + 1], taskList[n]];
       fixTimes();
     }
-    if (taskList[n + 1].date - taskList[n].end > 0 && taskList[n + 1].fuzzyness === 'isFuzzy') {
+    if (0 < taskList[n + 1].date - taskList[n].end && taskList[n + 1].fuzzyness === 'isFuzzy') {
       taskList[n + 1].date = taskList[n].end;
       taskList[n + 1].end = new Date(taskList[n + 1].date.getTime() + taskList[n + 1].duration);
     }
   }
   fixTimes();
+
+  overspill = fixOverspillingTasks();
+  if (overspill) {
+    fillChooseBox('day');
+    displayMessage(languagePack['taskPastEndOfDay'][language][0], 3000, 'day');
+  }
+}
+
+
+function fixOverspillingTasks() {
+  // Send tasks overspilling at the end of the day to chooseBox
+  let overspill = false;
+  let len = taskList.length;
+
+  if (taskList[len - 1].text != 'Day end') {
+    let dayEndPos = 1;
+    for (var n=1; n<len - 1; n++) {
+      if (taskList[n].text == 'Day end') {
+        dayEndPos = n;
+        break;
+      }
+    }
+
+    tasksSentToDay.push('dummy'); // Ugly hack to prevent handleChooseBox in taskHasBeenClicked eating relevant tasks
+
+    for (var m=dayEndPos + 1; m<len; m++) {
+      tasksSentToDay.push(taskList[m]);
+      overspill = true;
+    }
+
+    for (var m=dayEndPos + 1; m<len; m++) {
+      taskList.pop();
+    }
+    fixOverspillingTasks();
+  }
+
+  // Check if there is a task straggling Day End
+  let nextLast = taskList[taskList.length - 2];
+  if (taskList[taskList.length - 1].date.getTime() < nextLast.date.getTime() + nextLast.duration) {
+    tasksSentToDay.push(nextLast);
+    taskList.splice(taskList.length - 2, 1);
+    len -= 1;
+    overspill = true;
+  }
+
+  return overspill;
 }
 
 
@@ -3441,7 +3501,7 @@ function fixTimes() {
       taskList[n + 1].date = taskList[n].end;
       taskList[n + 1].end = new Date(taskList[n + 1].date.getTime() + taskList[n + 1].duration);
     } else {
-      // console.log(n, 'Overlapping a fixed task');
+      // console.log(n, 'Overlapping a fixed task'); // TODO: A fuzzy task can be pushed into overlapping a fixed task
     }
   }
 }
@@ -3718,16 +3778,22 @@ function parseText(rawText) {
 
   let time = /[0-9]?[0-9]:?[0-9][0-9]/.exec(rawText);
   if (time) { // If 1230 or 12:30 is found in rawText store numbers in hours and minutes and remove 1230 from rawText
-    time.toString().replace(':', '');
     time = time[0].toString();
+    time = time.toString().replace(':', '');
+
     if (time.length == 4) {
       timeH = /[0-9][0-9]/.exec(time).toString();
     } else if (time.length == 3) {
       timeH = /[0-9]/.exec(time).toString();
     }
+
     time = time.replace(timeH, '');
     timeM = /[0-9][0-9]/.exec(time).toString();
-    rawText = rawText.replace(timeH + timeM, '');
+    if (rawText.includes(':')) {
+      rawText = rawText.replace(timeH + ':' + timeM, '');
+    } else {
+      rawText = rawText.replace(timeH + timeM, '');
+    }
     // Make new datetime from timeM and timeH
     let now = new Date();
     taskStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);  // NO need for DST shenanigans here!
