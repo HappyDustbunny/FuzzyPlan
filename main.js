@@ -35,8 +35,6 @@ let drainGainLevel_add = 'd1';
 ///////// Play-view /////////
 let startTime_play = new Date();
 let endTime_play = new Date();
-let playViewActive = false;  // Helps styling the Add-view elements for Play-view to recycle code
-let fixedPlayInterval = false;  // Keeps tracks of if a fixed interval has been chosen in Play View
 let playTimer = '';
 
 ///////// Month-view ////////
@@ -136,18 +134,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
       'taskPastEndOfDay': [['Oups, a task were pushed past midnight\nPlease put back', ''],
         ['Ups, en opgave blev skubbet forbi midnat\nGeninsæt den venligst', '']],
       // Play View
-      'playText': [['Task running from', ''],
-                 ['Opgave løber fra', '']],
-      'toText': [[' to ', ''],
-                 [' til ', '']],
-      'playControlsQuery': [['Set duration or stress level?', ''],
-                 ['Sæt varighed eller stressniveau?', '']],
-      'cutPlayingTaskShort?': [['Confirming will insert the task at the start time with a shorter duration than '],
-                 ['Bekræft for at indsætte opgaven ved starttidspunktet med en kortere varighed end ']],
-      'isAShortTimeOK?': [['The time since the task started is less than 10 minutes. Go ahead and insert a short task? ('],
-                 ['Der er gået mindre end 10 minutter. Fortsæt og indsæt en kort opgave? (']],
-      'soundOrNot': [['Play sound when time is up? (Gong)', ''],
-                     ['Spil lyd når tiden er gået? (Gong)', '']],
+      'clicksSuppressed': [['You are registering a time period\nPress the red button to stop this\n before doing anything else', ''],
+                 ['Du registrerer en tidsperiode\nTryk på den røde knap for\nat foretage dig andet', '']],
+      'playButton': [['\u25B6', 'Insert a task from now and until pressed again.\nMinimum time will be 10 minutes'], // Left pointing arrow
+                 ['\u25B6', 'Indsætter en opgave fra nu og til knappen trykkes igen\nMinimum tiden vil blive sat til 10 minutter']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -976,7 +966,7 @@ document.getElementById('applyAdd').addEventListener('click', apply);
 // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
 ////////// Eventlisteners for Play-view   /////////////////////
 
-// document.getElementById('playButton').addEventListener('click', playButtonClicked);
+document.getElementById('playButton').addEventListener('click', playButtonClicked);
 
 // document.getElementById('playControlsQuery').addEventListener('click', playControlsQuery);
 
@@ -1134,9 +1124,9 @@ function readInputBox_add() {
 
     fillDurationBox(parsedList[1] / 60000);
 
-    if (playViewActive && /[0-9]+h/.exec(text) != null || /[0-9]+m/.exec(text) != null) {
-      playControlsQuery(false);
-    }
+    // if (playViewActive && /[0-9]+h/.exec(text) != null || /[0-9]+m/.exec(text) != null) {
+    //   playControlsQuery(false);
+    // }
 
     if (parsedList[0] != '') {  // This will rarely trigger because fixed times are currently stripped when double clicking a task to edit
       fillTimeBox(parsedList[0]);
@@ -1201,9 +1191,9 @@ function addDuration(event) {
     }
     fillDurationBox(taskDuration_add);
 
-    if (playViewActive) {
-      durationTimeChangeInPlayView();
-    }
+    // if (playViewActive) {
+    //   durationTimeChangeInPlayView();
+    // }
   }
 }
 
@@ -1383,11 +1373,7 @@ function formatTask() {
   readDrainGainRadioButtons();
 
   let prettyTaskTime = '';
-  if (playViewActive) {
-    prettyTaskTime = prettifyTime(startTime_play);
-    let now = new Date();
-    taskDuration_add = Math.trunc((now - startTime_play) / 60000);
-  } else if (document.getElementById('inputTimeBox').value.trim() === '') {
+  if (document.getElementById('inputTimeBox').value.trim() === '') {
     returnText =  taskText_add + ' '
     + taskDuration_add + 'm '
     + drainGainLevel_add;
@@ -1433,18 +1419,6 @@ function apply() {
 }
 
 function gotoDayFromAdd() {
-  // Reset Play-View
-  playViewActive = false;
-  fixedPlayInterval = false;
-
-  document.getElementById('toText').innerText = '';
-  document.getElementById('untilText').innerText = '';
-  // document.getElementById('hourglass').hidden = true; // TODO: This shows up in Add View after a cancelation of Play View
-  // document.getElementById('soundDiv').hidden = true;
-
-  displayClass('hourglassTimer', true); // TODO: This can't be right
-  displayClass('playControl', true);  // TODO: Should playControl be playView??
-
   // Close add-view
   displayClass('addView', false);
   displayClass('dayView', true);
@@ -1478,179 +1452,55 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
 // document.addEventListener('freeze', function () { console.log('rappelapgyk'); }); // Hmm. Doesn't seem to work when page looses focus or navigate to other page
 
 // //////////////////// Play-view button code below ///////////////////////////
-//
-// function playButtonClicked() {
-//   storeLocally();
-//   drainGainLevel_add = 'd1';
-//
-//   // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
-//   // Trigger animation via CSS
-//   // displayClass('addView', true); // TODO: Disentangel play and add view?
-//   displayClass('dayView', false);
-//
-//   playViewActive = true;
-//
-//   // displayClass('addView', false);
-//   displayClass('playView', true);
-//
-//   document.getElementById('stopButton').hidden = false;
-//   document.getElementById('applyAdd').hidden = true;
-//
-//   let inputBox = document.getElementById('dayInputBox');         // Day-inputBox
-//   let inputBox_add = document.getElementById('inputBox_add'); // Add-inputBox
-//
-//   inputBox_add.value = inputBox.value;
-//
-//   readInputBox_add();  // TODO: If a duration is in the inputbox playControlQuery should fire (?)
-//
-//   if (inputBox_add.value == '') {
-//     inputBox_add.value = '';
-//     inputBox_add.focus();
-//   }
-//
-//   startTime_play = new Date();
-//   let nowTime = prettifyTime(startTime_play);
-//   document.getElementById('nowText').innerText = nowTime;
-// }
-//
-//
-// function playUpdate(deltaTime) {  // deltaTime in minutes
-// 	let hourglassSize = 50;  // Half the width of the hourglass in px
-// 	let borderSize = 0;
-//
-//   if (deltaTime < 1) {
-//     deltaTime = 1;
-//   }
-//
-//   document.getElementById('hourglass').style.display = 'block';
-//   document.getElementById('soundDiv').style.display = 'block';
-//
-// 	elem = document.getElementById('hourglassDiv');
-// 	text = document.getElementById('hourglassText');
-//
-// 	if (typeof playUpdate.counter == 'undefined') {
-// 		playUpdate.counter = 0;
-// 	}
-//
-// 	if (playUpdate.counter < 100) {
-// 		playUpdate.counter += 100 /  Math.trunc(deltaTime * 60);
-// 		w = Math.trunc(playUpdate.counter / 2) - Math.trunc(playUpdate.counter / 2)%2;
-// 		borderSize = hourglassSize - w + 2;  // Plus 2 for last border
-//
-//     // console.log(deltaTime, playUpdate.counter);
-//     // console.log(playUpdate.counter, w, borderSize, 2*w + 2*borderSize);
-//
-// 		elem.style.width = Math.trunc(2 * w)  + 'px';
-// 		elem.style.height = Math.trunc(2 * w) + 'px';
-// 		elem.style.borderLeft = borderSize + 'px solid rgba(154, 219, 240, 0.6)';
-// 		elem.style.borderRight = borderSize + 'px solid rgba(154, 219, 240, 0.6)';
-// 		elem.style.borderTop = borderSize + 'px solid rgba(154, 219, 240, 1.0)';
-// 		elem.style.borderBottom = borderSize + 'px solid rgba(154, 219, 240, 1.0)';
-// 		text.innerHTML = Math.trunc(playUpdate.counter) + '%';
-// 		text.style.color = 'rgba(4, 177, 217, 1.0)'
-// 		text.style.fontSize = Math.trunc(playUpdate.counter / 4) + 'px';
-// 		text.style.opacity = Math.trunc(playUpdate.counter / 2 + 35) + '%';
-// 	} else if (typeof playTimer != 'undefined') {
-// 		clearInterval(playTimer);
-// 		playUpdate.counter = 0;
-//     insertTask();
-//
-//     // Say Gong three times?
-//     if (document.getElementById('sound').checked) {
-//       sayGong(); setTimeout(function () {sayGong(); setTimeout(function () {sayGong()}, 300)}, 600);
-//     }
-// 	}
-// }
-//
-//
-// function playControlsQuery(useDefault) {  // Turn off the playControlQuery div and shows Duration and Stress level controls
-//   document.getElementById('playControlsQueryDiv').style.display = 'none';
-//   document.getElementById('toText').style.display = 'inline-block';
-//   document.getElementById('inputDurationBox').style.backgroundColor = '#d3d3d31c';
-//   document.getElementById('inputDurationBox').disabled = 'true';
-//   displayClass('playControl', true);
-//
-//   if (useDefault) {
-//     fillDurationBox(defaultTaskDuration);
-//   }
-//
-//   if (playViewActive) {
-//     durationTimeChangeInPlayView();
-//   }
-//
-//   fixedPlayInterval = true;
-// }
-//
-//
-// function durationTimeChangeInPlayView() {
-//   readDurationTime();  // This updates taskDuration_add which is in minutes
-//
-//   let startTime = startTime_play.getTime();
-//   endTime_play = new Date(startTime + 60000 * taskDuration_add);
-//
-//   let now = new Date();
-//   if (endTime_play < now) {
-//     taskDuration_add = now - startTime_play;
-//     fillDurationBox(Math.trunc(taskDuration_add/60000));
-//   }
-//
-//   document.getElementById('untilText').innerText = prettifyTime(endTime_play);
-//
-//   let deltaTime = (endTime_play - startTime_play) / 60000;
-//
-//   // Start timer
-//   if (document.getElementById('inputDurationBox').value != '') {
-//     // Kill previous timers
-//     clearInterval(playTimer);
-//
-//     playTimer = setInterval(function () {playUpdate(deltaTime);}, 1000);
-//   }
-// }
-//
-//
-// function stopButtonPressed() {
-//   let contentInputBox = document.getElementById('inputBox_add').value;
-//   if (contentInputBox === '') {
-//     displayMessage(languagePack['taskTextMsg'][language], 3000, 'add');  // Please write a task text
-//   } else {
-//     // Chance to opt out from inserting the current task with current length
-//     if (fixedPlayInterval) {
-//       let answer = confirm(languagePack['cutPlayingTaskShort?'][language] + taskDuration_add + 'm');
-//       // 'Confirming will insert the task at the start time with a shorter duration than'
-//       if (!answer) {
-//         return;
-//       }
-//     }
-//     // Chance to opt out if the task is too small
-//     let now = new Date();
-//     let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
-//
-//     taskDuration_add = deltaTime;
-//
-//     if (deltaTime < 10) {
-//       let isAShortTimeOKAnswer = confirm(languagePack['isAShortTimeOK?'][language] + deltaTime + 'm)');
-//       // 'The time since the task started is less than 10 minutes. Go ahead and insert a short task?'
-//       if (!isAShortTimeOKAnswer) {
-//         return;
-//       }
-//     }
-//
-//     insertTask();
-//
-//     clearInterval(playTimer);
-//   }
-// }
-//
-// function insertTask() {
-//
-//   // Insert task with current length
-//   let returnText = formatTask();
-//   inputFixedTask(returnText);
-//
-//   gotoDayFromAdd();
-// }
-//
-//
+
+function playButtonClicked() {
+
+  let thisButton = document.getElementById('playButton');
+
+  if (thisButton.classList.contains('stop')) {  // Function as Stop button
+    let now = new Date();
+    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+
+    if (deltaTime < 10) {
+      deltaTime = 10;
+    }
+
+    let returnText = document.getElementById('dayInputBox').value + ' ' + deltaTime + 'm ' + prettifyTime(startTime_play).replace(':', '');
+
+    inputFixedTask(returnText);
+
+    thisButton.classList.remove('stop');
+    thisButton.textContent = '\u25B6'; // Left pointing arrow
+
+    document.getElementById('page').removeEventListener('click', suppressClicks, true);
+
+    fixClearButtonArrow();
+
+  } else {  // Function as Play button
+// The next line suppresses clicks from everything beside playButtom, but how to remove it?
+// document.getElementById('page').addEventListener('click', e => {if (e.target.id == 'playButton') {console.log('rap')} else {e.stopPropagation()}}, true)
+
+    let contentInputBox = document.getElementById('dayInputBox').value;
+    if (contentInputBox === '') {
+      displayMessage(languagePack['taskTextMsg'][language], 3000, 'add');  // Please write a task text
+    } else {
+      storeLocally();
+      thisButton.classList.add('stop');
+      thisButton.textContent = '\u25A0';  // Square
+      startTime_play = new Date();
+
+      document.getElementById('page').addEventListener('click', suppressClicks, true);
+
+    }
+  }
+}
+
+function suppressClicks(e) {
+  if (e.target.id != 'playButton') {
+    e.stopPropagation();
+    displayMessage(languagePack['clicksSuppressed'][language][0], 4000, 'day');
+  }
+}
 // //////////////////// Play-view button code above ///////////////////////////
 
 
