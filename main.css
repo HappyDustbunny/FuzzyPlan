@@ -83,7 +83,7 @@ html {
 
 .centerWrapper {
   display: grid;
-  grid-template-columns: 6% 18% 45% 10% 6% 6%;
+  grid-template-columns: 6% 21% 43% 11% 6% 6%;
   grid-template-rows: auto auto;
   grid-gap: .3rem;
   background-color: transparent;
@@ -665,7 +665,7 @@ html {
 
 #putBack {
   display: none;
-	line-height: 0.8em;
+	/* line-height: 0.8em; */
 	padding-top: 2px;
 }
 
@@ -807,7 +807,11 @@ html {
 /* settings view css below */
 
 .inputSettings {
-  width: 40px;
+  width: 43px;
+}
+
+#inputBoxWakeUp {
+  width: 52px;
 }
 
 label {  /* Used in settingsView */
@@ -1180,6 +1184,10 @@ div.tasksToSort {
 
 div.tasksToSort #upButton {
   display: none;
+}
+
+#upButton {
+  font-size: 0.5em;
 }
 
 div.tasksToSort #nowButton {

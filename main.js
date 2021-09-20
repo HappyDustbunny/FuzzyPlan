@@ -192,42 +192,50 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                           ['Sprog', '']],
      'apply0': [['Apply', ''],
                 ['Andvend', '']],
+     'applyWakeUp': [['Apply', ''],
+                ['Andvend', '']],
      'taskDurationHeading': [['Default task duration', ''],
                    ['Standard opgavelængde', '']],
      'taskDurationText': [['Set default task duration in minutes:', ''],
                           ['Sæt stadard opgavelængde i minutter', '']],
+      'wakeUpHeading': [['Wake up time', ''],
+                        ['Opvågningstid', '']],
+      'wakeUpText': [['Set the time you usually wake up and start planning', ''],
+                     ['Sæt den tid du sædvanligvis vågner op og planlægger', '']],
      'inputBoxM': [['', 'Set default task duration in minutes'],
                    ['', 'Sæt standardlængden for opgaver i minutter']],
+     'inputBoxWakeUp': [['', 'Set the time you usually wake up and start planning'],
+                ['', 'Sæt den tid du sædvanligvis vågner op og planlægger']],
      'apply1': [['Apply', ''],
                 ['Andvend', '']],
-     'playTocText': [['Play \'toc\' sound', ''],
-                     ['Afspil \'tac\' lyd', '']],
-     'tocLabelOff': [['Off', ''],
-                     ['Fra', '']],
-     'tocLabelStart': [['At the beginning of tasks (toc)', ''],
-                       ['I begyndelsen af en opgave (tac)', '']],
-     'tocLabelEnd': [['At the end of tasks (toc toc)', ''],
-                     ['I slutningen af en opgave (tac tac)', '']],
-     'tocLabelBoth': [['Both at beginning and end of tasks', ''],
-                      ['Både når opgaven starter og slutter', '']],
-     'playTicText': [['Play \'tic\' sound', ''],
-                     ['Afspil \'tic\' lyd', '']],
-     'ticLabelOff': [['Off', ''],
-                     ['Fra', '']],
-     'ticLabelEachX': [['Every X minutes', ''],
-                       ['Hver X. minut', '']],
-     'ticLabelRandom': [['Randomly within every X minutes', ''],
-                        ['Tilfældigt indenfor X minutter', '']],
-     'ticSpanInterval': [['Time interval X in minutes:', ''],
-                         ['Tidsinterval X i minutter:', '']],
-     'inputBoxX': [['', 'Time interval X in minutes'],
-                   ['', 'Tidsinterval X i minutter']],
-     'apply2': [['Apply', ''],
-                ['Anvend', '']],
-     'soundIfFocus': [['Note:\r\nThe sound only play if the page has focus', ''],
-                  ['Bemærk:\r\nLyd afspilles kun, hvis siden har fokus', '']],
-     'soundIfFocusPlayView': [['Note: The sound only play if the page has focus', ''],
-                  ['Bemærk: Lyd afspilles kun, hvis siden har fokus', '']],
+     // 'playTocText': [['Play \'toc\' sound', ''],
+     //                 ['Afspil \'tac\' lyd', '']],
+     // 'tocLabelOff': [['Off', ''],
+     //                 ['Fra', '']],
+     // 'tocLabelStart': [['At the beginning of tasks (toc)', ''],
+     //                   ['I begyndelsen af en opgave (tac)', '']],
+     // 'tocLabelEnd': [['At the end of tasks (toc toc)', ''],
+     //                 ['I slutningen af en opgave (tac tac)', '']],
+     // 'tocLabelBoth': [['Both at beginning and end of tasks', ''],
+     //                  ['Både når opgaven starter og slutter', '']],
+     // 'playTicText': [['Play \'tic\' sound', ''],
+     //                 ['Afspil \'tic\' lyd', '']],
+     // 'ticLabelOff': [['Off', ''],
+     //                 ['Fra', '']],
+     // 'ticLabelEachX': [['Every X minutes', ''],
+     //                   ['Hver X. minut', '']],
+     // 'ticLabelRandom': [['Randomly within every X minutes', ''],
+     //                    ['Tilfældigt indenfor X minutter', '']],
+     // 'ticSpanInterval': [['Time interval X in minutes:', ''],
+     //                     ['Tidsinterval X i minutter:', '']],
+     // 'inputBoxX': [['', 'Time interval X in minutes'],
+     //               ['', 'Tidsinterval X i minutter']],
+     // 'apply2': [['Apply', ''],
+     //            ['Anvend', '']],
+     // 'soundIfFocus': [['Note:\r\nThe sound only play if the page has focus', ''],
+     //              ['Bemærk:\r\nLyd afspilles kun, hvis siden har fokus', '']],
+     // 'soundIfFocusPlayView': [['Note: The sound only play if the page has focus', ''],
+     //              ['Bemærk: Lyd afspilles kun, hvis siden har fokus', '']],
      'stressModelHeading': [['Stress Model', ''],
                        ['Stress Model', '']],
      'settingsInfo': [['?', 'Information about the stress model'],
@@ -458,6 +466,10 @@ function storeLocally() {
 
   localStorage.defaultTaskDuration = defaultTaskDuration;
 
+  localStorage.wakeUpH = wakeUpH;
+
+  localStorage.wakeUpM = wakeUpM;
+
   localStorage.wakeUpStress = wakeUpStress;
 
   localStorage.tDouble = tDouble;
@@ -555,6 +567,14 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('defaultTaskDuration')) {
     defaultTaskDuration = localStorage.defaultTaskDuration;
+  }
+
+  if (localStorage.getItem('wakeUpH')) {
+    wakeUpH = localStorage.wakeUpH;
+  }
+
+  if (localStorage.getItem('wakeUpM')) {
+    wakeUpM = localStorage.wakeUpM;
   }
 
   if (localStorage.getItem('wakeUpStress')) {
@@ -812,39 +832,39 @@ function updateTimeMarker() {
 
   updateHearts();
 
-  // Update alarm Toc sound
-  let taskAlarms = localStorage.radioButtonResultAlarm;
-  if (taskAlarms != 'off') {
-    let nowTime = hours.toString() + min.toString() + sec.toString();
-    let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
-    if (taskAlarms === 'beginning' || taskAlarms === 'both') {
-      if (startAndEndTimes.includes('beginning' + nowTime)) {
-        sayToc();
-      }
-    }
-    if (taskAlarms === 'end' || taskAlarms === 'both') {
-      if (startAndEndTimes.includes('end' + nowMinusFiveTime)) {
-        sayTic();
-        setTimeout(sayToc, 300);
-      }
-    }
-  }
-
-  // Update reminder Tic sound
-  let reminder = localStorage.radioButtonResultReminder;
-  if (reminder != 'off') {
-    if (reminder === 'regularly') {
-      if (min % localStorage.ticInterval === 0 && sec === 0) {
-        sayTic();
-      }
-    }
-    if (reminder === 'rand') {
-      let randTime = Math.floor(Math.random() * (localStorage.ticInterval - 1) + 1);
-      if (min % randTime === 0 && sec === 0) {
-        sayTic();
-      }
-    }
-  }
+  // // Update alarm Toc sound
+  // let taskAlarms = localStorage.radioButtonResultAlarm;
+  // if (taskAlarms != 'off') {
+  //   let nowTime = hours.toString() + min.toString() + sec.toString();
+  //   let nowMinusFiveTime = hours.toString() + (min - 5).toString() + sec.toString();
+  //   if (taskAlarms === 'beginning' || taskAlarms === 'both') {
+  //     if (startAndEndTimes.includes('beginning' + nowTime)) {
+  //       sayToc();
+  //     }
+  //   }
+  //   if (taskAlarms === 'end' || taskAlarms === 'both') {
+  //     if (startAndEndTimes.includes('end' + nowMinusFiveTime)) {
+  //       sayTic();
+  //       setTimeout(sayToc, 300);
+  //     }
+  //   }
+  // }
+  //
+  // // Update reminder Tic sound
+  // let reminder = localStorage.radioButtonResultReminder;
+  // if (reminder != 'off') {
+  //   if (reminder === 'regularly') {
+  //     if (min % localStorage.ticInterval === 0 && sec === 0) {
+  //       sayTic();
+  //     }
+  //   }
+  //   if (reminder === 'rand') {
+  //     let randTime = Math.floor(Math.random() * (localStorage.ticInterval - 1) + 1);
+  //     if (min % randTime === 0 && sec === 0) {
+  //       sayTic();
+  //     }
+  //   }
+  // }
 }
 
 function updateHearts() {
@@ -1040,10 +1060,7 @@ document.getElementById('apply0').addEventListener('click', applyLanguage);
 
 document.getElementById('apply1').addEventListener('click', applyTaskDuration);
 
-// TODO: Make changing dayStart on 7:00 button possible
-
-// Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
-// document.getElementById('apply2').addEventListener('click', applyToc);
+document.getElementById('applyWakeUp').addEventListener('click', applyWakeUpTime);
 
 document.getElementById('settingsInfo').addEventListener('click', gotoInfoStress);
 
@@ -1055,9 +1072,8 @@ document.getElementById('clearEverything').addEventListener('click', clearEveryt
 document.getElementById('inputBoxM').addEventListener('focus',
           function () { document.getElementById('inputBoxM').select(); });
 
-// Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
-// document.getElementById('inputBoxX').addEventListener('focus',
-//           function () { document.getElementById('inputBoxX').select(); });
+document.getElementById('inputBoxWakeUp').addEventListener('focus',
+          function () { document.getElementById('inputBoxWakeUp').select(); });
 
 document.getElementById('stressLevel').addEventListener('focus',
           function () { document.getElementById('stressLevel').select(); });
@@ -1325,9 +1341,18 @@ function readDurationTime() {
 
 
 function readTaskStartTime() {
+  let [timeH, timeM] = readTimeBox('inputTimeBox');
+  let now = new Date();
+  taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
+  fillTimeBox(taskTime_add);
+
+  return taskTime_add;
+}
+
+function readTimeBox(whichBox) { // whichBox can be 'inputTimeBox' or 'inputBoxWakeUp'
   let timeH = '';
   let timeM = '';
-  let contentInputBox = document.getElementById('inputTimeBox').value.trim();
+  let contentInputBox = document.getElementById(whichBox).value.trim();
   let badCharacters = /[^0-9:]/.exec(contentInputBox);
   if (badCharacters) {
     displayMessage(languagePack['format1200'][language], 3000, 'add');
@@ -1345,14 +1370,11 @@ function readTaskStartTime() {
       return;
     }
     contentInputBox = contentInputBox.replace(timeH, '');
-    timeM = /[0-9][0-9]/.exec(contentInputBox).toString();
-    let now = new Date();
-    taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
-    if (0 < timeH || 0 < timeM) {
-      fillTimeBox(taskTime_add);
-      return taskTime_add;
-    }
+    timeM = Number(/[0-9][0-9]/.exec(contentInputBox)).toString();
+
+    return [timeH, timeM];
   }
+
 }
 
 
@@ -1572,7 +1594,7 @@ function fillMonthDateBar() {
   nowMinusSomeMonths = new Date(nowMinusSomeMonths.setMonth(nowMinusSomeMonths.getMonth() - someMonths));
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
-  // TODO: Set number of days shown based on data in pastDaylist?
+
   let thisMonth = now.getMonth();
 
   for (let i = nowMinusSomeMonths; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
@@ -1594,7 +1616,7 @@ function fillMonthDateBar() {
 
     newNode.classList.add('dateButton'); // Add to all dateButtons
 
-    if (i < now) {  // For styling purposes. // TODO: Make styling
+    if (i < now) {  // For styling purposes.
       newNode.classList.add('pastDateButton');
     } else if (i.getMonth() == now.getMonth() && i.getDate() == now.getDate()) {
       newNode.classList.add('todayButton');
@@ -1727,7 +1749,7 @@ function monthInputAtEnter(event) {
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
 
             if (textInputBox === '') {
-              gotoDate(myId); // TODO: Make gotoDate() (yank it from month.js?) and sanitize input
+              // gotoDate(myId); // TODO: Make gotoDate() (yank it from month.js?) and sanitize input
             } else {
               // Insert a new task at the provided date
               let now = new Date();
@@ -1925,7 +1947,7 @@ function monthRenderTasks() {
 }
 
 
-function putBack() { // TODO: Fix putBack.
+function putBack() {
   monthTaskList[putBackId] = tasksFromClickedDayInMonth;
 
   let chooseBox = document.getElementById('monthChooseBox');
@@ -2201,8 +2223,6 @@ function showOrHideTrackedTasksInTooltip() {
 
 //////////////////// Storage-view code below ///////////////////////////
 
-// TODO: The two first tasklist saved to storage seems linked, but not subsequent stored tasklist???
-
 function storageButtonClicked() {
   storeLocally();
 
@@ -2363,18 +2383,36 @@ function setUpSettings() {
   if (localStorage.defaultTaskDuration) {
     document.getElementById('inputBoxM').value = localStorage.defaultTaskDuration;
   }
-  if (localStorage.ticInterval) {
-    document.getElementById('inputBoxX').value = localStorage.ticInterval;
+
+  if (localStorage.wakeUpH && localStorage.wakeUpM) {
+    let timeH = localStorage.wakeUpH;
+    let timeM = localStorage.wakeUpM;
+    // Check if leading zeroes are needed and add them
+    let nils = ['', ''];
+    if (timeH < 10) {
+      nils[0] = '0';
+    }
+    if (timeM < 10) {
+      nils[1] = '0';
+    }
+
+    let displayText = nils[0] + timeH + ':' + nils[1] + timeM;
+    document.getElementById('inputBoxWakeUp').value = displayText;
   }
-  if (localStorage.radioButtonResultAlarm) {
-    document.getElementById(localStorage.radioButtonResultAlarm).checked = 'checked';
-  }
-  if (localStorage.radioButtonResultReminder) {
-    document.getElementById(localStorage.radioButtonResultReminder).checked = 'checked';
-  }
+
+  // if (localStorage.ticInterval) {
+  //   document.getElementById('inputBoxX').value = localStorage.ticInterval;
+  // }
+  // if (localStorage.radioButtonResultAlarm) {
+  //   document.getElementById(localStorage.radioButtonResultAlarm).checked = 'checked';
+  // }
+  // if (localStorage.radioButtonResultReminder) {
+  //   document.getElementById(localStorage.radioButtonResultReminder).checked = 'checked';
+  // }
   if (localStorage.wakeUpStress) {
     document.getElementById('stressLevel').value = localStorage.wakeUpStress;
   }
+
   if (localStorage.tDouble) {
     document.getElementById('tDouble').value = localStorage.tDouble;
   }
@@ -2412,35 +2450,48 @@ function applyTaskDuration() {
   // window.location.assign('main.html');
 }
 
+function applyWakeUpTime() {
+  [wakeUpH, wakeUpM] = readTimeBox('inputBoxWakeUp');
 
-function applyToc() {
-  let min = document.getElementById('inputBoxX').value.trim();
+  document.getElementById('inputBoxWakeUp').value = wakeUpH + ':' + wakeUpM;
 
-  if (isNaN(min) || min < 0 || 59 < min) {
-    displayMessage(languagePack['only0-59'][language], 3000, 'settings');
-    document.getElementById('inputBoxX').select();
-    return;
-  }
+  localStorage.wakeUpH = wakeUpH;
+  localStorage.wakeUpM = wakeUpM;
 
-  localStorage.ticInterval = min;
+  adjustNowAndWakeUpButtons();
 
-   let radioButtonResult1 = document.getElementsByClassName('alarm');
-   for (var i = 0; i < 4; i++) {
-     if (radioButtonResult1[i].type === 'radio' && radioButtonResult1[i].checked) {
-       localStorage.radioButtonResultAlarm = radioButtonResult1[i].value;
-     }
-   }
-
-   let radioButtonResult2 = document.getElementsByClassName('reminder');
-   for (var i = 0; i < 3; i++) {
-     if (radioButtonResult2[i].type === 'radio' && radioButtonResult2[i].checked) {
-       localStorage.radioButtonResultReminder = radioButtonResult2[i].value;
-     }
-   }
-
-   gotoDayFromSettings();
-   // window.location.assign('main.html');
+  gotoDayFromSettings();
 }
+
+
+// function applyToc() {
+//   let min = document.getElementById('inputBoxX').value.trim();
+//
+//   if (isNaN(min) || min < 0 || 59 < min) {
+//     displayMessage(languagePack['only0-59'][language], 3000, 'settings');
+//     document.getElementById('inputBoxX').select();
+//     return;
+//   }
+//
+//   localStorage.ticInterval = min;
+//
+//    let radioButtonResult1 = document.getElementsByClassName('alarm');
+//    for (var i = 0; i < 4; i++) {
+//      if (radioButtonResult1[i].type === 'radio' && radioButtonResult1[i].checked) {
+//        localStorage.radioButtonResultAlarm = radioButtonResult1[i].value;
+//      }
+//    }
+//
+//    let radioButtonResult2 = document.getElementsByClassName('reminder');
+//    for (var i = 0; i < 3; i++) {
+//      if (radioButtonResult2[i].type === 'radio' && radioButtonResult2[i].checked) {
+//        localStorage.radioButtonResultReminder = radioButtonResult2[i].value;
+//      }
+//    }
+//
+//    gotoDayFromSettings();
+//    // window.location.assign('main.html');
+// }
 
 
 function applyStressModel() {
@@ -2470,7 +2521,7 @@ function applyStressModel() {
 }
 
 
-function storeBackup() { // TODO: Finish this
+function storeBackup() { // TODO: Check size of blob against data needing storing
   // Wrap up data from localStorage in a blob
   let data = JSON.stringify(localStorage);
   // let data = JSON.stringify(localStorage.pastDayList);
@@ -2522,7 +2573,6 @@ function readFile(event) {
 
   reader.readAsText(file);
 }
-// TODO: Save more data than just past days?
 
 function confirmRestoreBackup() {
     // TODO: Make a confirm dialog
@@ -3546,7 +3596,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
     if (endM < 10) {
       nils[3] = '0';
     }
-    text1 = nils[0] + timeH + ':' + nils[1] + timeM + '-';
+    let text1 = nils[0] + timeH + ':' + nils[1] + timeM + '-';
     text = text1 + nils[2] + endH + ':' + nils[3] + endM + ' ' + text;
   }
 

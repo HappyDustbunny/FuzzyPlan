@@ -47,7 +47,6 @@
 
         <input type="text" id='dayInputBox' class="inputBox dayView active" autofocus value="">
 
-<!-- // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html -->
         <button type="button" id='playButton' class="controlButton dayView active"></button>  <!-- This button is placed in lower left corner by CSS -->
         <button type="button" id="addTaskButton" class="dayView active">+</button>  <!-- This button is placed in lower right corner by CSS -->
 
@@ -493,13 +492,29 @@
             <div>
               <h4 id="taskDurationHeading" class="text"></h4>
 
-              <span id="taskDurationText"></span>
+              <span id="taskDurationText" class="labelText"></span>
               <input type="text" id='inputBoxM' class="inputBox inputSettings" value="30">
 
               <br>
               <br>
 
               <button type="button" id="apply1" class='controlButton'> </button>
+            </div>
+          </div>
+
+          <span>   <br>   </span>
+
+          <div class='topic'>
+            <div>
+              <h4 id="wakeUpHeading" class="text"></h4>
+
+              <span id="wakeUpText" class="labelText"></span>
+              <input type="text" id='inputBoxWakeUp' class="inputBox inputSettings" value="7:00">
+
+              <br>
+              <br>
+
+              <button type="button" id="applyWakeUp" class='controlButton'> </button>
             </div>
           </div>
 
@@ -551,7 +566,7 @@
             <span id="soundIfFocus" class="labelText"> </span>
           </div> -->
 
-          <span>   <br>   </span>
+          <!-- <span>   <br>   </span> -->
 
           <div class='topic'>
             <div class="stressContainer">
