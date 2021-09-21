@@ -1492,6 +1492,8 @@ function playButtonClicked() {
     inputFixedTask(returnText);
 
     thisButton.classList.remove('stop');
+    document.getElementById('playButtonTap').classList.remove('stop');
+    document.getElementById('playButtonTop').classList.remove('stop');
     thisButton.textContent = '\u25B6'; // Left pointing arrow
 
     document.getElementById('page').removeEventListener('click', suppressClicks, true);
@@ -1499,7 +1501,7 @@ function playButtonClicked() {
     fixClearButtonArrow();
 
   } else {  // Function as Play button
-// The next line suppresses clicks from everything beside playButtom, but how to remove it?
+// The next line suppresses clicks from everything beside playButton, but how to remove it?
 // document.getElementById('page').addEventListener('click', e => {if (e.target.id == 'playButton') {console.log('rap')} else {e.stopPropagation()}}, true)
 
     let contentInputBox = document.getElementById('dayInputBox').value;
@@ -1508,6 +1510,8 @@ function playButtonClicked() {
     } else {
       storeLocally();
       thisButton.classList.add('stop');
+      document.getElementById('playButtonTap').classList.add('stop');
+      document.getElementById('playButtonTop').classList.add('stop');
       thisButton.textContent = '\u25A0';  // Square
       startTime_play = new Date();
 
@@ -3545,7 +3549,8 @@ function jumpToTime(time, showMessage) {
         displayMessage(languagePack['jumpedTo'][language] + hours + ':' + min, 700, 'day');
       }
     } else {
-      displayMessage(languagePack['numberNotRecognized'][language], 1000, 'day')
+      displayMessage(languagePack['numberNotRecognized'][language], 1000, 'day');
+      console.log(time);
     }
   }
 }

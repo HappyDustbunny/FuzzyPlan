@@ -47,7 +47,12 @@
 
         <input type="text" id='dayInputBox' class="inputBox dayView active" autofocus value="">
 
-        <button type="button" id='playButton' class="controlButton dayView active"></button>  <!-- This button is placed in lower left corner by CSS -->
+        <div id="playButtonContainer" class="dayView active">
+          <div id="playButtonTop" class="dayView active"></div>
+          <div id="playButtonTap" class="dayView active"></div>
+          <button type="button" id='playButton' class="controlButton dayView active"></button>  <!-- This button is placed in lower left corner by CSS -->
+        </div>
+
         <button type="button" id="addTaskButton" class="dayView active">+</button>  <!-- This button is placed in lower right corner by CSS -->
 
         <button type="button" id='toDoButton' class="controlButton" hidden> </button>
