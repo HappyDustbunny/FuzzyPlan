@@ -136,8 +136,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
       // Play View
       'clicksSuppressed': [['You are registering a time period\nPress the red button to stop this\n before doing anything else', ''],
                  ['Du registrerer en tidsperiode\nTryk på den røde knap for\nat foretage dig andet', '']],
-      'playButton': [['\u25B6', 'Insert a task from now and until pressed again.\nMinimum time will be 10 minutes'], // Left pointing arrow
-                 ['\u25B6', 'Indsætter en opgave fra nu og til knappen trykkes igen\nMinimum tiden vil blive sat til 10 minutter']],
+      'playButton': [['\u25B8', 'Insert a task from now and until pressed again.\nMinimum time will be 10 minutes'], // Left pointing arrow
+                 ['\u25B8', 'Indsætter en opgave fra nu og til knappen trykkes igen\nMinimum tiden vil blive sat til 10 minutter']],
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
@@ -431,6 +431,7 @@ function setUpFunc() {
 
   updateHearts(); // Update hearts to current time
 
+  // Scale the window to current screen size on reload
   document.getElementById('container').style.height = window.innerHeight - 110 +'px';
   document.getElementById('monthContainer').style.height = window.innerHeight - 110 +'px';
   document.getElementById('dayInputBox').focus();
@@ -920,7 +921,15 @@ document.getElementById('postpone').addEventListener('click', postponeTask);
 
 // Insert a 15 min planning task at start-your-day time according to settings
 // document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700, false);});
+document.getElementById('upButton').addEventListener('click', function() {
+  let padding = '';
+  if (wakeUpM < 10) {
+    padding = '0';
+  }
+  let targetTime = wakeUpH + padding + wakeUpM;
+  jumpToTime(targetTime, false);
+});
+// document.getElementById('upButton').addEventListener('click', function() {jumpToTime(700, false);});
 
 // Insert a 15 min planning task at the current time
 // document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
@@ -1365,7 +1374,7 @@ function readTimeBox(whichBox) { // whichBox can be 'inputTimeBox' or 'inputBoxW
     if (contentInputBox.length == 3 + colonOffset) { // Not 3 because of colon...
       timeH = /[0-9]/.exec(contentInputBox).toString();
     } else if (contentInputBox.length == 4 + colonOffset) { // Not 4 because of colon...
-      timeH = /[0-9][0-9]/.exec(contentInputBox).toString();
+      timeH = Number(/[0-9][0-9]/.exec(contentInputBox)).toString(); // Number() to get rid of leading zeroes
     } else {
       return;
     }
@@ -1494,7 +1503,7 @@ function playButtonClicked() {
     thisButton.classList.remove('stop');
     document.getElementById('playButtonTap').classList.remove('stop');
     document.getElementById('playButtonTop').classList.remove('stop');
-    thisButton.textContent = '\u25B6'; // Left pointing arrow
+    thisButton.textContent = '\u25B8'; // Left pointing arrow
 
     document.getElementById('page').removeEventListener('click', suppressClicks, true);
 
@@ -1677,7 +1686,7 @@ function monthTaskHasBeenClicked(event) {
       let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId) , 12, 00)
 
       let task = new Task(clickedDate, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
-
+// TODO: Double clicking days in monthView add 15m to content of choosebox. Why??
       if (monthTaskList[myId]) {
         monthTaskList[myId].push(task);
       } else {
@@ -1952,7 +1961,9 @@ function monthRenderTasks() {
 
 
 function putBack() {
-  monthTaskList[putBackId] = tasksFromClickedDayInMonth;
+  for (var item of tasksFromClickedDayInMonth) {
+    monthTaskList[putBackId].push(item);
+  }
 
   let chooseBox = document.getElementById('monthChooseBox');
 
@@ -2770,9 +2781,10 @@ function inputAtEnter(event) {
   let button = document.getElementById('clearButton');
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('dayInputBox').value.trim();
-    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
+    // If text or emojis and no chosenTaskId
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, æ, ø, ǻ]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       inputFixedTask(contentInputBox);
-    } else {
+    } else { // Just numbers
       if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') {
         // If there is a chosen task AND text it must be an error
         nullifyClick();
@@ -2783,7 +2795,7 @@ function inputAtEnter(event) {
         resetInputBox('day');
         jumpToTime(contentInputBox, true);
       } else { // Give up. Something stupid happened.
-        console.log(contentInputBox);
+        console.log('inputAtEnter error. contentInputBox was ', contentInputBox);
         displayMessage(languagePack['formatReminder'][language], 6000, 'day')
         resetInputBox('day');
       }
@@ -2815,6 +2827,9 @@ function inputFixedTask(contentInputBox) {
       displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');
       document.getElementById('dayInputBox').value = contentInputBox;
     }
+    wakeUpOrNowClickedOnce = true; // Inserting a fixed task render the need to use upButton or nowButton to insert the first task
+    document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true}); // Remove eventlisteners sat by setUp via adjuistNowAndWakeUpButtons()
+    document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
     renderTasks();
     jumpTo(uniqueIdOfLastTouched)
   }
@@ -3550,7 +3565,6 @@ function jumpToTime(time, showMessage) {
       }
     } else {
       displayMessage(languagePack['numberNotRecognized'][language], 1000, 'day');
-      console.log(time);
     }
   }
 }
