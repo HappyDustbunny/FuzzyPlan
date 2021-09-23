@@ -283,8 +283,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                     'Brug formatet 12:00 eller 1200'],
      'taskTextMsg': ['Please write a task text',
                      'Skriv en opgavetekst'],
-     'noPastDates': ['Past dates can not be assigned tasks until\n a time machine has been invented',
-                     'Datoer i fortiden kan ikke tildeles opgaver\nfør der bliver opfundet en tidsmaskine'],
+     'noPastDates': ['Past dates can not be assigned tasks',
+                     'Datoer i fortiden kan ikke tildeles opgaver'],
      'useDayView': ['Use Day-view for today\'s tasks',
                     'Brug dagsvisning for dagens opgaver'],
      'finishTaskFirst': ['Please finish the current edit \nbefore starting a new',
@@ -670,6 +670,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
   chooseBox.classList.add('active');
   let tasks = [];
 
+  // Restore buttons in relevant view
   if (whichView != 'day') { // whichView is 'month'
     document.getElementById('putBack').classList.add('active');
     document.getElementById('moveToDay').classList.add('active');
@@ -697,15 +698,18 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
 
   }
 
+  // Actually fill choose box
   if (tasks.length > 0) {
     let counter = 0;
     for (var task of tasks) {
       if (counter === 0) {
-        document.getElementById(whichView + 'InputBox').value = task.text + ' ' + task.duration/60000 + 'm';
+        document.getElementById(whichView + 'InputBox').value = task.text;
+        // document.getElementById(whichView + 'InputBox').value = task.text + ' ' + task.duration/60000 + 'm';
       } else {
         newButton = document.createElement('button');
         newButton.classList.add('floatingTask');
-        newButton.textContent = task.text + ' ' + task.duration/60000 + 'm';
+        newButton.textContent = task.text;
+        // newButton.textContent = task.text + ' ' + task.duration/60000 + 'm';
         newButton.setAttribute('id', 'task' + counter);
 
         document.getElementById(whichView + 'ChooseBox').appendChild(newButton);
@@ -1686,7 +1690,6 @@ function monthTaskHasBeenClicked(event) {
       let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId) , 12, 00)
 
       let task = new Task(clickedDate, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
-// TODO: Double clicking days in monthView add 15m to content of choosebox. Why??
       if (monthTaskList[myId]) {
         monthTaskList[myId].push(task);
       } else {
@@ -1753,13 +1756,29 @@ function monthInputAtEnter(event) {
         if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
           /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
 
-            // Make myId from date
-            let month = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
-            let day = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
-            let now = new Date();
-            let myId = day + month + now.getFullYear();
-
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
+            // Make myId from date
+            let myId = '';
+
+            let now = new Date();
+            let year = /\d+\d+/.exec(textInputBox);
+            if (year < now.getFullYear()) {
+              displayMessage(languagePack['noPastDates'][language], 4000, 'month');
+              return;
+            }
+            textInputBox = contentInputBox.replace(year[0], '').trim();
+            let month = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
+            let day = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
+
+            if (year != '' && now.getFullYear() <= year) {
+              myId = day + '-' + month + '-' + year;
+            }  else {
+              if (day <= now.getDate() && month <= now.getMonth()) {
+                displayMessage(languagePack['noPastDates'][language], 4000, 'month');
+                return;
+              }
+              myId = day + '-' + month + '-' + now.getFullYear();
+            }
 
             if (textInputBox === '') {
               // gotoDate(myId); // TODO: Make gotoDate() (yank it from month.js?) and sanitize input
