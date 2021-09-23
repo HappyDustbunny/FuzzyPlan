@@ -283,8 +283,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                     'Brug formatet 12:00 eller 1200'],
      'taskTextMsg': ['Please write a task text',
                      'Skriv en opgavetekst'],
-     'noPastDates': ['Past dates can not be assigned tasks until a time machine has been invented',
-                     'Datoer i fortiden kan ikke tildeles opgaver før der bliver opfundet en tidsmaskine'],
+     'noPastDates': ['Past dates can not be assigned tasks until\n a time machine has been invented',
+                     'Datoer i fortiden kan ikke tildeles opgaver\nfør der bliver opfundet en tidsmaskine'],
      'useDayView': ['Use Day-view for today\'s tasks',
                     'Brug dagsvisning for dagens opgaver'],
      'finishTaskFirst': ['Please finish the current edit \nbefore starting a new',
@@ -1667,9 +1667,10 @@ function monthTaskHasBeenClicked(event) {
     myId = event.target.closest('button').id;
   }
 
+  let contentInputBox = document.getElementById('monthInputBox').value.trim();
   let day =  document.getElementById(myId);
 
-  if (day.classList.contains('pastDateButton')) {
+  if (day.classList.contains('pastDateButton') && contentInputBox != '') {
     displayMessage(languagePack['noPastDates'][language], 3000, 'month');
     return
   } else if (day.classList.contains('todayButton')) {
@@ -1677,7 +1678,6 @@ function monthTaskHasBeenClicked(event) {
     return
   }
 
-  let contentInputBox = document.getElementById('monthInputBox').value.trim();
 
   if (contentInputBox != '' && day.classList.contains('isNotClicked')) {
     // Text in inputBox and no previous clicked date
@@ -1961,8 +1961,12 @@ function monthRenderTasks() {
 
 
 function putBack() {
-  for (var item of tasksFromClickedDayInMonth) {
-    monthTaskList[putBackId].push(item);
+  if (monthTaskList[putBackId]) { // If one or more is put back manually, put the rest back where they came from
+    for (var item of tasksFromClickedDayInMonth) {
+      monthTaskList[putBackId].push(item);
+    }
+  } else {
+    monthTaskList[putBackId] = tasksFromClickedDayInMonth;
   }
 
   let chooseBox = document.getElementById('monthChooseBox');
@@ -1973,6 +1977,7 @@ function putBack() {
 
   chooseBox.classList.remove('active');
   document.getElementById('putBack').classList.remove('active');
+  document.getElementById('moveToDay').classList.remove('active');
 
   monthRenderTasks();
 
