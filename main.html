@@ -122,22 +122,6 @@
 
         <span>   <br>   </span>
 
-<!-- // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html -->
-        <!-- <div class="topic playView" hidden>
-          <span id="playText" class="text"></span>
-          <span id="nowText"></span>
-          <span id="toText" class="text" hidden></span>
-          <span id="untilText"></span>
-        </div>
-
-        <span class="playView" hidden>   <br>   </span>
-
-        <div id='playControlsQueryDiv' class="topic playView" hidden>
-          <button type="button" id="playControlsQuery" class="controlButton add" tabindex="6"></button>
-        </div>
-
-        <span id="playTopicSpan" hidden>   <br>   </span> -->
-
         <div class='topic addView playControl'>
           <div id="duration" class="durationContainer">
             <span id='text1'>
@@ -357,7 +341,20 @@
           <div id="colourButtons" hidden></div>
         </div>
 
-        <span> <br> </span>
+        <!-- <span> <br> </span> -->
+
+        <div id="trackViewSpacer"></div>
+
+        <div class="topic">
+          <span id="showTrackedItemsInTooltip" class="text"> </span>
+          <br> <br>
+          <input id='showTTChkbox' type="checkbox" name="showInTooltip" value="show" checked>
+          <label id="showTTLabel" class="labelText" for="showInTooltip"></label>
+
+          <span> <br> </span>
+
+          <!-- <button type="button" id="deleteTrackedButton" class="controlButton"></button> -->
+        </div>
 
         <div id="trackViewSpacer"></div>
 
@@ -375,20 +372,7 @@
           <button type="button" id="deleteTrackedButton" class="controlButton"></button>
         </div>
 
-        <span> <br> </span>
-
-        <div id="trackViewSpacer"></div>
-
-        <div class="topic">
-          <span id="showTrackedItemsInTooltip" class="text"> </span>
-          <br> <br>
-          <input id='showTTChkbox' type="checkbox" name="showInTooltip" value="show" checked>
-          <label id="showTTLabel" class="labelText" for="showInTooltip"></label>
-
-          <span> <br> </span>
-
-          <!-- <button type="button" id="deleteTrackedButton" class="controlButton"></button> -->
-        </div>
+        <!-- <span> <br> </span> -->
 
       </div>    <!-- trackView -->
 

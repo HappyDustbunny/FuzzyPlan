@@ -1,3 +1,10 @@
+// TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
+// TODO: Using navigation keys from settings view or month view gives unexpected behaviour. Maybe use location.hash? But how to detect hashchange? Like this:
+// window.addEventListener('hashchange', function() {
+//   console.log('The hash has changed!')
+// }, false);
+// if (location.hash == '') {gotoDayFromStorage()}
+// location.hash = 'storage'
 
 let taskList = [];  // List of all tasks
 let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
