@@ -6,6 +6,7 @@
 // if (location.hash == '') {gotoDayFromStorage()}
 // location.hash = 'storage'
 
+let lastHashes = [];
 let taskList = [];  // List of all tasks
 let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
 let startAndEndTimes = [];
@@ -412,6 +413,7 @@ class Task {
 // Runs when the page is loaded:
 function setUpFunc() {
   taskList = [];
+  // location.hash = '#';
 
   makeFirstTasks();
 
@@ -631,6 +633,32 @@ function retrieveLocallyStoredStuff() {
       //   storageList[key][0][index].end = new Date(storageList[key][0][index].end);
       // }
     }
+  }
+}
+
+function pushHashChange() {
+  lastHashes.push(location.hash);
+  console.table(lastHashes);
+}
+
+function bindNavigation() {
+  let len = lastHashes.length;
+  if (lastHashes[len - 2] == '#storageView' && lastHashes[len - 1] == '') {
+    lastHashes.pop();
+    gotoDayFromStorage();
+  } else if (lastHashes[len - 1] == '' && lastHashes[len - 2] == '#monthView') {
+    lastHashes.pop();
+    gotoDayFromMonth();
+  } else if (lastHashes[len - 1] == '' && lastHashes[len - 1] == '#settingsView') {
+    lastHashes.pop();
+    gotoDayFromSettings();
+  // } else if (lastHashes[len - 2] == '#monthView' && lastHashes[len - 1] == '#trackView') {
+  //   lastHashes.pop();
+  //   returnToMonthFromTrackView();
+  } else if (lastHashes[len - 2] == '#trackView' && lastHashes[len - 1] == '#monthView') {
+    lastHashes.pop();
+    returnToMonthFromTrackView();
+    // gotoDayFromMonth();
   }
 }
 
@@ -920,7 +948,10 @@ function sayGong() {  // Sound credit https://freesound.org/people/Q.K./sounds/5
   sound.play();
 }
 
-////// Eventlisteners  //////                      // Remember removeEventListener() for anoter time
+////// Eventlisteners  //////
+
+// window.addEventListener('hashchange', pushHashChange);
+// window.addEventListener('hashchange', bindNavigation);
 
 document.getElementById('info').addEventListener('click', gotoInfo);
 document.getElementById('month').addEventListener('click', monthButtonClicked);
@@ -1021,7 +1052,7 @@ document.getElementById('monthInputBox').addEventListener('keypress', function (
 
 document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
 
-document.getElementById('day').addEventListener('click', gotoDay);
+document.getElementById('day').addEventListener('click', gotoDayFromMonth);
 
 document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
 
@@ -1031,7 +1062,7 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('month1').addEventListener('click', returnToMonth);
+document.getElementById('month1').addEventListener('click', returnToMonthFromTrackView);
 
 ////////////////// Eventlisteners for track-view ///////////////////////
 
@@ -1117,10 +1148,6 @@ function addTaskButtonClicked() {
   // Trigger animation via CSS
   displayClass('addView', true);
   displayClass('dayView', false);
-
-  // displayClass('playView', true);
-  // displayClass('addView', false);
-  // displayClass('hourglassTimer', false);  // Inelegant to turn the hourglassTimer off just after turning it on, but the logic is cleaner
 
   fillDurationBox(defaultTaskDuration);
 
@@ -1485,6 +1512,19 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
       members[i].classList.remove('active');
     }
   }
+
+  // Fix unexpected behaviour of back-button
+  if (displayStatus) {
+    window.removeEventListener('hashchange', pushHashChange);
+    window.removeEventListener('hashchange', bindNavigation);
+    if (className == 'dayView') {
+      location.hash = '';
+    } else {
+      location.hash = '#' + className;
+    }
+    window.addEventListener('hashchange', pushHashChange);
+    window.addEventListener('hashchange', bindNavigation);
+  }
 }
 
 // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
@@ -1572,7 +1612,7 @@ function monthButtonClicked() {
 }
 
 
-function gotoDay() {
+function gotoDayFromMonth() {
   displayClass('monthView', false);
   displayClass('dayView', true);
 
@@ -1952,7 +1992,7 @@ function monthRenderTasks() {
             isTracked = trackTaskList[txt][1];
           }
 
-          if (dontShowTrackedAsTooltip && isTracked == 1) { // Skip writing task to tooltip if the flag is false. Flag is toggled in trackview by checkbox
+          if (dontShowTrackedAsTooltip && isTracked == 1) { // Skip writing task to tooltip if the flag is false. Flag is toggled in trackView by checkbox
             continue;
           }
           children[1].innerHTML += ' \u25CF ' + txt.replace(/_/g, ' ') + '&nbsp;' + '<br>'; // Write to tooltip
@@ -2254,7 +2294,7 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 }
 
 
-function returnToMonth() {
+function returnToMonthFromTrackView() {
   displayClass('trackView', false);
   displayClass('monthView', true);
   monthRenderTasks();
