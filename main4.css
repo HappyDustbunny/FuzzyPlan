@@ -832,6 +832,11 @@ label {  /* Used in settingsView */
 }
 
 #gotoDayFromSettings {
+  display: none;
+}
+
+#gotoDayFromSettings.active {
+  display: block;
   grid-area: hcl;
 }
 

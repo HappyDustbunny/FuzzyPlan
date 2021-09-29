@@ -6,6 +6,19 @@
     <title>FuzzyPlan</title>
     <link rel="icon" type="image/png" sizes="32x32" href="FPlogo.png">
     <link rel="stylesheet" href="main4.css">
+    <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/serviceWorker.js').then(function(registration) {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        // registration failed :(
+        console.log('ServiceWorker registration failed: ', err);
+      });
+     });
+    }
+    </script>
     <script src="main.js" defer></script>
   </head>
 
