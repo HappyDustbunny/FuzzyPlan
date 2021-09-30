@@ -650,32 +650,47 @@ function pushHashChange() {
 
 function bindNavigation() {
   let len = lastHashes.length;
-  if (lastHashes[len - 1] == '#dayViewstorageView') {
+
+  if (location.hash == '') {
+    let hashParts = lastHashes[len - 2].replace('#', '').split('_');
+    let reversedHash = '#' + hashParts[1] + '_' + hashParts[0];
+    navigateTo(reversedHash);
+  } else if (lastHashes[len - 1] == location.hash) {
+    navigateTo(lastHashes[len - 1]);
+  } else {
+    navigateTo(location.hash);
+  }
+}
+
+
+function navigateTo(thisPlace) {
+  if (thisPlace == '#dayView_storageView') {
     // console.log(lastHashes.pop());
     gotoDayFromStorage();
-  } else if (lastHashes[len - 1] == '#storageViewdayView') {
+  } else if (thisPlace == '#storageView_dayView') {
     // console.log(lastHashes.pop());
     gotoStorageFromDay();
-  } else if (lastHashes[len - 1] == '#dayViewsettingsView') {
+  } else if (thisPlace == '#dayView_settingsView') {
     // console.log(lastHashes.pop());
     gotoSettingsFromDay();
-  } else if (lastHashes[len - 1] == '#settingsViewdayView') {
+  } else if (thisPlace == '#settingsView_dayView') {
     // console.log(lastHashes.pop());
     gotoDayFromSettings();
-  } else if (lastHashes[len - 1] == '#dayViewmonthView') {
+  } else if (thisPlace == '#dayView_monthView') {
     // console.log(lastHashes.pop());
     gotoMonhtFromDay();
-  } else if (lastHashes[len - 1] == '#monthViewdayView') {
-    // console.log(lastHashes.shift());
+  } else if (thisPlace == '#monthView_dayView') {
+    // console.log(thisPlace, location.hash);
     gotoDayFromMonth();
-  } else if (lastHashes[len - 1] == '#trackViewmonthView') {
+  } else if (thisPlace == '#trackView_monthView') {
     // console.log(lastHashes.pop());
     gotoTrackFromMonth();
-  } else if (lastHashes[len - 1] == '#monthViewtrackView') {
+  } else if (thisPlace == '#monthView_trackView') {
     // console.log(lastHashes.pop());
     gotoMonthFromTrack();
   }
 }
+
 
 function toDoButtonClicked() {
   fillChooseBox('day');
@@ -965,15 +980,17 @@ function updateHearts() {
 
 ////// Eventlisteners  //////
 
-window.addEventListener('hashchange', pushHashChange);
+// window.addEventListener('hashchange', pushHashChange);
 window.addEventListener('hashchange', bindNavigation);
 
 document.getElementById('info').addEventListener('click', gotoInfo);
-document.getElementById('month').addEventListener('click', function () { location.hash = '#dayViewmonthView'});
+document.getElementById('month').addEventListener('click', function () { location.hash = '#dayView_monthView';
+pushHashChange(); });
 // document.getElementById('month').addEventListener('click', gotoMonhtFromDay);
 
 // Unfold settings
-document.getElementById('gotoSettings').addEventListener('click', function () {location.hash = '#dayViewsettingsView'});
+document.getElementById('gotoSettings').addEventListener('click', function () {location.hash = '#dayView_settingsView';
+pushHashChange(); });
 // document.getElementById('gotoSettings').addEventListener('click', gotoSettingsFromDay);
 
 document.getElementById('postpone').addEventListener('click', postponeTask);
@@ -1063,14 +1080,16 @@ document.getElementById('playButton').addEventListener('click', playButtonClicke
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('track').addEventListener('click', function () { location.hash = '#trackViewmonthView' });
+document.getElementById('track').addEventListener('click', function () { location.hash = '#trackView_monthView';
+pushHashChange(); });
 // document.getElementById('track').addEventListener('click', gotoTrackFromMonth);
 
 document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
 
 document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
 
-document.getElementById('day').addEventListener('click', function () { location.hash = '#monthViewdayView' });
+document.getElementById('day').addEventListener('click', function () { location.hash = '#monthView_dayView';
+pushHashChange(); });
 // document.getElementById('day').addEventListener('click', gotoDayFromMonth);
 
 document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
@@ -1081,7 +1100,8 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('month1').addEventListener('click', function () { location.hash = '#monthViewtrackView' });
+document.getElementById('month1').addEventListener('click', function () { location.hash = '#monthView_trackView';
+pushHashChange(); });
 // document.getElementById('month1').addEventListener('click', gotoMonthFromTrack);
 
 ////////////////// Eventlisteners for track-view ///////////////////////
@@ -1108,10 +1128,12 @@ document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrac
 
 ////////////////// Eventlisteners for storage-view ///////////////////////
 
-document.getElementById('storage').addEventListener('click', function () { location.hash = '#storageViewdayView' });
+document.getElementById('storage').addEventListener('click', function () { location.hash = '#storageView_dayView';
+pushHashChange(); });
 // document.getElementById('storage').addEventListener('click', gotoStorageFromDay);
 
-document.getElementById('day1').addEventListener('click', function () { location.hash = '#dayViewstorageView' });
+document.getElementById('day1').addEventListener('click', function () { location.hash = '#dayView_storageView';
+pushHashChange(); });
 // document.getElementById('day1').addEventListener('click', gotoDayFromStorage);
 
 document.getElementById('storeList').addEventListener('click', storeList);
@@ -1120,9 +1142,11 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 
 ////////////////// Eventlisteners for settings-view ///////////////////////
 
-document.getElementById('gotoDayFromSettings').addEventListener('click', function () { location.hash = '#settingsViewdayView' });
+document.getElementById('gotoDayFromSettings').addEventListener('click', function () { location.hash = '#settingsView_dayView';
+pushHashChange(); });
 // document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
-document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { location.hash = '#settingsViewdayView' });
+document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { location.hash = '#settingsView_dayView';
+pushHashChange(); });
 // document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
 
 document.getElementById('eng').addEventListener('click',
