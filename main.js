@@ -6,7 +6,7 @@
 // if (location.hash == '') {gotoDayFromStorage()}
 // location.hash = 'storage'
 
-let lastHashes = [];
+let hashStack = [];
 let lastHash = '';
 let taskList = [];  // List of all tasks
 let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
@@ -416,7 +416,7 @@ function setUpFunc() {
 
   taskList = [];
   location.hash = '';
-  lastHashes = [];
+  hashStack = [];
   lastHash = '';
 
   makeFirstTasks();
@@ -640,24 +640,30 @@ function retrieveLocallyStoredStuff() {
   }
 }
 
-function pushHashChange() {
-  lastHashes.push(location.hash);
-  if (10 < lastHashes.length) {
-    lastHashes.shift();  // Pop from the begining of the array
+
+function pushHashChangeToStack() {
+  // Update hashStack list
+  hashStack.push(location.hash);
+  if (10 < hashStack.length) {
+    hashStack.shift();  // Pop from the begining of the array
   }
-  console.table(lastHashes);
 }
 
-function bindNavigation() {
-  let len = lastHashes.length;
 
-  if (location.hash == '') {
-    let hashParts = lastHashes[len - 2].replace('#', '').split('_');
+function bindNavigation() {  // Called by eventlistener on 'hashchange'
+
+  // Find out where to go
+  let len = hashStack.length;
+  console.log(hashStack[len - 1], location.hash);
+
+  if (1 < len && (location.hash == '' || hashStack[len - 1] != location.hash)) {
+    let hashParts = hashStack[len - 1].replace('#', '').split('_');
     let reversedHash = '#' + hashParts[1] + '_' + hashParts[0];
+    let pop = hashStack.pop();
+    console.table('pop', pop, hashStack);
     navigateTo(reversedHash);
-  } else if (lastHashes[len - 1] == location.hash) {
-    navigateTo(lastHashes[len - 1]);
   } else {
+
     navigateTo(location.hash);
   }
 }
@@ -665,29 +671,21 @@ function bindNavigation() {
 
 function navigateTo(thisPlace) {
   if (thisPlace == '#dayView_storageView') {
-    // console.log(lastHashes.pop());
-    gotoDayFromStorage();
-  } else if (thisPlace == '#storageView_dayView') {
-    // console.log(lastHashes.pop());
     gotoStorageFromDay();
+  } else if (thisPlace == '#storageView_dayView') {
+    gotoDayFromStorage();
   } else if (thisPlace == '#dayView_settingsView') {
-    // console.log(lastHashes.pop());
     gotoSettingsFromDay();
   } else if (thisPlace == '#settingsView_dayView') {
-    // console.log(lastHashes.pop());
     gotoDayFromSettings();
   } else if (thisPlace == '#dayView_monthView') {
-    // console.log(lastHashes.pop());
-    gotoMonhtFromDay();
+    gotoMonthFromDay();
   } else if (thisPlace == '#monthView_dayView') {
-    // console.log(thisPlace, location.hash);
     gotoDayFromMonth();
   } else if (thisPlace == '#trackView_monthView') {
-    // console.log(lastHashes.pop());
-    gotoTrackFromMonth();
-  } else if (thisPlace == '#monthView_trackView') {
-    // console.log(lastHashes.pop());
     gotoMonthFromTrack();
+  } else if (thisPlace == '#monthView_trackView') {
+    gotoTrackFromMonth();
   }
 }
 
@@ -787,6 +785,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     clearButton.title = languagePack['clearButtonText'][language][1];
   }
 }
+
 
 function postponeTask() {
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
@@ -980,17 +979,14 @@ function updateHearts() {
 
 ////// Eventlisteners  //////
 
-// window.addEventListener('hashchange', pushHashChange);
 window.addEventListener('hashchange', bindNavigation);
 
 document.getElementById('info').addEventListener('click', gotoInfo);
-document.getElementById('month').addEventListener('click', function () { location.hash = '#dayView_monthView';
-pushHashChange(); });
-// document.getElementById('month').addEventListener('click', gotoMonhtFromDay);
+document.getElementById('month').addEventListener('click', function () { location.hash = '#dayView_monthView'; pushHashChangeToStack(); });
+// document.getElementById('month').addEventListener('click', gotoMonthFromDay);
 
 // Unfold settings
-document.getElementById('gotoSettings').addEventListener('click', function () {location.hash = '#dayView_settingsView';
-pushHashChange(); });
+document.getElementById('gotoSettings').addEventListener('click', function () {location.hash = '#dayView_settingsView'; pushHashChangeToStack(); });
 // document.getElementById('gotoSettings').addEventListener('click', gotoSettingsFromDay);
 
 document.getElementById('postpone').addEventListener('click', postponeTask);
@@ -1080,16 +1076,14 @@ document.getElementById('playButton').addEventListener('click', playButtonClicke
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('track').addEventListener('click', function () { location.hash = '#trackView_monthView';
-pushHashChange(); });
+document.getElementById('track').addEventListener('click', function () { location.hash = '#monthView_trackView'; pushHashChangeToStack(); });
 // document.getElementById('track').addEventListener('click', gotoTrackFromMonth);
 
 document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
 
 document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
 
-document.getElementById('day').addEventListener('click', function () { location.hash = '#monthView_dayView';
-pushHashChange(); });
+document.getElementById('day').addEventListener('click', function () { location.hash = '#monthView_dayView'; pushHashChangeToStack(); });
 // document.getElementById('day').addEventListener('click', gotoDayFromMonth);
 
 document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
@@ -1100,8 +1094,7 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('month1').addEventListener('click', function () { location.hash = '#monthView_trackView';
-pushHashChange(); });
+document.getElementById('month1').addEventListener('click', function () { location.hash = '#trackView_monthView'; pushHashChangeToStack(); });
 // document.getElementById('month1').addEventListener('click', gotoMonthFromTrack);
 
 ////////////////// Eventlisteners for track-view ///////////////////////
@@ -1128,12 +1121,10 @@ document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrac
 
 ////////////////// Eventlisteners for storage-view ///////////////////////
 
-document.getElementById('storage').addEventListener('click', function () { location.hash = '#storageView_dayView';
-pushHashChange(); });
+document.getElementById('storage').addEventListener('click', function () { location.hash = '#dayView_storageView'; pushHashChangeToStack(); });
 // document.getElementById('storage').addEventListener('click', gotoStorageFromDay);
 
-document.getElementById('day1').addEventListener('click', function () { location.hash = '#dayView_storageView';
-pushHashChange(); });
+document.getElementById('day1').addEventListener('click', function () { location.hash = '#storageView_dayView'; pushHashChangeToStack(); });
 // document.getElementById('day1').addEventListener('click', gotoDayFromStorage);
 
 document.getElementById('storeList').addEventListener('click', storeList);
@@ -1142,11 +1133,9 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 
 ////////////////// Eventlisteners for settings-view ///////////////////////
 
-document.getElementById('gotoDayFromSettings').addEventListener('click', function () { location.hash = '#settingsView_dayView';
-pushHashChange(); });
+document.getElementById('gotoDayFromSettings').addEventListener('click', function () { location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
 // document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
-document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { location.hash = '#settingsView_dayView';
-pushHashChange(); });
+document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
 // document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
 
 document.getElementById('eng').addEventListener('click',
@@ -1545,6 +1534,7 @@ function gotoDayFromAdd() {
 
 // Helper function for Add-view and Play-view
 function displayClass(className, displayStatus) {  // displaystatus can be 'true' or 'false'
+  // console.log('displayClass', className, displayStatus);
 
   // Check if the className is used as id and if so, turn the element with this id on or off
   let id = document.getElementById(className);
@@ -1627,7 +1617,7 @@ function suppressClicks(e) {
 
 //////////////////// Month-view code below ///////////////////////////
 
-function gotoMonhtFromDay() {
+function gotoMonthFromDay() {
   storeLocally();
 
   displayClass('dayView', false);
@@ -1641,9 +1631,6 @@ function gotoMonhtFromDay() {
   if (0 < tasksSentToMonth.length) {
     fillChooseBox('month');
   }
-
-  // resetInputBox('day');
-  document.getElementById('monthInputBox').focus();
 }
 
 
@@ -2399,7 +2386,7 @@ function storeHasBeenClicked(event) {
         taskList = trash;  // Restore trash as taskList
         document.getElementById('trashBin').classList.add('inUse');
         document.getElementById('trashBin').classList.remove('notInUse');
-        gotoMonthFromTrack();
+        gotoDayFromStorage();
       } else {
         displayMessage(languagePack['nothingIsDiscarded'][language], 3000, 'storage');
       }
@@ -2568,7 +2555,6 @@ function applyTaskDuration() {
   localStorage.defaultTaskDuration = defaultTaskDuration;
 
    gotoDayFromSettings();
-  // window.location.assign('main.html');
 }
 
 function applyWakeUpTime() {
@@ -2760,7 +2746,7 @@ function gotoDayFromSettings() {
 //       gotoStorageFromDay();
 //     } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
 //       // goToPage('month.html'); // TODO: Fix twofingerNavigation?
-//       gotoMonhtFromDay();
+//       gotoMonthFromDay();
 //     }
 //   }
 // }
