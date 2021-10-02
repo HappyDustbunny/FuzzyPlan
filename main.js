@@ -656,11 +656,12 @@ function bindNavigation() {  // Called by eventlistener on 'hashchange'
   let len = hashStack.length;
   console.log(hashStack[len - 1], location.hash);
 
-  if (1 < len && (location.hash == '' || hashStack[len - 1] != location.hash)) {
+  if (0 < len && (location.hash == '' || hashStack[len - 1] != location.hash)) {
     let hashParts = hashStack[len - 1].replace('#', '').split('_');
     let reversedHash = '#' + hashParts[1] + '_' + hashParts[0];
-    let pop = hashStack.pop();
-    console.table('pop', pop, hashStack);
+    if (1 < hashStack.length) {
+      hashStack.pop();
+    }
     navigateTo(reversedHash);
   } else {
 
