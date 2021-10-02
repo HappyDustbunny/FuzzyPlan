@@ -1049,7 +1049,7 @@ document.getElementById('inputDurationBox').addEventListener('focusout',
         function () {readDurationTime(); fillDurationBox(taskDuration_add);
         document.getElementById('inputTimeBox').blur;} );
 
-document.addEventListener('touchmove', function() {swipeNavigation(event);});
+// document.addEventListener('touchmove', function() {swipeNavigation(event);});
 
 document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
 
@@ -2738,7 +2738,7 @@ function swipeNavigation(event) {
   // if (sessionStorage.touchX && event.touches.length === 1) {
   //   sessionStorage.touchX = '';
   // }
-
+// TODO: Hmm. Too quick response and not intuitive unless the hashStack is full. Goes off page really quick
   if (event.touches.length > 0) {
     if (!sessionStorage.touchX) {
       sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
