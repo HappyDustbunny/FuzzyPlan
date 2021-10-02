@@ -654,7 +654,7 @@ function bindNavigation() {  // Called by eventlistener on 'hashchange'
 
   // Find out where to go
   let len = hashStack.length;
-  console.log(hashStack[len - 1], location.hash);
+  // console.log(hashStack[len - 1], location.hash);
 
   if (0 < len && (location.hash == '' || hashStack[len - 1] != location.hash)) {
     let hashParts = hashStack[len - 1].replace('#', '').split('_');
@@ -1049,7 +1049,7 @@ document.getElementById('inputDurationBox').addEventListener('focusout',
         function () {readDurationTime(); fillDurationBox(taskDuration_add);
         document.getElementById('inputTimeBox').blur;} );
 
-// document.addEventListener('touchmove', function() {twoFingerNavigation(event);});
+document.addEventListener('touchmove', function() {swipeNavigation(event);});
 
 document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
 
@@ -2734,23 +2734,25 @@ function gotoDayFromSettings() {
 
 //////////////////// Settings-view code above ^^^ ///////////////////////////
 
-// function twoFingerNavigation(event) {
-//   if (sessionStorage.touchX && event.touches.length === 1) {
-//     sessionStorage.touchX = '';
-//   }
-//
-//   if (event.touches.length > 0) {
-//     if (!sessionStorage.touchX) {
-//       sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
-//     } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
-//       // goToPage('storage.html');
-//       gotoStorageFromDay();
-//     } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
-//       // goToPage('month.html'); // TODO: Fix twofingerNavigation?
-//       gotoMonthFromDay();
-//     }
-//   }
-// }
+function swipeNavigation(event) {
+  // if (sessionStorage.touchX && event.touches.length === 1) {
+  //   sessionStorage.touchX = '';
+  // }
+
+  if (event.touches.length > 0) {
+    if (!sessionStorage.touchX) {
+      sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
+    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
+      window.history.back();
+      // goToPage('storage.html');
+      // gotoStorageFromDay();
+    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
+      window.history.forward();
+      // goToPage('month.html');
+      // gotoMonthFromDay();
+    }
+  }
+}
 
 function  fillHearths(currentStressLevel) {
   const heartSpan = document.getElementById('heart');
