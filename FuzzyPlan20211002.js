@@ -77,10 +77,10 @@ let storageList = {};  // taskList and their names are stored in memory1-17  {'m
 ///////// Languages ///////
 let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The variable language is 0 for english and 1 for danish
    // Day view
-     "month": [['Month', 'Click to show month (or just swipe rigth with two fingers anywhere)'],
-               ['Måned', 'Klik for at vise måned (eller swipe til højre med to fingre)']],
-     "storage": [['Storage', 'Click to show the storage (or just swipe left with two fingers anywhere)'],
-                 ['Lagre', 'Klik for at vise lagrene (eller swipe til venstre med to fingre)']],
+     "month": [['Month', 'Click to show month (or just swipe rigth)'],
+               ['Måned', 'Klik for at vise måned (eller swipe til højre)']],
+     "storage": [['Storage', 'Click to show the storage (or just swipe left)'],
+                 ['Lagre', 'Klik for at vise lagrene (eller swipe til venstre)']],
      'info': [['?', "Information and user manual"],
         ['?', 'Information og brugsanvisning']],
      "postpone": [['\u25C2 Postpone', "Click to move content of input box to month (postpone task)"], // &#x25C2; Black left-pointing small triangle
@@ -150,10 +150,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
       // Month View
      'track': [['Track', 'Choose which task to track with colours'],
                ['Følg', 'Vælg hvilke opgaver der skal følges']],
-     'day': [['Day', 'Click to get back to day-view (or just swipe left with two fingers anywhere)'],
-             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstre med to fingre hvorsomhelst)']],
-     'day1': [['Day', 'Click to get back to day-view (or just swipe right with two fingers anywhere)'],
-             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til højre med to fingre hvorsomhelst)']],
+     'day': [['Day', 'Click to get back to day-view (or just swipe left anywhere)'],
+             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstrehvorsomhelst)']],
+     'day1': [['Day', 'Click to get back to day-view (or just swipe right anywhere)'],
+             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til højre hvorsomhelst)']],
      'monthClearButton': [['Clear\u25B8', 'Clear input box'], // Black right-pointing small triangle
         ['Slet \u25B8', 'Slet input boks']],
      'monthInputBox': [['', 'Input tasks to store in month view'],
@@ -1049,7 +1049,7 @@ document.getElementById('inputDurationBox').addEventListener('focusout',
         function () {readDurationTime(); fillDurationBox(taskDuration_add);
         document.getElementById('inputTimeBox').blur;} );
 
-// document.addEventListener('touchmove', function() {swipeNavigation(event);});
+document.addEventListener('touchmove', function() {swipeNavigation(event);});
 
 document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
 
@@ -2738,16 +2738,48 @@ function swipeNavigation(event) {
   // if (sessionStorage.touchX && event.touches.length === 1) {
   //   sessionStorage.touchX = '';
   // }
-// TODO: Hmm. Too quick response and not intuitive unless the hashStack is full. Goes off page really quick
+// TODO: Hmm.Left and right swipe not recognised consistently. I may need to THINK :-(
   if (event.touches.length > 0) {
+    let posDiff = event.touches[0].screenX - sessionStorage.touchX;
     if (!sessionStorage.touchX) {
       sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
-    } else if (event.touches[0].screenX - sessionStorage.touchX < 50) { // Left swipe
-      window.history.back();
+    } else if (posDiff < 0 && 150 < Math.abs(posDiff)) { // Left swipe
+      console.log('Left swipe?', posDiff  ) //, event.touches[0].screenX);
+      if (location.hash == '#monthView_trackView') {
+        location.hash = '#trackView_monthView';
+        sessionStorage.removeItem('touchX')
+        return;
+      }
+      if (location.hash == '#trackView_monthView' || location.hash == '#dayView_monthView') {
+        location.hash = '#monthView_dayView';
+        sessionStorage.removeItem('touchX')
+        return;
+      }
+      // window.history.back();
       // goToPage('storage.html');
       // gotoStorageFromDay();
-    } else if (event.touches[0].screenX - sessionStorage.touchX > 50) { // Right swipe
-      window.history.forward();
+    } else if (0 < posDiff && 150 < Math.abs(posDiff)) { // Right swipe
+      console.log('Right swipe?', posDiff);
+      if (location.hash == '#settingsView_dayView' || location.hash == '#monthView_dayView') {
+        location.hash = '#dayView_monthView';
+        sessionStorage.removeItem('touchX')
+        return;
+      }
+      if (location.hash == '#trackView_monthView' || location.hash == '#dayView_monthView') {
+        location.hash = '#monthView_trackView';
+        sessionStorage.removeItem('touchX')
+        return;
+      }
+      if (location.hash == '#dayView_settingsView') {
+        location.hash = '#settingsView_dayView';
+        sessionStorage.removeItem('touchX')
+        return;
+      }
+      if (location.hash == '#dayView_storageView') {
+        location.hash = '#storageView_dayView';
+        sessionStorage.removeItem('touchX')
+      }
+      // window.history.forward();
       // goToPage('month.html');
       // gotoMonthFromDay();
     }
