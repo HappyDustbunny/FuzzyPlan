@@ -1010,7 +1010,7 @@ document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
 document.getElementById('dayInputBox').addEventListener('keypress', function () { inputAtEnter(event); });
-document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
+// document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
 document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
@@ -1049,7 +1049,8 @@ document.getElementById('inputDurationBox').addEventListener('focusout',
         function () {readDurationTime(); fillDurationBox(taskDuration_add);
         document.getElementById('inputTimeBox').blur;} );
 
-document.addEventListener('touchmove', function() {swipeNavigation(event);});
+document.addEventListener('touchstart', function() {swipeNavigationStart(event);});
+document.addEventListener('touchend', function() {swipeNavigationEnd(event);});
 
 document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
 
@@ -2734,55 +2735,52 @@ function gotoDayFromSettings() {
 
 //////////////////// Settings-view code above ^^^ ///////////////////////////
 
-function swipeNavigation(event) {
-  // if (sessionStorage.touchX && event.touches.length === 1) {
-  //   sessionStorage.touchX = '';
-  // }
-// TODO: Hmm.Left and right swipe not recognised consistently. I may need to THINK :-(
-  if (event.touches.length > 0) {
-    let posDiff = event.touches[0].screenX - sessionStorage.touchX;
-    if (!sessionStorage.touchX) {
-      sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
-    } else if (posDiff < 0 && 150 < Math.abs(posDiff)) { // Left swipe
-      console.log('Left swipe?', posDiff  ) //, event.touches[0].screenX);
-      if (location.hash == '#monthView_trackView') {
-        location.hash = '#trackView_monthView';
-        sessionStorage.removeItem('touchX')
-        return;
-      }
-      if (location.hash == '#trackView_monthView' || location.hash == '#dayView_monthView') {
-        location.hash = '#monthView_dayView';
-        sessionStorage.removeItem('touchX')
-        return;
-      }
-      // window.history.back();
-      // goToPage('storage.html');
-      // gotoStorageFromDay();
-    } else if (0 < posDiff && 150 < Math.abs(posDiff)) { // Right swipe
-      console.log('Right swipe?', posDiff);
-      if (location.hash == '#settingsView_dayView' || location.hash == '#monthView_dayView') {
-        location.hash = '#dayView_monthView';
-        sessionStorage.removeItem('touchX')
-        return;
-      }
-      if (location.hash == '#trackView_monthView' || location.hash == '#dayView_monthView') {
-        location.hash = '#monthView_trackView';
-        sessionStorage.removeItem('touchX')
-        return;
-      }
-      if (location.hash == '#dayView_settingsView') {
-        location.hash = '#settingsView_dayView';
-        sessionStorage.removeItem('touchX')
-        return;
-      }
-      if (location.hash == '#dayView_storageView') {
-        location.hash = '#storageView_dayView';
-        sessionStorage.removeItem('touchX')
-      }
-      // window.history.forward();
-      // goToPage('month.html');
-      // gotoMonthFromDay();
+function swipeNavigationStart(event) {
+  // console.log('Start   ',event.touches[0].screenX);
+  sessionStorage.touchX = event.touches[0].screenX; // SESSIONstorage, not localStorage. Doh.
+}
+
+
+function swipeNavigationEnd(event) {
+  // console.log('End ',event.changedTouches[0].screenX);
+
+  let posDiff = event.changedTouches[0].screenX - sessionStorage.touchX;
+
+  if (posDiff < 0 && 100 < Math.abs(posDiff)) { // Left swipe
+    console.log('Left swipe?', posDiff  ) //, event.touches[0].screenX);
+    if (location.hash == '#monthView_trackView') {
+      location.hash = '#trackView_monthView';
+      pushHashChangeToStack();
+      return;
     }
+    if (location.hash == '#trackView_monthView' || location.hash == '#dayView_monthView') {
+      location.hash = '#monthView_dayView';
+      pushHashChangeToStack();
+      return;
+    }
+  } else if (0 < posDiff && 100 < Math.abs(posDiff)) { // Right swipe
+    console.log('Right swipe?', posDiff);
+    if (location.hash == '#settingsView_dayView' || location.hash == '#monthView_dayView') {
+      location.hash = '#dayView_monthView';
+      pushHashChangeToStack();
+      return;
+    }
+    if (location.hash == '#trackView_monthView' || location.hash == '#dayView_monthView') {
+      location.hash = '#monthView_trackView';
+      pushHashChangeToStack();
+      return;
+    }
+    if (location.hash == '#dayView_settingsView') {
+      location.hash = '#settingsView_dayView';
+      pushHashChangeToStack();
+      return;
+    }
+    if (location.hash == '#dayView_storageView') {
+      location.hash = '#storageView_dayView';
+      pushHashChangeToStack();
+    }
+
+    sessionStorage.removeItem('touchX');
   }
 }
 
