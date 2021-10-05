@@ -430,6 +430,16 @@ html {
 
 /* month view css below */
 
+/* Doesn't work */
+/* @keyframes glide {
+  0% {
+    transform: (0, 0);
+  }
+  100% {
+    transform: (150, 0);
+  }
+} */
+
 #monthView {
     /* bottom: 780px; */
     /* left: 300px; */

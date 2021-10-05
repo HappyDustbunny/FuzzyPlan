@@ -1183,8 +1183,7 @@ function addTaskButtonClicked() {
   storeLocally();
   drainGainLevel_add = 'd1';
 
-  // TODO: Hmmm. Using .hidden removes transition. Get rid of transition CSS or .hidden?
-  // Trigger animation via CSS
+  // TODO: Hmmm. Using .hidden removes transition. Fix this
   displayClass('dayView', false);
   displayClass('addView', true);
 
@@ -1552,6 +1551,8 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
       members[i].classList.remove('active');
     }
   }
+  // id.style.width = '100%';
+  // console.log(id, displayStatus);
 }
 
 // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
