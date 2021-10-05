@@ -1551,6 +1551,14 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
       members[i].classList.remove('active');
     }
   }
+  // TODO: Kill your darlings: get rid of Bezier bump. Implement for all classNames
+  if (id) {
+    id.style.transform = 'translate(-500px)';
+    setTimeout(function() {id.style.transform = 'translate(0px)'; console.log('gok');}, 20);
+    // document.getElementById('monthView').style.transform = 'translate(-500px)';
+    // setTimeout(function() {document.getElementById('monthView').style.transform = 'translate(0px)'; console.log('gok');}, 20);
+  }
+
 }
 
 // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
@@ -1623,7 +1631,9 @@ function gotoMonthFromDay() {
 
   displayClass('dayView', false);
   displayClass('monthView', true);
-  document.getElementById('rap').style.transform = 'translate(100px);'
+  // setTimeout(function() {document.getElementById('monthView').style.transform = 'translate(-500px)'; console.log('rap');}, 500);
+  // document.getElementById('monthView').style.transform = 'translate(-500px)';
+  // setTimeout(function() {document.getElementById('monthView').style.transform = 'translate(0px)'; console.log('gok');}, 20);
 
 
   fillMonthDateBar();
