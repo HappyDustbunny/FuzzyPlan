@@ -1551,8 +1551,6 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
       members[i].classList.remove('active');
     }
   }
-  // id.style.width = '100%';
-  // console.log(id, displayStatus);
 }
 
 // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
@@ -1625,6 +1623,7 @@ function gotoMonthFromDay() {
 
   displayClass('dayView', false);
   displayClass('monthView', true);
+  document.getElementById('rap').style.transform = 'translate(100px);'
 
 
   fillMonthDateBar();

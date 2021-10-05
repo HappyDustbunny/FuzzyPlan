@@ -430,15 +430,15 @@ html {
 
 /* month view css below */
 
-/* Doesn't work */
-/* @keyframes glide {
+/* Doesn't work yet */
+@keyframes glide {
   0% {
-    transform: (0, 0);
+    transform: translateX(-100px);
   }
   100% {
-    transform: (150, 0);
+    transform: translateX(150px);
   }
-} */
+}
 
 #monthView {
     /* bottom: 780px; */
@@ -447,8 +447,15 @@ html {
     /* height: 0px; */
     background-color: white;
     /* visibility: hidden; */
-    transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+    /* transition: all 0.4s cubic-bezier(.54,.38,.6,1.29); */
     position: relative;
+}
+
+.glid {
+  position: relative;
+  background-color: red;
+  transition: glide 4s cubic-bezier(.54,.38,.6,1.29);
+
 }
 
 /* #monthView.active {
