@@ -3422,10 +3422,11 @@ function taskHasBeenClicked(event) {
     chosenTaskId = chosenTask.id;
     uniqueIdOfLastTouched = chosenTaskId;
 
-    if (nullTimeClicked && document.activeElement.id == 'dayInputBox') {
-      document.getElementById('dayInputBox').blur()
+    if ((nullTimeClicked && document.activeElement.id == 'dayInputBox')
+    || (!nullTimeClicked && document.activeElement.id != 'dayInputBox')) {
+      document.getElementById('dayInputBox').blur();
     } else {
-      document.getElementById('dayInputBox').focus()
+      document.getElementById('dayInputBox').focus();
     }
 
   } else if (contentInputBox == '' && chosenTaskId) {
