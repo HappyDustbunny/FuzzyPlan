@@ -48,8 +48,8 @@ let playTimer = '';
 
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-let monthTaskList = {};  // Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
-let pastDayList = {};   // Old taskList is stored here on their relevant date {"4-1-21": [task, task,...]}
+let monthTaskList = {};  // Future tasks. Dict with all tasks storede in month-view. Technically a JS object usable much like a Python dictionary
+let pastDayList = {};   // Past tasks. Old taskList is stored here on their relevant date {"4-1-21": [task, task,...]}
 let pastDayListBackUp = {}; // Inelegant way of moving data from one function to the next
 let trackTaskList = {}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 // let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
@@ -1623,7 +1623,7 @@ function gotoMonthFromDay() {
 
   displayClass('dayView', false);
   displayClass('monthView', true);
-  document.getElementById('rap').style.transform = 'translate(100px);'
+  // document.getElementById('rap').style.transform = 'translate(100px);'
 
 
   fillMonthDateBar();
@@ -2635,7 +2635,6 @@ function storeBackup() { // TODO: Check size of blob against data needing storin
   let data = JSON.stringify(localStorage);
   // let data = JSON.stringify(localStorage.pastDayList);
   let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-  console.log(blob);
 
   // Make filename
   let now = new Date();
@@ -2842,16 +2841,19 @@ function goToPage(page) {
 
 // Used by an eventListener. Inserts a 15 min planning task at the start of your day
 function wakeUpButton() {
-  let succes = false;
-  let now = new Date();
-  let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
-  let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
-  let task = new Task(taskStart, 15 * 60000, languagePack['planning'][0][language], 1);
-  succes = addFixedTask(task);
-  if (!succes) {
-    console.log('wakeUpButton failed to insert a task');
+  if (taskList.length < 3) {
+    let succes = false;
+    let now = new Date();
+    let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
+    let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
+    let task = new Task(taskStart, 15 * 60000, languagePack['planning'][0][language], 1);
+    succes = addFixedTask(task);
+    if (!succes) {
+      console.log('wakeUpButton failed to insert a task');
+    }
   }
   document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
+  document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
   wakeUpOrNowClickedOnce = true;
   adjustNowAndWakeUpButtons();
 }
@@ -2859,8 +2861,11 @@ function wakeUpButton() {
 
 // Used by an eventListener. Inserts a 15 min planning task at the current time
 function nowButton() {
-  let task = new Task(new Date(), 15 * 60000, languagePack['planning'][0][language], 1);
-  addFixedTask(task);
+  if (taskList.length < 3) {
+    let task = new Task(new Date(), 15 * 60000, languagePack['planning'][0][language], 1);
+    addFixedTask(task);
+  }
+  document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
   document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
   wakeUpOrNowClickedOnce = true;
   adjustNowAndWakeUpButtons();
@@ -3665,8 +3670,9 @@ function jumpTo(index) {
 
 
 function jumpToNow() {
-  let now = new Date()
+  let now = new Date();
   let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
+  console.log('jumpToNow pressed. Juping to nowMinusOneHour: ', nowMinusOneHour);
   jumpToTime(nowMinusOneHour, false);
 }
 

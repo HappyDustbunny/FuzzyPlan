@@ -1081,6 +1081,7 @@ label {  /* Used in settingsView */
 	margin-top: 450px;
 	margin-left: 100px;
   z-index: 10;
+  opacity: 0.8;
 }
 
 #playButton.stop, #playButtonTap.stop, #playButtonTop.stop {
@@ -1111,6 +1112,7 @@ label {  /* Used in settingsView */
   border-radius: 25px;
   border: 1px solid rgb(108, 168, 48);
   z-index: 10;
+  opacity: 0.8;
 }
 
 #addView {  /* Box that help transition to add-view */
