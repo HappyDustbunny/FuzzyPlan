@@ -331,10 +331,6 @@ html {
 }
 
 #dayView {
-  /* position: relative; */ /* Needs to be relative in order for the add-button to have an absolute position with respect to the viewport and not the total page https://css-tricks.com/absolute-relative-fixed-positioining-how-do-they-differ/ */
-  /* transition: all 0.4s; */
-
-  /* display: grid; */
   grid-template-columns: auto;
   grid-template-rows: auto auto auto;
   grid-gap: .3rem;
@@ -342,12 +338,8 @@ html {
   border: none;
   overflow-y: scroll;
   grid-template-areas: 'head' 'wrap' 'cont';
-  /* position: fixed; */
+  transition: all 0.1s cubic-bezier(0.25, 0.6, 0.6, 1);
 }
-
-/* #dayView.active {
-  visibility: visible;
-} */
 
 #text1, #text2 {
   display: flex;
@@ -430,33 +422,14 @@ html {
 
 /* month view css below */
 
-/* Doesn't work yet */
-@keyframes glide {
-  0% {
-    transform: translateX(-100px);
-  }
-  100% {
-    transform: translateX(150px);
-  }
-}
 
 #monthView {
-    /* bottom: 780px; */
-    /* left: 300px; */
     width: 100%;
-    /* height: 0px; */
     background-color: white;
-    /* visibility: hidden; */
-    /* transition: all 0.4s cubic-bezier(.54,.38,.6,1.29); */
+    transition: all .1s cubic-bezier(0.25, 0.6, 0.6, 1);
     position: relative;
 }
 
-.glid {
-  position: relative;
-  background-color: red;
-  transition: glide 4s cubic-bezier(.54,.38,.6,1.29);
-
-}
 
 /* #monthView.active {
     bottom: 780px;
@@ -785,6 +758,7 @@ html {
 } */
 
 #trackViewName {
+  /* TODO: Clean up unused stuff */
   /* Put FuzzyPlan header in right place */
   justify-content: center;
   grid-area: header1;
@@ -792,13 +766,10 @@ html {
 
 
 #trackView {
-    /* bottom: 3400px; */
-    /* left: 300px; */
     width: 100%;
-    height: 700px;
+    /* height: 700px; */
     background-color: white;
-    /* visibility: hidden; */
-    transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+    transition: all 0.1s cubic-bezier(0.25, 0.6, 0.6, 1);
     position: relative;
 }
 
@@ -1116,14 +1087,9 @@ label {  /* Used in settingsView */
 }
 
 #addView {  /* Box that help transition to add-view */
-  /* bottom: 0px; */
-  /* left: 300px; */
   width: 100%;
-  /* height: 0px; */
   background-color: white;
-  position: absolute;
-  /* visibility: hidden; */
-  transition: all 0.4s cubic-bezier(.54,.38,.6,1.29);
+  transition: all 0.1s cubic-bezier(0.25, 0.6, 0.6, 1);
   position: relative;
   left: 0px;
 }
@@ -1347,6 +1313,12 @@ div.tasksToSort #postpone {
   display: flex;
   flex-direction: column;
 }
+
+
+#storageView {
+  transition: all 0.1s cubic-bezier(0.25, 0.6, 0.6, 1);
+}
+
 
 .storage {
   width: 250px;

@@ -687,6 +687,10 @@ function navigateTo(thisPlace) {
     gotoMonthFromTrack();
   } else if (thisPlace == '#monthView_trackView') {
     gotoTrackFromMonth();
+  } else if (thisPlace == '#dayView_addView') {
+    addTaskButtonClicked();
+  } else if (thisPlace == '#addView_dayView') {
+    gotoDayFromAdd();
   }
 }
 
@@ -1026,7 +1030,8 @@ document.getElementById('toDoButton').addEventListener('click', toDoButtonClicke
 
 ////////// Eventlisteners for Add-view   /////////////////////
 
-document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
+// document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
+document.getElementById('addTaskButton').addEventListener('click', function () { location.hash = '#dayView_addView'; pushHashChangeToStack(); });
 
 document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
 
@@ -1062,7 +1067,8 @@ document.getElementById('now').addEventListener('click', setTimeNow);
 
 document.getElementById('addInfo').addEventListener('click', gotoInfoStress);
 
-document.getElementById('cancel').addEventListener('click', gotoDayFromAdd);
+// document.getElementById('cancel').addEventListener('click', gotoDayFromAdd);
+document.getElementById('cancel').addEventListener('click', function () { location.hash = '#addView_dayView'; pushHashChangeToStack(); });
 
 document.getElementById('applyAdd').addEventListener('click', apply);
 
@@ -1551,10 +1557,22 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
       members[i].classList.remove('active');
     }
   }
-  // TODO: Kill your darlings: get rid of Bezier bump. Implement for all classNames
-  if (id) {
-    id.style.transform = 'translate(-500px)';
-    setTimeout(function() {id.style.transform = 'translate(0px)'; console.log('gok');}, 20);
+
+  if (displayStatus) {
+    if (location.hash == '#dayView_monthView' || location.hash == '#storageView_dayView'
+    || location.hash == '#monthView_trackView'){
+      id.style.transform = 'translate(-500px)';
+      setTimeout(function() { id.style.transform = 'translate(0px)'; }, 20);
+    } else if (location.hash == '#trackView_monthView' || location.hash == '#monthView_dayView'
+    || location.hash == '#dayView_storageView'){
+      id.style.transform = 'translate(500px)';
+      setTimeout(function() { id.style.transform = 'translate(0px)'; }, 20);
+    } else if (location.hash == '#dayView_addView') {
+      id.style.transform = 'translate(50px, 100px)';
+      setTimeout(function() { id.style.transform = 'translate(0px, 0px)'; }, 20);
+    } else if (location.hash == '#addView_dayView') {
+      id.style.transform = 'translate(0px)';
+    }
     // document.getElementById('monthView').style.transform = 'translate(-500px)';
     // setTimeout(function() {document.getElementById('monthView').style.transform = 'translate(0px)'; console.log('gok');}, 20);
   }
@@ -2640,7 +2658,7 @@ function applyStressModel() {
 }
 
 
-function storeBackup() { // TODO: Check size of blob against data needing storing
+function storeBackup() { // TODO: Make automatic backups at the end of each day (/week?)
   // Wrap up data from localStorage in a blob
   let data = JSON.stringify(localStorage);
   // let data = JSON.stringify(localStorage.pastDayList);
