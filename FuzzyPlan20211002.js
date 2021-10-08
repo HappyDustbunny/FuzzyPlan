@@ -1,10 +1,4 @@
 // TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
-// TODO: Using navigation keys from settings view or month view gives unexpected behaviour. Maybe use location.hash? But how to detect hashchange? Like this:
-// window.addEventListener('hashchange', function() {
-//   console.log('The hash has changed!')
-// }, false);
-// if (location.hash == '') {gotoDayFromStorage()}
-// location.hash = 'storage'
 
 let hashStack = [];
 let lastHash = '';
@@ -988,11 +982,9 @@ window.addEventListener('hashchange', bindNavigation);
 
 document.getElementById('info').addEventListener('click', gotoInfo);
 document.getElementById('month').addEventListener('click', function () { location.hash = '#dayView_monthView'; pushHashChangeToStack(); });
-// document.getElementById('month').addEventListener('click', gotoMonthFromDay);
 
 // Unfold settings
 document.getElementById('gotoSettings').addEventListener('click', function () {location.hash = '#dayView_settingsView'; pushHashChangeToStack(); });
-// document.getElementById('gotoSettings').addEventListener('click', gotoSettingsFromDay);
 
 document.getElementById('postpone').addEventListener('click', postponeTask);
 
@@ -1030,7 +1022,6 @@ document.getElementById('toDoButton').addEventListener('click', toDoButtonClicke
 
 ////////// Eventlisteners for Add-view   /////////////////////
 
-// document.getElementById('addTaskButton').addEventListener('click', addTaskButtonClicked);
 document.getElementById('addTaskButton').addEventListener('click', function () { location.hash = '#dayView_addView'; pushHashChangeToStack(); });
 
 document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
@@ -1067,7 +1058,6 @@ document.getElementById('now').addEventListener('click', setTimeNow);
 
 document.getElementById('addInfo').addEventListener('click', gotoInfoStress);
 
-// document.getElementById('cancel').addEventListener('click', gotoDayFromAdd);
 document.getElementById('cancel').addEventListener('click', function () { location.hash = '#addView_dayView'; pushHashChangeToStack(); });
 
 document.getElementById('applyAdd').addEventListener('click', apply);
@@ -1085,14 +1075,12 @@ document.getElementById('playButton').addEventListener('click', playButtonClicke
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
 document.getElementById('track').addEventListener('click', function () { location.hash = '#monthView_trackView'; pushHashChangeToStack(); });
-// document.getElementById('track').addEventListener('click', gotoTrackFromMonth);
 
 document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
 
 document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
 
 document.getElementById('day').addEventListener('click', function () { location.hash = '#monthView_dayView'; pushHashChangeToStack(); });
-// document.getElementById('day').addEventListener('click', gotoDayFromMonth);
 
 document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
 
@@ -1103,7 +1091,6 @@ document.getElementById('putBack').addEventListener('click', putBack);
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
 document.getElementById('month1').addEventListener('click', function () { location.hash = '#trackView_monthView'; pushHashChangeToStack(); });
-// document.getElementById('month1').addEventListener('click', gotoMonthFromTrack);
 
 ////////////////// Eventlisteners for track-view ///////////////////////
 
@@ -1130,10 +1117,8 @@ document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrac
 ////////////////// Eventlisteners for storage-view ///////////////////////
 
 document.getElementById('storage').addEventListener('click', function () { location.hash = '#dayView_storageView'; pushHashChangeToStack(); });
-// document.getElementById('storage').addEventListener('click', gotoStorageFromDay);
 
 document.getElementById('day1').addEventListener('click', function () { location.hash = '#storageView_dayView'; pushHashChangeToStack(); });
-// document.getElementById('day1').addEventListener('click', gotoDayFromStorage);
 
 document.getElementById('storeList').addEventListener('click', storeList);
 
@@ -1142,9 +1127,7 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 ////////////////// Eventlisteners for settings-view ///////////////////////
 
 document.getElementById('gotoDayFromSettings').addEventListener('click', function () { location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
-// document.getElementById('gotoDayFromSettings').addEventListener('click', gotoDayFromSettings);
 document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
-// document.getElementById('gotoDayFromSettings1').addEventListener('click', gotoDayFromSettings);
 
 document.getElementById('eng').addEventListener('click',
           function () { document.getElementById('en').checked = true; } );
@@ -2418,7 +2401,6 @@ function storeHasBeenClicked(event) {
         document.getElementById('trashBin').classList.remove('notInUse');
         location.hash = '#storageView_dayView';
         pushHashChangeToStack();
-        // gotoDayFromStorage();
       } else {
         displayMessage(languagePack['nothingIsDiscarded'][language], 3000, 'storage');
       }
@@ -2458,8 +2440,7 @@ function storeHasBeenClicked(event) {
       } else {
         displayMessage(languagePack['listStoredIn'][language] + clickedButton.innerText, 3000, 'storage');
       }
-      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2500);
-      // setTimeout(function() {gotoDayFromStorage();}, 2500);
+      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2000);
 
       // ... else get stuff
     } else if (clickedButton.classList.contains('inUse')) {
@@ -2470,10 +2451,8 @@ function storeHasBeenClicked(event) {
 
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
-      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2500);
-      // setTimeout(function() {gotoDayFromStorage();}, 500); // timeout necessary for displayMessage to finish
+      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2000); // timeout necessary for displayMessage to finish
       displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'day');
-      // displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'storage');
     } else {
       displayMessage(languagePack['storeIsEmpty'][language], 3000, 'storage');
     }
@@ -2571,7 +2550,8 @@ function applyLanguage() {
   }
   renderLanguage();
 
-  gotoDayFromSettings();
+  location.hash = '#settingsView_dayView';
+  pushHashChangeToStack();
 }
 
 
@@ -2588,7 +2568,8 @@ function applyTaskDuration() {
   defaultTaskDuration = min;
   localStorage.defaultTaskDuration = defaultTaskDuration;
 
-   gotoDayFromSettings();
+   location.hash = '#settingsView_dayView';
+   pushHashChangeToStack();
 }
 
 function applyWakeUpTime() {
@@ -2601,7 +2582,8 @@ function applyWakeUpTime() {
 
   adjustNowAndWakeUpButtons();
 
-  gotoDayFromSettings();
+  location.hash = '#settingsView_dayView';
+  pushHashChangeToStack();
 }
 
 
@@ -2630,7 +2612,8 @@ function applyWakeUpTime() {
 //      }
 //    }
 //
-//    gotoDayFromSettings();
+//    location.hash = '#settingsView_dayView';
+//    pushHashChangeToStack();
 //    // window.location.assign('main.html');
 // }
 
@@ -2658,7 +2641,8 @@ function applyStressModel() {
     localStorage.tDouble = tDouble;
   }
 
-  gotoDayFromSettings();
+  location.hash = '#settingsView_dayView';
+  pushHashChangeToStack();
 }
 
 
