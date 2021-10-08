@@ -2416,7 +2416,9 @@ function storeHasBeenClicked(event) {
         taskList = trash;  // Restore trash as taskList
         document.getElementById('trashBin').classList.add('inUse');
         document.getElementById('trashBin').classList.remove('notInUse');
-        gotoDayFromStorage();
+        location.hash = '#storageView_dayView';
+        pushHashChangeToStack();
+        // gotoDayFromStorage();
       } else {
         displayMessage(languagePack['nothingIsDiscarded'][language], 3000, 'storage');
       }
@@ -2456,7 +2458,8 @@ function storeHasBeenClicked(event) {
       } else {
         displayMessage(languagePack['listStoredIn'][language] + clickedButton.innerText, 3000, 'storage');
       }
-      setTimeout(function() {gotoDayFromStorage();}, 2500);
+      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2500);
+      // setTimeout(function() {gotoDayFromStorage();}, 2500);
 
       // ... else get stuff
     } else if (clickedButton.classList.contains('inUse')) {
@@ -2467,7 +2470,8 @@ function storeHasBeenClicked(event) {
 
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
-      setTimeout(function() {gotoDayFromStorage();}, 500); // timeout necessary for displayMessage to finish
+      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2500);
+      // setTimeout(function() {gotoDayFromStorage();}, 500); // timeout necessary for displayMessage to finish
       displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'day');
       // displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'storage');
     } else {
