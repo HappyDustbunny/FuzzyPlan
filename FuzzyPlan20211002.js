@@ -2699,7 +2699,7 @@ function readFile(event) {
 }
 
 function confirmRestoreBackup() {
-    // TODO: Make a confirm dialog
+    // TODO: Make a confirm dialog. The button cancelRestoreBackup is in place, but not addressed
     document.getElementById('backup').hidden = false;
     document.getElementById('restoreBackup').hidden = false;
 
@@ -3687,8 +3687,12 @@ function jumpTo(index) {
 
 function jumpToNow() {
   let now = new Date();
-  let nowMinusOneHour = (now.getHours() - 1).toString() + now.getMinutes().toString();
-  console.log('jumpToNow pressed. Juping to nowMinusOneHour: ', nowMinusOneHour);
+  let hours = (now.getHours() - 1).toString();
+  let minutes = now.getMinutes().toString();
+  if (minutes < 10) {
+    minutes = '0' + minutes;
+  }
+  let nowMinusOneHour = hours + minutes;
   jumpToTime(nowMinusOneHour, false);
 }
 
