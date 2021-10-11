@@ -36,9 +36,10 @@ let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new
 let drainGainLevel_add = 'd1';
 
 ///////// Play-view /////////
+let playViewIsRecording = false; // Boolean
 let startTime_play = new Date();
 let endTime_play = new Date();
-let playTimer = '';
+let taskText_play = '';
 
 ///////// Month-view ////////
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -438,6 +439,10 @@ function setUpFunc() {
 
   updateHearts(); // Update hearts to current time
 
+  if (playViewIsRecording) {
+    changePlayButtonToStopButton();
+  }
+
   // Scale the window to current screen size on reload
   document.getElementById('container').style.height = window.innerHeight - 110 +'px';
   document.getElementById('monthContainer').style.height = window.innerHeight - 110 +'px';
@@ -488,6 +493,12 @@ function storeLocally() {
 
   localStorage.dontShowTrackedAsTooltip = dontShowTrackedAsTooltip;
 
+  localStorage.playViewIsRecording = playViewIsRecording;
+
+  localStorage.startTime_play = startTime_play;
+
+  localStorage.taskText_play = JSON.stringify(taskText_play);
+
   if (monthTaskList) {
     localStorage.monthTaskList = JSON.stringify(monthTaskList);
   }
@@ -499,7 +510,6 @@ function storeLocally() {
   // Store today in pastDayList
   let now = new Date();
   let id = now.getDate().toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
-  // pastDayList[id] = deepCopyFunc(taskList);  //  Func is used to make a deep copy
   pastDayList[id] = taskListExtractor();  //  Func is used to make a deep copy
 
   // Store pastDayList
@@ -602,7 +612,19 @@ function retrieveLocallyStoredStuff() {
   }
 
   if (localStorage.getItem('dontShowTrackedAsTooltip')) {
-    dontShowTrackedAsTooltip = (localStorage.dontShowTrackedAsTooltip);
+    dontShowTrackedAsTooltip = JSON.parse(localStorage.dontShowTrackedAsTooltip);
+  }
+
+  if (localStorage.getItem('playViewIsRecording')) {
+    playViewIsRecording = JSON.parse(localStorage.playViewIsRecording);  // Parse to get from "false" to false and "true" to true
+  }
+
+  if (localStorage.getItem('startTime_play')) {
+    startTime_play = new Date(localStorage.startTime_play);
+  }
+
+  if (localStorage.getItem('taskText_play')) {
+    taskText_play = JSON.parse(localStorage.taskText_play);
   }
 
   if (localStorage.getItem('monthTaskList')) {
@@ -1574,18 +1596,32 @@ function playButtonClicked() {
 
   let thisButton = document.getElementById('playButton');
 
-  if (thisButton.classList.contains('stop')) {  // Function as Stop button
+  if (playViewIsRecording) {  // Make playButton behave as Stop button
     let now = new Date();
-    let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+    let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0);
+    let currentText = document.getElementById('dayInputBox').value;
 
-    if (deltaTime < 10) {
-      deltaTime = 10;
+
+    if (now - startTime_play < now - midnight) { // Is it still the same day or did you forget starting the recording?
+      let deltaTime = Math.trunc((now - startTime_play) / 60000);  // The current task time since start in minutes
+
+      if (deltaTime < 10) {
+        deltaTime = 10;
+      }
+
+      if (currentText == '') {
+        currentText = JSON.parse(localStorage.taskText_play);
+      }
+
+      let returnText = currentText + ' ' + deltaTime + 'm ' + prettifyTime(startTime_play).replace(':', '');
+
+      inputFixedTask(returnText);
+    } else {
+      currentText = JSON.parse(localStorage.taskText_play);
     }
 
-    let returnText = document.getElementById('dayInputBox').value + ' ' + deltaTime + 'm ' + prettifyTime(startTime_play).replace(':', '');
-
-    inputFixedTask(returnText);
-
+    playViewIsRecording = false;
+    taskText_play = '';
     thisButton.classList.remove('stop');
     document.getElementById('playButtonTap').classList.remove('stop');
     document.getElementById('playButtonTop').classList.remove('stop');
@@ -1593,28 +1629,40 @@ function playButtonClicked() {
 
     document.getElementById('page').removeEventListener('click', suppressClicks, true);
 
+    storeLocally();
+
     fixClearButtonArrow();
 
-  } else {  // Function as Play button
-// The next line suppresses clicks from everything beside playButton, but how to remove it?
-// document.getElementById('page').addEventListener('click', e => {if (e.target.id == 'playButton') {console.log('rap')} else {e.stopPropagation()}}, true)
-
+  } else {  // Behave as Play button
     let contentInputBox = document.getElementById('dayInputBox').value;
+
     if (contentInputBox === '') {
       displayMessage(languagePack['taskTextMsg'][language], 3000, 'add');  // Please write a task text
     } else {
-      storeLocally();
-      thisButton.classList.add('stop');
-      document.getElementById('playButtonTap').classList.add('stop');
-      document.getElementById('playButtonTop').classList.add('stop');
-      thisButton.textContent = '\u25A0';  // Square
       startTime_play = new Date();
 
-      document.getElementById('page').addEventListener('click', suppressClicks, true);
+      playViewIsRecording = true;
 
+      taskText_play = contentInputBox;
+
+      changePlayButtonToStopButton();
+
+      storeLocally();
+
+      document.getElementById('page').addEventListener('click', suppressClicks, true);
     }
   }
 }
+
+
+function changePlayButtonToStopButton() {
+  let thisButton = document.getElementById('playButton');
+  thisButton.classList.add('stop');
+  thisButton.textContent = '\u25A0';  // Square
+  document.getElementById('playButtonTap').classList.add('stop');
+  document.getElementById('playButtonTop').classList.add('stop');
+}
+
 
 function suppressClicks(e) {
   if (e.target.id != 'playButton') {

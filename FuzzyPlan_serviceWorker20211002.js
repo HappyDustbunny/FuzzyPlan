@@ -5,12 +5,12 @@ let CACHED_URLS = [
   '200px-A_SVG_semicircle_heart.svg.png',
   '200px-Flag_of_Denmark.png',
   '200px-Flag_of_the_United_Kingdom.png',
-  'FPlogo.png',
-  'FuzzyPlan20211002.css',
-  'FuzzyPlan20211002.js',
-  'instructions_dk.html',
-  'instructions.html',
-  'main.html'
+  'FPlogo.png'
+  // 'FuzzyPlan20211002.css',
+  // 'FuzzyPlan20211002.js',
+  // 'instructions_dk.html',
+  // 'instructions.html',
+  // 'main.html'
 ];
 
 self.addEventListener('install', function(event) {
