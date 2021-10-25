@@ -51,6 +51,9 @@ let trackTaskList = {}; // Each tracked task have a text-key and a colour and an
 let putBackId = '';
 let dontShowTrackedAsTooltip = false;
 
+///////// Month-view ////////
+let backupFileName = '';
+
 ///////// Track-view ////////
 let colours = [
 'Aquamarine','LightBlue', 'SkyBlue', 'SteelBlue', 'Turquoise', 'DarkTurquoise', 'DarkCyan',
@@ -259,10 +262,16 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                 ['Tag backup af de gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
      'backup': [['Backup', ''],
                 ['Tag backup', '']],
+     'backupInputText': [['Choose filename for backup', ''],
+                ['Vælg filnavn for backup', '']],
      'restoreBackupInputText': [['Open the text file with your backup', ''],
                 ['Åben tekstfilen med din backup', '']],
+      'confirmBackup': [['Confirm backup', ''],
+                ['Bekræft backup', '']],
      'restoreBackup': [['Restore backup', ''],
                        ['Gendan backup', '']],
+     'cancelBackup': [['Cancel backup', ''],
+                       ['Afbryd backup', '']],
      'confirmRestoreBackup': [['Confirm restore of backup', ''],
                        ['Bekræft gendanlse af backup', '']],
      'cancelRestoreBackup': [['Cancel backup', ''],
@@ -1182,7 +1191,17 @@ document.getElementById('stressLevel').addEventListener('focus',
 document.getElementById('tDouble').addEventListener('focus',
           function () { document.getElementById('tDouble').select(); });
 
-document.getElementById('backup').addEventListener('click', storeBackup);
+document.getElementById('backup').addEventListener('click', prepareStoreBackup);
+
+document.getElementById('cancelBackup').addEventListener('click', resetBackupButtons);
+
+document.getElementById('backupInput').addEventListener('change', fixBackupNameFromBrowsedNames);
+document.getElementById('backupInputFixed').addEventListener('change', fixBackupNameFromWrittenName);
+
+document.getElementById('confirmBackup').addEventListener('click', confirmBackup);
+
+document.getElementById('backupInputFixed').addEventListener('focus',
+          function () { document.getElementById('backupInputFixed').select(); });
 
 document.getElementById('restoreBackup').addEventListener('click', restoreBackup);
 
@@ -2694,16 +2713,62 @@ function applyStressModel() {
 }
 
 
-function storeBackup() { // TODO: Make automatic backups at the end of each day (/week?)
-  // Wrap up data from localStorage in a blob
-  let data = JSON.stringify(localStorage);
-  // let data = JSON.stringify(localStorage.pastDayList);
-  let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+function prepareStoreBackup() { // TODO: Make automatic backups at the end of each day (/week?)
+  document.getElementById('backup').hidden = true;
+  document.getElementById('restoreBackup').hidden = true;
+
+  document.getElementById('cancelBackup').hidden = false;
+  document.getElementById('backupInputText').hidden = false;
+  document.getElementById('confirmBackup').hidden = false;
+  let backupInputFixed = document.getElementById('backupInputFixed');
+  backupInputFixed.hidden = false;
+  document.getElementById('backupInput').hidden = false;
 
   // Make filename
   let now = new Date();
   let date = now.getDate().toString() + '-' + (now.getMonth() + 1).toString() + '-' + now.getFullYear().toString();
-  let fileName = 'FuzzyPlanBackup_' + date + '.txt';
+  backupFileName = 'FuzzyPlanBackup_' + date + '.txt';
+  backupInputFixed.value = backupFileName;
+}
+
+
+function resetBackupButtons() { // TODO: Make this work for both backup and restore backup. Clean up divs and group buttons with divs to manage with fewer hidden true/false
+  document.getElementById('backup').hidden = false;
+  document.getElementById('restoreBackup').hidden = false;
+
+  document.getElementById('cancelBackup').hidden = true;
+  document.getElementById('backupInputText').hidden = true;
+  document.getElementById('confirmBackup').hidden = true;
+  document.getElementById('backupInputFixed').hidden = true;
+  let backupInput = document.getElementById('backupInput');
+  backupInput.hidden = true;
+  backupInput.value = '';
+
+  backupFileName = '';
+}
+
+
+function fixBackupNameFromBrowsedNames() {
+  let backupInput = document.getElementById('backupInput');
+
+  if (backupInput.value != '') {
+    backupFileName = backupInput.files[0].name;
+  }
+
+  document.getElementById('backupInputFixed').value = backupFileName;
+}
+
+
+function fixBackupNameFromWrittenName() {
+  backupFileName = document.getElementById('backupInputFixed').value + '.txt';
+}
+
+
+function confirmBackup() {
+  // Wrap up data from localStorage in a blob
+  let data = JSON.stringify(localStorage);
+  // let data = JSON.stringify(localStorage.pastDayList);
+  let blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
 
   // Store the blob by creating a link element, clicking it and removing it again
   let url = window.URL.createObjectURL(blob);
@@ -2711,14 +2776,17 @@ function storeBackup() { // TODO: Make automatic backups at the end of each day 
 
   let element = window.document.createElement('a');
   element.href = url;
-  element.download = fileName;
+  element.download = backupFileName;
   document.body.appendChild(element);
   element.click();
   document.body.removeChild(element);
 
   // Clean up
   window.URL.revokeObjectURL(url);
+
+  resetBackupButtons();
 }
+
 
 function restoreBackup() {
   document.getElementById('backup').hidden = true;

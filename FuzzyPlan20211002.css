@@ -798,6 +798,11 @@ html {
   width: 43px;
 }
 
+#backupDistanceBetweenButtons {
+  display: inline-block;
+  width: 100px;
+}
+
 #inputBoxWakeUp {
   width: 52px;
 }

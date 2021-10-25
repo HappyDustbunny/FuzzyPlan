@@ -467,6 +467,39 @@
             </div>
           </div>
 
+          <span> <br> </span>
+
+          <div class='topic'>
+            <h4 id='backupHeading' class="text"> </h4>
+
+            <span id="backupText" class="labelText">  </span>
+
+            <span> <br> </span>
+            <span> <br> </span>
+
+            <button type="button"  id="restoreBackup" class='controlButton'></button>
+
+            <div id="backupDistanceBetweenButtons"></div>
+
+            <button type="button" id="backup" class='controlButton'></button>
+
+            <div>
+              <label id="backupInputText" class="labelText" for='fileChooser' hidden></label>
+              <input id="backupInput" type="file" name="fileChooserOut" accept=".txt" hidden>
+              <input id="backupInputFixed" type="text" name="fileChooserOutFixed" hidden>
+            </div>
+            <br>
+            <button type="button"  id="cancelBackup" class='controlButton' hidden></button>
+            <button type="button"  id="confirmBackup" class='controlButton' hidden></button>
+
+            <label id="restoreBackupInputText" class="labelText" for='fileChooser' hidden></label>
+            <input id="restoreBackupInput" type="file" name="fileChooser" accept=".txt" hidden>
+
+            <button type="button"  id="cancelRestoreBackup" class='controlButton' hidden></button>
+            <button type="button"  id="confirmRestoreBackup" class='controlButton' hidden></button>
+
+          </div>
+
           <span>   <br>   </span>
 
           <div class='topic'>
@@ -568,28 +601,6 @@
             <br>
 
             <button type="button" id='apply3' class='controlButton' lang="en">Apply</button>
-          </div>
-
-          <span> <br> </span>
-
-          <div class='topic'>
-            <h4 id='backupHeading' class="text"> </h4>
-
-            <span id="backupText" class="labelText">  </span>
-
-            <span> <br> </span>
-            <span> <br> </span>
-
-            <button type="button" id="backup" class='controlButton'></button>
-
-            <button type="button"  id="restoreBackup" class='controlButton'></button>
-
-            <label id="restoreBackupInputText" class="labelText" for='fileChooser' hidden></label>
-            <input id="restoreBackupInput" type="file" name="fileChooser" hidden>
-            <br><br>
-            <button type="button"  id="cancelRestoreBackup" class='controlButton' hidden></button>
-            <button type="button"  id="confirmRestoreBackup" class='controlButton' hidden></button>
-
           </div>
 
           <span>   <br>   </span>
