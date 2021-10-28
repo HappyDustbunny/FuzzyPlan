@@ -310,6 +310,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                           'Vil du fjerne alle opgaver UDEN flueben fra denne liste?\n (Dette påvirker ikke opgaverne andre steder)'],
      'nothingChanged': ['Nothing was changed',
                         'Der skete ingen ændringer'],
+     'chooseABackup': ['Please choose a backup to restore first',
+                        'Vælg venligst en backup der skal gendannes'],
+     'sureYouWannaRestore?': ['Are you sure you want to restore the backup?\nThe current tasks and settings will be overwritten.',
+                        'Er du sikker på at du vil gendanne backuppen?\nDe nuværende opgaver og indstillinger vil blive overskrevet.'],
      'nothingIsDiscarded': ['No task has been discarded yet.\nNothing was changed.',
                             'Ingen opgaver er blevet smidt ud endnu\nIntet er ændret'],
      'changeLabel?': ['Change label of the stored list?\n(Clicking OK will erase earlier content)',
@@ -1194,6 +1198,7 @@ document.getElementById('tDouble').addEventListener('focus',
 document.getElementById('backup').addEventListener('click', prepareStoreBackup);
 
 document.getElementById('cancelBackup').addEventListener('click', resetBackupButtons);
+document.getElementById('cancelRestoreBackup').addEventListener('click', resetBackupButtons);
 
 document.getElementById('backupInput').addEventListener('change', fixBackupNameFromBrowsedNames);
 document.getElementById('backupInputFixed').addEventListener('change', fixBackupNameFromWrittenName);
@@ -2717,9 +2722,10 @@ function prepareStoreBackup() { // TODO: Make automatic backups at the end of ea
   document.getElementById('backup').hidden = true;
   document.getElementById('restoreBackup').hidden = true;
 
-  document.getElementById('cancelBackup').hidden = false;
-  document.getElementById('backupInputText').hidden = false;
-  document.getElementById('confirmBackup').hidden = false;
+  document.getElementById('backupSection').hidden = false;
+  // document.getElementById('cancelBackup').hidden = false;
+  // document.getElementById('backupInputText').hidden = false;
+  // document.getElementById('confirmBackup').hidden = false;
   let backupInputFixed = document.getElementById('backupInputFixed');
   backupInputFixed.hidden = false;
   document.getElementById('backupInput').hidden = false;
@@ -2727,22 +2733,20 @@ function prepareStoreBackup() { // TODO: Make automatic backups at the end of ea
   // Make filename
   let now = new Date();
   let date = now.getDate().toString() + '-' + (now.getMonth() + 1).toString() + '-' + now.getFullYear().toString();
-  backupFileName = 'FuzzyPlanBackup_' + date + '.txt';
+  backupFileName = 'FuzzyPlanBackup_' + date + '.fpbu';
+  // backupFileName = 'FuzzyPlanBackup_' + date + '.txt';
   backupInputFixed.value = backupFileName;
 }
 
 
-function resetBackupButtons() { // TODO: Make this work for both backup and restore backup. Clean up divs and group buttons with divs to manage with fewer hidden true/false
+function resetBackupButtons() {
   document.getElementById('backup').hidden = false;
   document.getElementById('restoreBackup').hidden = false;
 
-  document.getElementById('cancelBackup').hidden = true;
-  document.getElementById('backupInputText').hidden = true;
-  document.getElementById('confirmBackup').hidden = true;
-  document.getElementById('backupInputFixed').hidden = true;
-  let backupInput = document.getElementById('backupInput');
-  backupInput.hidden = true;
-  backupInput.value = '';
+  document.getElementById('backupSection').hidden = true;
+  document.getElementById('restoreBackupSection').hidden = true;
+  document.getElementById('backupInput').value = '';
+  document.getElementById('restoreBackupInput').value = '';
 
   backupFileName = '';
 }
@@ -2760,7 +2764,8 @@ function fixBackupNameFromBrowsedNames() {
 
 
 function fixBackupNameFromWrittenName() {
-  backupFileName = document.getElementById('backupInputFixed').value + '.txt';
+  backupFileName = document.getElementById('backupInputFixed').value + '.fpbu';
+  // backupFileName = document.getElementById('backupInputFixed').value + '.txt';
 }
 
 
@@ -2792,9 +2797,7 @@ function restoreBackup() {
   document.getElementById('backup').hidden = true;
   document.getElementById('restoreBackup').hidden = true;
 
-  document.getElementById('restoreBackupInputText').hidden = false;
-  document.getElementById('restoreBackupInput').hidden = false;
-  document.getElementById('confirmRestoreBackup').hidden = false;
+  document.getElementById('restoreBackupSection').hidden = false;
 
   document.getElementById('restoreBackupInput').addEventListener('change', readFile, false);
 }
@@ -2815,24 +2818,31 @@ function readFile(event) {
 }
 
 function confirmRestoreBackup() {
-    // TODO: Make a confirm dialog. The button cancelRestoreBackup is in place, but not addressed
+  if (document.getElementById('restoreBackupInput').value == '') {
+    alert(languagePack['chooseABackup'][language]);
+  } else {
+    let answer = confirm(languagePack['sureYouWannaRestore?'][language]);
+    if (answer) {
+      for (item in pastDayListBackUp) {
+        localStorage[item] = pastDayListBackUp[item];
+      }
+
+      location.reload(true);
+
+    } else {
+      alert(languagePack['nothingChanged'][language]);
+    }
+    // TODO: Make a confirm dialog.
     document.getElementById('backup').hidden = false;
     document.getElementById('restoreBackup').hidden = false;
 
-    document.getElementById('restoreBackupInputText').hidden = true;
-    document.getElementById('restoreBackupInput').hidden = true;
-    document.getElementById('confirmRestoreBackup').hidden = true;
-
-    for (item in pastDayListBackUp) {
-      localStorage[item] = pastDayListBackUp[item];
-    }
-
-    location.reload(true);
+    document.getElementById('restoreBackupSection').hidden = true;
+  }
 }
 
 
 function clearAllData() {
-  let answer = confirm(languagePack['sureYouWannaClear?'][language])
+  let answer = confirm(languagePack['sureYouWannaClear?'][language]);
   if (answer) {
     taskList = [];
     localStorage.taskList = [];

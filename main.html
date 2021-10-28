@@ -478,25 +478,29 @@
             <span> <br> </span>
 
             <button type="button"  id="restoreBackup" class='controlButton'></button>
-
-            <div id="backupDistanceBetweenButtons"></div>
-
+            <div class="backupDistanceBetweenButtons"></div>
             <button type="button" id="backup" class='controlButton'></button>
 
-            <div>
-              <label id="backupInputText" class="labelText" for='fileChooser' hidden></label>
-              <input id="backupInput" type="file" name="fileChooserOut" accept=".txt" hidden>
-              <input id="backupInputFixed" type="text" name="fileChooserOutFixed" hidden>
+            <div id='backupSection' hidden>
+              <label id="backupInputText" class="labelText" for='fileChooser'></label>
+              <input id="backupInput" type="file" name="fileChooserOut" accept=".txt">
+              <input id="backupInputFixed" type="text" name="fileChooserOutFixed">
+              <br><br>
+              <button type="button"  id="cancelBackup" class='controlButton'></button>
+              <div class="backupDistanceBetweenButtons"></div>
+              <button type="button"  id="confirmBackup" class='controlButton'></button>
             </div>
-            <br>
-            <button type="button"  id="cancelBackup" class='controlButton' hidden></button>
-            <button type="button"  id="confirmBackup" class='controlButton' hidden></button>
 
-            <label id="restoreBackupInputText" class="labelText" for='fileChooser' hidden></label>
-            <input id="restoreBackupInput" type="file" name="fileChooser" accept=".txt" hidden>
+            <div id="restoreBackupSection" hidden>
+              <label id="restoreBackupInputText" class="labelText" for='fileChooser'></label>
+              <input id="restoreBackupInput" type="file" name="fileChooser" accept=".fpbu">
+              <!-- <input id="restoreBackupInput" type="file" name="fileChooser" accept=".txt"> -->
+              <br><br>
+              <button type="button"  id="cancelRestoreBackup" class='controlButton'></button>
+              <div class="backupDistanceBetweenButtons"></div>
+              <button type="button"  id="confirmRestoreBackup" class='controlButton'></button>
+            </div>
 
-            <button type="button"  id="cancelRestoreBackup" class='controlButton' hidden></button>
-            <button type="button"  id="confirmRestoreBackup" class='controlButton' hidden></button>
 
           </div>
 
