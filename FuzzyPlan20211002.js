@@ -566,8 +566,10 @@ function fixDatesInList(list) {
     task.date = new Date(task.date);
     if (!task.date) {debugger};
     task.date.setDate(now.getDate());
+    task.date.setMonth(now.getMonth());
     task.end = new Date(task.end);
     task.end.setDate(now.getDate());
+    task.end.setMonth(now.getMonth());
   }
   return list;
 }
@@ -2816,6 +2818,8 @@ function readFile(event) {
   reader.onload = function(event) {
     pastDayListBackUp =  JSON.parse(event.target.result);
   }
+
+  fixDatesInList(taskList); // Ensure that the taskList tasks is at the current date.
 
   reader.readAsText(file);
 }
