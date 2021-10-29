@@ -283,6 +283,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                       ['Slet alle dagens opgaver', '']],
      'clearEverything': [['Clear ALL data and preferences', ''],
                          ['Slet ALLE data og indstillinger', '']],
+     'updateApp': [['Update app', 'The newest version is only fetched if this button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser has it\'s own local storage and app version. Move tasks and settings via backups.'],
+                         ['Opdater app', 'Den nyeste version hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup']],
      'gotoDayFromSettings1': [['Go back', ''],
                        ['Gå tilbage', '']],
     // Messages
@@ -1182,6 +1184,7 @@ document.getElementById('apply3').addEventListener('click', applyStressModel);
 
 document.getElementById('clearAllData').addEventListener('click', clearAllData);
 document.getElementById('clearEverything').addEventListener('click', clearEverything);
+document.getElementById('updateApp').addEventListener('click', updateApp);
 
 document.getElementById('inputBoxM').addEventListener('focus',
           function () { document.getElementById('inputBoxM').select(); });
@@ -2864,6 +2867,31 @@ function clearEverything() {
   } else {
     alert(languagePack['nothingWasDeleted'][language]);
   }
+}
+
+function updateApp() {
+  // Delete cached pages and ressources
+  caches.delete('FP-cache');
+
+  // location.reload(true); // Reload to actually remove content
+
+  // Remove the current serviceworker
+  navigator.serviceWorker.getRegistrations().then( function(registrations) {
+    for (var registration of registrations) {
+      registration.unregister();
+    }
+  });
+
+  // Fetch the serviceWorker again to reload pages and ressources into cache
+  navigator.serviceWorker.register('/FuzzyPlan_serviceWorker20211002.js').then(function(registration) {
+     // Registration was successful
+     console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    }, function(err) {
+       // registration failed :(
+       console.log('ServiceWorker registration failed: ', err);
+  });
+
+  location.reload(true);
 }
 
 
