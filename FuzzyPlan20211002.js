@@ -1,4 +1,6 @@
 // TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
+// TODO: Integrate the help file in main
+// TODO: Make icons for all platforms
 
 let hashStack = [];
 let lastHash = '';
@@ -250,9 +252,9 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
      'stressLevelText': [['Set the stress level you experience\r\nwhen you wake up (1-5, 1 is low)\u00a0', ''],
                          ['Angiv det stressniveau du oplever\r\nnår du vågner (1-5, 1 er lavt)\u00a0', '']],
      'stressLevelDoubleText': [['Set the approximately time for\r\nyour stress level to '
-                                + 'double\r\nwhen working without pause', ''],
+                                + 'double\r\nwhen working without pause (in minutes)', ''],
                                ['Sæt den tid det omtrent tager\r\nfør dit stressniveau '
-                                + 'fordobles,\r\nnår du arbejder uden pause', '']],
+                                + 'fordobles,\r\nnår du arbejder uden pause (i minutter)', '']],
      'apply3': [['Apply', ''],
                 ['Anvend', '']],
 
@@ -262,8 +264,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                 ['Tag backup af de gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
      'backup': [['Backup', ''],
                 ['Tag backup', '']],
-     'backupInputText': [['Choose filename for backup', ''],
-                ['Vælg filnavn for backup', '']],
+     'backupInputText': [['Choose a file to overwrite, write your own name for the backup or use the proposed filename', ''],
+                ['Vælg en fil at overskrive, skriv dit eget navn for backupen eller benyt det foreslåede', '']],
      'restoreBackupInputText': [['Open the text file with your backup', ''],
                 ['Åben tekstfilen med din backup', '']],
       'confirmBackup': [['Confirm backup', ''],
@@ -283,8 +285,12 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                       ['Slet alle dagens opgaver', '']],
      'clearEverything': [['Clear ALL data and preferences', ''],
                          ['Slet ALLE data og indstillinger', '']],
-     'updateApp': [['Update app', 'The newest version is only fetched if this button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser has it\'s own local storage and app version. Move tasks and settings via backups.'],
-                         ['Opdater app', 'Den nyeste version hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup']],
+     'updateAppHeading': [['Update App', ''],
+                          ['Opdater App', '']],
+     'updateAppText': [['The newest version of this app is only fetched if the button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser will have it\'s own local storage and app version. Move tasks and settings via backups.', ''],
+                         ['Den nyeste version af denne app hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser.\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup', '']],
+     'updateApp': [['Update app', 'The newest version is only fetched if this button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser will have it\'s own local storage and app version. Move tasks and settings via backups.'],
+                         ['Opdater app', 'Den nyeste version hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser.\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup']],
      'gotoDayFromSettings1': [['Go back', ''],
                        ['Gå tilbage', '']],
     // Messages
@@ -1165,8 +1171,10 @@ document.getElementById('stores').addEventListener('click', function () { storeH
 
 ////////////////// Eventlisteners for settings-view ///////////////////////
 
-document.getElementById('gotoDayFromSettings').addEventListener('click', function () { location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
-document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
+document.getElementById('gotoDayFromSettings').addEventListener('click', function () { resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
+  location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
+document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
+  location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
 
 document.getElementById('eng').addEventListener('click',
           function () { document.getElementById('en').checked = true; } );
@@ -2627,6 +2635,8 @@ function applyLanguage() {
   }
   renderLanguage();
 
+  resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
+
   location.hash = '#settingsView_dayView';
   pushHashChangeToStack();
 }
@@ -2645,8 +2655,10 @@ function applyTaskDuration() {
   defaultTaskDuration = min;
   localStorage.defaultTaskDuration = defaultTaskDuration;
 
-   location.hash = '#settingsView_dayView';
-   pushHashChangeToStack();
+  resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
+
+  location.hash = '#settingsView_dayView';
+  pushHashChangeToStack();
 }
 
 function applyWakeUpTime() {
@@ -2658,6 +2670,8 @@ function applyWakeUpTime() {
   localStorage.wakeUpM = wakeUpM;
 
   adjustNowAndWakeUpButtons();
+
+  resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
 
   location.hash = '#settingsView_dayView';
   pushHashChangeToStack();
@@ -2717,6 +2731,8 @@ function applyStressModel() {
     tDouble = min;
     localStorage.tDouble = tDouble;
   }
+
+  resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
 
   location.hash = '#settingsView_dayView';
   pushHashChangeToStack();

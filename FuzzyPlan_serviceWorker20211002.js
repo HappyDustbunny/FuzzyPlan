@@ -10,6 +10,7 @@ let CACHED_URLS = [
   'FuzzyPlan20211002.js',
   'instructions_dk.html',
   'instructions.html',
+  'FuzzyPlan_manifest.json',
   'main.html'
 ];
 
