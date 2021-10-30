@@ -1,6 +1,6 @@
 // TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
 // TODO: Integrate the help file in main
-// TODO: Make icons for all platforms
+// TODO: Make Postpone appear when text appear in inputBox
 
 let hashStack = [];
 let lastHash = '';
@@ -3036,7 +3036,7 @@ function wakeUpButton() {
     let now = new Date();
     let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
     let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
-    let task = new Task(taskStart, 15 * 60000, languagePack['planning'][0][language], 1);
+    let task = new Task(taskStart, 15 * 60000, languagePack['planning'][language][0], 1);
     succes = addFixedTask(task);
     if (!succes) {
       console.log('wakeUpButton failed to insert a task');
