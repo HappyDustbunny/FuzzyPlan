@@ -2,42 +2,29 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
+    <meta name="description" content="FuzzyPlan is a planning tool for those of us
+     who hates plans - but knows we need them. FuzzyPlan is designed to be flexible
+     and effective, yet still reminds you of postponed tasks. FuzzyPlan is free and
+     can be found at fuzzyplan.madshorn.dk">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#FFFFFF">
+
     <title>FuzzyPlan</title>
 
-    <!-- ****** faviconit.com favicons ****** -->
-  	<link rel="shortcut icon" href="/favicons/favicon.ico">
-  	<link rel="icon" sizes="16x16 32x32 64x64" href="/favicons/favicon.ico">
-  	<link rel="icon" type="image/png" sizes="196x196" href="/favicons/favicon-192.png">
-  	<link rel="icon" type="image/png" sizes="160x160" href="/favicons/favicon-160.png">
-  	<link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96.png">
-  	<link rel="icon" type="image/png" sizes="64x64" href="/favicons/favicon-64.png">
-  	<link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32.png">
-  	<link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16.png">
-  	<link rel="apple-touch-icon" href="/favicons/favicon-57.png">
-  	<link rel="apple-touch-icon" sizes="114x114" href="/favicons/favicon-114.png">
-  	<link rel="apple-touch-icon" sizes="72x72" href="/favicons/favicon-72.png">
-  	<link rel="apple-touch-icon" sizes="144x144" href="/favicons/favicon-144.png">
-  	<link rel="apple-touch-icon" sizes="60x60" href="/favicons/favicon-60.png">
-  	<link rel="apple-touch-icon" sizes="120x120" href="/favicons/favicon-120.png">
-  	<link rel="apple-touch-icon" sizes="76x76" href="/favicons/favicon-76.png">
-  	<link rel="apple-touch-icon" sizes="152x152" href="/favicons/favicon-152.png">
-  	<link rel="apple-touch-icon" sizes="180x180" href="/favicons/favicon-180.png">
-  	<meta name="msapplication-TileColor" content="#FFFFFF">
-  	<meta name="msapplication-TileImage" content="/favicons/favicon-144.png">
-  	<meta name="msapplication-config" content="/favicons/browserconfig.xml">
-  	<!-- ****** faviconit.com favicons ****** -->
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icons" type="image/png" href="favicons/maskable_192.png" sizes="192x192"> <!-- The manifest may ask for 'icons' instead of 'icon' -->
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-startup-image" href="apple-touch-startup-image.png">
 
     <link rel="stylesheet" href="FuzzyPlan20211002.css">
-    <link rel="manifest" href="/FuzzyPlan_manifest.json">
+
     <script type="text/javascript">
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/FuzzyPlan_serviceWorker20211002.js').then(function(registration) {
-          // Registration was successful
+        navigator.serviceWorker.register('/FuzzyPlan_serviceWorker20211002.js', { scope: '/' }).then(function(registration) {
           console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, function(err) {
-          // registration failed :(
           console.log('ServiceWorker registration failed: ', err);
         });
       });
@@ -45,6 +32,8 @@
     </script>
     <!-- <script src="FuzzyPlan_serviceWorker20211002.js"></script> -->
     <script src="FuzzyPlan20211002.js" defer></script>
+
+    <link rel="manifest" href="manifest.json">
   </head>
 
   <body onload="setUpFunc()">
@@ -59,7 +48,10 @@
 
         <button type="button" id="storage" class='controlButton dayView active'> </button>
 
-        <span id='heart'></span>
+        <span id='heart'>
+          <!-- Having a heart from the start may alleviate layout shift -->
+          <img class="heartImg"  src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" width="14px" height="14px">
+        </span>
         <span id='message' hidden></span>
 
         <!-- monht view -->
@@ -83,7 +75,8 @@
           <button type="button" id='nowButton' class="controlButton"> </button>
         </div>
 
-        <input type="text" id='dayInputBox' class="inputBox dayView active" autofocus value="">
+        <input type="text" id='dayInputBox' class="inputBox dayView active" name="dayInput" autofocus value="">
+        <label id="dayInputLabel" class="labelText screenReaderOnly" for="dayInputBox"></label>
 
         <div id="playButtonContainer" class="dayView active">
           <div id="playButtonTop" class="dayView active"></div>
@@ -145,11 +138,6 @@
       <!-- Add-task view ---------------------- -->
 
       <div id='addView' hidden>
-        <!-- <div class="addContainer1">
-          <h1 align='center'>FuzzyPlan</h1>
-          <span id='addMessage' hidden></span>
-        </div> -->
-
 
         <div class='topic addView playView'>
           <div>
@@ -188,18 +176,6 @@
                 <button class='add timeAdjusterBottom' type="button" id="durationMinus5m" title='Minus 5 minutes'>&#x25BE;</button>
               </div>
             </div>
-          </div>
-          <div id="hourglass" class="hourglassTimer">
-            <div id="hourglassDiv" style='width: 100px; height: 100px;  border: 2px solid rgba(154, 219, 240, 1.0)'>
-              <div id="hourglassText">	</div>
-            </div>
-          </div>
-          <span class="hourglassTimer"> <br> </span>
-          <div id='soundDiv' class="hourglassTimer">
-            <input id='sound' type="checkbox" name="soundOrNot">
-            <label  id="soundOrNot" for="soundOrNots" class="labelText"></label>
-            <br>
-            <span id="soundIfFocusPlayView" class="labelText"> </span>
           </div>
         </div>
 
@@ -257,46 +233,46 @@
               <label class="hearts">
                 &nbsp;
                 <input type="radio" id='d5' class="drain" name='drain' value="d5">
-                <img class="heartImg"  src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart">
+                <img class="heartImg"  src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='d4' class="drain" name='drain' value="d4">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='d3' class="drain" name='drain' value="d3">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='d2' class="drain" name='drain' value="d2">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='d1' class="drain" name='drain' value="d1" checked='checked'>
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart_empty.svg.png" alt="empty heart" width="14px" height="14px">
               </label>
             </div>
 
             <div id='gainBand'>
               <label class="hearts">
                 <input type="radio" id='g1' class="drain" name='drain' value="g1">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='g2' class="drain" name='drain' value="g2">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='g3' class="drain" name='drain' value="g3">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='g4' class="drain" name='drain' value="g4">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart" width="14px" height="14px">
               </label>
               <label class="hearts">
                 <input type="radio" id='g5' class="drain" name='drain' value="g5">
-                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart">
+                <img class="heartImg" src="200px-A_SVG_semicircle_heart.svg.png" alt="red heart" width="14px" height="14px">
               </label>
             </div>
           </div>
@@ -312,9 +288,6 @@
           </div>
         </div>
       </div>
-
-<!-- // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html -->
-      <!-- <span class="addView playView" hidden>   <br>   </span> -->
 
       <!-- Month view ---------------------- -->
 
@@ -369,7 +342,6 @@
 
           <span> <br> </span>
 
-          <!-- <button type="button" id="deleteTrackedButton" class="controlButton"></button> -->
         </div>
 
         <div id="trackViewSpacer"></div>
@@ -395,17 +367,6 @@
       <!-- Storage view ------------------------- -->
 
       <div id="storageView" hidden>
-        <!-- <div class="storageContainer">
-          <h1 id='storageViewName' align='center'>
-            FuzzyPlan
-          </h1>
-
-
-          <span id='storageMessage' hidden></span>
-
-          <br>
-
-        </div>     <!-- storageContainer -->
 
         <div class="storageContainer1">
           <div>
@@ -453,17 +414,6 @@
 
       <div id="settingsView" hidden>
 
-        <!-- <div class="container1">
-          <h1 id='name' align=center>
-            FuzzyPlan
-          </h1>
-
-
-          <span id='settingsMessage' hidden></span>
-
-          <br>
-        </div>    <!-- settingsContainer1 -->
-
         <div class="settingsContainer">
 
           <div class="topic">
@@ -472,7 +422,7 @@
 
               <span id='eng'>
                 <input type="radio" id='en' class="language" name='language' value=0 checked='checked'>
-                <img src="./200px-Flag_of_the_United_Kingdom.png" alt="UK flag" height=15px>
+                <img src="./200px-Flag_of_the_United_Kingdom.png" alt="UK flag" width="30px" height=15px>
                 <label for="en">English </label>
               </span>
 
@@ -480,7 +430,7 @@
 
               <span id='dan'>
                 <input type="radio" id='da' class="language" name='language' value=1>
-                <img src="./200px-Flag_of_Denmark.png" alt="DK flag" height=15px>
+                <img src="./200px-Flag_of_Denmark.png" alt="DK flag" width="20px" height=15px>
                 <label for="da">&nbsp;&nbsp;Dansk</label>
               </span>
 
@@ -517,7 +467,7 @@
 
             <div id="restoreBackupSection" hidden>
               <label id="restoreBackupInputText" class="labelText" for='fileChooser'></label>
-              <input id="restoreBackupInput" type="file" name="fileChooser" accept=".fpbu">
+              <input id="restoreBackupInput" type="file" name="fileChooser" accept=".txt">
               <!-- <input id="restoreBackupInput" type="file" name="fileChooser" accept=".txt"> -->
               <br><br>
               <button type="button"  id="cancelRestoreBackup" class='controlButton'></button>
@@ -562,54 +512,6 @@
 
           <span>   <br>   </span>
 
-<!-- // Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html -->
-          <!-- <div class='topic'>
-            <div>
-              <h4 id="playTocText" class="text"></h4>
-
-              <input type="radio" id='off' class="alarm" name='alarm' value="off" checked='checked'>
-              <label for="off" id="tocLabelOff" class="labelText"></label> <br>
-
-              <input type="radio" id='beginning' class="alarm" name='alarm' value="beginning">
-              <label for="beginning" id="tocLabelStart" class="labelText"></label> <br>
-
-              <input type="radio" id='end' class="alarm" name='alarm' value="end">
-              <label for="end" id="tocLabelEnd" class="labelText"></label> <br>
-
-              <input type="radio" id='both' class="alarm" name='alarm' value="both">
-              <label for="both" id="tocLabelBoth" class="labelText"></label> <br>
-
-              <h4 id="playTicText" class="text"></h4>
-
-              <input type="radio" id='off' class="reminder" name='reminder' value="off" checked='checked'>
-              <label for=off"" id="ticLabelOff" class="labelText"></label> <br>
-
-              <input type="radio" id='regularly' class="reminder" name='reminder' value="regularly">
-              <label for="regularly" id="ticLabelEachX" class="labelText"></label> <br>
-
-              <input type="radio" id='rand' class="reminder" name='reminder' value="rand">
-              <label for="rand" id="ticLabelRandom" class="labelText"></label> <br>
-              <br>
-
-              <span id="ticSpanInterval" class="labelText">Time interval X in minutes:</span>
-
-              <input type="text"  id='inputBoxX' class="inputBox" value="10" class="inputBox inputSettings">
-              <br>
-
-            </div>
-
-            <span>   <br>   </span>
-
-            <div>
-              <button type="button" id='apply2' class='controlButton'> </button>
-            </div>
-            <br>
-            <br>
-            <span id="soundIfFocus" class="labelText"> </span>
-          </div> -->
-
-          <!-- <span>   <br>   </span> -->
-
           <div class='topic'>
             <div class="stressContainer">
               <h4 id='stressModelHeading' class="text"> </h4>
@@ -636,7 +538,7 @@
           <div class='topic'>
             <h4  id='clearDataHeading' class="text"> </h4>
 
-            <span>   <br>   </span>
+            <br>
 
             <button type="button" id="clearAllData" class='controlButton'></button>
 
@@ -651,7 +553,8 @@
 
             <span id="updateAppText" class="labelText"> </span>
 
-            <span>   <br>   </span>
+            <br>
+            <br>
 
             <button type="button"  id="updateApp" class='controlButton'></button>
 

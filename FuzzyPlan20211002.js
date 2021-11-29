@@ -1,6 +1,5 @@
 // TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
 // TODO: Integrate the help file in main
-// TODO: Make Postpone appear when text appear in inputBox
 
 let hashStack = [];
 let lastHash = '';
@@ -52,6 +51,7 @@ let trackTaskList = {}; // Each tracked task have a text-key and a colour and an
 // let trackTaskList = {'morgenprogram': ['#00FF00', '1'], 'frokost': ['#DD0000', '1'], 'programmere': ['#0000FF', '1']}; // Each tracked task have a text-key and a colour and an opacity  Ex: {'morgenprogram': ['#00FF00', '1']}
 let putBackId = '';
 let dontShowTrackedAsTooltip = false;
+let backupMessageShown = 0;   // Value 0: Not shown yet     1: Shown today
 
 ///////// Month-view ////////
 let backupFileName = '';
@@ -71,7 +71,7 @@ let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturda
 'Sunday', 'Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
 let ugeDage = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
-'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3']; // TODO: Fix weekdays translation when a storage is in use(?)
+'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3'];
 let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
 
 ///////// Languages ///////
@@ -95,6 +95,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                   ['Nu \u25BE', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
      'toDoButton': [['To do ...', 'Click to view due tasks from Month view'],
                     ['Husk at ...', 'Klik for at se forfaldne opgaver fra Månedsvisningen']],
+      'dayInputLabel': [['Input box for entering tasks', ''], // Only for aria label
+                   ['Input box til at skrive opgaver ind i', '']],
      'nowButtonJump': [['\u25B8 Now', 'Click to jump to current time'],  // \u25B8 <!-- Black Right-Pointing Small Triangle -->
                   ['\u25B8 Nu', 'Klik for at hoppe til nuværende tidspunkt.']],
      'clearButton': [['\u25BEClear', "Clear all tasks"],  // <!-- Black down-pointing small triangle  -->
@@ -186,7 +188,7 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
      'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
                       ['Vis opgaver der følges i tool tip i månedsvisningen', 'Fjern hakket for at gøre det lettere at se hvad der gør en dag særlig (rutineopgaverne bliver ikke vist så)']],
     // Storage view
-     'storageHeadingText': [['Store or retrive tasklists', ''],
+     'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think
                             ['Gem eller gendan opgavelister', '']],
      'storeList': [['Store list in', 'To clear a stored list, just store an empty list'],
                    ['Gem liste i', 'Gem en tom liste for at slette en gemt liste.']],
@@ -260,8 +262,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
 
      'backupHeading': [['Backup', ''],
                 ['Tag backup', '']],
-     'backupText': [['Backup the lists stored in Month View.\r\n(Note that this backup also can restore the past days in Month View in another browser)', ''],
-                ['Tag backup af de gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
+     'backupText': [['Backup settings and lists stored in Month View.\r\n(Note that this backup also can restore the past days in Month View in another browser)', ''],
+                ['Tag backup af indstillinger og gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
      'backup': [['Backup', ''],
                 ['Tag backup', '']],
      'backupInputText': [['Choose a file to overwrite, write your own name for the backup or use the proposed filename', ''],
@@ -308,6 +310,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                      'Datoer i fortiden kan ikke tildeles opgaver'],
      'useDayView': ['Use Day-view for today\'s tasks',
                     'Brug dagsvisning for dagens opgaver'],
+     'considerBackup': ['Consider taking a backup\r\nIt is done in Settings (\u2699)',
+                    'Overvej at tage en backup\r\nDet gøres i Indstillinger (\u2699)'],
      'finishTaskFirst': ['Please finish the current edit \nbefore starting a new',
                          'Afslut redigeringen før du starter en ny opgave'],
      'notADate': ['Not a date.\nPlease fix date or remove the back-slash',
@@ -350,8 +354,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                         '\nStart dagen med en opgave med fast tid\n\nTryk enten på "Nu" knappen eller tilføj\n en opgave kl 6:00 ved \nat skrive "600 15m planlægning"'],
      'notEnoughRoom': ['Not enough room. \nPlease clear some space',
                        'Der er ikke plads til en opgave\naf den længde her'],
-     'overlap': ['There is an overlap with another fixed time',
-                 'Der er et overlap med en anden opgave med fast tid'],
+     'overlap': ['There is an overlap with another fixed time.\nPlease choose another time',
+                 'Der er et overlap med en anden opgave med fast tid.\nVælg venligst en anden tid'],
      'fixedTaskClicked': ['One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.',
                           'En af de klikkede opgaver har fast tid\nOpgaver med fast tid kan ikke byttes rundt\nRet opgaven med fast tid før der byttes'],
      'jumpedTo': ['Jumped to ',
@@ -378,10 +382,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
 
 
 // Daylight saving time shenanigans
-let today = new Date();
-let january = new Date(today.getFullYear(), 0, 1);
-let july = new Date(today.getFullYear(), 6, 1);
-const dstOffset = (july.getTimezoneOffset() - january.getTimezoneOffset()) * 60000; // Daylight saving time offset in ms
+// let today = new Date();
+// let january = new Date(today.getFullYear(), 0, 1);
+// let july = new Date(today.getFullYear(), 6, 1);
+// const dstOffset = (july.getTimezoneOffset() - january.getTimezoneOffset()) * 60000; // Daylight saving time offset in ms
 
 // Task-object. Each task will be an object of this type
 class Task {
@@ -456,7 +460,7 @@ function setUpFunc() {
 
   getDueRemindersFromLast3Months();
 
-  jumpToNow();
+  jumpToNow(); // Looks like this is the Cumulative Layout Shift Lighthouse complains about :-) Nothing much to be done
 
   updateHearts(); // Update hearts to current time
 
@@ -481,7 +485,7 @@ function createTimeMarker() {
 
 function makeFirstTasks() {
   // Make the first tasks. Necessary for adding new tasks
-  let startList = ['000 1m Day start', '2359 1m Day end'];
+  let startList = ['000 1m Day start', '2358 1m Day end']; // Day end can't be from 2359 because this causes Dayend.end = 0:00 on the same day, i.e. dayend.end = daystart.start
   for (const [index, text] of startList.entries()) {
     parsedList = parseText(text.trim());
     let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
@@ -511,6 +515,8 @@ function storeLocally() {
   localStorage.idOflastTouched = idOfLastTouched;
 
   localStorage.language = language;   // Value 0:English 1:Danish
+
+  localStorage.backupMessageShown = backupMessageShown;   // Value 0: Not shown yet    1: Shown today
 
   localStorage.dontShowTrackedAsTooltip = dontShowTrackedAsTooltip;
 
@@ -632,6 +638,10 @@ function retrieveLocallyStoredStuff() {
 
   if (localStorage.getItem('language')) {
     language = Number(localStorage.language);   // Value 0:English 1:Danish
+  }
+
+  if (localStorage.getItem('backupMessageShown')) {
+    backupMessageShown = Number(localStorage.backupMessageShown);   // Value 0: Not shown yet     1: Shown today
   }
 
   if (localStorage.getItem('dontShowTrackedAsTooltip')) {
@@ -792,15 +802,15 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     }
 
   } else {  // whichView is 'day'
-    document.getElementById('postpone').classList.add('active'); // TODO: Is the class 'active' used? Nope. Should it be?
+    document.getElementById('postpone').classList.add('active'); // The class 'active' is being used for CSS formatting. I think
 
     tasks = tasksSentToDay;
     tasksSentToDay = [];
 
-    if (tasks.length === 0) {
-      document.getElementById('sortTask').classList.remove('tasksToSort');
-    } else {
+    if (tasks.length != 0 || document.getElementById('dayChooseBox').classList.contains('active')) {
       document.getElementById('sortTask').classList.toggle('tasksToSort',true); // Add the class tasksToSort due to 'true' flag
+    } else {
+      document.getElementById('sortTask').classList.remove('tasksToSort');
     }
 
   }
@@ -853,13 +863,12 @@ function postponeTask() {
   renderTasks();
   fixClearButtonArrow();
 }
-// TODO: Postpone does not appear when more than one task from monhtView is sorted in dayView
+
 
 function moveToDay() {
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-  console.log(tasksSentToDay);
   tasksSentToDay.push(task);
   resetInputBox('month');
 }
@@ -1077,7 +1086,8 @@ document.getElementById('inputBox_add').addEventListener('keypress',
 document.getElementById('inputDurationBox').addEventListener('focus',
         function() {document.getElementById('inputDurationBox').select();} );
 document.getElementById('inputTimeBox').addEventListener('focus',
-        function() {document.getElementById('inputTimeBox').select();} );
+        function() {document.getElementById('inputTimeBox').value = '12:00';
+          document.getElementById('inputTimeBox').select();} );
 
 document.getElementById('inputDurationBox').addEventListener('keypress',
         function () { if (event.key === 'Enter') { readDurationTime(); } });
@@ -1231,7 +1241,6 @@ function addTaskButtonClicked() {
   storeLocally();
   drainGainLevel_add = 'd1';
 
-  // TODO: Hmmm. Using .hidden removes transition. Fix this
   displayClass('dayView', false);
   displayClass('addView', true);
 
@@ -1474,12 +1483,16 @@ function readDurationTime() {
 
 
 function readTaskStartTime() {
-  let [timeH, timeM] = readTimeBox('inputTimeBox');
-  let now = new Date();
-  taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
-  fillTimeBox(taskTime_add);
+  if (document.getElementById('inputTimeBox').value != '') {
+    let [timeH, timeM] = readTimeBox('inputTimeBox');
+    let now = new Date();
+    taskTime_add = new Date(now.getFullYear(), now.getMonth(), now.getDate(), timeH, timeM);
+    fillTimeBox(taskTime_add);
+    return taskTime_add;
+  } else {
+    return '';
+  }
 
-  return taskTime_add;
 }
 
 function readTimeBox(whichBox) { // whichBox can be 'inputTimeBox' or 'inputBoxWakeUp'
@@ -1548,7 +1561,7 @@ function formatTask() {
 
 
 function apply() {
-  let taskText = document.getElementById('inputBox_add');
+  let taskText = document.getElementById('inputBox_add').value;
   if (taskText === '') {
     displayMessage(languagePack['taskTextMsg'][language], 3000, 'day');  // Please write a task text
   } else {
@@ -1558,7 +1571,7 @@ function apply() {
     let returnText = formatTask();
 
     if (startTime) {
-      inputFixedTask(returnText);
+      handleTaskInput(returnText);
     } else {
       document.getElementById('dayInputBox').value = returnText;
     }
@@ -1569,7 +1582,8 @@ function apply() {
     displayClass('addView', false);
     displayClass('dayView', true);
 
-    // document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
+    location.hash = '#addView_dayView';
+    pushHashChangeToStack();
   }
 }
 
@@ -1652,7 +1666,7 @@ function playButtonClicked() {
 
       let returnText = currentText + ' ' + deltaTime + 'm ' + prettifyTime(startTime_play).replace(':', '');
 
-      inputFixedTask(returnText);
+      handleTaskInput(returnText);
     } else {
       currentText = JSON.parse(localStorage.taskText_play);
     }
@@ -1779,7 +1793,7 @@ function fillMonthDateBar() {
   let nowPlus3Month = new Date();
   nowPlus3Month = new Date(nowPlus3Month.setMonth(nowPlus3Month.getMonth() + 3));
 
-  let thisMonth = now.getMonth();
+  let thisMonth = nowMinusSomeMonths.getMonth(); // Hepls insert monthnames just once per month
 
   for (let i = nowMinusSomeMonths; i < nowPlus3Month; i.setDate(i.getDate() + 1)) {
     // Insert monthnames before each the 1th
@@ -1916,26 +1930,35 @@ function monthInputAtEnter(event) {
     if (contentInputBox != '') {
 
       // Check if date is provided in the form 7/11
-      let dateArray = /\d+\/\d+/.exec(contentInputBox);
+      let dateArray = /\d+\/\d+ \d+\d+/.exec(contentInputBox);
+      if (!dateArray) {  // If no year information is present
+        dateArray = /\d+\/\d+/.exec(contentInputBox);
+      }
 
       if ( dateArray != null ) {
         // Is it a legit date?
-        if ( (/\d+\//.exec(dateArray[0])[0].replace('\/', '') <= 31 &&
-          /\/\d+/.exec(dateArray[0])[0].replace('\/', '') <= 12)) {
+        let now = new Date();
+        let month = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
+        let day = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
+        let year = '';
+        if (/ \d+\d+/.exec(dateArray[0])){
+          year = (/ \d+\d+/.exec(dateArray[0])).toString();
+          year = year.trim();
+        }
+        if (year == '') {
+          year = now.getFullYear();
+        }
+
+        if ( day <= 31 && month <= 11 ) {
 
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
             // Make myId from date
             let myId = '';
 
-            let now = new Date();
-            let year = /\d+\d+/.exec(textInputBox);
-            if (year < now.getFullYear()) {
+            if (year < now.getFullYear() || month < now.getMonth() || (month == now.getMonth() && day < now.getDate())) {
               displayMessage(languagePack['noPastDates'][language], 4000, 'month');
               return;
             }
-            textInputBox = contentInputBox.replace(year[0], '').trim();
-            let month = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
-            let day = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
 
             if (year != '' && now.getFullYear() <= year) {
               myId = day + '-' + month + '-' + year;
@@ -2143,6 +2166,14 @@ function monthRenderTasks() {
   let monthContainer = document.getElementById('monthContainer');
   let scrollTop = monthContainer.scrollHeight - 2085; // 2085 is the pixel height of 3 monht in the future
   monthContainer.scrollTop = scrollTop;
+
+  let now = new Date();
+  if (now.getDate() == 5 && backupMessageShown == 0){
+     displayMessage(languagePack['considerBackup'][language], 3000, 'month');
+     backupMessageShown = 1;
+  } else if (now.getDate() != 5) {
+    backupMessageShown = 0;
+  }
 }
 
 
@@ -2264,7 +2295,6 @@ function colourButtonClicked(event) {
 
 
 function addTrackedTask(buttonColour) {
-  // TODO: Sanitize inputs
   let taskPickerInputBox = document.getElementById('taskPickerInputBox');
   let text = taskPickerInputBox.value.trim();
   if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) {
@@ -2346,7 +2376,7 @@ function selectAllOrNone() {
   }
 }
 
-function trackCheckboxClicked(event) {
+function trackCheckboxClicked(event) { // TODO: Is this actually used?
   let trackedTask = event.target.id;
   let element = document.getElementsByClassName(trackedTask);
 
@@ -2646,7 +2676,7 @@ function applyTaskDuration() {
 
   let min = document.getElementById('inputBoxM').value.trim();
 
-  if (isNaN(min) || min < 0 || 24*60 - 2 < min) { // TODO: Scroll to top or display message
+  if (isNaN(min) || min < 0 || 24*60 - 2 < min) {
     displayMessage(languagePack['only0-1438'][language], 3000, 'settings');
     document.getElementById('inputBoxM').select();
     return;
@@ -2739,14 +2769,11 @@ function applyStressModel() {
 }
 
 
-function prepareStoreBackup() { // TODO: Make automatic backups at the end of each day (/week?)
+function prepareStoreBackup() {
   document.getElementById('backup').hidden = true;
   document.getElementById('restoreBackup').hidden = true;
 
   document.getElementById('backupSection').hidden = false;
-  // document.getElementById('cancelBackup').hidden = false;
-  // document.getElementById('backupInputText').hidden = false;
-  // document.getElementById('confirmBackup').hidden = false;
   let backupInputFixed = document.getElementById('backupInputFixed');
   backupInputFixed.hidden = false;
   document.getElementById('backupInput').hidden = false;
@@ -2754,8 +2781,8 @@ function prepareStoreBackup() { // TODO: Make automatic backups at the end of ea
   // Make filename
   let now = new Date();
   let date = now.getDate().toString() + '-' + (now.getMonth() + 1).toString() + '-' + now.getFullYear().toString();
-  backupFileName = 'FuzzyPlanBackup_' + date + '.fpbu';
-  // backupFileName = 'FuzzyPlanBackup_' + date + '.txt';
+  // backupFileName = 'FuzzyPlanBackup_' + date + '.fpbu';
+  backupFileName = 'FuzzyPlanBackup_' + date + '.txt';
   backupInputFixed.value = backupFileName;
 }
 
@@ -2785,8 +2812,8 @@ function fixBackupNameFromBrowsedNames() {
 
 
 function fixBackupNameFromWrittenName() {
-  backupFileName = document.getElementById('backupInputFixed').value + '.fpbu';
-  // backupFileName = document.getElementById('backupInputFixed').value + '.txt';
+  // backupFileName = document.getElementById('backupInputFixed').value + '.fpbu';
+  backupFileName = document.getElementById('backupInputFixed').value + '.txt';
 }
 
 
@@ -2850,12 +2877,12 @@ function confirmRestoreBackup() {
         localStorage[item] = pastDayListBackUp[item];
       }
 
-      location.reload(true);
+      location.reload();
 
     } else {
       alert(languagePack['nothingChanged'][language]);
     }
-    // TODO: Make a confirm dialog.
+
     document.getElementById('backup').hidden = false;
     document.getElementById('restoreBackup').hidden = false;
 
@@ -2872,7 +2899,7 @@ function clearAllData() {
     localStorage.monthTaskList = [];
     localStorage.pastDayList = [];
     clearDay();
-    location.reload(true);
+    location.reload();
   } else {
     alert(languagePack['nothingWasDeleted'][language]);
   }
@@ -2883,7 +2910,7 @@ function clearEverything() {
   let answer = confirm(languagePack['reallySure?'][language]);
   if (answer) {
     localStorage.clear();
-    location.reload(true);
+    location.reload();
   } else {
     alert(languagePack['nothingWasDeleted'][language]);
   }
@@ -2893,8 +2920,6 @@ function updateApp() {
   // Delete cached pages and ressources
   caches.delete('FP-cache');
 
-  // location.reload(true); // Reload to actually remove content
-
   // Remove the current serviceworker
   navigator.serviceWorker.getRegistrations().then( function(registrations) {
     for (var registration of registrations) {
@@ -2902,16 +2927,15 @@ function updateApp() {
     }
   });
 
-  // Fetch the serviceWorker again to reload pages and ressources into cache
-  navigator.serviceWorker.register('/FuzzyPlan_serviceWorker20211002.js').then(function(registration) {
-     // Registration was successful
-     console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }, function(err) {
-       // registration failed :(
-       console.log('ServiceWorker registration failed: ', err);
-  });
+  // // Fetch the serviceWorker again to reload pages and ressources into cache
+  // navigator.serviceWorker.register('FuzzyPlan_serviceWorker20211002.js').then(function(registration) {
+  //    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+  //   }, function(err) {
+  //      console.log('ServiceWorker registration failed: ', err);
+  // });
 
-  location.reload(true);
+  location.reload(true); // Before removing it I had trouble with using location.reload(true); in backupConfirm as it removed cached content
+
 }
 
 
@@ -2989,7 +3013,7 @@ function  fillHearths(currentStressLevel) {
     newHeart.src="200px-A_SVG_semicircle_heart.svg.png";
     newHeart.style.width = '14px';
     newHeart.style.height = '14px';
-    newHeart.style.alt="heart symbol";
+    newHeart.alt="heart symbol";
 
     heartSpan.appendChild(newHeart);
   }
@@ -2999,7 +3023,7 @@ function  fillHearths(currentStressLevel) {
     newHalfHeart.src="200px-A_SVG_semicircle_heart_empty.svg.png";
     newHalfHeart.style.width = '14px';
     newHalfHeart.style.height = '14px';
-    newHalfHeart.style.alt="empty heart symbol";
+    newHalfHeart.alt="empty heart symbol";
 
     heartSpan.appendChild(newHalfHeart);
   }
@@ -3035,7 +3059,7 @@ function wakeUpButton() {
     let succes = false;
     let now = new Date();
     let taskStartMinusDst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), wakeUpH, wakeUpM);
-    let taskStart = new Date(taskStartMinusDst.getTime() + 0 * dstOffset); // TODO: Remove dstOffset?
+    let taskStart = new Date(taskStartMinusDst.getTime());
     let task = new Task(taskStart, 15 * 60000, languagePack['planning'][language][0], 1);
     succes = addFixedTask(task);
     if (!succes) {
@@ -3103,7 +3127,7 @@ function inputAtEnter(event) {
     let contentInputBox = document.getElementById('dayInputBox').value.trim();
     // If text or emojis and no chosenTaskId
     if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, æ, ø, ǻ]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
-      inputFixedTask(contentInputBox);
+      handleTaskInput(contentInputBox);
     } else { // Just numbers
       if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') {
         // If there is a chosen task AND text it must be an error
@@ -3135,19 +3159,19 @@ function inputAtEnter(event) {
   }
 }
 
-function inputFixedTask(contentInputBox) {
+function handleTaskInput(contentInputBox) {
   let parsedList = parseText(contentInputBox);
   let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
-  if (taskList.length == 1 && parsedList[0] == '') {
+  if (taskList.length == 2 && parsedList[0] == '') {
     displayMessage(languagePack['startWithFixed'][language], 5000, 'day');
   } else {
-    let succes = addTask(uniqueIdOfLastTouched, task); // Note: The unique id changes when jumping between pages...
+    let succes = addTask(uniqueIdOfLastTouched, task);
 
     if (!succes) {
       displayMessage(languagePack['notEnoughRoom'][language], 3000, 'day');
       document.getElementById('dayInputBox').value = contentInputBox;
     }
-    wakeUpOrNowClickedOnce = true; // Inserting a fixed task render the need to use upButton or nowButton to insert the first task
+    wakeUpOrNowClickedOnce = true; // Inserting a fixed task remove the need to use upButton or nowButton to insert the first task
     document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true}); // Remove eventlisteners sat by setUp via adjuistNowAndWakeUpButtons()
     document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
     renderTasks();
@@ -3274,8 +3298,9 @@ function isThereASoftOverlap(task) {
   let len = taskList.length;
 
   for (var n=0; n<len; n++) {
-    if ((taskList[n].date <= task.date && task.date <= taskList[n].end)
-      || (taskList[n].date <= task.end && task.end <= taskList[n].end)) {
+    if ((taskList[n].date <= task.date && task.date <= taskList[n].end) // If task start is in anoter task
+      || (taskList[n].date <= task.end && task.end <= taskList[n].end) // Or if task end is
+      || (task.date <= taskList[n].date && taskList[n].end <= task.end)) { // Or if the new task straddle an old task
         if (taskList[n].fuzzyness === 'isNotFuzzy') {
           overlap = 'hardOverlap';
           return overlap;
@@ -3680,7 +3705,7 @@ function swapTasks(myId) {
 }
 
 
-function anneal() { // TODO: Tasks can end up after 23:59. At least a warning is needed(?)
+function anneal() {
   fixTimes();
   let len = taskList.length;
   for (var n=1; n<len - 1; n++) {
@@ -4009,6 +4034,9 @@ function updateStartAndEndTimes(timeH, timeM, hours, minutes) { // Makes a list 
 
 function parseText(rawText) {
   let taskStart = '';
+  if (!rawText) {
+    rawText = '';
+  }
 
   let minutes = /[0-9]+m/.exec(rawText);
   if (minutes) { // If 30m is in rawText store number in minutes and remove 30m from rawText
@@ -4074,7 +4102,7 @@ function parseText(rawText) {
     rawText = rawText.replace('g' + gain, '');
   };
 
-  if (drain == 1) { // TODO: If rawText is undefined .toLowerCase() will throw an error
+  if (drain == 1) {
     if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'};
     if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
     if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
