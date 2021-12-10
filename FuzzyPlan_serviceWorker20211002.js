@@ -11,6 +11,7 @@ let CACHED_URLS = [
   'favicon.ico',
   'favicon.png',
   'icon.svg',
+  '/',
   'index.html',
   'instructions_dk.html',
   'instructions.html',
