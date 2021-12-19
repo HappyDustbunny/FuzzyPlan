@@ -32,9 +32,26 @@ self.addEventListener('fetch', function(event) {
   console.log('Fetch request for: ', event.request.url);
   event.respondWith( caches.match(event.request, {ignoreVary: true}).then( // ignoreVary should make the cache match ignore flags and stuff that can make a mathc fail unintentionally
     function(response) {
-      return response || fetch(event.request);
+      if (response) {
+        console.log('Yay, retrieved from cache!', response.url);
+        return response
+      } else {
+        console.log('Strange, requested online request...', response.url);
+        return fetch(event.request);
+      }
     }).catch(function(error) {
       console.log('FuzzyPlan serviceWorker responded with error', error);
     })
   );
 })
+
+// self.addEventListener('fetch', function(event) {
+//   console.log('Fetch request for: ', event.request.url);
+//   event.respondWith( caches.match(event.request, {ignoreVary: true}).then( // ignoreVary should make the cache match ignore flags and stuff that can make a mathc fail unintentionally
+//     function(response) {
+//       return response || fetch(event.request);
+//     }).catch(function(error) {
+//       console.log('FuzzyPlan serviceWorker responded with error', error);
+//     })
+//   );
+// })

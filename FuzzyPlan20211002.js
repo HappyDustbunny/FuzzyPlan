@@ -309,6 +309,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                      'Skriv en opgavetekst'],
      'noPastDates': ['Past dates can not be assigned tasks',
                      'Datoer i fortiden kan ikke tildeles opgaver'],
+     'noDateHere': ['Can\'t jump to this date',
+                     'Kan ikke hoppe til denne dato'],
      'useDayView': ['Use Day-view for today\'s tasks',
                     'Brug dagsvisning for dagens opgaver'],
      'considerBackup': ['Consider taking a backup\r\nIt is done in Settings (\u2699)',
@@ -1961,9 +1963,10 @@ function monthInputAtEnter(event) {
             // Make myId from date
             let myId = '';
 
-            if (year < now.getFullYear() || month < now.getMonth() || (month == now.getMonth() && day < now.getDate())) {
-              displayMessage(languagePack['noPastDates'][language], 4000, 'month');
-              return;
+            if (textInputBox != '' && year <= now.getFullYear() && (month < now.getMonth() 
+                || (month == now.getMonth() && day < now.getDate()))) {
+                  displayMessage(languagePack['noPastDates'][language], 4000, 'month');
+                  return;
             }
 
             if (year != '' && now.getFullYear() <= year) {
@@ -1977,7 +1980,8 @@ function monthInputAtEnter(event) {
             }
 
             if (textInputBox === '') {
-              // gotoDate(myId); // TODO: Make gotoDate() (yank it from month.js?) and sanitize input
+              jumpToDate(myId);
+              return;
             } else {
               // Insert a new task at the provided date
               let now = new Date();
@@ -2018,6 +2022,18 @@ function monthInputAtEnter(event) {
       resetInputBox('month');
 
     }
+  }
+}
+
+
+function jumpToDate(myId) {
+  let monthContainer = document.getElementById('monthContainer');
+  let dateOfInterest = document.getElementById(myId);
+  if (dateOfInterest) {
+    monthContainer.scrollTop = dateOfInterest.offsetTop - 150;
+    document.getElementById('monthInputBox').value = '';
+  } else {
+    displayMessage(languagePack['noDateHere'][language], 4000, 'month');
   }
 }
 
@@ -2168,7 +2184,6 @@ function monthRenderTasks() {
     }
   }
 
-  // document.getElementById('monthContainer').scrollTop = 500;
   let monthContainer = document.getElementById('monthContainer');
   let scrollTop = monthContainer.scrollHeight - 2085; // 2085 is the pixel height of 3 monht in the future
   monthContainer.scrollTop = scrollTop;
