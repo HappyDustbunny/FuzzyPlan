@@ -473,6 +473,10 @@ html {
   border: 3px solid rgb(160, 179, 185);
 }
 
+.pastDateButton.weekend.isClicked {
+  border: 3px solid rgb(255, 50, 255);
+}
+
 .todayButton {
   border: 3px solid rgba(70, 197, 238, 0.83);
   border-radius: 0px;
@@ -814,7 +818,7 @@ label {  /* Used in settingsView */
 
 .isClicked { /* Needs to come after .isFuzzy */
   transform: rotateX(10deg);
-  border: 1px solid rgb(255, 50, 255);
+  border: 2px solid rgb(255, 50, 255);
 }
 
 .isNotFuzzy.isGain { /* Needs to come after .isFuzzy */

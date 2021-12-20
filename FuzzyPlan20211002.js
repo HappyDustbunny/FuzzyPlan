@@ -378,6 +378,7 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
       // Auto replace
       'pause': ['pause', 'pause'],
       'rest': ['rest', 'hvile'],
+      'break': ['take a break', 'slappe af'],
       'relax': ['relax', 'afspænding'],
       'meditate': ['meditate', 'meditere'],
       'splatte': ['bliss out', 'splatte'],
@@ -1860,6 +1861,13 @@ function monthTaskHasBeenClicked(event) {
     myId = event.target.closest('button').id;
   }
 
+  // Remove highlights
+  let monthTaskDivChildren = document.getElementById('monthTaskDiv').children;
+  for (var oneDay of monthTaskDivChildren) {
+    oneDay.classList.remove('isClicked');
+    oneDay.classList.add('isNotClicked');
+  }
+
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
   let day =  document.getElementById(myId);
 
@@ -1963,7 +1971,7 @@ function monthInputAtEnter(event) {
             // Make myId from date
             let myId = '';
 
-            if (textInputBox != '' && year <= now.getFullYear() && (month < now.getMonth() 
+            if (textInputBox != '' && year <= now.getFullYear() && (month < now.getMonth()
                 || (month == now.getMonth() && day < now.getDate()))) {
                   displayMessage(languagePack['noPastDates'][language], 4000, 'month');
                   return;
@@ -4126,6 +4134,7 @@ function parseText(rawText) {
   if (drain == 1) {
     if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'}; // gain is negative drain..
     if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
+    if (rawText.toLowerCase().includes(languagePack['break'][language])) {drain = '-3'};
     if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
     if (rawText.toLowerCase().includes(languagePack['meditate'][language])) {drain = '-5'};
     if (rawText.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
