@@ -1861,13 +1861,6 @@ function monthTaskHasBeenClicked(event) {
     myId = event.target.closest('button').id;
   }
 
-  // Remove highlights
-  let monthTaskDivChildren = document.getElementById('monthTaskDiv').children;
-  for (var oneDay of monthTaskDivChildren) {
-    oneDay.classList.remove('isClicked');
-    oneDay.classList.add('isNotClicked');
-  }
-
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
   let day =  document.getElementById(myId);
 
@@ -1934,9 +1927,17 @@ function monthTaskHasBeenClicked(event) {
 
   } else {
     // No text in inputBox and no clicked date
-    day.classList.remove('isNotClicked');
+
+    // Remove highlights
+    let monthTaskDivChildren = document.getElementById('monthTaskDiv').children;
+    for (var oneDay of monthTaskDivChildren) {
+      oneDay.classList.remove('isClicked');
+      oneDay.classList.add('isNotClicked');
+    }
+    // ... except for the day just clicked
     day.classList.add('isClicked');
   }
+
 }
 
 
@@ -1955,7 +1956,7 @@ function monthInputAtEnter(event) {
         // Is it a legit date?
         let now = new Date();
         let month = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
-        let day = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
+        let dayOfMonth = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
         let year = '';
         if (/ \d+\d+/.exec(dateArray[0])){
           year = (/ \d+\d+/.exec(dateArray[0])).toString();
@@ -1965,26 +1966,26 @@ function monthInputAtEnter(event) {
           year = now.getFullYear();
         }
 
-        if ( day <= 31 && month <= 11 ) {
+        if ( dayOfMonth <= 31 && month <= 11 ) {
 
             let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
             // Make myId from date
             let myId = '';
 
             if (textInputBox != '' && year <= now.getFullYear() && (month < now.getMonth()
-                || (month == now.getMonth() && day < now.getDate()))) {
+                || (month == now.getMonth() && dayOfMonth < now.getDate()))) {
                   displayMessage(languagePack['noPastDates'][language], 4000, 'month');
                   return;
             }
 
             if (year != '' && now.getFullYear() <= year) {
-              myId = day + '-' + month + '-' + year;
+              myId = dayOfMonth + '-' + month + '-' + year;
             }  else {
-              if (day <= now.getDate() && month <= now.getMonth()) {
+              if (dayOfMonth <= now.getDate() && month <= now.getMonth()) {
                 displayMessage(languagePack['noPastDates'][language], 4000, 'month');
                 return;
               }
-              myId = day + '-' + month + '-' + now.getFullYear();
+              myId = dayOfMonth + '-' + month + '-' + now.getFullYear();
             }
 
             if (textInputBox === '') {
@@ -1993,7 +1994,7 @@ function monthInputAtEnter(event) {
             } else {
               // Insert a new task at the provided date
               let now = new Date();
-              let taskStart = new Date(now.getFullYear(), month, day, 12, 0);
+              let taskStart = new Date(now.getFullYear(), month, dayOfMonth, 12, 0);
               let task = new Task(taskStart, 15 * 60000, textInputBox[0].toUpperCase() + textInputBox.slice(1), 1);
 
               if (monthTaskList[myId]) {
