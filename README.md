@@ -17,7 +17,7 @@ FuzzyPlan also feature a basic stress model (with healtbar!) to remind you to ta
 
 Read more at https://madshorn.dk/planner/index.html where there will be links to YouTube tutorials. The web app will be hosted at https://fuzzyplan.madshorn.dk for as long as I can afford it. Hopefully a long time, but feel free to grab your own copy of the code here if you like the app :-)
 
-FuzzyPlan is free to use and ALL data is stored on your phone/computer. No data is collected by me. 
+FuzzyPlan is free to use under a MIT licence and ALL data is stored on your phone/computer. No data is collected by me. 
 
 I can't guarantee everything works and that you will be reminded as planned, so have important stuff in a traditional calendar with alarms too.
 
