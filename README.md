@@ -20,3 +20,5 @@ Read more at https://madshorn.dk/planner/index.html where there will be links to
 FuzzyPlan is free to use and ALL data is stored on your phone/computer. No data is collected by me. 
 
 I can't guarantee everything works and that you will be reminded as planned, so have important stuff in a traditional calendar with alarms too.
+
+![FuzzyPlanExample.png](https://github.com/HappyDustbunny/FuzzyPlan/blob/b069f6edd6226dc5c3c34745f20b8c671efab892/favicons/FuzzyPlanExample.png)
