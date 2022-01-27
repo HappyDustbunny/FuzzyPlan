@@ -3376,8 +3376,8 @@ function removeFuzzyOverlap(task) {
   let len = taskList.length;
   // debugger;
   for (var n=1; n<len - 1; n++) {
-    if ((taskList[n].date < task.date && task.date < taskList[n].end)
-    || (taskList[n].date < task.end && task.end < taskList[n].end)) {
+    if ((taskList[n].date <= task.date && task.date < taskList[n].end)
+    || (taskList[n].date < task.end && task.end <= taskList[n].end)) {
       if (taskList[n].fuzzyness === 'isNotFuzzy') {
         console.log('Bugger. Logic broke.', taskList[n]);
       };
