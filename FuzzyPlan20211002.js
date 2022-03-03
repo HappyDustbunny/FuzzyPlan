@@ -77,7 +77,7 @@ let putBackId = '';
 let dontShowTrackedAsTooltip = false;
 let backupMessageShown = 0;   // Value 0: Not shown yet     1: Shown today
 
-///////// Month-view ////////
+///////// Settings-view ////////
 let backupFileName = '';
 
 ///////// Track-view ////////
@@ -719,9 +719,12 @@ function retrieveLocallyStoredStuff() {
 
 function pushHashChangeToStack() {
   // Update hashStack list
-  if (!location.hash.includes('add')) { // Exclude addView from entering navitation via back-arrow
-    hashStack.push(location.hash);
-  }
+  hashStack.push(location.hash);
+  // if (!location.hash.includes('add')) { // Exclude addView from entering navitation via back-arrow
+  //   hashStack.push(location.hash);
+  // // } else {
+  // //   addTaskButtonClicked();
+  // }
 
   if (10 < hashStack.length) {
     hashStack.shift();  // Pop from the begining of the array
@@ -741,9 +744,9 @@ function bindNavigation() {  // Called by eventlistener on 'hashchange'
       hashStack.pop();
     }
     navigateTo(reversedHash);
-    console.log('Location hash: ' + location.hash, hashStack);
+    console.log('back Location hash: ' + location.hash, hashStack);
   } else {
-    console.log('Location hash: ' + location.hash, hashStack);
+    console.log('forward Location hash: ' + location.hash, hashStack);
     navigateTo(location.hash);
   }
 }
@@ -770,6 +773,8 @@ function navigateTo(thisPlace) {
     addTaskButtonClicked();
   } else if (thisPlace == '#addView_dayView') {
     gotoDayFromAdd();
+    hashStack.pop(); // Remove #addView_dayView from hashStack in order to remove Add View from navigation via back-arrow
+    hashStack.pop(); // Twice, because ... forward and backward
   } else {
     console.log('Unexpected navigation event: ' + thisPlace);
   }
@@ -1107,6 +1112,8 @@ document.getElementById('toDoButton').addEventListener('click', toDoButtonClicke
 
 
 ////////// Eventlisteners for Add-view   /////////////////////
+
+
 
 document.getElementById('addTaskButton').addEventListener('click', function () { location.hash = '#dayView_addView'; pushHashChangeToStack(); });
 
@@ -1629,7 +1636,7 @@ function gotoDayFromAdd() {
 
 // Helper function for Add-view and Play-view
 function displayClass(className, displayStatus) {  // displaystatus can be 'true' or 'false'
-  // console.log('displayClass', className, displayStatus);
+  console.log('displayClass', className, displayStatus);
 
   // Check if the className is used as id and if so, turn the element with this id on or off
   let id = document.getElementById(className);
@@ -1667,7 +1674,7 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
 
 }
 
-// Running a timer when the page looses focus is tricky. The play and tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
+// Running a timer when the page looses focus is tricky. The tic part of the app will be dropped for now. This message is pasted before all uncommented sections in main.js and main.html
 // It may be done using progressive web app tech or Page Lifecycle APIs
 // See here https://stackoverflow.com/questions/58244539/best-practice-for-keeping-timer-running-in-pwa
 // And here https://developers.google.com/web/updates/2018/07/page-lifecycle-api
@@ -2181,7 +2188,7 @@ function monthRenderTasks() {
         for (var task of tasks) {
           let isTracked = 0;
           let txt = parseText(task)[2].replace(/ /g, '_');
-          if (txt == 'Day start' || txt == 'Day end') {
+          if (txt == 'Day_start' || txt == 'Day_end') {
             continue;
           }
 
@@ -2392,6 +2399,7 @@ function addTrackedTask(buttonColour) {
   }
 }
 
+
 function removeTracking() {
   let answer = confirm(languagePack['removeUnchecked?'][language]);
   if (answer) {
@@ -2405,6 +2413,7 @@ function removeTracking() {
     displayMessage(languagePack['nothingChanged'][language], 3000, 'track');
   }
 }
+
 
 function selectAllOrNone() {
   let trackedChkboxes = document.getElementsByClassName('trackedTask');
@@ -2461,7 +2470,6 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   } else {
     trackedItemCheckBox.checked = false;
   }
-  // trackedItemCheckBox.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemCheckBox);
 
@@ -2477,7 +2485,6 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   trackedItemColour.style.backgroundColor = trackTaskList[item][0];
   trackedItemColour.textContent = '\u00a0\u00a0\u00a0\u00a0';
   trackedItemColour.style.opacity = trackTaskList[item][1];
-  // trackedItemColour.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemColour);
 
@@ -2487,14 +2494,43 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
   let text = item.replace(/_/g, ' ');
   trackedItemButton.textContent = '\u00a0\u00a0\u00a0' + text.charAt(0).toUpperCase() + text.slice(1);
   trackedItemButton.style.opacity = trackTaskList[item][1];
-  // trackedItemButton.style.gridArea = '1 / 0';
 
   trackedItem.appendChild(trackedItemButton);
+
+  // Count the time spent on this task
+  let timeSpent = howMuchTimeSpent(item);
+
+  trackedItemTime = document.createElement('span');
+  trackedItemTime.classList.add(item);
+  let timeText = timeSpent;
+  trackedItemTime.textContent = '\u00a0\u00a0\u00a0' + timeText;
+  trackedItemTime.style.opacity = trackTaskList[item][1];
+
+  trackedItem.appendChild(trackedItemTime);
 
   document.getElementById('trackedItemsDiv').appendChild(trackedItem);
 
   document.getElementById(item).addEventListener('click', function () { trackCheckboxClicked(event); });
 }
+
+
+function howMuchTimeSpent(item) {
+  let timeSpent = '';
+  let timeSpentInMilliSec = 0;
+
+  for (const currentDay in pastDayList) {
+    for (const itemFromPastDay in pastDayList[currentDay]) {
+      currentTask = parseText(pastDayList[currentDay][itemFromPastDay]);
+      if (currentTask[2] == item) {
+        timeSpentInMilliSec += currentTask[1];
+      }
+    }
+  }
+  timeSpent = prettifyTime(new Date(0,0,0,0, timeSpentInMilliSec/60000, 0, 0));
+
+  return timeSpent;
+}
+
 
 
 function gotoMonthFromTrack() {
@@ -3455,6 +3491,9 @@ function clearDay() {
   document.getElementById('addTaskButton').textContent = '+';
   document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
   document.getElementById('dayInputBox').focus();
+
+  // Check for old tasks in monhtView. This should happen when setUpFunc() run, but sometimes it doesn't...
+  getDueRemindersFromLast3Months();
 }
 
 
