@@ -334,7 +334,7 @@
           <div>
             <span id="trackText" class="text" lang="en"></span>
 
-            <input type="text" id='taskPickerInputBox' class="inputBox"
+            <input id='taskPickerInputBox' type="text" class="inputBox"
             autofocus value="" tabindex="1" placeholder="pause">
           </div>
         </div>
@@ -357,18 +357,6 @@
         <div id="trackViewSpacer"></div>
 
         <div class="topic">
-          <span id="showTrackedItemsInTooltip" class="text"> </span>
-          <br> <br>
-          <input id='showTTChkbox' type="checkbox" name="showInTooltip" value="show" checked>
-          <label id="showTTLabel" class="labelText" for="showInTooltip"></label>
-
-          <span> <br> </span>
-
-        </div>
-
-        <div id="trackViewSpacer"></div>
-
-        <div class="topic">
           <span id="trackedItemsText" class="text"> </span>
 
           <div id="selectAllOrNoneDiv">
@@ -379,7 +367,45 @@
 
           <span> <br> </span>
 
-          <button type="button" id="deleteTrackedButton" class="controlButton"></button>
+          <button id="deleteTrackedButton" type="button" class="controlButton"></button>
+        </div>
+
+        <div id="trackViewSpacer"></div>
+
+        <div class="topic">
+          <span id="showTimeSpentHeading" class="text"> </span>
+          <br>
+          <input id="showTimeSpentChkbox" type="checkbox" name="showTimeSpent" value="show" unchecked>
+          <label id="showTimeSpentLabel" class="labelText" for="showTimeSpent"></label>
+
+          <br>
+          <span id="showTimeSpentFromText" class="text lblTxt"></span>
+          <input id="showTimeSpentFrom" type="text" tabindex="3" value="" placeholder="From first entry">
+          <br>
+          <span id="showTimeSpentToText" class="text lblTxt"></span>
+          <input id="showTimeSpentTo" type="text" tabindex="4" value="" placeholder="Till today">
+
+          <br> <br>
+          <span id="showTimeSpentMoveInterval" class="text"> </span>
+          <br>
+          <input id="showTimeSpentMoveIntervalChkbox" type="checkbox" name="moveInterval" value="show" unchecked>
+          <label id="showTimeSpentMoveIntervalLabel" class="labelText" for="moveInterval"></label>
+
+          <button id="showTimeSpentMoveMonth" type="button" class="controlButton"></button>
+          <button id="showTimeSpentMoveWeek" type="button" class="controlButton"></button>
+        </div>
+
+
+        <div id="trackViewSpacer"></div>
+
+        <div class="topic">
+          <span id="showTrackedItemsInTooltip" class="text"> </span>
+          <br>
+          <input id='showTTChkbox' type="checkbox" name="showInTooltip" value="show" checked>
+          <label id="showTTLabel" class="labelText" for="showInTooltip"></label>
+
+          <span> <br> </span>
+
         </div>
 
         <!-- <span> <br> </span> -->

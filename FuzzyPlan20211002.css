@@ -261,6 +261,10 @@ html {
   margin-top: 5px;
 }
 
+.lblTxt {
+  font-weight: normal;
+}
+
 .backgroundUp {
   width: 30px;
   border-bottom-left-radius: 0px;

@@ -207,6 +207,22 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                           ['Vælg alle eller ingen', '']],
      'deleteTrackedButton': [['Remove UNcheked tasks from this list', ''],
                              ['Fjern opgaver UDEN flueben fra denne liste', '']],
+     'showTimeSpentHeading': [['Total time spent', ''],
+                              ['Samlet tidsforbrug', '']],
+     'showTimeSpentLabel': [['Show for tracked tasks', ''],
+                            ['Vis for opgaver der følges', '']],
+     'showTimeSpentFromText': [['From ', ''],
+                            ['Fra ', '']],
+     'showTimeSpentToText': [['To ', ''],
+                            ['Til ', '']],
+     'showTimeSpentMoveInterval': [['Move interval', ''],
+                                   ['Flyt tidsinterval', '']],
+     'showTimeSpentMoveIntervalLabel': [['Back', ''],
+                                        ['Tilbage', '']],
+     'showTimeSpentMoveMonth': [['Month', ''],
+                                ['Måned', '']],
+     'showTimeSpentMoveWeek': [['Week', ''],
+                               ['Uge', '']],
      'showTrackedItemsInTooltip': [['Show/hide routine tasks', ''],
                                    ['Vis/skjul rutineopgaver', '']],
      'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
@@ -2497,16 +2513,21 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 
   trackedItem.appendChild(trackedItemButton);
 
-  // Count the time spent on this task
-  let timeSpent = howMuchTimeSpent(item);
+  // TODO: Repaint list if tracked tasks is checked or unchecked
 
-  trackedItemTime = document.createElement('span');
-  trackedItemTime.classList.add(item);
-  let timeText = timeSpent;
-  trackedItemTime.textContent = '\u00a0\u00a0\u00a0' + timeText;
-  trackedItemTime.style.opacity = trackTaskList[item][1];
+  if (trackTaskList[item][1] == 1) { // If opacity is 1 ...
+    // Count the time spent on this task
+    let timeSpent = howMuchTimeSpent(item);
 
-  trackedItem.appendChild(trackedItemTime);
+    trackedItemTime = document.createElement('span');
+    trackedItemTime.classList.add(item);
+    let timeText = timeSpent;
+    trackedItemTime.textContent = '\u00a0\u00a0\u00a0' + timeText;
+    trackedItemTime.style.opacity = trackTaskList[item][1];
+
+    trackedItem.appendChild(trackedItemTime);
+  }
+
 
   document.getElementById('trackedItemsDiv').appendChild(trackedItem);
 
@@ -2515,22 +2536,27 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 
 
 function howMuchTimeSpent(item) {
+  let targetDate = new Date(2022, 1, 4);
   let timeSpent = '';
   let timeSpentInMilliSec = 0;
 
   for (const currentDay in pastDayList) {
-    for (const itemFromPastDay in pastDayList[currentDay]) {
-      currentTask = parseText(pastDayList[currentDay][itemFromPastDay]);
-      if (currentTask[2] == item) {
-        timeSpentInMilliSec += currentTask[1];
+    currentDayAsList = currentDay.split('-');
+    currentDayTime = new Date(currentDayAsList[2], currentDayAsList[1], currentDayAsList[0])
+    if (targetDate <= currentDayTime) {
+      for (const itemFromPastDay in pastDayList[currentDay]) {
+        currentTask = parseText(pastDayList[currentDay][itemFromPastDay]);
+        if (currentTask[2] == item) {
+          timeSpentInMilliSec += currentTask[1];
+        }
       }
     }
   }
-  timeSpent = prettifyTime(new Date(0,0,0,0, timeSpentInMilliSec/60000, 0, 0));
+
+  timeSpent = (timeSpentInMilliSec/3600000).toFixed(1) + ' h';
 
   return timeSpent;
 }
-
 
 
 function gotoMonthFromTrack() {
@@ -2538,6 +2564,7 @@ function gotoMonthFromTrack() {
   displayClass('monthView', true);
   monthRenderTasks();
 }
+
 
 function showOrHideTrackedTasksInTooltip() {
   dontShowTrackedAsTooltip = !document.getElementById('showTTChkbox').checked;
