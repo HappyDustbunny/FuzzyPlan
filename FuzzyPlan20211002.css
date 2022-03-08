@@ -667,7 +667,7 @@ html {
 }
 
 #trackViewSpacer, #selectAllOrNoneDiv{
-  height: 30px;
+  height: 20px;
 }
 
 #deleteTrackedButton {
@@ -696,6 +696,14 @@ html {
 
 #colourPickerInputBox {
   width: 200px;
+}
+
+.timeSpentIntChoser {
+  opacity: 0.3;
+}
+
+input.timeSpentIntChoser {
+  width: 120px;
 }
 
 /* track view css above ^^^ */
