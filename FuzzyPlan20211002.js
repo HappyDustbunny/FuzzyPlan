@@ -1220,6 +1220,8 @@ document.getElementById('taskPickerInputBox').addEventListener('keypress', funct
 
 document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
 
+document.getElementById('showTimeSpentChkbox').addEventListener('click', showTimeSpent);
+
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
 
 document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrackedTasksInTooltip);
@@ -1499,9 +1501,30 @@ function prettifyTime(time) {
   if (taskTimeMinutes < 10) {
     nils[1] = '0';
   }
+
   let prettyTaskTime = nils[0] + taskTimeHours + ':' + nils[1] + taskTimeMinutes;
 
   return prettyTaskTime;
+}
+
+
+function prettifyDate(date) {
+  let dateDay = date.getDate().toString();
+  let dateMonth = date.getMonth().toString();
+  let dateYear = date.getFullYear().toString();
+
+  // Check if leading zeroes are needed and add them
+  let nils = ['', ''];
+  if (dateDay < 10) {
+    nils[0] = '0';
+  }
+  if (dateMonth < 10) {
+    nils[1] = '0';
+  }
+
+  let prettyDate = nils[0] + dateDay + '-' + nils[1] + dateMonth + '-' + dateYear;
+
+  return prettyDate;
 }
 
 
@@ -2316,8 +2339,9 @@ function renderTracking() {
 
   // Add new content
   // ... to list of tracked tasks
+  let doShowTimeSpent = document.getElementById('showTimeSpentChkbox').checked;
   for (const item in trackTaskList) {
-    showTrackedTask(item);
+    showTrackedTask(item, doShowTimeSpent);
   }
   // ... and to colourButtons (still hidden)
   for (const colour in colours) {
@@ -2470,8 +2494,22 @@ function trackCheckboxClicked(event) { // TODO: Is this actually used?
   }
 }
 
+// TODO: Make global variables for From and To date and update placeholder text on first render
+// Use prettifyDate(date)
+function showTimeSpent() {
+  let chkBoxResult = document.getElementById('showTimeSpentChkbox').checked;
+  if (chkBoxResult) {
+    document.getElementById('timeSpentGreyOut').classList.remove('greyedOut');
+    document.getElementById('showTimeSpentFrom').placeholder = '01-01-1970';
+  } else {
+    document.getElementById('timeSpentGreyOut').classList.add('greyedOut');
+    document.getElementById('showTimeSpentTo').placeholder = 'ddmmyyyy';
+  }
+  renderTracking();
+}
 
-function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for suspended items
+
+function showTrackedTask(item, doShowTimeSpent) {  // Opacity is 1 for tracked items and 0.25 for suspended items
   let trackedItem = document.createElement('span');
 
   // Create checkbox
@@ -2513,9 +2551,7 @@ function showTrackedTask(item) {  // Opacity is 1 for tracked items and 0.25 for
 
   trackedItem.appendChild(trackedItemButton);
 
-  // TODO: Repaint list if tracked tasks is checked or unchecked
-
-  if (trackTaskList[item][1] == 1) { // If opacity is 1 ...
+  if (doShowTimeSpent && trackTaskList[item][1] == 1) { // If opacity is 1 ...
     // Count the time spent on this task
     let timeSpent = howMuchTimeSpent(item);
 

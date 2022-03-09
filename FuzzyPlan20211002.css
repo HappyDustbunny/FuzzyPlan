@@ -698,14 +698,17 @@ html {
   width: 200px;
 }
 
-.timeSpentIntChoser {
+.greyedOut {
   opacity: 0.3;
 }
 
-input.timeSpentIntChoser {
+#showTimeSpentFrom, #showTimeSpentTo {
   width: 120px;
 }
 
+#showTimeSpentMoveIntervalChkbox {
+  width: 14px;
+}
 /* track view css above ^^^ */
 
 /* settings view css below */
