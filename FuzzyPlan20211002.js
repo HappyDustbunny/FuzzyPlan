@@ -88,6 +88,8 @@ let colours = [
 'Gold','Yellow','GreenYellow' ,'LawnGreen','LightGreen','SpringGreen','Lime','LimeGreen',
 'ForestGreen','Green','DarkGreen','Lightgrey','Darkgrey','grey'
 ]
+let trackTo = new Date();
+let trackFrom = new Date(new Date().setMonth(trackTo.getMonth() - 1));
 
 ///////// Storage-view ///////
 let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
@@ -211,6 +213,10 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                               ['Samlet tidsforbrug', '']],
      'showTimeSpentLabel': [['Show for tracked tasks', ''],
                             ['Vis for opgaver der følges', '']],
+     'showTimeSpentLastMonth': [['Show for last month', ''],
+                            ['Vis for sidste måned', '']],
+     'showTimeSpentLastWeek': [['Show for last week', ''],
+                            ['Vis for sidste uge', '']],
      'showTimeSpentFromText': [['From\u00a0', ''],
                             ['Fra\u00a0', '']],
      'showTimeSpentToText': [['To\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0', ''],
@@ -1202,7 +1208,7 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 document.getElementById('month1').addEventListener('click', function () { location.hash = '#trackView_monthView'; pushHashChangeToStack(); });
 
-////////////////// Eventlisteners for track-view ///////////////////////
+////////////////// Eventlisteners for Track-view ///////////////////////
 
 document.getElementById('colourPickerInputBox').addEventListener('focus', function () {
   document.getElementById('colourButtons').hidden = false;
@@ -1220,9 +1226,17 @@ document.getElementById('taskPickerInputBox').addEventListener('keypress', funct
 
 document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
 
+document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
+
 document.getElementById('showTimeSpentChkbox').addEventListener('click', showTimeSpent);
 
-document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
+document.getElementById('showTimeSpentLastMonth').addEventListener('click', showTimeSpentLastMonth);
+
+document.getElementById('showTimeSpentLastWeek').addEventListener('click', showTimeSpentLastWeek);
+
+document.getElementById('showTimeSpentMoveMonth').addEventListener('click', showTimeSpentMoveMonth);
+
+document.getElementById('showTimeSpentMoveWeek').addEventListener('click', showTimeSpentMoveWeek);
 
 document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrackedTasksInTooltip);
 
@@ -1508,9 +1522,9 @@ function prettifyTime(time) {
 }
 
 
-function prettifyDate(date) {
+function prettifyDate(date) { // Yes, some code is duplicated. No, readability will not be better by squashing it into something fancy
   let dateDay = date.getDate().toString();
-  let dateMonth = date.getMonth().toString();
+  let dateMonth = (date.getMonth() + 1).toString();
   let dateYear = date.getFullYear().toString();
 
   // Check if leading zeroes are needed and add them
@@ -2494,17 +2508,70 @@ function trackCheckboxClicked(event) { // TODO: Is this actually used?
   }
 }
 
-// TODO: Make global variables for From and To date and update placeholder text on first render
-// Use prettifyDate(date)
+// TODO: Add functionality to text written in From and To input boxes
 function showTimeSpent() {
   let chkBoxResult = document.getElementById('showTimeSpentChkbox').checked;
   if (chkBoxResult) {
     document.getElementById('timeSpentGreyOut').classList.remove('greyedOut');
-    document.getElementById('showTimeSpentFrom').placeholder = '01-01-1970';
   } else {
     document.getElementById('timeSpentGreyOut').classList.add('greyedOut');
+    document.getElementById('showTimeSpentFrom').value = '';
+    document.getElementById('showTimeSpentTo').value = '';
+    document.getElementById('showTimeSpentFrom').placeholder = '01-01-1970';
     document.getElementById('showTimeSpentTo').placeholder = 'ddmmyyyy';
+    trackFrom = new Date(1970, 1, 1);
+    trackTo = new Date();
   }
+  renderTracking();
+}
+
+
+function showTimeSpentLastMonth() {
+  trackTo = new Date();
+  trackFrom = new Date(new Date().setMonth(trackTo.getMonth() - 1));
+  document.getElementById('showTimeSpentFrom').value = prettifyDate(trackFrom);
+  document.getElementById('showTimeSpentTo').value = prettifyDate(trackTo);
+  renderTracking();
+}
+
+
+function showTimeSpentLastWeek() {
+  trackTo = new Date();
+  trackFrom = new Date(new Date().setDate(trackTo.getDate() - 7));
+  document.getElementById('showTimeSpentFrom').value = prettifyDate(trackFrom);
+  document.getElementById('showTimeSpentTo').value = prettifyDate(trackTo);
+  renderTracking();
+}
+
+
+function showTimeSpentMoveDirection() { // Check direction from checkbox
+  let chkBoxResultBack = document.getElementById('showTimeSpentMoveIntervalChkbox').checked;
+  if (chkBoxResultBack) {
+    direction = 1;
+  } else {
+    direction = -1;
+  }
+
+  return direction;
+}
+
+
+function showTimeSpentMoveMonth() {
+  let direction = showTimeSpentMoveDirection(); // Check direction from checkbox
+  new Date(trackTo.setMonth(trackTo.getMonth() - 1 * direction));
+  new Date(trackFrom.setMonth(trackFrom.getMonth() - 1 * direction));
+  document.getElementById('showTimeSpentFrom').value = prettifyDate(trackFrom);
+  document.getElementById('showTimeSpentTo').value = prettifyDate(trackTo);
+  renderTracking();
+}
+
+
+function showTimeSpentMoveWeek() {
+  let direction = showTimeSpentMoveDirection(); // Check direction from checkbox
+  new Date(trackTo.setDate(trackTo.getDate() - 7 * direction));
+  new Date(trackFrom.setDate(trackFrom.getDate() - 7 * direction));
+  document.getElementById('showTimeSpentFrom').value = prettifyDate(trackFrom);
+  document.getElementById('showTimeSpentTo').value = prettifyDate(trackTo);
   renderTracking();
 }
 
@@ -2572,14 +2639,14 @@ function showTrackedTask(item, doShowTimeSpent) {  // Opacity is 1 for tracked i
 
 
 function howMuchTimeSpent(item) {
-  let targetDate = new Date(2022, 1, 4);
+  // let targetDate = new Date(2022, 1, 4);
   let timeSpent = '';
   let timeSpentInMilliSec = 0;
 
   for (const currentDay in pastDayList) {
     currentDayAsList = currentDay.split('-');
     currentDayTime = new Date(currentDayAsList[2], currentDayAsList[1], currentDayAsList[0])
-    if (targetDate <= currentDayTime) {
+    if (trackFrom <= currentDayTime && currentDayTime <= trackTo) {
       for (const itemFromPastDay in pastDayList[currentDay]) {
         currentTask = parseText(pastDayList[currentDay][itemFromPastDay]);
         if (currentTask[2] == item) {
