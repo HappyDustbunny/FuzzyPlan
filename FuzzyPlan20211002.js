@@ -223,12 +223,14 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                             ['Til\u00a0\u00a0\u00a0', '']],
      'showTimeSpentMoveInterval': [['Move interval', ''],
                                    ['Flyt tidsinterval', '']],
-     'showTimeSpentMoveIntervalLabel': [['Back', ''],
+     'sTSMILabelForward': [['Forward', ''],
+                                        ['Fremad', '']],
+     'sTSMILabelBack': [['Back', ''],
                                         ['Tilbage', '']],
-     'showTimeSpentMoveMonth': [['Month', ''],
-                                ['Måned', '']],
-     'showTimeSpentMoveWeek': [['Week', ''],
-                               ['Uge', '']],
+     'showTimeSpentMoveMonth': [['1 Month', ''],
+                                ['1 Måned', '']],
+     'showTimeSpentMoveWeek': [['1 Week', ''],
+                               ['1 Uge', '']],
      'showTrackedItemsInTooltip': [['Show/hide routine tasks', ''],
                                    ['Vis/skjul rutineopgaver', '']],
      'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
@@ -508,6 +510,8 @@ function setUpFunc() {
   adjustNowAndWakeUpButtons();  // Needs to be after the first tasks is pushed to taskList because of renderTasks() // renderTasks() Is in adjustNowAndWakeUpButtons
 
   getDueRemindersFromLast3Months();
+
+  showTimeSpent();
 
   jumpToNow(); // Looks like this is the Cumulative Layout Shift Lighthouse complains about :-) Nothing much to be done
 
@@ -1229,6 +1233,10 @@ document.getElementById('colourPickerInputBox').addEventListener('keypress', fun
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
 
 document.getElementById('showTimeSpentChkbox').addEventListener('click', showTimeSpent);
+
+document.getElementById('showTimeSpentFrom').addEventListener('input', readShowTimeSpentFrom);
+
+document.getElementById('showTimeSpentTo').addEventListener('input', readShowTimeSpentTo);
 
 document.getElementById('showTimeSpentLastMonth').addEventListener('click', showTimeSpentLastMonth);
 
@@ -2526,6 +2534,32 @@ function showTimeSpent() {
 }
 
 
+function readShowTimeSpentFrom() {
+  let contentInputBoxFrom = document.getElementById('showTimeSpentFrom').value;
+  let contentFromDashes = /\d\d-\d\d-\d\d\d\d/.exec(contentInputBoxFrom);
+  let contentFrom = /\d\d\d\d\d\d\d\d/.exec(contentInputBoxFrom);
+  if (contentFrom || contentFromDashes) {
+    if (contentFromDashes) {
+      contentFrom = contentFromDashes.toString().replace(/-/g, '');
+    } else {
+      contentFrom = contentFrom.toString();
+    }
+    let fromDate = /\d./.exec(contentFrom).toString();
+    contentFrom = contentFrom.replace(fromDate, '')
+    let fromMonth = /\d./.exec(contentFrom).toString();
+    contentFrom = contentFrom.replace(fromMonth, '')
+    let fromYear = /\d+/.exec(contentFrom).toString();
+    let fromTime = new Date(fromYear, fromMonth - 1, fromDate);
+    console.log(fromTime);
+  }
+
+}
+
+function readShowTimeSpentTo() {
+
+}
+
+
 function showTimeSpentLastMonth() {
   trackTo = new Date();
   trackFrom = new Date(new Date().setMonth(trackTo.getMonth() - 1));
@@ -2545,7 +2579,7 @@ function showTimeSpentLastWeek() {
 
 
 function showTimeSpentMoveDirection() { // Check direction from checkbox
-  let chkBoxResultBack = document.getElementById('showTimeSpentMoveIntervalChkbox').checked;
+  let chkBoxResultBack = document.getElementById('sTSMIRadioBack').checked;
   if (chkBoxResultBack) {
     direction = 1;
   } else {
