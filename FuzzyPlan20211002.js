@@ -235,6 +235,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                                    ['Vis/skjul rutineopgaver', '']],
      'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
                       ['Vis opgaver der følges i tool tip i månedsvisningen', 'Fjern hakket for at gøre det lettere at se hvad der gør en dag særlig (rutineopgaverne bliver ikke vist så)']],
+    'formatReminderDate': ['Please use the format ddmmyyyy OR 7/12 plus a space',
+                   'Brug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
     // Storage view
      'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think
                             ['Gem eller gendan opgavelister', '']],
@@ -1234,9 +1236,17 @@ document.getElementById('deleteTrackedButton').addEventListener('click', removeT
 
 document.getElementById('showTimeSpentChkbox').addEventListener('click', showTimeSpent);
 
+document.getElementById('showTimeSpentFrom').addEventListener('keypress',
+          function () { if (event.key === 'Enter') { readShowTimeSpentFromAtEnter(); } });
 document.getElementById('showTimeSpentFrom').addEventListener('input', readShowTimeSpentFrom);
+document.getElementById('showTimeSpentFrom').addEventListener('focus',
+          function () { document.getElementById('showTimeSpentFrom').select(); });
 
+document.getElementById('showTimeSpentTo').addEventListener('keypress',
+          function () { if (event.key === 'Enter') { readShowTimeSpentToAtEnter(); } });
 document.getElementById('showTimeSpentTo').addEventListener('input', readShowTimeSpentTo);
+document.getElementById('showTimeSpentTo').addEventListener('focus',
+          function () { document.getElementById('showTimeSpentTo').select(); });
 
 document.getElementById('showTimeSpentLastMonth').addEventListener('click', showTimeSpentLastMonth);
 
@@ -2516,7 +2526,7 @@ function trackCheckboxClicked(event) { // TODO: Is this actually used?
   }
 }
 
-// TODO: Add functionality to text written in From and To input boxes
+
 function showTimeSpent() {
   let chkBoxResult = document.getElementById('showTimeSpentChkbox').checked;
   if (chkBoxResult) {
@@ -2534,29 +2544,83 @@ function showTimeSpent() {
 }
 
 
-function readShowTimeSpentFrom() {
-  let contentInputBoxFrom = document.getElementById('showTimeSpentFrom').value;
-  let contentFromDashes = /\d\d-\d\d-\d\d\d\d/.exec(contentInputBoxFrom);
-  let contentFrom = /\d\d\d\d\d\d\d\d/.exec(contentInputBoxFrom);
-  if (contentFrom || contentFromDashes) {
-    if (contentFromDashes) {
-      contentFrom = contentFromDashes.toString().replace(/-/g, '');
-    } else {
-      contentFrom = contentFrom.toString();
-    }
-    let fromDate = /\d./.exec(contentFrom).toString();
-    contentFrom = contentFrom.replace(fromDate, '')
-    let fromMonth = /\d./.exec(contentFrom).toString();
-    contentFrom = contentFrom.replace(fromMonth, '')
-    let fromYear = /\d+/.exec(contentFrom).toString();
-    let fromTime = new Date(fromYear, fromMonth - 1, fromDate);
-    console.log(fromTime);
-  }
+function readShowTimeSpentFromAtEnter() {
+  trackTo = readShowTimeBox('showTimeSpentFrom');
 
+  if (trackTo == 'No result yet') {
+    displayMessage(languagePack['formatReminderDate'][language], 5000, 'track')
+  } else {
+    readShowTimeSpentFrom();
+  }
 }
 
-function readShowTimeSpentTo() {
 
+function readShowTimeSpentToAtEnter() {
+  trackTo = readShowTimeBox('showTimeSpentTo');
+
+  if (trackTo == 'No result yet') {
+    displayMessage(languagePack['formatReminderDate'][language], 5000, 'track')
+  } else {
+    readShowTimeSpentFrom();
+  }
+}
+
+
+function readShowTimeSpentTo() {
+  trackTo = readShowTimeBox('showTimeSpentTo');
+
+  if (trackTo != 'No result yet') {
+    toBox = document.getElementById('showTimeSpentTo');
+    toBox.value = prettifyDate(trackTo);
+    toBox.blur();
+
+    showTimeSpent();
+  }
+}
+
+
+function readShowTimeSpentFrom() {
+  trackFrom = readShowTimeBox('showTimeSpentFrom');
+
+  if (trackFrom != 'No result yet') {
+    fromBox = document.getElementById('showTimeSpentFrom');
+    fromBox.value = prettifyDate(trackFrom);
+    fromBox.blur();
+
+    showTimeSpent();
+  }
+}
+
+// TODO: Check for real dates and trackFrom < trackTo
+function readShowTimeBox(whichBox) {
+  let fromDate = '';
+  let fromMonth = '';
+  let fromYear = '';
+  let contentInputBoxFrom = document.getElementById(whichBox).value;
+  let contentFrom = /\d\d\d\d\d\d\d\d/.exec(contentInputBoxFrom); // ddmmyyyy
+  let contentFromShort = /\d*\/\d* /.exec(contentInputBoxFrom); //    date/month
+  if (contentFrom || contentFromShort) {
+    if (contentFromShort) {
+      contentFrom = contentFromShort.toString().trim();
+      fromDate = /\d*/.exec(contentFrom).toString();
+      contentFrom = contentFrom.replace(fromDate + '/', '')
+      fromMonth = /\d*/.exec(contentFrom).toString();
+      fromYear = new Date().getFullYear();
+    } else {
+      contentFrom = contentFrom.toString();
+      fromDate = /\d./.exec(contentFrom).toString();
+      contentFrom = contentFrom.replace(fromDate, '')
+      fromMonth = /\d./.exec(contentFrom).toString();
+      contentFrom = contentFrom.replace(fromMonth, '')
+      fromYear = /\d+/.exec(contentFrom).toString();
+    }
+
+    let boxTime = new Date(fromYear, fromMonth - 1, fromDate);
+
+    return boxTime;
+  } else {
+    return 'No result yet';
+  }
 }
 
 
