@@ -235,8 +235,12 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
                                    ['Vis/skjul rutineopgaver', '']],
      'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
                       ['Vis opgaver der følges i tool tip i månedsvisningen', 'Fjern hakket for at gøre det lettere at se hvad der gør en dag særlig (rutineopgaverne bliver ikke vist så)']],
-    'formatReminderDate': ['Please use the format ddmmyyyy OR 7/12 plus a space',
+    'formatReminderDate': ['Please use the format ddmmyyyy\nOR\n7/12 plus a space',
                    'Brug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
+    'enterADatePls': ['Not a valid date\nPlease use the format ddmmyyyy\nOR\n7/12 plus a space',
+                   'Ugyldig dato\nBrug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
+    'noResultPossible': ['From-date is after To-date\nNo result possible',
+                         'Fra-dato er efter Til-dato\nIntet resultat er muligt'],
     // Storage view
      'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think
                             ['Gem eller gendan opgavelister', '']],
@@ -2535,19 +2539,19 @@ function showTimeSpent() {
     document.getElementById('timeSpentGreyOut').classList.add('greyedOut');
     document.getElementById('showTimeSpentFrom').value = '';
     document.getElementById('showTimeSpentTo').value = '';
-    document.getElementById('showTimeSpentFrom').placeholder = '01-01-1970';
-    document.getElementById('showTimeSpentTo').placeholder = 'ddmmyyyy';
     trackFrom = new Date(1970, 1, 1);
     trackTo = new Date();
+    document.getElementById('showTimeSpentFrom').placeholder = prettifyDate(trackFrom);
+    document.getElementById('showTimeSpentTo').placeholder = prettifyDate(trackTo);
   }
   renderTracking();
 }
 
 
 function readShowTimeSpentFromAtEnter() {
-  trackTo = readShowTimeBox('showTimeSpentFrom');
+  trackFrom = readShowTimeBox('showTimeSpentFrom');
 
-  if (trackTo == 'No result yet') {
+  if (trackFrom == 'No result yet') {
     displayMessage(languagePack['formatReminderDate'][language], 5000, 'track')
   } else {
     readShowTimeSpentFrom();
@@ -2561,33 +2565,43 @@ function readShowTimeSpentToAtEnter() {
   if (trackTo == 'No result yet') {
     displayMessage(languagePack['formatReminderDate'][language], 5000, 'track')
   } else {
-    readShowTimeSpentFrom();
+    readShowTimeSpentTo();
   }
 }
 
 
 function readShowTimeSpentTo() {
-  trackTo = readShowTimeBox('showTimeSpentTo');
-
-  if (trackTo != 'No result yet') {
-    toBox = document.getElementById('showTimeSpentTo');
-    toBox.value = prettifyDate(trackTo);
-    toBox.blur();
-
-    showTimeSpent();
-  }
+  trackTo = readShowTimeSpent('showTimeSpentTo');
+  checkFromToOrder('showTimeSpentTo');
 }
 
 
 function readShowTimeSpentFrom() {
-  trackFrom = readShowTimeBox('showTimeSpentFrom');
+  trackFrom = readShowTimeSpent('showTimeSpentFrom');
+  checkFromToOrder('showTimeSpentFrom');
+}
 
-  if (trackFrom != 'No result yet') {
-    fromBox = document.getElementById('showTimeSpentFrom');
-    fromBox.value = prettifyDate(trackFrom);
-    fromBox.blur();
+
+function checkFromToOrder(whichTimeSpentBox) {
+  // Check if From < To Nothing will break if not, but a warning about no result possible is given
+  if ((document.activeElement != document.getElementById(whichTimeSpentBox)) && !(trackFrom < trackTo)) { // If NOT ...
+    displayMessage(languagePack['noResultPossible'][language], 4000, 'track');
+    return 'No result yet';
+  }
+}
+
+
+function readShowTimeSpent(whichTimeSpentBox) {
+  trackFromOrTo = readShowTimeBox(whichTimeSpentBox);
+
+  if (trackFromOrTo != 'No result yet') {
+    fromOrToBox = document.getElementById(whichTimeSpentBox);
+    fromOrToBox.value = prettifyDate(trackFromOrTo);
+    fromOrToBox.blur();
 
     showTimeSpent();
+
+    return trackFromOrTo;
   }
 }
 
@@ -2614,10 +2628,15 @@ function readShowTimeBox(whichBox) {
       contentFrom = contentFrom.replace(fromMonth, '')
       fromYear = /\d+/.exec(contentFrom).toString();
     }
+    // Check if real date
+    if (!(fromDate <= 31 && fromMonth <= 12 && fromYear <= new Date().getFullYear())) { // If NOT ...
+      displayMessage(languagePack['enterADatePls'][language], 4000, 'track');
+      return 'No result yet';
+    }
 
     let boxTime = new Date(fromYear, fromMonth - 1, fromDate);
-
     return boxTime;
+
   } else {
     return 'No result yet';
   }
