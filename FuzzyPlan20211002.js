@@ -776,9 +776,9 @@ function bindNavigation() {  // Called by eventlistener on 'hashchange'
       hashStack.pop();
     }
     navigateTo(reversedHash);
-    console.log('back Location hash: ' + location.hash, hashStack);
+    // console.log('back Location hash: ' + location.hash, hashStack);
   } else {
-    console.log('forward Location hash: ' + location.hash, hashStack);
+    // console.log('forward Location hash: ' + location.hash, hashStack);
     navigateTo(location.hash);
   }
 }
@@ -1711,7 +1711,7 @@ function gotoDayFromAdd() {
 
 // Helper function for Add-view and Play-view
 function displayClass(className, displayStatus) {  // displaystatus can be 'true' or 'false'
-  console.log('displayClass', className, displayStatus);
+  // console.log('displayClass', className, displayStatus);
 
   // Check if the className is used as id and if so, turn the element with this id on or off
   let id = document.getElementById(className);
