@@ -2539,7 +2539,7 @@ function showTimeSpent() {
     document.getElementById('timeSpentGreyOut').classList.add('greyedOut');
     document.getElementById('showTimeSpentFrom').value = '';
     document.getElementById('showTimeSpentTo').value = '';
-    trackFrom = new Date(1970, 1, 1);
+    trackFrom = new Date(1970, 0, 1);
     trackTo = new Date();
     document.getElementById('showTimeSpentFrom').placeholder = prettifyDate(trackFrom);
     document.getElementById('showTimeSpentTo').placeholder = prettifyDate(trackTo);
@@ -2573,21 +2573,14 @@ function readShowTimeSpentToAtEnter() {
 function readShowTimeSpentTo() {
   trackTo = readShowTimeSpent('showTimeSpentTo');
   checkFromToOrder('showTimeSpentTo');
+  renderTracking();
 }
 
 
 function readShowTimeSpentFrom() {
   trackFrom = readShowTimeSpent('showTimeSpentFrom');
   checkFromToOrder('showTimeSpentFrom');
-}
-
-
-function checkFromToOrder(whichTimeSpentBox) {
-  // Check if From < To Nothing will break if not, but a warning about no result possible is given
-  if ((document.activeElement != document.getElementById(whichTimeSpentBox)) && !(trackFrom < trackTo)) { // If NOT ...
-    displayMessage(languagePack['noResultPossible'][language], 4000, 'track');
-    return 'No result yet';
-  }
+  renderTracking();
 }
 
 
@@ -2605,7 +2598,16 @@ function readShowTimeSpent(whichTimeSpentBox) {
   }
 }
 
-// TODO: Check for real dates and trackFrom < trackTo
+
+function checkFromToOrder(whichTimeSpentBox) {
+  // Check if From < To Nothing will break if not, but a warning about no result possible is given
+  if ((document.activeElement != document.getElementById(whichTimeSpentBox)) && !(trackFrom <= trackTo)) { // If NOT ...
+    displayMessage(languagePack['noResultPossible'][language], 4000, 'track');
+    return 'No result yet';
+  }
+}
+
+
 function readShowTimeBox(whichBox) {
   let fromDate = '';
   let fromMonth = '';
