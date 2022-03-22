@@ -3717,7 +3717,9 @@ function fixClearButtonArrow() {
 
 function clearDay() {
   // Move current taskList to trashBin
-  storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]];
+  if (2<taskList.length) {
+    storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]];
+  }
   document.getElementById('trashBin').classList.add('inUse');
   document.getElementById('trashBin').classList.remove('notInUse');
 
