@@ -2846,7 +2846,7 @@ function storeHasBeenClicked(event) {
       if (storageList['trashBin']) {
         let trash = deepCopyFunc(storageList['trashBin'][0]);  // Retrieve content of trashBin
         if (2<taskList.length) {
-          storageList['trashBin'] = [deepCopyFunc(taskList), 'Restore last discarded task list'];   // Put current taskList into the trashBin
+          storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]];   // Put current taskList into the trashBin
         }
         // taskList = fixDatesInList(trash);  // Restore trash as taskList
         taskList = trash;  // Restore trash as taskList
