@@ -82,359 +82,359 @@ let backupFileName = '';
 
 ///////// Track-view ////////
 let colours = [
-'Aquamarine','LightBlue', 'SkyBlue', 'SteelBlue', 'Turquoise', 'DarkTurquoise', 'DarkCyan',
-'Cyan','DeepSkyBlue','RoyalBlue','DarkBlue','Blue','Indigo','BlueViolet','Purple','Magenta',
-'Violet','DeepPink','Crimson','Red','Tomato','Salmon','Sienna','Chocolate','Brown','Khaki',
-'Gold','Yellow','GreenYellow' ,'LawnGreen','LightGreen','SpringGreen','Lime','LimeGreen',
-'ForestGreen','Green','DarkGreen','Lightgrey','Darkgrey','grey'
+  'Aquamarine', 'LightBlue', 'SkyBlue', 'SteelBlue', 'Turquoise', 'DarkTurquoise', 'DarkCyan',
+  'Cyan', 'DeepSkyBlue', 'RoyalBlue', 'DarkBlue', 'Blue', 'Indigo', 'BlueViolet', 'Purple', 'Magenta',
+  'Violet', 'DeepPink', 'Crimson', 'Red', 'Tomato', 'Salmon', 'Sienna', 'Chocolate', 'Brown', 'Khaki',
+  'Gold', 'Yellow', 'GreenYellow', 'LawnGreen', 'LightGreen', 'SpringGreen', 'Lime', 'LimeGreen',
+  'ForestGreen', 'Green', 'DarkGreen', 'Lightgrey', 'Darkgrey', 'grey'
 ]
 let trackTo = new Date();
 let trackFrom = new Date(new Date().setMonth(trackTo.getMonth() - 1));
 
 ///////// Storage-view ///////
 let weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
-'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
-'Sunday', 'Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
+  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+  'Sunday', 'Extra Store 1', 'Extra Store 2', 'Extra Store 3'];
 let ugeDage = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
-'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
-'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3'];
+  'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag',
+  'Ekstralager 1', 'Ekstralager 2', 'Ekstralager 3'];
 let storageList = {};  // taskList and their names are stored in memory1-17  {'memory1': [[task, task, ...], 'name']}
 
 ///////// Languages ///////
 let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The variable language is 0 for english and 1 for danish
-   // Day view
-     "month": [['Month', 'Click to show month (or just swipe rigth)'],
-               ['Måned', 'Klik for at vise måned (eller swipe til højre)']],
-     "storage": [['Storage', 'Click to show the storage (or just swipe left)'],
-                 ['Lagre', 'Klik for at vise lagrene (eller swipe til venstre)']],
-     'info': [['?', "Information and user manual"],
-        ['?', 'Information og brugsanvisning']],
-     "postpone": [['\u25C2 Postpone', "Click to move content of input box to month (postpone task)"], // &#x25C2; Black left-pointing small triangle
-                  ['\u25C2 Udskyd', "Klik for at sende indholdet af indput-boxen til månedsvisningen (udskyd opgaven)"]],
-     'upButton': [['\u25BE 7:00', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
-                  ['\u25BE 7:00', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid "]],
-     'upButtonRegular': [['\u25BE ', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
-                  ['\u25BE ', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid "]],
-     'upButtonJump': [['\u25B8 ', "Click to jump to the chosen wake up time"],  // &#x25B8; Black Right-Pointing Small Triangle
-                  ['\u25B8 ', "Klik for at hoppe til den valgte opvågningstid "]],
-     'nowButton': [['Now \u25BE', 'Click to insert a 15 min planning period at current time'],  // \u25BE <!-- Black Down-Pointing Small Triangle -->
-                  ['Nu \u25BE', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
-     'toDoButton': [['To do ...', 'Click to view due tasks from Month view'],
-                    ['Husk at ...', 'Klik for at se forfaldne opgaver fra Månedsvisningen']],
-      'dayInputLabel': [['Input box for entering tasks', ''], // Only for aria label
-                   ['Input box til at skrive opgaver ind i', '']],
-     'nowButtonJump': [['\u25B8 Now', 'Click to jump to current time'],  // \u25B8 <!-- Black Right-Pointing Small Triangle -->
-                  ['\u25B8 Nu', 'Klik for at hoppe til nuværende tidspunkt.']],
-     'clearButton': [['\u25BEClear', "Clear all tasks"],  // <!-- Black down-pointing small triangle  -->
-                     ['\u25BESlet', 'Slet alle opgaver']],
-     'clearButtonText': [['\u25C2Clear', "Clear textbox"],  // Black left-pointing small triangle
-                     ['\u25C2Slet', 'Slet inputbox']],
-     'gotoSettings': [['\u2699', 'Settings'],  // Gear icon
-                      ['\u2699', 'Indstillinger']],
-     'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
-              ['\u2350', 'Zoom ind og ud']],
-     'planning': [['Planning', ''],
-              ['Planlægning', '']],
-     'spacerText': [['This space is to allow scrolling to the end of the day when the screen keyboard is active.', ''],
-              ['Dette blanke område er for at man kan scrolle til slutningen af dagen, når skærmtastaturet er aktivt.', '']],
-    // Add view
-     'addTaskHeading': [['Add task', ''],
-                        ['Tilføj opgave', '']],
-     'inputBox_add_text': [['Task text', ''],
-                           ['Opave tekst', '']],
-     'inputBox_add': [['', 'Write task text'],
-                      ['', 'Skriv en opgavetekst']],
-     'inputDurationBox_text': [['Duration\u00a0', ''],
-                               ['Varighed\u00a0', '']],
-     'inputDurationBox': [['', 'Write duration in minutes'],
-                          ['', 'Skriv varigheden i minutter']],
-     'inputTimeBoxText': [['Task starts at', ''],
-                          ['Opgaven starter kl', '']],
-     'inputTimeBox': [['', 'Write time here'],
-                      ['', 'Skriv tiden her']],
-     'optional': [['(optional)', ''],
-                  ['(Ikke påkrævet)', '']],
-     'now': [['Now', 'Set time to now'],
-             ['Nu', 'Sæt tiden til nu']],
-     'clear': [['Clear', 'Clear time'],
-               ['Slet', 'Slet tidspunkt']],
-     'drainLevelText': [['\u00a0 Stress level', ''],
-                        ['\u00a0 Stressniveau', '']],
-     'addInfo': [['?', 'Information and user manual'],
-        ['?', 'Information og brugsanvisning']],
-     'cancel': [['Cancel', ''],
-                ['Afbryd', '']],
-     'apply': [['OK', ''],
-        ['OK', '']],
-     'applyButtonText': [['Ok (Then tap where this task should be)', ''],
-        ['OK (Klik der hvor opgaven skal indsættes)', '']],
-      'taskPastEndOfDay': [['Oups, a task were pushed past midnight\nPlease put back', ''],
-        ['Ups, en opgave blev skubbet forbi midnat\nGeninsæt den venligst', '']],
-      // Play View
-      'clicksSuppressed': [['You are registering a time period\nPress the red button to stop this\n before doing anything else', ''],
-                 ['Du registrerer en tidsperiode\nTryk på den røde knap for\nat foretage dig andet', '']],
-      'playButton': [['\u25B8', 'Insert a task from now and until pressed again.\nMinimum time will be 10 minutes'], // Left pointing arrow
-                 ['\u25B8', 'Indsætter en opgave fra nu og til knappen trykkes igen\nMinimum tiden vil blive sat til 10 minutter']],
-      // Month View
-     'track': [['Track', 'Choose which task to track with colours'],
-               ['Følg', 'Vælg hvilke opgaver der skal følges']],
-     'day': [['Day', 'Click to get back to day-view (or just swipe left anywhere)'],
-             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstrehvorsomhelst)']],
-     'day1': [['Day', 'Click to get back to day-view (or just swipe right anywhere)'],
-             ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til højre hvorsomhelst)']],
-     'monthClearButton': [['Clear\u25B8', 'Clear input box'], // Black right-pointing small triangle
-        ['Slet \u25B8', 'Slet input boks']],
-     'monthInputBox': [['', 'Input tasks to store in month view'],
-                       ['', 'Skriv opgaver der skal gemmes i månedsvisningen']],
-     'moveToDay': [['Today \u25B8', 'Click to move content of input box to today\'s plan'], // Black right-pointing small triangle
-                   ['I dag \u25B8', 'Klik for at flytte indholdet af inputboxen til dagens plan']],
-     'putBack': [['Put back', 'Put the tasks back in month view'],
-        ['Fortryd', 'Sæt opgaverne tilbage i månedsvisningen']],
-     'trackViewHeading': [['Choose tasks to track', ''],
-                          ['Vælg opgaver der skal følges', '']],
-     'month1': [['Month', 'Click to get back to month-view'],
-                ['Måned', 'Klik for at komme tilbage til månedsvisningen']],
-    // Track view
-     'trackText': [['Track\u00a0', ''],
-                   ['Følg\u00a0', '']],
-     'taskPickerInputBox': [['', 'Write task text for the task you want to track'],
-                            ['', 'Skriv opgaveteksten for den opgave du vil følge']],
-     'colourText': [['Colour\u00a0', ''],
-                     ['Farve\u00a0', '']],
-     'colourPickerInputBox': [['', 'Write colour name or rgb-value or hex-value'],
-                              ['', 'Skriv farvenavn (på engelsk) eller rgb-værdi eller hex-værdi for farven']],
-     'trackedItemsText': [['Tracked tasks', ''],
-                          ['Opgaver der følges', '']],
-     'selectAllOrNoneLabel': [['Select all or none', ''],
-                          ['Vælg alle eller ingen', '']],
-     'deleteTrackedButton': [['Remove UNcheked tasks from this list', ''],
-                             ['Fjern opgaver UDEN flueben fra denne liste', '']],
-     'showTimeSpentHeading': [['Total time spent', ''],
-                              ['Samlet tidsforbrug', '']],
-     'showTimeSpentLabel': [['Show for tracked tasks', ''],
-                            ['Vis for opgaver der følges', '']],
-     'showTimeSpentLastMonth': [['Show for last month', ''],
-                            ['Vis for sidste måned', '']],
-     'showTimeSpentLastWeek': [['Show for last week', ''],
-                            ['Vis for sidste uge', '']],
-     'showTimeSpentFromText': [['From\u00a0', ''],
-                            ['Fra\u00a0', '']],
-     'showTimeSpentToText': [['To\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0', ''],
-                            ['Til\u00a0\u00a0\u00a0', '']],
-     'showTimeSpentMoveInterval': [['Move interval', ''],
-                                   ['Flyt tidsinterval', '']],
-     'sTSMILabelForward': [['Forward', ''],
-                                        ['Fremad', '']],
-     'sTSMILabelBack': [['Back', ''],
-                                        ['Tilbage', '']],
-     'showTimeSpentMoveMonth': [['1 Month', ''],
-                                ['1 Måned', '']],
-     'showTimeSpentMoveWeek': [['1 Week', ''],
-                               ['1 Uge', '']],
-     'showTrackedItemsInTooltip': [['Show/hide routine tasks', ''],
-                                   ['Vis/skjul rutineopgaver', '']],
-     'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
-                      ['Vis opgaver der følges i tool tip i månedsvisningen', 'Fjern hakket for at gøre det lettere at se hvad der gør en dag særlig (rutineopgaverne bliver ikke vist så)']],
-    'formatReminderDate': ['Please use the format ddmmyyyy\nOR\n7/12 plus a space',
-                   'Brug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
-    'enterADatePls': ['Not a valid date\nPlease use the format ddmmyyyy\nOR\n7/12 plus a space',
-                   'Ugyldig dato\nBrug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
-    'noResultPossible': ['From-date is after To-date\nNo result possible',
-                         'Fra-dato er efter Til-dato\nIntet resultat er muligt'],
-    // Storage view
-     'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think
-                            ['Gem eller gendan opgavelister', '']],
-     'storeList': [['Store list in', 'To clear a stored list, just store an empty list'],
-                   ['Gem liste i', 'Gem en tom liste for at slette en gemt liste.']],
-     'trashBin': [['Restore last discarded task list', ''],
-                  ['Gendan sidst slettede liste', '']],
-    // Settings view
-     'gotoDayFromSettings': [['Day', 'Click to get back to day-view'],
-                             ['Dag', 'Klik for at vende tilbage til dagsvisning']],
-     'settingsHeading': [['Settings', ''],
-                         ['Indstillinger', '']],
-     'languageHeading': [['Language', ''],
-                          ['Sprog', '']],
-     'apply0': [['Apply', ''],
-                ['Anvend', '']],
-     'applyWakeUp': [['Apply', ''],
-                ['Anvend', '']],
-     'taskDurationHeading': [['Default task duration', ''],
-                   ['Standard opgavelængde', '']],
-     'taskDurationText': [['Set default task duration in minutes:', ''],
-                          ['Sæt stadard opgavelængde i minutter', '']],
-      'wakeUpHeading': [['Wake up time', ''],
-                        ['Opvågningstid', '']],
-      'wakeUpText': [['Set the time you usually wake up and start planning', ''],
-                     ['Sæt den tid du sædvanligvis vågner op og planlægger', '']],
-     'inputBoxM': [['', 'Set default task duration in minutes'],
-                   ['', 'Sæt standardlængden for opgaver i minutter']],
-     'inputBoxWakeUp': [['', 'Set the time you usually wake up and start planning'],
-                ['', 'Sæt den tid du sædvanligvis vågner op og planlægger']],
-     'apply1': [['Apply', ''],
-                ['Anvend', '']],
-     // 'playTocText': [['Play \'toc\' sound', ''],
-     //                 ['Afspil \'tac\' lyd', '']],
-     // 'tocLabelOff': [['Off', ''],
-     //                 ['Fra', '']],
-     // 'tocLabelStart': [['At the beginning of tasks (toc)', ''],
-     //                   ['I begyndelsen af en opgave (tac)', '']],
-     // 'tocLabelEnd': [['At the end of tasks (toc toc)', ''],
-     //                 ['I slutningen af en opgave (tac tac)', '']],
-     // 'tocLabelBoth': [['Both at beginning and end of tasks', ''],
-     //                  ['Både når opgaven starter og slutter', '']],
-     // 'playTicText': [['Play \'tic\' sound', ''],
-     //                 ['Afspil \'tic\' lyd', '']],
-     // 'ticLabelOff': [['Off', ''],
-     //                 ['Fra', '']],
-     // 'ticLabelEachX': [['Every X minutes', ''],
-     //                   ['Hver X. minut', '']],
-     // 'ticLabelRandom': [['Randomly within every X minutes', ''],
-     //                    ['Tilfældigt indenfor X minutter', '']],
-     // 'ticSpanInterval': [['Time interval X in minutes:', ''],
-     //                     ['Tidsinterval X i minutter:', '']],
-     // 'inputBoxX': [['', 'Time interval X in minutes'],
-     //               ['', 'Tidsinterval X i minutter']],
-     // 'apply2': [['Apply', ''],
-     //            ['Anvend', '']],
-     // 'soundIfFocus': [['Note:\r\nThe sound only play if the page has focus', ''],
-     //              ['Bemærk:\r\nLyd afspilles kun, hvis siden har fokus', '']],
-     // 'soundIfFocusPlayView': [['Note: The sound only play if the page has focus', ''],
-     //              ['Bemærk: Lyd afspilles kun, hvis siden har fokus', '']],
-     'stressModelHeading': [['Stress Model', ''],
-                       ['Stress Model', '']],
-     'settingsInfo': [['?', 'Information about the stress model'],
-                       ['?', 'Information om stressmodellen']],
-     'stressLevelText': [['Set the stress level you experience\r\nwhen you wake up (1-5, 1 is low)\u00a0', ''],
-                         ['Angiv det stressniveau du oplever\r\nnår du vågner (1-5, 1 er lavt)\u00a0', '']],
-     'stressLevelDoubleText': [['Set the approximately time for\r\nyour stress level to '
-                                + 'double\r\nwhen working without pause (in minutes)', ''],
-                               ['Sæt den tid det omtrent tager\r\nfør dit stressniveau '
-                                + 'fordobles,\r\nnår du arbejder uden pause (i minutter)', '']],
-     'apply3': [['Apply', ''],
-                ['Anvend', '']],
+  // Day view
+  "month": [['Month', 'Click to show month (or just swipe rigth)'],
+  ['Måned', 'Klik for at vise måned (eller swipe til højre)']],
+  "storage": [['Storage', 'Click to show the storage (or just swipe left)'],
+  ['Lagre', 'Klik for at vise lagrene (eller swipe til venstre)']],
+  'info': [['?', "Information and user manual"],
+  ['?', 'Information og brugsanvisning']],
+  "postpone": [['\u25C2 Postpone', "Click to move content of input box to month (postpone task)"], // &#x25C2; Black left-pointing small triangle
+  ['\u25C2 Udskyd', "Klik for at sende indholdet af indput-boxen til månedsvisningen (udskyd opgaven)"]],
+  'upButton': [['\u25BE 7:00', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
+  ['\u25BE 7:00', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid "]],
+  'upButtonRegular': [['\u25BE ', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
+  ['\u25BE ', "Klik for at indsætte en 15 minutteres planlægnings periode på den valgte opvågningstid "]],
+  'upButtonJump': [['\u25B8 ', "Click to jump to the chosen wake up time"],  // &#x25B8; Black Right-Pointing Small Triangle
+  ['\u25B8 ', "Klik for at hoppe til den valgte opvågningstid "]],
+  'nowButton': [['Now \u25BE', 'Click to insert a 15 min planning period at current time'],  // \u25BE <!-- Black Down-Pointing Small Triangle -->
+  ['Nu \u25BE', 'Klik for at indsætte en 15 minutteres planlægnings periode på nuværende tidspunkt.']],
+  'toDoButton': [['To do ...', 'Click to view due tasks from Month view'],
+  ['Husk at ...', 'Klik for at se forfaldne opgaver fra Månedsvisningen']],
+  'dayInputLabel': [['Input box for entering tasks', ''], // Only for aria label
+  ['Input box til at skrive opgaver ind i', '']],
+  'nowButtonJump': [['\u25B8 Now', 'Click to jump to current time'],  // \u25B8 <!-- Black Right-Pointing Small Triangle -->
+  ['\u25B8 Nu', 'Klik for at hoppe til nuværende tidspunkt.']],
+  'clearButton': [['\u25BEClear', "Clear all tasks"],  // <!-- Black down-pointing small triangle  -->
+  ['\u25BESlet', 'Slet alle opgaver']],
+  'clearButtonText': [['\u25C2Clear', "Clear textbox"],  // Black left-pointing small triangle
+  ['\u25C2Slet', 'Slet inputbox']],
+  'gotoSettings': [['\u2699', 'Settings'],  // Gear icon
+  ['\u2699', 'Indstillinger']],
+  'zoom': [['\u2350', 'Toggles zoom'],  // ⍐
+  ['\u2350', 'Zoom ind og ud']],
+  'planning': [['Planning', ''],
+  ['Planlægning', '']],
+  'spacerText': [['This space is to allow scrolling to the end of the day when the screen keyboard is active.', ''],
+  ['Dette blanke område er for at man kan scrolle til slutningen af dagen, når skærmtastaturet er aktivt.', '']],
+  // Add view
+  'addTaskHeading': [['Add task', ''],
+  ['Tilføj opgave', '']],
+  'inputBox_add_text': [['Task text', ''],
+  ['Opave tekst', '']],
+  'inputBox_add': [['', 'Write task text'],
+  ['', 'Skriv en opgavetekst']],
+  'inputDurationBox_text': [['Duration\u00a0', ''],
+  ['Varighed\u00a0', '']],
+  'inputDurationBox': [['', 'Write duration in minutes'],
+  ['', 'Skriv varigheden i minutter']],
+  'inputTimeBoxText': [['Task starts at', ''],
+  ['Opgaven starter kl', '']],
+  'inputTimeBox': [['', 'Write time here'],
+  ['', 'Skriv tiden her']],
+  'optional': [['(optional)', ''],
+  ['(Ikke påkrævet)', '']],
+  'now': [['Now', 'Set time to now'],
+  ['Nu', 'Sæt tiden til nu']],
+  'clear': [['Clear', 'Clear time'],
+  ['Slet', 'Slet tidspunkt']],
+  'drainLevelText': [['\u00a0 Stress level', ''],
+  ['\u00a0 Stressniveau', '']],
+  'addInfo': [['?', 'Information and user manual'],
+  ['?', 'Information og brugsanvisning']],
+  'cancel': [['Cancel', ''],
+  ['Afbryd', '']],
+  'apply': [['OK', ''],
+  ['OK', '']],
+  'applyButtonText': [['Ok (Then tap where this task should be)', ''],
+  ['OK (Klik der hvor opgaven skal indsættes)', '']],
+  'taskPastEndOfDay': [['Oups, a task were pushed past midnight\nPlease put back', ''],
+  ['Ups, en opgave blev skubbet forbi midnat\nGeninsæt den venligst', '']],
+  // Play View
+  'clicksSuppressed': [['You are registering a time period\nPress the red button to stop this\n before doing anything else', ''],
+  ['Du registrerer en tidsperiode\nTryk på den røde knap for\nat foretage dig andet', '']],
+  'playButton': [['\u25B8', 'Insert a task from now and until pressed again.\nMinimum time will be 10 minutes'], // Left pointing arrow
+  ['\u25B8', 'Indsætter en opgave fra nu og til knappen trykkes igen\nMinimum tiden vil blive sat til 10 minutter']],
+  // Month View
+  'track': [['Track', 'Choose which task to track with colours'],
+  ['Følg', 'Vælg hvilke opgaver der skal følges']],
+  'day': [['Day', 'Click to get back to day-view (or just swipe left anywhere)'],
+  ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til venstrehvorsomhelst)']],
+  'day1': [['Day', 'Click to get back to day-view (or just swipe right anywhere)'],
+  ['Dag', 'Klik for at komme tilbage til dagsvisning (eller swipe til højre hvorsomhelst)']],
+  'monthClearButton': [['Clear\u25B8', 'Clear input box'], // Black right-pointing small triangle
+  ['Slet \u25B8', 'Slet input boks']],
+  'monthInputBox': [['', 'Input tasks to store in month view'],
+  ['', 'Skriv opgaver der skal gemmes i månedsvisningen']],
+  'moveToDay': [['Today \u25B8', 'Click to move content of input box to today\'s plan'], // Black right-pointing small triangle
+  ['I dag \u25B8', 'Klik for at flytte indholdet af inputboxen til dagens plan']],
+  'putBack': [['Put back', 'Put the tasks back in month view'],
+  ['Fortryd', 'Sæt opgaverne tilbage i månedsvisningen']],
+  'trackViewHeading': [['Choose tasks to track', ''],
+  ['Vælg opgaver der skal følges', '']],
+  'month1': [['Month', 'Click to get back to month-view'],
+  ['Måned', 'Klik for at komme tilbage til månedsvisningen']],
+  // Track view
+  'trackText': [['Track\u00a0', ''],
+  ['Følg\u00a0', '']],
+  'taskPickerInputBox': [['', 'Write task text for the task you want to track'],
+  ['', 'Skriv opgaveteksten for den opgave du vil følge']],
+  'colourText': [['Colour\u00a0', ''],
+  ['Farve\u00a0', '']],
+  'colourPickerInputBox': [['', 'Write colour name or rgb-value or hex-value'],
+  ['', 'Skriv farvenavn (på engelsk) eller rgb-værdi eller hex-værdi for farven']],
+  'trackedItemsText': [['Tracked tasks', ''],
+  ['Opgaver der følges', '']],
+  'selectAllOrNoneLabel': [['Select all or none', ''],
+  ['Vælg alle eller ingen', '']],
+  'deleteTrackedButton': [['Remove UNcheked tasks from this list', ''],
+  ['Fjern opgaver UDEN flueben fra denne liste', '']],
+  'showTimeSpentHeading': [['Total time spent', ''],
+  ['Samlet tidsforbrug', '']],
+  'showTimeSpentLabel': [['Show for tracked tasks', ''],
+  ['Vis for opgaver der følges', '']],
+  'showTimeSpentLastMonth': [['Show for last month', ''],
+  ['Vis for sidste måned', '']],
+  'showTimeSpentLastWeek': [['Show for last week', ''],
+  ['Vis for sidste uge', '']],
+  'showTimeSpentFromText': [['From\u00a0', ''],
+  ['Fra\u00a0', '']],
+  'showTimeSpentToText': [['To\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0', ''],
+  ['Til\u00a0\u00a0\u00a0', '']],
+  'showTimeSpentMoveInterval': [['Move interval', ''],
+  ['Flyt tidsinterval', '']],
+  'sTSMILabelForward': [['Forward', ''],
+  ['Fremad', '']],
+  'sTSMILabelBack': [['Back', ''],
+  ['Tilbage', '']],
+  'showTimeSpentMoveMonth': [['1 Month', ''],
+  ['1 Måned', '']],
+  'showTimeSpentMoveWeek': [['1 Week', ''],
+  ['1 Uge', '']],
+  'showTrackedItemsInTooltip': [['Show/hide routine tasks', ''],
+  ['Vis/skjul rutineopgaver', '']],
+  'showTTLabel': [['Show tracked tasks in tool tip in month view', 'Remove checkmark to make it easier to see what made a day special (the tracked routine tasks is not shown)'],
+  ['Vis opgaver der følges i tool tip i månedsvisningen', 'Fjern hakket for at gøre det lettere at se hvad der gør en dag særlig (rutineopgaverne bliver ikke vist så)']],
+  'formatReminderDate': ['Please use the format ddmmyyyy\nOR\n7/12 plus a space',
+    'Brug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
+  'enterADatePls': ['Not a valid date\nPlease use the format ddmmyyyy\nOR\n7/12 plus a space',
+    'Ugyldig dato\nBrug formatet ddmmyyyy \nELLER\n 7/12 plus et mellemrum'],
+  'noResultPossible': ['From-date is after To-date\nNo result possible',
+    'Fra-dato er efter Til-dato\nIntet resultat er muligt'],
+  // Storage view
+  'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think
+  ['Gem eller gendan opgavelister', '']],
+  'storeList': [['Store list in', 'To clear a stored list, just store an empty list'],
+  ['Gem plan i', 'Gem en tom plan for at slette en gemt plan.']],
+  'trashBin': [['Restore last discarded task list', ''],
+  ['Gendan sidst slettede plan', '']],
+  // Settings view
+  'gotoDayFromSettings': [['Day', 'Click to get back to day-view'],
+  ['Dag', 'Klik for at vende tilbage til dagsvisning']],
+  'settingsHeading': [['Settings', ''],
+  ['Indstillinger', '']],
+  'languageHeading': [['Language', ''],
+  ['Sprog', '']],
+  'apply0': [['Apply', ''],
+  ['Anvend', '']],
+  'applyWakeUp': [['Apply', ''],
+  ['Anvend', '']],
+  'taskDurationHeading': [['Default task duration', ''],
+  ['Standard opgavelængde', '']],
+  'taskDurationText': [['Set default task duration in minutes:', ''],
+  ['Sæt stadard opgavelængde i minutter', '']],
+  'wakeUpHeading': [['Wake up time', ''],
+  ['Opvågningstid', '']],
+  'wakeUpText': [['Set the time you usually wake up and start planning', ''],
+  ['Sæt den tid du sædvanligvis vågner op og planlægger', '']],
+  'inputBoxM': [['', 'Set default task duration in minutes'],
+  ['', 'Sæt standardlængden for opgaver i minutter']],
+  'inputBoxWakeUp': [['', 'Set the time you usually wake up and start planning'],
+  ['', 'Sæt den tid du sædvanligvis vågner op og planlægger']],
+  'apply1': [['Apply', ''],
+  ['Anvend', '']],
+  // 'playTocText': [['Play \'toc\' sound', ''],
+  //                 ['Afspil \'tac\' lyd', '']],
+  // 'tocLabelOff': [['Off', ''],
+  //                 ['Fra', '']],
+  // 'tocLabelStart': [['At the beginning of tasks (toc)', ''],
+  //                   ['I begyndelsen af en opgave (tac)', '']],
+  // 'tocLabelEnd': [['At the end of tasks (toc toc)', ''],
+  //                 ['I slutningen af en opgave (tac tac)', '']],
+  // 'tocLabelBoth': [['Both at beginning and end of tasks', ''],
+  //                  ['Både når opgaven starter og slutter', '']],
+  // 'playTicText': [['Play \'tic\' sound', ''],
+  //                 ['Afspil \'tic\' lyd', '']],
+  // 'ticLabelOff': [['Off', ''],
+  //                 ['Fra', '']],
+  // 'ticLabelEachX': [['Every X minutes', ''],
+  //                   ['Hver X. minut', '']],
+  // 'ticLabelRandom': [['Randomly within every X minutes', ''],
+  //                    ['Tilfældigt indenfor X minutter', '']],
+  // 'ticSpanInterval': [['Time interval X in minutes:', ''],
+  //                     ['Tidsinterval X i minutter:', '']],
+  // 'inputBoxX': [['', 'Time interval X in minutes'],
+  //               ['', 'Tidsinterval X i minutter']],
+  // 'apply2': [['Apply', ''],
+  //            ['Anvend', '']],
+  // 'soundIfFocus': [['Note:\r\nThe sound only play if the page has focus', ''],
+  //              ['Bemærk:\r\nLyd afspilles kun, hvis siden har fokus', '']],
+  // 'soundIfFocusPlayView': [['Note: The sound only play if the page has focus', ''],
+  //              ['Bemærk: Lyd afspilles kun, hvis siden har fokus', '']],
+  'stressModelHeading': [['Stress Model', ''],
+  ['Stress Model', '']],
+  'settingsInfo': [['?', 'Information about the stress model'],
+  ['?', 'Information om stressmodellen']],
+  'stressLevelText': [['Set the stress level you experience\r\nwhen you wake up (1-5, 1 is low)\u00a0', ''],
+  ['Angiv det stressniveau du oplever\r\nnår du vågner (1-5, 1 er lavt)\u00a0', '']],
+  'stressLevelDoubleText': [['Set the approximately time for\r\nyour stress level to '
+    + 'double\r\nwhen working without pause (in minutes)', ''],
+  ['Sæt den tid det omtrent tager\r\nfør dit stressniveau '
+    + 'fordobles,\r\nnår du arbejder uden pause (i minutter)', '']],
+  'apply3': [['Apply', ''],
+  ['Anvend', '']],
 
-     'backupHeading': [['Backup', ''],
-                ['Tag backup', '']],
-     'backupText': [['Backup settings and lists stored in Month View.\r\n(Note that this backup also can restore the past days in Month View in another browser)', ''],
-                ['Tag backup af indstillinger og gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
-     'backup': [['Backup', ''],
-                ['Tag backup', '']],
-     'backupInputText': [['Choose a file to overwrite, write your own name for the backup or use the proposed filename', ''],
-                ['Vælg en fil at overskrive, skriv dit eget navn for backupen eller benyt det foreslåede', '']],
-     'restoreBackupInputText': [['Open the text file with your backup', ''],
-                ['Åben tekstfilen med din backup', '']],
-      'confirmBackup': [['Confirm backup', ''],
-                ['Bekræft backup', '']],
-     'restoreBackup': [['Restore backup', ''],
-                       ['Gendan backup', '']],
-     'cancelBackup': [['Cancel backup', ''],
-                       ['Afbryd backup', '']],
-     'confirmRestoreBackup': [['Confirm restore of backup', ''],
-                       ['Bekræft gendanlse af backup', '']],
-     'cancelRestoreBackup': [['Cancel backup', ''],
-                       ['Afbryd backup', '']],
+  'backupHeading': [['Backup', ''],
+  ['Tag backup', '']],
+  'backupText': [['Backup settings and lists stored in Month View.\r\n(Note that this backup also can restore the past days in Month View in another browser)', ''],
+  ['Tag backup af indstillinger og gamle opgavelister gemt i Månedsvisningen.\r\n(Bemærk at denne backup også kan flytte gamle opgavelister til Månedsvisningen i en anden browser)', '']],
+  'backup': [['Backup', ''],
+  ['Tag backup', '']],
+  'backupInputText': [['Choose a file to overwrite, write your own name for the backup or use the proposed filename', ''],
+  ['Vælg en fil at overskrive, skriv dit eget navn for backupen eller benyt det foreslåede', '']],
+  'restoreBackupInputText': [['Open the text file with your backup', ''],
+  ['Åben tekstfilen med din backup', '']],
+  'confirmBackup': [['Confirm backup', ''],
+  ['Bekræft backup', '']],
+  'restoreBackup': [['Restore backup', ''],
+  ['Gendan backup', '']],
+  'cancelBackup': [['Cancel backup', ''],
+  ['Afbryd backup', '']],
+  'confirmRestoreBackup': [['Confirm restore of backup', ''],
+  ['Bekræft gendanlse af backup', '']],
+  'cancelRestoreBackup': [['Cancel backup', ''],
+  ['Afbryd backup', '']],
 
-     'clearDataHeading': [['Clear data and preferences', ''],
-                          ['Slet data og indstillinger', '']],
-     'clearAllData': [['Clear current day', ''],
-                      ['Slet alle dagens opgaver', '']],
-     'clearEverything': [['Clear ALL data and preferences', ''],
-                         ['Slet ALLE data og indstillinger', '']],
-     'updateAppHeading': [['Update App', ''],
-                          ['Opdater App', '']],
-     'updateAppText': [['The newest version of this app is only fetched if the button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser will have it\'s own local storage and app version. Move tasks and settings via backups.', ''],
-                         ['Den nyeste version af denne app hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser.\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup', '']],
-     'updateApp': [['Update app', 'The newest version is only fetched if this button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser will have it\'s own local storage and app version. Move tasks and settings via backups.'],
-                         ['Opdater app', 'Den nyeste version hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser.\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup']],
-     'gotoDayFromSettings1': [['Go back', ''],
-                       ['Gå tilbage', '']],
-    // Messages
-     // 'dontUse': [['Please don\'t use ' , ' for task description'],  // Fossile code. May be needed, but most probably not
-     //             ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
-     'format1h30m': ['Please use the format 1h30m\r\n for 1 hour and 30 minutes',
-                     'Brug formatet 1h30m\r\n for 1 time og 30 minutter'],
-     'max23h': ['Durations longer than 23 hours is not possible',
-                'Varihed længere end 23 timer er ikke muligt'],
-     'format1200': ['Please use the format 12:00 or 1200',
-                    'Brug formatet 12:00 eller 1200'],
-     'taskTextMsg': ['Please write a task text',
-                     'Skriv en opgavetekst'],
-     'noPastDates': ['Past dates can not be assigned tasks',
-                     'Datoer i fortiden kan ikke tildeles opgaver'],
-     'noDateHere': ['Can\'t jump to this date',
-                     'Kan ikke hoppe til denne dato'],
-     'useDayView': ['Use Day-view for today\'s tasks',
-                    'Brug dagsvisning for dagens opgaver'],
-     'considerBackup': ['Consider taking a backup\r\nIt is done in Settings (\u2699)',
-                    'Overvej at tage en backup\r\nDet gøres i Indstillinger (\u2699)'],
-     'finishTaskFirst': ['Please finish the current edit \nbefore starting a new',
-                         'Afslut redigeringen før du starter en ny opgave'],
-     'notADate': ['Not a date.\nPlease fix date or remove the back-slash',
-                  'Det er ikke en dato.\nVær venlig at angive en rigtig dato eller fjern skråstregen'],
-     'addATask': ['Please add a task',
-                  'Tilføj venligst en opgave'],
-     'removeUnchecked?': ['Do you want to remove all UNcheked tasks from this list?\n (The same tasks elsewhere is not affected)',
-                          'Vil du fjerne alle opgaver UDEN flueben fra denne liste?\n (Dette påvirker ikke opgaverne andre steder)'],
-     'nothingChanged': ['Nothing was changed',
-                        'Der skete ingen ændringer'],
-     'chooseABackup': ['Please choose a backup to restore first',
-                        'Vælg venligst en backup der skal gendannes'],
-     'sureYouWannaRestore?': ['Are you sure you want to restore the backup?\nThe current tasks and settings will be overwritten.',
-                        'Er du sikker på at du vil gendanne backuppen?\nDe nuværende opgaver og indstillinger vil blive overskrevet.'],
-     'nothingIsDiscarded': ['No task has been discarded yet.\nNothing was changed.',
-                            'Ingen opgaver er blevet smidt ud endnu\nIntet er ændret'],
-     'changeLabel?': ['Change label of the stored list?\n(Clicking OK will erase earlier content)',
-                      'Vil du ændre navnet på den gemte liste?\n(Tidligere indhold vil blive slettet hvis du klikker OK)'],
-     'onlyAlphaNumerics': ['Limit your charcters to letters and numbers, please.',
-                           'Brug venligst kun bogstaver og tal'],
-     'listCleared': ['Stored list is cleared',
-                     'Den gemte liste er slettet'],
-     'listStoredIn': ['Current task list stored in ',
-                      'Dagens liste er gemt i '],
-     'restoreLast': ['Restore last discarded task list',
-                     'Genskab den sidst forkastede liste'],
-     'retrieveFrom': [['Retrieved list from the \"', '\" storage'],
-                      ['Listen hentet fra lageret \"', '\"']],
-     'storeIsEmpty': ['This store is empty',
-                      'Dette lager er tomt'],
-     'only0-1438': ['Use only numbers between 0 and 1438, please.',
-                    'Brug venligst kun tal mellem 0 og 1438'],
-     'only0-59': ['Use only numbers between 0 and 59, please.',
-                  'Brug venligst kun tal mellem  0 og 59'],
-     'only0-5': ['Use only numbers between 0 and 5, please',
-                 'Brug venligst kun tal mellem 0 og 5'],
-     'formatReminder': ['The format should be \r\n1200 1h30m text OR\r\n1200 text OR\r\n text OR \r\n800 or 1230',
-                        'Formatet bør være \r\n1200 1h30m tekst ELLER\r\n1200 tekst ELLER\r\n tekst ELLER \r\n800 eller 1230'],
-     'startWithFixed': ['\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n',
-                        '\nStart dagen med en opgave med fast tid\n\nTryk enten på "Nu" knappen eller tilføj\n en opgave kl 6:00 ved \nat skrive "600 15m planlægning"'],
-     'notEnoughRoom': ['Not enough room. \nPlease clear some space',
-                       'Der er ikke plads til en opgave\naf den længde her'],
-     'overlap': ['There is an overlap with another fixed time.\nPlease choose another time',
-                 'Der er et overlap med en anden opgave med fast tid.\nVælg venligst en anden tid'],
-     'fixedTaskClicked': ['One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.',
-                          'En af de klikkede opgaver har fast tid\nOpgaver med fast tid kan ikke byttes rundt\nRet opgaven med fast tid før der byttes'],
-     'jumpedTo': ['Jumped to ',
-                  'Sprang til '],
-     'numberNotRecognized': ['Number not recognised as a time',
-                             'Tallet blev ikke genkendt som en tid'],
-     'sureYouWannaClear?': ['The data can NOT be retrieved. Are you SURE you want to delete all data, including tasks on past days?',
-                            'Dataene kan IKKE genskabes. Er du SIKKER på at du vil slette alle data, inklusive opgaver i fortiden?'],
-     'reallySure?': ['All data and preferences will be cleared. \n\nThey can NOT be retrieved.\n\nAre you SURE you want to delete everything?\n\n',
-                     'Alle data og indstillinger vil blive slettet\n\nDe kan IKKE blive gendannet.\n\nEr du SIKKER på at du vil slette alt?\n\n'],
-     'nothingWasDeleted': ['Nothing was deleted.',
-                           'Intet blev slettet'],
-     'removeAllTasks?': ['Do you want to remove all tasks and start planning a new day?',
-                         'Vil du fjerne alle opgaver og starte planlægning af en ny dag?'],
-     'removeAllReminder': ['If you want to remove all tasks and settings go to Settings (Gear symbol in Day View)',
-                           'Hvis du vil fjerne alle opgaver og indstillinger, så gå til Indstillinger (Tandhjulssymbolet i Dagsvisning)'],
-      // Auto replace
-      'pause': ['pause', 'pause'],
-      'rest': ['rest', 'hvile'],
-      'break': ['take a break', 'slappe af'],
-      'relax': ['relax', 'afspænding'],
-      'meditate': ['meditate', 'meditere'],
-      'splatte': ['bliss out', 'splatte'],
+  'clearDataHeading': [['Clear data and preferences', ''],
+  ['Slet data og indstillinger', '']],
+  'clearAllData': [['Clear current day', ''],
+  ['Slet alle dagens opgaver', '']],
+  'clearEverything': [['Clear ALL data and preferences', ''],
+  ['Slet ALLE data og indstillinger', '']],
+  'updateAppHeading': [['Update App', ''],
+  ['Opdater App', '']],
+  'updateAppText': [['The newest version of this app is only fetched if the button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser will have it\'s own local storage and app version. Move tasks and settings via backups.', ''],
+  ['Den nyeste version af denne app hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser.\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup', '']],
+  'updateApp': [['Update app', 'The newest version is only fetched if this button is pushed.\nThere is no roll-back so maybe test the new version in another browser first.\nEach browser will have it\'s own local storage and app version. Move tasks and settings via backups.'],
+  ['Opdater app', 'Den nyeste version hentes kun hvis du trykker på knappen.\nDen gamle version kan ikke gendannes, så overvej at teste nye versioner først i en anden browser.\nHver browser har sin eget lokale lager og version af appen. Flyt opgaver og instillinger via backup']],
+  'gotoDayFromSettings1': [['Go back', ''],
+  ['Gå tilbage', '']],
+  // Messages
+  // 'dontUse': [['Please don\'t use ' , ' for task description'],  // Fossile code. May be needed, but most probably not
+  //             ['Undlad venligst at bruge ', 'til at beskrive opgaver']],
+  'format1h30m': ['Please use the format 1h30m\r\n for 1 hour and 30 minutes',
+    'Brug formatet 1h30m\r\n for 1 time og 30 minutter'],
+  'max23h': ['Durations longer than 23 hours is not possible',
+    'Varihed længere end 23 timer er ikke muligt'],
+  'format1200': ['Please use the format 12:00 or 1200',
+    'Brug formatet 12:00 eller 1200'],
+  'taskTextMsg': ['Please write a task text',
+    'Skriv en opgavetekst'],
+  'noPastDates': ['Past dates can not be assigned tasks',
+    'Datoer i fortiden kan ikke tildeles opgaver'],
+  'noDateHere': ['Can\'t jump to this date',
+    'Kan ikke hoppe til denne dato'],
+  'useDayView': ['Use Day-view for today\'s tasks',
+    'Brug dagsvisning for dagens opgaver'],
+  'considerBackup': ['Consider taking a backup\r\nIt is done in Settings (\u2699)',
+    'Overvej at tage en backup\r\nDet gøres i Indstillinger (\u2699)'],
+  'finishTaskFirst': ['Please finish the current edit \nbefore starting a new',
+    'Afslut redigeringen før du starter en ny opgave'],
+  'notADate': ['Not a date.\nPlease fix date or remove the back-slash',
+    'Det er ikke en dato.\nVær venlig at angive en rigtig dato eller fjern skråstregen'],
+  'addATask': ['Please add a task',
+    'Tilføj venligst en opgave'],
+  'removeUnchecked?': ['Do you want to remove all UNcheked tasks from this list?\n (The same tasks elsewhere is not affected)',
+    'Vil du fjerne alle opgaver UDEN flueben fra denne liste?\n (Dette påvirker ikke opgaverne andre steder)'],
+  'nothingChanged': ['Nothing was changed',
+    'Der skete ingen ændringer'],
+  'chooseABackup': ['Please choose a backup to restore first',
+    'Vælg venligst en backup der skal gendannes'],
+  'sureYouWannaRestore?': ['Are you sure you want to restore the backup?\nThe current tasks and settings will be overwritten.',
+    'Er du sikker på at du vil gendanne backuppen?\nDe nuværende opgaver og indstillinger vil blive overskrevet.'],
+  'nothingIsDiscarded': ['No task has been discarded yet.\nNothing was changed.',
+    'Ingen opgaver er blevet smidt ud endnu\nIntet er ændret'],
+  'changeLabel?': ['Change label of the stored task list?\n(Clicking OK will erase earlier content)',
+    'Vil du ændre navnet på den gemte dagsplan?\n(Tidligere indhold vil blive slettet hvis du klikker OK)'],
+  'onlyAlphaNumerics': ['Limit your charcters to letters and numbers, please.',
+    'Brug venligst kun bogstaver og tal'],
+  'listCleared': ['Stored list is cleared',
+    'Den gemte dagsplan er slettet'],
+  'listStoredIn': ['Current task list stored in ',
+    'Dagsplanen er gemt i '],
+  'restoreLast': ['Restore last discarded task list',
+    'Genskab den sidst forkastede dagsplan'],
+  'retrieveFrom': [['Retrieved list from the \"', '\" storage'],
+  ['dagsplann hentet fra lageret \"', '\"']],
+  'storeIsEmpty': ['This store is empty',
+    'Dette lager er tomt'],
+  'only0-1438': ['Use only numbers between 0 and 1438, please.',
+    'Brug venligst kun tal mellem 0 og 1438'],
+  'only0-59': ['Use only numbers between 0 and 59, please.',
+    'Brug venligst kun tal mellem  0 og 59'],
+  'only0-5': ['Use only numbers between 0 and 5, please',
+    'Brug venligst kun tal mellem 0 og 5'],
+  'formatReminder': ['The format should be \r\n1200 1h30m text OR\r\n1200 text OR\r\n text OR \r\n800 or 1230',
+    'Formatet bør være \r\n1200 1h30m tekst ELLER\r\n1200 tekst ELLER\r\n tekst ELLER \r\n800 eller 1230'],
+  'startWithFixed': ['\nPlease start planning with a fixed time \n\nEither press "Now" or add a task at\n6:00 by typing "600 15m planning"\n',
+    '\nStart dagen med en opgave med fast tid\n\nTryk enten på "Nu" knappen eller tilføj\n en opgave kl 6:00 ved \nat skrive "600 15m planlægning"'],
+  'notEnoughRoom': ['Not enough room. \nPlease clear some space',
+    'Der er ikke plads til en opgave\naf den længde her'],
+  'overlap': ['There is an overlap with another fixed time.\nPlease choose another time',
+    'Der er et overlap med en anden opgave med fast tid.\nVælg venligst en anden tid'],
+  'fixedTaskClicked': ['One of the clicked tasks is fixed. \nFixed task can not be swapped. \nPlease edit before swap.',
+    'En af de klikkede opgaver har fast tid\nOpgaver med fast tid kan ikke byttes rundt\nRet opgaven med fast tid før der byttes'],
+  'jumpedTo': ['Jumped to ',
+    'Sprang til '],
+  'numberNotRecognized': ['Number not recognised as a time',
+    'Tallet blev ikke genkendt som en tid'],
+  'sureYouWannaClear?': ['The data can NOT be retrieved. Are you SURE you want to delete all data, including tasks on past days?',
+    'Dataene kan IKKE genskabes. Er du SIKKER på at du vil slette alle data, inklusive opgaver i fortiden?'],
+  'reallySure?': ['All data and preferences will be cleared. \n\nThey can NOT be retrieved.\n\nAre you SURE you want to delete everything?\n\n',
+    'Alle data og indstillinger vil blive slettet\n\nDe kan IKKE blive gendannet.\n\nEr du SIKKER på at du vil slette alt?\n\n'],
+  'nothingWasDeleted': ['Nothing was deleted.',
+    'Intet blev slettet'],
+  'removeAllTasks?': ['Do you want to remove all tasks and start planning a new day?',
+    'Vil du fjerne alle opgaver og starte planlægning af en ny dag?'],
+  'removeAllReminder': ['If you want to remove all tasks and settings go to Settings (Gear symbol in Day View)',
+    'Hvis du vil fjerne alle opgaver og indstillinger, så gå til Indstillinger (Tandhjulssymbolet i Dagsvisning)'],
+  // Auto replace
+  'pause': ['pause', 'pause'],
+  'rest': ['rest', 'hvile'],
+  'break': ['take a break', 'slappe af'],
+  'relax': ['relax', 'afspænding'],
+  'meditate': ['meditate', 'meditere'],
+  'splatte': ['bliss out', 'splatte'],
 };
 
 
@@ -528,8 +528,8 @@ function setUpFunc() {
   }
 
   // Scale the window to current screen size on reload
-  document.getElementById('container').style.height = window.innerHeight - 110 +'px';
-  document.getElementById('monthContainer').style.height = window.innerHeight - 110 +'px';
+  document.getElementById('container').style.height = window.innerHeight - 110 + 'px';
+  document.getElementById('monthContainer').style.height = window.innerHeight - 110 + 'px';
   document.getElementById('dayInputBox').focus();
 }
 
@@ -635,7 +635,7 @@ function fixDatesInList(list) {
   let now = new Date();
   for (const [index, task] of list.entries()) {
     task.date = new Date(task.date);
-    if (!task.date) {debugger};
+    if (!task.date) { debugger };
     task.date.setDate(now.getDate());
     task.date.setMonth(now.getMonth());
     task.end = new Date(task.end);
@@ -829,7 +829,7 @@ function getDueRemindersFromLast3Months() {  // If the day in the list lies in t
   nowMinus3Month = new Date(nowMinus3Month.setMonth(nowMinus3Month.getMonth() - 3));
 
   for (let i = nowMinus3Month; i < now; i.setDate(i.getDate() + 1)) {
-    let myId = i.getDate().toString() + '-' + i.getMonth().toString()  + '-' + i.getFullYear().toString();
+    let myId = i.getDate().toString() + '-' + i.getMonth().toString() + '-' + i.getFullYear().toString();
 
     // Stuff the currently processed day into tasksSentToDay
     if (monthTaskList[myId]) {
@@ -865,7 +865,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
       tasks = tasksSentToMonth;
       tasksSentToMonth = [];
     } else if (0 < tasksFromClickedDayInMonth.length) {
-      tasks = tasksFromClickedDayInMonth ;
+      tasks = tasksFromClickedDayInMonth;
     } else {
       console.log('Nothing to show in ChooseBox');
     }
@@ -877,7 +877,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     tasksSentToDay = [];
 
     if (tasks.length != 0 || document.getElementById('dayChooseBox').classList.contains('active')) {
-      document.getElementById('sortTask').classList.toggle('tasksToSort',true); // Add the class tasksToSort due to 'true' flag
+      document.getElementById('sortTask').classList.toggle('tasksToSort', true); // Add the class tasksToSort due to 'true' flag
     } else {
       document.getElementById('sortTask').classList.remove('tasksToSort');
     }
@@ -1008,7 +1008,7 @@ function updateTimeMarker() {
   let min = now.getMinutes();
   let sec = now.getSeconds();
   // The height of the nowSpan is set to the percentage the passed time represents of the number of minutes in a day
-  let nowHeight = zoom * ((hours * 60 + min) * 100 ) / (24*60) + '%';
+  let nowHeight = zoom * ((hours * 60 + min) * 100) / (24 * 60) + '%';
   if (document.getElementById('nowSpan')) {
     nowSpanElement = document.getElementById('nowSpan');
     nowSpanElement.style.height = nowHeight;
@@ -1063,7 +1063,7 @@ function updateHearts() {
   let currentTask = taskList[0];
 
   // Find the current task and remove old hearts from the display
-  for (const [index,  task] of displayList.entries()) {
+  for (const [index, task] of displayList.entries()) {
     if (task.date < now && now < task.end) {
       // Remove old hearts from heart span
       const heartNode = document.getElementById('heart');
@@ -1077,7 +1077,7 @@ function updateHearts() {
   }
 
   let time = (now - currentTask.date) / 60000;
-  let result = currentTask.startStressLevel * Math.pow(2, time/(tDouble/currentTask.drain));
+  let result = currentTask.startStressLevel * Math.pow(2, time / (tDouble / currentTask.drain));
 
   fillHearths(Math.round(10 - result));
 }
@@ -1104,10 +1104,10 @@ function updateHearts() {
 window.addEventListener('hashchange', bindNavigation);
 
 document.getElementById('info').addEventListener('click', gotoInfo);
-document.getElementById('month').addEventListener('click', function () { location.hash = '#dayView_monthView'; pushHashChangeToStack(); });
+document.getElementById('month').addEventListener('click', function() { location.hash = '#dayView_monthView'; pushHashChangeToStack(); });
 
 // Unfold settings
-document.getElementById('gotoSettings').addEventListener('click', function () {location.hash = '#dayView_settingsView'; pushHashChangeToStack(); });
+document.getElementById('gotoSettings').addEventListener('click', function() { location.hash = '#dayView_settingsView'; pushHashChangeToStack(); });
 
 document.getElementById('postpone').addEventListener('click', postponeTask);
 
@@ -1128,7 +1128,7 @@ document.getElementById('upButton').addEventListener('click', function() {
 document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
 // Makes pressing Enter add task
-document.getElementById('dayInputBox').addEventListener('keypress', function () { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('keypress', function() { inputAtEnter(event); });
 // document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
@@ -1138,7 +1138,7 @@ document.getElementById('clearButton').addEventListener('click', clearTextboxOrD
 document.getElementById('zoom').addEventListener('click', zoomFunc);
 
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
-document.getElementById('taskDiv').addEventListener('click', function () { taskHasBeenClicked(event); }, true);
+document.getElementById('taskDiv').addEventListener('click', function() { taskHasBeenClicked(event); }, true);
 
 document.getElementById('toDoButton').addEventListener('click', toDoButtonClicked);
 
@@ -1147,36 +1147,42 @@ document.getElementById('toDoButton').addEventListener('click', toDoButtonClicke
 
 
 
-document.getElementById('addTaskButton').addEventListener('click', function () { location.hash = '#dayView_addView'; pushHashChangeToStack(); });
+document.getElementById('addTaskButton').addEventListener('click', function() { location.hash = '#dayView_addView'; pushHashChangeToStack(); });
 
 document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
 
 document.getElementById('inputBox_add').addEventListener('keypress',
-        function () { if (event.key === 'Enter') { readTaskText(); } });
+  function() { if (event.key === 'Enter') { readTaskText(); } });
 
 document.getElementById('inputDurationBox').addEventListener('focus',
-        function() {document.getElementById('inputDurationBox').select();} );
+  function() { document.getElementById('inputDurationBox').select(); });
 document.getElementById('inputTimeBox').addEventListener('focus',
-        function() {document.getElementById('inputTimeBox').value = '12:00';
-          document.getElementById('inputTimeBox').select();} );
+  function() {
+    document.getElementById('inputTimeBox').value = '12:00';
+    document.getElementById('inputTimeBox').select();
+  });
 
 document.getElementById('inputDurationBox').addEventListener('keypress',
-        function () { if (event.key === 'Enter') { readDurationTime(); } });
+  function() { if (event.key === 'Enter') { readDurationTime(); } });
 
 document.getElementById('inputTimeBox').addEventListener('focusout',
-        function () {readTaskStartTime(); fillTimeBox(taskTime_add);
-        document.getElementById('inputTimeBox').blur;} );
+  function() {
+    readTaskStartTime(); fillTimeBox(taskTime_add);
+    document.getElementById('inputTimeBox').blur;
+  });
 
 document.getElementById('inputDurationBox').addEventListener('focusout',
-        function () {readDurationTime(); fillDurationBox(taskDuration_add);
-        document.getElementById('inputTimeBox').blur;} );
+  function() {
+    readDurationTime(); fillDurationBox(taskDuration_add);
+    document.getElementById('inputTimeBox').blur;
+  });
 
-document.addEventListener('touchstart', function() {swipeNavigationStart(event);});
-document.addEventListener('touchend', function() {swipeNavigationEnd(event);});
+document.addEventListener('touchstart', function() { swipeNavigationStart(event); });
+document.addEventListener('touchend', function() { swipeNavigationEnd(event); });
 
-document.getElementById('duration').addEventListener('click', function () { addDuration(event);});
+document.getElementById('duration').addEventListener('click', function() { addDuration(event); });
 
-document.getElementById('time').addEventListener('click', function () { time_add(event);});
+document.getElementById('time').addEventListener('click', function() { time_add(event); });
 
 document.getElementById('clear').addEventListener('click', clearTimeBox);
 
@@ -1184,7 +1190,7 @@ document.getElementById('now').addEventListener('click', setTimeNow);
 
 document.getElementById('addInfo').addEventListener('click', gotoInfoStress);
 
-document.getElementById('cancel').addEventListener('click', function () { location.hash = '#addView_dayView'; pushHashChangeToStack(); });
+document.getElementById('cancel').addEventListener('click', function() { location.hash = '#addView_dayView'; pushHashChangeToStack(); });
 
 document.getElementById('applyAdd').addEventListener('click', apply);
 
@@ -1200,13 +1206,13 @@ document.getElementById('playButton').addEventListener('click', playButtonClicke
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('track').addEventListener('click', function () { location.hash = '#monthView_trackView'; pushHashChangeToStack(); });
+document.getElementById('track').addEventListener('click', function() { location.hash = '#monthView_trackView'; pushHashChangeToStack(); });
 
-document.getElementById('monthInputBox').addEventListener('keypress', function () { monthInputAtEnter(event); });
+document.getElementById('monthInputBox').addEventListener('keypress', function() { monthInputAtEnter(event); });
 
-document.getElementById('monthTaskDiv').addEventListener('click', function () { monthTaskHasBeenClicked(event); }, true);
+document.getElementById('monthTaskDiv').addEventListener('click', function() { monthTaskHasBeenClicked(event); }, true);
 
-document.getElementById('day').addEventListener('click', function () { location.hash = '#monthView_dayView'; pushHashChangeToStack(); });
+document.getElementById('day').addEventListener('click', function() { location.hash = '#monthView_dayView'; pushHashChangeToStack(); });
 
 document.getElementById('monthClearButton').addEventListener('click', monthClearBehavior);
 
@@ -1216,11 +1222,11 @@ document.getElementById('putBack').addEventListener('click', putBack);
 
 ////////////////// Eventlisteners for Month-view ///////////////////////
 
-document.getElementById('month1').addEventListener('click', function () { location.hash = '#trackView_monthView'; pushHashChangeToStack(); });
+document.getElementById('month1').addEventListener('click', function() { location.hash = '#trackView_monthView'; pushHashChangeToStack(); });
 
 ////////////////// Eventlisteners for Track-view ///////////////////////
 
-document.getElementById('colourPickerInputBox').addEventListener('focus', function () {
+document.getElementById('colourPickerInputBox').addEventListener('focus', function() {
   document.getElementById('colourButtons').hidden = false;
 });
 
@@ -1228,29 +1234,29 @@ document.getElementById('colourPickerInputBox').addEventListener('focus', functi
 //   document.getElementById('colourButtons').hidden = true;
 // });
 
-document.getElementById('colourButtons').addEventListener('click', function () { colourButtonClicked(event);});
+document.getElementById('colourButtons').addEventListener('click', function() { colourButtonClicked(event); });
 
 document.getElementById('selectAllOrNoneChkbox').addEventListener('click', selectAllOrNone);
 
-document.getElementById('taskPickerInputBox').addEventListener('keypress', function () { taskPickerEvent(event); });
+document.getElementById('taskPickerInputBox').addEventListener('keypress', function() { taskPickerEvent(event); });
 
-document.getElementById('colourPickerInputBox').addEventListener('keypress', function () { colourPickerEvent(event); });
+document.getElementById('colourPickerInputBox').addEventListener('keypress', function() { colourPickerEvent(event); });
 
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
 
 document.getElementById('showTimeSpentChkbox').addEventListener('click', showTimeSpent);
 
 document.getElementById('showTimeSpentFrom').addEventListener('keypress',
-          function () { if (event.key === 'Enter') { readShowTimeSpentFromAtEnter(); } });
+  function() { if (event.key === 'Enter') { readShowTimeSpentFromAtEnter(); } });
 document.getElementById('showTimeSpentFrom').addEventListener('input', readShowTimeSpentFrom);
 document.getElementById('showTimeSpentFrom').addEventListener('focus',
-          function () { document.getElementById('showTimeSpentFrom').select(); });
+  function() { document.getElementById('showTimeSpentFrom').select(); });
 
 document.getElementById('showTimeSpentTo').addEventListener('keypress',
-          function () { if (event.key === 'Enter') { readShowTimeSpentToAtEnter(); } });
+  function() { if (event.key === 'Enter') { readShowTimeSpentToAtEnter(); } });
 document.getElementById('showTimeSpentTo').addEventListener('input', readShowTimeSpentTo);
 document.getElementById('showTimeSpentTo').addEventListener('focus',
-          function () { document.getElementById('showTimeSpentTo').select(); });
+  function() { document.getElementById('showTimeSpentTo').select(); });
 
 document.getElementById('showTimeSpentLastMonth').addEventListener('click', showTimeSpentLastMonth);
 
@@ -1264,26 +1270,30 @@ document.getElementById('showTTChkbox').addEventListener('click', showOrHideTrac
 
 ////////////////// Eventlisteners for storage-view ///////////////////////
 
-document.getElementById('storage').addEventListener('click', function () { location.hash = '#dayView_storageView'; pushHashChangeToStack(); });
+document.getElementById('storage').addEventListener('click', function() { location.hash = '#dayView_storageView'; pushHashChangeToStack(); });
 
-document.getElementById('day1').addEventListener('click', function () { location.hash = '#storageView_dayView'; pushHashChangeToStack(); });
+document.getElementById('day1').addEventListener('click', function() { location.hash = '#storageView_dayView'; pushHashChangeToStack(); });
 
 document.getElementById('storeList').addEventListener('click', storeList);
 
-document.getElementById('stores').addEventListener('click', function () { storeHasBeenClicked(event); }, true);
+document.getElementById('stores').addEventListener('click', function() { storeHasBeenClicked(event); }, true);
 
 ////////////////// Eventlisteners for settings-view ///////////////////////
 
-document.getElementById('gotoDayFromSettings').addEventListener('click', function () { resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
-  location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
-document.getElementById('gotoDayFromSettings1').addEventListener('click', function () { resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
-  location.hash = '#settingsView_dayView'; pushHashChangeToStack(); });
+document.getElementById('gotoDayFromSettings').addEventListener('click', function() {
+  resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
+  location.hash = '#settingsView_dayView'; pushHashChangeToStack();
+});
+document.getElementById('gotoDayFromSettings1').addEventListener('click', function() {
+  resetBackupButtons();  // Tidy up if a backup is in progress, but is overridden by this button being pressed
+  location.hash = '#settingsView_dayView'; pushHashChangeToStack();
+});
 
 document.getElementById('eng').addEventListener('click',
-          function () { document.getElementById('en').checked = true; } );
+  function() { document.getElementById('en').checked = true; });
 
 document.getElementById('dan').addEventListener('click',
-          function () { document.getElementById('da').checked = true; } );
+  function() { document.getElementById('da').checked = true; });
 
 document.getElementById('apply0').addEventListener('click', applyLanguage);
 
@@ -1300,16 +1310,16 @@ document.getElementById('clearEverything').addEventListener('click', clearEveryt
 document.getElementById('updateApp').addEventListener('click', updateApp);
 
 document.getElementById('inputBoxM').addEventListener('focus',
-          function () { document.getElementById('inputBoxM').select(); });
+  function() { document.getElementById('inputBoxM').select(); });
 
 document.getElementById('inputBoxWakeUp').addEventListener('focus',
-          function () { document.getElementById('inputBoxWakeUp').select(); });
+  function() { document.getElementById('inputBoxWakeUp').select(); });
 
 document.getElementById('stressLevel').addEventListener('focus',
-          function () { document.getElementById('stressLevel').select(); });
+  function() { document.getElementById('stressLevel').select(); });
 
 document.getElementById('tDouble').addEventListener('focus',
-          function () { document.getElementById('tDouble').select(); });
+  function() { document.getElementById('tDouble').select(); });
 
 document.getElementById('backup').addEventListener('click', prepareStoreBackup);
 
@@ -1322,7 +1332,7 @@ document.getElementById('backupInputFixed').addEventListener('change', fixBackup
 document.getElementById('confirmBackup').addEventListener('click', confirmBackup);
 
 document.getElementById('backupInputFixed').addEventListener('focus',
-          function () { document.getElementById('backupInputFixed').select(); });
+  function() { document.getElementById('backupInputFixed').select(); });
 
 document.getElementById('restoreBackup').addEventListener('click', restoreBackup);
 
@@ -1587,7 +1597,7 @@ function readDurationTime() {
       timeH = Number(timeH.replace('h', ''));
     }
     taskDuration_add = timeH * 60 + timeM;
-    if (23*60 < taskDuration_add) {
+    if (23 * 60 < taskDuration_add) {
       displayMessage(languagePack['max23h'][language], 3000, 'add');
       taskDuration_add = 30;
       fillDurationBox(taskDuration_add);
@@ -1656,19 +1666,19 @@ function formatTask() {
 
   let prettyTaskTime = '';
   if (document.getElementById('inputTimeBox').value.trim() === '') {
-    returnText =  taskText_add + ' '
-    + taskDuration_add + 'm '
-    + drainGainLevel_add;
+    returnText = taskText_add + ' '
+      + taskDuration_add + 'm '
+      + drainGainLevel_add;
     return returnText;
   } else {
     prettyTaskTime = prettifyTime(taskTime_add);
     readDurationTime();
   }
 
-  returnText =  taskText_add + ' '
-  + prettyTaskTime.replace(':', '') + ' '
-  + taskDuration_add + 'm '
-  + drainGainLevel_add;
+  returnText = taskText_add + ' '
+    + prettyTaskTime.replace(':', '') + ' '
+    + taskDuration_add + 'm '
+    + drainGainLevel_add;
 
   return returnText;
 }
@@ -1730,11 +1740,11 @@ function displayClass(className, displayStatus) {  // displaystatus can be 'true
 
   if (displayStatus) {
     if (location.hash == '#dayView_monthView' || location.hash == '#storageView_dayView'
-    || location.hash == '#monthView_trackView'){
+      || location.hash == '#monthView_trackView') {
       id.style.transform = 'translate(-500px)';
       setTimeout(function() { id.style.transform = 'translate(0px)'; }, 20);
     } else if (location.hash == '#trackView_monthView' || location.hash == '#monthView_dayView'
-    || location.hash == '#dayView_storageView'){
+      || location.hash == '#dayView_storageView') {
       id.style.transform = 'translate(500px)';
       setTimeout(function() { id.style.transform = 'translate(0px)'; }, 20);
     } else if (location.hash == '#dayView_addView') {
@@ -1921,7 +1931,7 @@ function fillMonthDateBar() {
 
     let newNode = document.createElement('button');
 
-    let id = i.getDate().toString() + '-' + i.getMonth().toString()  + '-' + i.getFullYear().toString();
+    let id = i.getDate().toString() + '-' + i.getMonth().toString() + '-' + i.getFullYear().toString();
 
     newNode.setAttribute('id', id);
     newNode.setAttribute('class', 'isNotClicked');
@@ -1945,7 +1955,7 @@ function fillMonthDateBar() {
     if (i.getDate() < 10) {
       datePart.textContent = '\u00a0\u00a0'; // Adjust all dates to align right
     }
-    datePart.textContent += i.getDate() + '/' + (i.getMonth() + 1) +  '\u00a0\u00a0\u00a0';
+    datePart.textContent += i.getDate() + '/' + (i.getMonth() + 1) + '\u00a0\u00a0\u00a0';
     newNode.appendChild(datePart);
 
     toolTipSpan = document.createElement('span');
@@ -1967,7 +1977,7 @@ function monthTaskHasBeenClicked(event) {
   }
 
   let contentInputBox = document.getElementById('monthInputBox').value.trim();
-  let day =  document.getElementById(myId);
+  let day = document.getElementById(myId);
 
   if (day.classList.contains('pastDateButton') && contentInputBox != '') {
     displayMessage(languagePack['noPastDates'][language], 3000, 'month');
@@ -1982,7 +1992,7 @@ function monthTaskHasBeenClicked(event) {
     // Text in inputBox and no previous clicked date
     if (contentInputBox != '') {
       let now = new Date();
-      let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId) , 12, 00)
+      let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId), 12, 00)
 
       let task = new Task(clickedDate, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
       if (monthTaskList[myId]) {
@@ -2057,13 +2067,13 @@ function monthInputAtEnter(event) {
         dateArray = /\d+\/\d+/.exec(contentInputBox);
       }
 
-      if ( dateArray != null ) {
+      if (dateArray != null) {
         // Is it a legit date?
         let now = new Date();
         let month = (Number(/\/\d+/.exec(dateArray[0])[0].replace('\/', '')) - 1).toString();
         let dayOfMonth = (/\d+\//.exec(dateArray[0])[0].replace('\/', '')).toString();
         let year = '';
-        if (/ \d+\d+/.exec(dateArray[0])){
+        if (/ \d+\d+/.exec(dateArray[0])) {
           year = (/ \d+\d+/.exec(dateArray[0])).toString();
           year = year.trim();
         }
@@ -2071,50 +2081,50 @@ function monthInputAtEnter(event) {
           year = now.getFullYear();
         }
 
-        if ( dayOfMonth <= 31 && month <= 11 ) {
+        if (dayOfMonth <= 31 && month <= 11) {
 
-            let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
-            // Make myId from date
-            let myId = '';
+          let textInputBox = contentInputBox.replace(dateArray[0], '').trim();
+          // Make myId from date
+          let myId = '';
 
-            if (textInputBox != '' && year <= now.getFullYear() && (month < now.getMonth()
-                || (month == now.getMonth() && dayOfMonth < now.getDate()))) {
-                  displayMessage(languagePack['noPastDates'][language], 4000, 'month');
-                  return;
-            }
+          if (textInputBox != '' && year <= now.getFullYear() && (month < now.getMonth()
+            || (month == now.getMonth() && dayOfMonth < now.getDate()))) {
+            displayMessage(languagePack['noPastDates'][language], 4000, 'month');
+            return;
+          }
 
-            if (year != '' && now.getFullYear() <= year) {
-              myId = dayOfMonth + '-' + month + '-' + year;
-            }  else {
-              if (dayOfMonth <= now.getDate() && month <= now.getMonth()) {
-                displayMessage(languagePack['noPastDates'][language], 4000, 'month');
-                return;
-              }
-              myId = dayOfMonth + '-' + month + '-' + now.getFullYear();
-            }
-
-            if (textInputBox === '') {
-              jumpToDate(myId);
+          if (year != '' && now.getFullYear() <= year) {
+            myId = dayOfMonth + '-' + month + '-' + year;
+          } else {
+            if (dayOfMonth <= now.getDate() && month <= now.getMonth()) {
+              displayMessage(languagePack['noPastDates'][language], 4000, 'month');
               return;
-            } else {
-              // Insert a new task at the provided date
-              let now = new Date();
-              let taskStart = new Date(now.getFullYear(), month, dayOfMonth, 12, 0);
-              let task = new Task(taskStart, 15 * 60000, textInputBox[0].toUpperCase() + textInputBox.slice(1), 1);
-
-              if (monthTaskList[myId]) {
-                monthTaskList[myId].push(task);
-              } else {
-                monthTaskList[myId] = [task];
-              }
             }
+            myId = dayOfMonth + '-' + month + '-' + now.getFullYear();
+          }
+
+          if (textInputBox === '') {
+            jumpToDate(myId);
+            return;
+          } else {
+            // Insert a new task at the provided date
+            let now = new Date();
+            let taskStart = new Date(now.getFullYear(), month, dayOfMonth, 12, 0);
+            let task = new Task(taskStart, 15 * 60000, textInputBox[0].toUpperCase() + textInputBox.slice(1), 1);
+
+            if (monthTaskList[myId]) {
+              monthTaskList[myId].push(task);
+            } else {
+              monthTaskList[myId] = [task];
+            }
+          }
 
         } else {
           displayMessage(languagePack['notADate'][language], 4000, 'month');
           return;
         }
 
-      // If no date is included make a new task tomorrow
+        // If no date is included make a new task tomorrow
       } else {
         let now = new Date();
         let nowPlusOneDay = new Date();
@@ -2192,13 +2202,13 @@ function monthRenderTasks() {
       taskDuration = parsedTxt[1];
 
       if (parsedTxt[0] != '') {
-      // if (parsedTxt[0] != '' && Object.keys(trackTaskList).length != 0) {
+        // if (parsedTxt[0] != '' && Object.keys(trackTaskList).length != 0) {
         taskDate = parsedTxt[0];
         nowTime = new Date(taskDate.getTime());
         if (0 < n) {
           gradient += ', white ' + ' ' + Number(endPercent + 0.3) + '%, white ' + ' '
-          + Number( parseInt((taskDate.getHours() * 60
-          + taskDate.getMinutes()) / (24 * 60) * 100) - 0.3)  + '%';
+            + Number(parseInt((taskDate.getHours() * 60
+              + taskDate.getMinutes()) / (24 * 60) * 100) - 0.3) + '%';
         } else if (n == 0) {
 
           let key = parseText(tasks[0])[2].replace(/ /g, '_');
@@ -2208,7 +2218,7 @@ function monthRenderTasks() {
           startPercent = parseInt((taskDate.getHours() * 60 + taskDate.getMinutes()) / (24 * 60) * 100);
           endPercent = parseInt(startPercent + (taskDuration / 60000) / (24 * 60) * 100);
 
-          gradient +=  startPercent + '% ' ;
+          gradient += startPercent + '% ';
         }
       } else {
         taskDate = nowTime;
@@ -2243,8 +2253,8 @@ function monthRenderTasks() {
 
       // Add to gradient and pad with black
       gradient += ', black ' + Number(startPercent - 0.2) + '%, ' + taskColour + ' ' + startPercent
-      + '%, ' + taskColour + ' ' + Number(endPercent - 0.6)  + '%, '
-      + 'black ' + Number(endPercent - 0.3)  + '%';
+        + '%, ' + taskColour + ' ' + Number(endPercent - 0.6) + '%, '
+        + 'black ' + Number(endPercent - 0.3) + '%';
 
       taskColour = 'white';
     }
@@ -2292,7 +2302,7 @@ function monthRenderTasks() {
       if (tasks != '') {
         for (var task of tasks) {
           children[1].innerHTML += ' \u25CF ' + task.text + '&nbsp;' + '<br>'; // Write to tooltip
-          children[2].textContent +=  ' \u25CF ' + task.text + '\u00a0'; // Write task to date
+          children[2].textContent += ' \u25CF ' + task.text + '\u00a0'; // Write task to date
         }
       }
     }
@@ -2303,9 +2313,9 @@ function monthRenderTasks() {
   monthContainer.scrollTop = scrollTop;
 
   let now = new Date();
-  if (now.getDate() == 5 && backupMessageShown == 0){
-     displayMessage(languagePack['considerBackup'][language], 3000, 'month');
-     backupMessageShown = 1;
+  if (now.getDate() == 5 && backupMessageShown == 0) {
+    displayMessage(languagePack['considerBackup'][language], 3000, 'month');
+    backupMessageShown = 1;
   } else if (now.getDate() != 5) {
     backupMessageShown = 0;
   }
@@ -2444,7 +2454,7 @@ function addTrackedTask(buttonColour) {
       let tryAgain = false;
       do {
         tryAgain = false;
-        chosenColour = colours[Math.floor(Math.random()*40)];
+        chosenColour = colours[Math.floor(Math.random() * 40)];
         for (var key in trackTaskList) {
           if (trackTaskList[key][0] === chosenColour) {
             tryAgain = true;
@@ -2753,7 +2763,7 @@ function showTrackedTask(item, doShowTimeSpent) {  // Opacity is 1 for tracked i
 
   document.getElementById('trackedItemsDiv').appendChild(trackedItem);
 
-  document.getElementById(item).addEventListener('click', function () { trackCheckboxClicked(event); });
+  document.getElementById(item).addEventListener('click', function() { trackCheckboxClicked(event); });
 }
 
 
@@ -2775,7 +2785,7 @@ function howMuchTimeSpent(item) {
     }
   }
 
-  timeSpent = (timeSpentInMilliSec/3600000).toFixed(1) + ' h';
+  timeSpent = (timeSpentInMilliSec / 3600000).toFixed(1) + ' h';
 
   return timeSpent;
 }
@@ -2805,7 +2815,7 @@ function gotoStorageFromDay() {
 
   let storages = document.getElementsByClassName('store');
 
-  for (var index in storages){
+  for (var index in storages) {
     if (language === 0) {  // Value 0:English 1:Danish
       storages[index].innerText = weekDays[index];
     } else if (language === 1) {
@@ -2842,10 +2852,10 @@ function storeHasBeenClicked(event) {
   if (id != '') {
     let clickedButton = document.getElementById(id);
     if (id === 'trashBin') {
-    // Restore stuff from trashBin
+      // Restore stuff from trashBin
       if (storageList['trashBin']) {
         let trash = deepCopyFunc(storageList['trashBin'][0]);  // Retrieve content of trashBin
-        if (2<taskList.length) {
+        if (2 < taskList.length) {
           storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]];   // Put current taskList into the trashBin
         }
         // taskList = fixDatesInList(trash);  // Restore trash as taskList
@@ -2857,8 +2867,8 @@ function storeHasBeenClicked(event) {
       } else {
         displayMessage(languagePack['nothingIsDiscarded'][language], 3000, 'storage');
       }
-    // If a store is clicked...
-    // Store current day if clicked store not in use
+      // If a store is clicked...
+      // Store current day if clicked store not in use
     } else if (clickedButton.classList.contains('highLighted')) {
       if (clickedButton.classList.contains('notInUse')) {
         clickedButton.classList.remove('notInUse');
@@ -2871,7 +2881,7 @@ function storeHasBeenClicked(event) {
         storageList[id] = [deepCopyFunc(taskList), clickedButton.innerText];
       }
       else if (/^[^'!"#$%&\\'()\*+,\-\.\/:;<=>?@\[\\\]\^_`{|}~']+$/.exec(text)) { // Sanitize input: only alpha numericals
-        text = text.slice(0, 1).toUpperCase() + text.slice(1, );
+        text = text.slice(0, 1).toUpperCase() + text.slice(1);
         clickedButton.innerText = text;
         storageList[id] = [deepCopyFunc(taskList), text];
       } else if (text != '') {
@@ -2893,7 +2903,7 @@ function storeHasBeenClicked(event) {
       } else {
         displayMessage(languagePack['listStoredIn'][language] + clickedButton.innerText, 3000, 'storage');
       }
-      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2000);
+      setTimeout(function() { location.hash = '#storageView_dayView'; pushHashChangeToStack(); }, 2000);
 
       // ... else get stuff
     } else if (clickedButton.classList.contains('inUse')) {
@@ -2904,7 +2914,7 @@ function storeHasBeenClicked(event) {
 
       document.getElementById('trashBin').classList.add('inUse');
       document.getElementById('trashBin').classList.remove('notInUse');
-      setTimeout(function() {location.hash = '#storageView_dayView'; pushHashChangeToStack();}, 2000); // timeout necessary for displayMessage to finish
+      setTimeout(function() { location.hash = '#storageView_dayView'; pushHashChangeToStack(); }, 2000); // timeout necessary for displayMessage to finish
       displayMessage(languagePack['retrieveFrom'][language][0] + clickedButton.innerText + languagePack['retrieveFrom'][language][1], 3000, 'day');
     } else {
       displayMessage(languagePack['storeIsEmpty'][language], 3000, 'storage');
@@ -2982,20 +2992,20 @@ function setUpSettings() {
   }
 
   // if (localStorage.ticInterval) {
-    //   document.getElementById('inputBoxX').value = localStorage.ticInterval;
-    // }
-    // if (localStorage.radioButtonResultAlarm) {
-      //   document.getElementById(localStorage.radioButtonResultAlarm).checked = 'checked';
-      // }
-      // if (localStorage.radioButtonResultReminder) {
-        //   document.getElementById(localStorage.radioButtonResultReminder).checked = 'checked';
-        // }
+  //   document.getElementById('inputBoxX').value = localStorage.ticInterval;
+  // }
+  // if (localStorage.radioButtonResultAlarm) {
+  //   document.getElementById(localStorage.radioButtonResultAlarm).checked = 'checked';
+  // }
+  // if (localStorage.radioButtonResultReminder) {
+  //   document.getElementById(localStorage.radioButtonResultReminder).checked = 'checked';
+  // }
 }
 
 
 function applyLanguage() {
   radioButtonResult0 = document.getElementsByClassName('language');
-  for (var i=0; i<2; i++) {
+  for (var i = 0; i < 2; i++) {
     if (radioButtonResult0[i].type === 'radio' && radioButtonResult0[i].checked) {
       language = Number(radioButtonResult0[i].value);  // Value 0:English 1:Danish
       localStorage.language = language;
@@ -3014,7 +3024,7 @@ function applyTaskDuration() {
 
   let min = document.getElementById('inputBoxM').value.trim();
 
-  if (isNaN(min) || min < 0 || 24*60 - 2 < min) {
+  if (isNaN(min) || min < 0 || 24 * 60 - 2 < min) {
     displayMessage(languagePack['only0-1438'][language], 3000, 'settings');
     document.getElementById('inputBoxM').select();
     return;
@@ -3091,7 +3101,7 @@ function applyStressModel() {
 
   // Set tDouble
   let min = document.getElementById('tDouble').value.trim();
-  if (isNaN(min) || min < 0 || 24*60 < min) {
+  if (isNaN(min) || min < 0 || 24 * 60 < min) {
     displayMessage(languagePack['only0-1438'][language], 3000, 'settings');
     document.getElementById('stressLevel').select();
     return;
@@ -3197,7 +3207,7 @@ function readFile(event) {
 
   let reader = new FileReader();
   reader.onload = function(event) {
-    pastDayListBackUp =  JSON.parse(event.target.result);
+    pastDayListBackUp = JSON.parse(event.target.result);
   }
 
   fixDatesInList(taskList); // Ensure that the taskList tasks is at the current date.
@@ -3259,7 +3269,7 @@ function updateApp() {
   caches.delete('FP-cache');
 
   // Remove the current serviceworker
-  navigator.serviceWorker.getRegistrations().then( function(registrations) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
     for (var registration of registrations) {
       registration.unregister();
     }
@@ -3298,7 +3308,7 @@ function swipeNavigationEnd(event) {
   let posDiff = event.changedTouches[0].screenX - sessionStorage.touchX;
 
   if (posDiff < 0 && 100 < Math.abs(posDiff)) { // Left swipe
-    console.log('Left swipe?', posDiff  ) //, event.touches[0].screenX);
+    console.log('Left swipe?', posDiff) //, event.touches[0].screenX);
     if (location.hash == '#monthView_trackView') {
       location.hash = '#trackView_monthView';
       pushHashChangeToStack();
@@ -3335,7 +3345,7 @@ function swipeNavigationEnd(event) {
   }
 }
 
-function  fillHearths(currentStressLevel) {
+function fillHearths(currentStressLevel) {
   const heartSpan = document.getElementById('heart');
 
   let max = currentStressLevel;
@@ -3348,20 +3358,20 @@ function  fillHearths(currentStressLevel) {
 
   for (var i = 0; i < max; i++) {
     let newHeart = document.createElement('img');
-    newHeart.src="200px-A_SVG_semicircle_heart.svg.png";
+    newHeart.src = "200px-A_SVG_semicircle_heart.svg.png";
     newHeart.style.width = '14px';
     newHeart.style.height = '14px';
-    newHeart.alt="heart symbol";
+    newHeart.alt = "heart symbol";
 
     heartSpan.appendChild(newHeart);
   }
 
   for (var i = 0; i < 10 - max; i++) {
     let newHalfHeart = document.createElement('img');
-    newHalfHeart.src="200px-A_SVG_semicircle_heart_empty.svg.png";
+    newHalfHeart.src = "200px-A_SVG_semicircle_heart_empty.svg.png";
     newHalfHeart.style.width = '14px';
     newHalfHeart.style.height = '14px';
-    newHalfHeart.alt="empty heart symbol";
+    newHalfHeart.alt = "empty heart symbol";
 
     heartSpan.appendChild(newHalfHeart);
   }
@@ -3376,13 +3386,13 @@ function gotoInfo() {
   }
 }
 
- function gotoInfoStress() {
-   if (language === 0) {  // Value 0:English 1:Danish {
-     goToPage('instructions.html#stressModel');
-   } else if (language === 1) {
-     goToPage('instructions_dk.html#stressModel');
-   }
- }
+function gotoInfoStress() {
+  if (language === 0) {  // Value 0:English 1:Danish {
+    goToPage('instructions.html#stressModel');
+  } else if (language === 1) {
+    goToPage('instructions_dk.html#stressModel');
+  }
+}
 
 function goToPage(page) {
   storeLocally();
@@ -3404,8 +3414,8 @@ function wakeUpButton() {
       console.log('wakeUpButton failed to insert a task');
     }
   }
-  document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
-  document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
+  document.getElementById('nowButton').removeEventListener('click', nowButton, { once: true });
+  document.getElementById('upButton').removeEventListener('click', wakeUpButton, { once: true });
   wakeUpOrNowClickedOnce = true;
   adjustNowAndWakeUpButtons();
 }
@@ -3417,8 +3427,8 @@ function nowButton() {
     let task = new Task(new Date(), 15 * 60000, languagePack['planning'][0][language], 1);
     addFixedTask(task);
   }
-  document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
-  document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true});
+  document.getElementById('nowButton').removeEventListener('click', nowButton, { once: true });
+  document.getElementById('upButton').removeEventListener('click', wakeUpButton, { once: true });
   wakeUpOrNowClickedOnce = true;
   adjustNowAndWakeUpButtons();
 }
@@ -3437,14 +3447,14 @@ function adjustNowAndWakeUpButtons() {
   }
 
   if (!wakeUpOrNowClickedOnce) {
-    upBtn.title=  languagePack['upButtonRegular'][language][1] + wakeUpH + ':' + min;
-    upBtn.textContent = wakeUpH + ':' + min + languagePack['upButtonRegular'][language][0] ; //' \u25BE';  // Black down-pointing small triangle
+    upBtn.title = languagePack['upButtonRegular'][language][1] + wakeUpH + ':' + min;
+    upBtn.textContent = wakeUpH + ':' + min + languagePack['upButtonRegular'][language][0]; //' \u25BE';  // Black down-pointing small triangle
 
     nowBtn.title = languagePack['nowButton'][language][1]; // 'Click to insert a 15 min planning period at current time';
     nowBtn.textContent = languagePack['nowButton'][language][0]; // 'Now' + ' \u25BE';  // Black down-pointing small triangle
 
-    document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-    document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
+    document.getElementById('upButton').addEventListener('click', wakeUpButton, { once: true });
+    document.getElementById('nowButton').addEventListener('click', nowButton, { once: true });
     document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
   } else {
     upBtn.title = languagePack['upButtonJump'][language][1] + wakeUpH + ':' + min;  // 'Jumpt to'
@@ -3464,7 +3474,7 @@ function inputAtEnter(event) {
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('dayInputBox').value.trim();
     // If text or emojis and no chosenTaskId
-    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, æ, ø, ǻ]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, æ, ø, ǻ]/.exec(contentInputBox) != null || /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       handleTaskInput(contentInputBox);
     } else { // Just numbers
       if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') {
@@ -3510,8 +3520,8 @@ function handleTaskInput(contentInputBox) {
       document.getElementById('dayInputBox').value = contentInputBox;
     }
     wakeUpOrNowClickedOnce = true; // Inserting a fixed task remove the need to use upButton or nowButton to insert the first task
-    document.getElementById('upButton').removeEventListener('click', wakeUpButton, {once:true}); // Remove eventlisteners sat by setUp via adjuistNowAndWakeUpButtons()
-    document.getElementById('nowButton').removeEventListener('click', nowButton, {once:true});
+    document.getElementById('upButton').removeEventListener('click', wakeUpButton, { once: true }); // Remove eventlisteners sat by setUp via adjuistNowAndWakeUpButtons()
+    document.getElementById('nowButton').removeEventListener('click', nowButton, { once: true });
     renderTasks();
     jumpTo(uniqueIdOfLastTouched)
   }
@@ -3538,7 +3548,7 @@ function addTask(myId, task) {
 function addWhereverAfter(uniqueId, task) {
   let succes = false;
   let myId = getIndexFromUniqueId(uniqueId);
-  for (var id=myId; id<taskList.length - 1; id++) {
+  for (var id = myId; id < taskList.length - 1; id++) {
     succes = addTaskAfter(taskList[id].uniqueId, task);
     if (succes) {
       looseInputBoxFocus('day');
@@ -3613,15 +3623,15 @@ function addFixedTask(task) {
       }
     }
   } else if (overlap === 'noOverlap') {
-    for (var n=0; n<len; n++) {
+    for (var n = 0; n < len; n++) {
       if (task.end < taskList[n].date) {
         taskList.splice(n, 0, task);
         task.fuzzyness = 'isNotFuzzy';
         uniqueIdOfLastTouched = task.uniqueId;
         succes = true;
         break;
-        }
       }
+    }
   }
 
   if (!succes) {
@@ -3635,20 +3645,20 @@ function isThereASoftOverlap(task) {
   let overlap = '';
   let len = taskList.length;
 
-  for (var n=0; n<len; n++) {
+  for (var n = 0; n < len; n++) {
     if ((taskList[n].date <= task.date && task.date <= taskList[n].end) // If task start is in anoter task
       || (taskList[n].date <= task.end && task.end <= taskList[n].end) // Or if task end is
       || (task.date <= taskList[n].date && taskList[n].end <= task.end)) { // Or if the new task straddle an old task
-        if (taskList[n].fuzzyness === 'isNotFuzzy') {
-          overlap = 'hardOverlap';
-          return overlap;
-        } else {
-          overlap = 'softOverlap';
-        }
-      }
-      if (n === len - 1 && overlap === 'softOverlap') {
+      if (taskList[n].fuzzyness === 'isNotFuzzy') {
+        overlap = 'hardOverlap';
         return overlap;
+      } else {
+        overlap = 'softOverlap';
       }
+    }
+    if (n === len - 1 && overlap === 'softOverlap') {
+      return overlap;
+    }
   }
 
   overlap = 'noOverlap';
@@ -3660,9 +3670,9 @@ function removeFuzzyOverlap(task) {
   let overlappingTasks = [];
   let len = taskList.length;
   // debugger;
-  for (var n=1; n<len - 1; n++) {
+  for (var n = 1; n < len - 1; n++) {
     if ((taskList[n].date <= task.date && task.date < taskList[n].end)
-    || (taskList[n].date < task.end && task.end <= taskList[n].end)) {
+      || (taskList[n].date < task.end && task.end <= taskList[n].end)) {
       if (taskList[n].fuzzyness === 'isNotFuzzy') {
         console.log('Bugger. Logic broke.', taskList[n]);
       };
@@ -3682,7 +3692,7 @@ function removeFuzzyOverlap(task) {
 
 // Used by an eventListener. Govern the Edit/Clear button
 function clearTextboxOrDay() {
-  if (document.getElementById('dayInputBox').value != '' ) {
+  if (document.getElementById('dayInputBox').value != '') {
     fixClearButtonArrow();
   } else { // Clean all tasks from day-view
     let answer = confirm(languagePack['removeAllTasks?'][language]);
@@ -3717,7 +3727,7 @@ function fixClearButtonArrow() {
 
 function clearDay() {
   // Move current taskList to trashBin
-  if (2<taskList.length) {
+  if (2 < taskList.length) {
     storageList['trashBin'] = [deepCopyFunc(taskList), languagePack['restoreLast'][language]];
   }
   document.getElementById('trashBin').classList.add('inUse');
@@ -3733,8 +3743,8 @@ function clearDay() {
   resetInputBox('day');
   wakeUpOrNowClickedOnce = false;
   localStorage.indexOfLastTouched = 0;
-  document.getElementById('upButton').addEventListener('click', wakeUpButton, {once:true});
-  document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
+  document.getElementById('upButton').addEventListener('click', wakeUpButton, { once: true });
+  document.getElementById('nowButton').addEventListener('click', nowButton, { once: true });
   storeLocally();
   adjustNowAndWakeUpButtons();
   setUpFunc();
@@ -3760,7 +3770,7 @@ function resetViews() {
 function renderLanguage() {
   let buttons = document.getElementsByClassName('controlButton');
 
-  for (var index in buttons){
+  for (var index in buttons) {
     let id = buttons[index].id;
     if (languagePack[id]) {
       buttons[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
@@ -3771,7 +3781,7 @@ function renderLanguage() {
 
   let inputBoxes = document.getElementsByClassName('inputBox');
 
-  for (var index in inputBoxes){
+  for (var index in inputBoxes) {
     let id = inputBoxes[index].id;
     if (languagePack[id]) {
       inputBoxes[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
@@ -3782,7 +3792,7 @@ function renderLanguage() {
 
   let texts = document.getElementsByClassName('text');
 
-  for (var index in texts){
+  for (var index in texts) {
     let id = texts[index].id;
     if (languagePack[id]) {
       texts[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
@@ -3793,7 +3803,7 @@ function renderLanguage() {
 
   let labelTexts = document.getElementsByClassName('labelText');
 
-  for (var index in labelTexts){
+  for (var index in labelTexts) {
     let id = labelTexts[index].id;
     if (languagePack[id]) {
       labelTexts[index].textContent = languagePack[id][language][0];  // languagePack:  {'id': ['text', 'title']}
@@ -3860,17 +3870,17 @@ function createDisplayList(sourceList) {
   sourceList[0].stressGradient = currentStressLevel;
 
   let len = sourceList.length;
-  for (var n=1; n<len; n++) {
+  for (var n = 1; n < len; n++) {
     let duration = sourceList[n].date.getTime() - (sourceList[n - 1].date.getTime() + sourceList[n - 1].duration);
     // }
     if (duration > 0) { // Create a nullTime task if there is a timegab between tasks
-      let nullTime = new Task(sourceList[n-1].end, duration, '', -1);
-      nullTime.uniqueId = sourceList[n-1].uniqueId + 'n';
+      let nullTime = new Task(sourceList[n - 1].end, duration, '', -1);
+      nullTime.uniqueId = sourceList[n - 1].uniqueId + 'n';
       nullTime.fuzzyness = 'isNullTime';
       nullTime.startStressLevel = currentStressLevel;
       // nullTime.drain = -1;
       if (n === 1) {
-        let colour = 'hsl(255, 100%, ' + (100 - Math.floor(currentStressLevel*10)).toString() + '%)';
+        let colour = 'hsl(255, 100%, ' + (100 - Math.floor(currentStressLevel * 10)).toString() + '%)';
         nullTime.stressGradient = [colour, colour];
       } else {
         let result = getStress(nullTime);
@@ -3899,7 +3909,7 @@ function getStress(task) {
   let durationM = Math.floor(task.duration / 60000);
   let stress = 0;
   for (var i = 0; i < durationM; i += 5) {
-    stress = currentStressLevel * Math.pow(2, i/(tDouble/(task.drain * 2))); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
+    stress = currentStressLevel * Math.pow(2, i / (tDouble / (task.drain * 2))); // The stress doubles after the time tDouble (in minutes) - or fall if drain is negative
     colourBit = 'hsl(255, 100%, ' + (100 - Math.floor(stress * 10)).toString() + '%)';
     gradient.push(colourBit);
   }
@@ -3916,7 +3926,7 @@ function displayMessage(text, displayTime, view) {  // displayTime in millisecon
   msg.textContent = text;
 
   // Add an eventListener to stop annoying messages by clicking anywhere
-  setTimeout(function() {document.addEventListener('click', stopTimeout);}, 500);  // A short timeout is necessary in order to not fire immediately
+  setTimeout(function() { document.addEventListener('click', stopTimeout); }, 500);  // A short timeout is necessary in order to not fire immediately
 
   msgTimeOutID = setTimeout(function() {
     msg.style.display = 'none';
@@ -3944,7 +3954,7 @@ function taskHasBeenClicked(event) {
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null ||  /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z]/.exec(contentInputBox) != null || /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       anneal();
@@ -3976,7 +3986,7 @@ function taskHasBeenClicked(event) {
     nullifyClick();
     console.log('Text in inputbox and a chosenTaskId. Should not happen.');
 
-  }  else if (contentInputBox == '' && !chosenTaskId) {
+  } else if (contentInputBox == '' && !chosenTaskId) {
     // No text in inputBox and no chosenTaskId: Getting ready to edit or delete
     chosenTask = document.getElementById(myUniqueId);
     let myId = getIndexFromUniqueId(myUniqueId);
@@ -3985,7 +3995,7 @@ function taskHasBeenClicked(event) {
     uniqueIdOfLastTouched = chosenTaskId;
 
     if ((nullTimeClicked && document.activeElement.id == 'dayInputBox')
-    || (!nullTimeClicked && document.activeElement.id != 'dayInputBox')) {
+      || (!nullTimeClicked && document.activeElement.id != 'dayInputBox')) {
       document.getElementById('dayInputBox').blur();
     } else {
       document.getElementById('dayInputBox').focus();
@@ -4036,22 +4046,22 @@ function getIndexFromUniqueId(uniqueId) {
 
 
 function swapTasks(myId) {
-    let id1 = getIndexFromUniqueId(chosenTaskId);
-    let id2 = getIndexFromUniqueId(myId);
-    taskList[id1].isClicked = 'isNotClicked';
-    taskList[id2].isClicked = 'isNotClicked';
-    taskList[id1].date = '';
-    taskList[id2].date = '';
-    [taskList[id2], taskList[id1]] = [taskList[id1], taskList[id2]];
-    anneal();
-    uniqueIdOfLastTouched = taskList[id1].uniqueId;
+  let id1 = getIndexFromUniqueId(chosenTaskId);
+  let id2 = getIndexFromUniqueId(myId);
+  taskList[id1].isClicked = 'isNotClicked';
+  taskList[id2].isClicked = 'isNotClicked';
+  taskList[id1].date = '';
+  taskList[id2].date = '';
+  [taskList[id2], taskList[id1]] = [taskList[id1], taskList[id2]];
+  anneal();
+  uniqueIdOfLastTouched = taskList[id1].uniqueId;
 }
 
 
 function anneal() {
   fixTimes();
   let len = taskList.length;
-  for (var n=1; n<len - 1; n++) {
+  for (var n = 1; n < len - 1; n++) {
     if (taskList[n + 1].date < taskList[n].end) {
       [taskList[n], taskList[n + 1]] = [taskList[n + 1], taskList[n]];
       fixTimes();
@@ -4078,7 +4088,7 @@ function fixOverspillingTasks() {
 
   if (taskList[len - 1].text != 'Day end') {
     let dayEndPos = 1;
-    for (var n=1; n<len - 1; n++) {
+    for (var n = 1; n < len - 1; n++) {
       if (taskList[n].text == 'Day end') {
         dayEndPos = n;
         break;
@@ -4087,12 +4097,12 @@ function fixOverspillingTasks() {
 
     tasksSentToDay.push('dummy'); // Ugly hack to prevent handleChooseBox in taskHasBeenClicked eating relevant tasks
 
-    for (var m=dayEndPos + 1; m<len; m++) {
+    for (var m = dayEndPos + 1; m < len; m++) {
       tasksSentToDay.push(taskList[m]);
       overspill = true;
     }
 
-    for (var m=dayEndPos + 1; m<len; m++) {
+    for (var m = dayEndPos + 1; m < len; m++) {
       taskList.pop();
     }
     fixOverspillingTasks();
@@ -4113,7 +4123,7 @@ function fixOverspillingTasks() {
 
 function fixTimes() {
   let len = taskList.length;
-  for (var n=1; n<len - 1; n++) {
+  for (var n = 1; n < len - 1; n++) {
     if (taskList[n].end <= taskList[n + 1].date) {
       continue;
     } else if (taskList[n + 1].fuzzyness === 'isFuzzy') {
@@ -4219,7 +4229,7 @@ function clearOldTasksEtc() {
 
 
 function jumpTo(index) {
-  if (document.getElementById('container') !== null  && taskList.length > 0) {
+  if (document.getElementById('container') !== null && taskList.length > 0) {
     container = document.getElementById('container');
     container.scrollTop = document.getElementById(index).offsetTop - 180 * zoom;
     // document.getElementById('dayInputBox').focus();
@@ -4249,7 +4259,7 @@ function jumpToTime(time, showMessage) {
     min = '30';
     time = hours + min;
   }
-  if (document.getElementById('container') !== null  && taskList.length > 0) {
+  if (document.getElementById('container') !== null && taskList.length > 0) {
     container = document.getElementById('container');
     timeDiv = document.getElementById(time);  // time in the format of a string ex: '700'
     if (timeDiv) {
@@ -4334,7 +4344,7 @@ function taskListExtractor() {  // Make a list of strings that can generate the 
       if (hours > 0 && minutes > 0) {
         text = hours + 'h' + minutes + 'm ' + task.text;
       } else if (hours > 0) {
-        text = hours + 'h '  + task.text;
+        text = hours + 'h ' + task.text;
       } else {
         text = minutes + 'm ' + task.text;
       }
@@ -4446,16 +4456,16 @@ function parseText(rawText) {
   };
 
   if (drain == 1) {
-    if (rawText.toLowerCase().includes(languagePack['pause'][language])) {drain = '-1'}; // gain is negative drain..
-    if (rawText.toLowerCase().includes(languagePack['rest'][language])) {drain = '-3'};
-    if (rawText.toLowerCase().includes(languagePack['break'][language])) {drain = '-3'};
-    if (rawText.toLowerCase().includes(languagePack['relax'][language])) {drain = '-5'};
-    if (rawText.toLowerCase().includes(languagePack['meditate'][language])) {drain = '-5'};
-    if (rawText.toLowerCase().includes(languagePack['splatte'][language])) {drain = '-5'};
+    if (rawText.toLowerCase().includes(languagePack['pause'][language])) { drain = '-1' }; // gain is negative drain..
+    if (rawText.toLowerCase().includes(languagePack['rest'][language])) { drain = '-3' };
+    if (rawText.toLowerCase().includes(languagePack['break'][language])) { drain = '-3' };
+    if (rawText.toLowerCase().includes(languagePack['relax'][language])) { drain = '-5' };
+    if (rawText.toLowerCase().includes(languagePack['meditate'][language])) { drain = '-5' };
+    if (rawText.toLowerCase().includes(languagePack['splatte'][language])) { drain = '-5' };
   }
 
   let text = rawText.trim();
-  text = text.slice(0, 1).toUpperCase() + text.slice(1, );
+  text = text.slice(0, 1).toUpperCase() + text.slice(1);
 
   parsedList = [taskStart, duration, text, drain];
   return parsedList;
@@ -4476,7 +4486,7 @@ function debugExamples() {
     '45m mediumOne',
     '1200 1h lunch',
     // '1530 1h tea',
-    '1h longTwo' ,
+    '1h longTwo',
     '45m mediumTwo',
     '30m shortThree'
   ];
@@ -4500,7 +4510,7 @@ function textListToTaskList(taskListAsText) {  // Used by debugExamples()
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       // console.log(task.text, [].concat(taskList));
       succes = addTask(id, task);
-      if (!succes) {console.log('Retrieval got wrong at index ', index);}
+      if (!succes) { console.log('Retrieval got wrong at index ', index); }
     }
   }
 
@@ -4514,7 +4524,7 @@ function textListToTaskList(taskListAsText) {  // Used by debugExamples()
 // For debugging only:
 function showTaskListTimes() {
   let len = taskList.length;
-  for (var n=0; n<len; n++) {
+  for (var n = 0; n < len; n++) {
     console.log(n, 'Start:', taskList[n].date.getHours(), taskList[n].date.getMinutes(), 'End: ', taskList[n].end.getHours(), taskList[n].end.getMinutes(), taskList[n].text);
   }
 }
