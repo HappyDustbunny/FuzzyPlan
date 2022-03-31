@@ -917,7 +917,8 @@ function postponeTask() {
 
   // Store task in tomorrow of pastDayList
   let now = new Date();
-  let tomorrowId = (now.getDate() + 1).toString() + '-' + now.getMonth().toString() + '-' + now.getFullYear();
+  let tomorrow = new Date(now.getFullYear().toString(), now.getMonth().toString(), (now.getDate() + 1).toString());
+  let tomorrowId = tomorrow.getDate().toString() + '-' + tomorrow.getMonth().toString() + '-' + tomorrow.getFullYear();
   if (monthTaskList[tomorrowId]) {
     monthTaskList[tomorrowId].push(task);
   } else {
