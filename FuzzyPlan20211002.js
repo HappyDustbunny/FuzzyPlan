@@ -877,7 +877,8 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     tasksSentToDay = [];
 
     if (tasks.length != 0 || document.getElementById('dayChooseBox').classList.contains('active')) {
-      document.getElementById('sortTask').classList.toggle('tasksToSort', true); // Add the class tasksToSort due to 'true' flag
+      document.getElementById('sortTask').classList.add('tasksToSort');
+      document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
     } else {
       document.getElementById('sortTask').classList.remove('tasksToSort');
     }
@@ -926,7 +927,7 @@ function postponeTask() {
   }
 
   if (!document.getElementById('dayChooseBox').classList.contains('active')) {
-    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
+    document.getElementById('sortTask').classList.remove('tasksToSort');
   }
   resetInputBox('day');
   anneal();
@@ -3456,7 +3457,7 @@ function adjustNowAndWakeUpButtons() {
 
     document.getElementById('upButton').addEventListener('click', wakeUpButton, { once: true });
     document.getElementById('nowButton').addEventListener('click', nowButton, { once: true });
-    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
+    document.getElementById('sortTask').classList.remove('tasksToSort');
   } else {
     upBtn.title = languagePack['upButtonJump'][language][1] + wakeUpH + ':' + min;  // 'Jumpt to'
     upBtn.textContent = languagePack['upButtonJump'][language][0] + wakeUpH + ':' + min;  // '\u25B8' Black right-pointing small triangle
@@ -3497,14 +3498,14 @@ function inputAtEnter(event) {
     // button.textContent = languagePack['clearButton'][language][0];  // Black down-pointing small triangle
     // button.title = languagePack['clearButton'][language][1];
     fixClearButtonArrow();
-    document.getElementById('addTaskButton').textContent = '+';
-    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
+    // document.getElementById('addTaskButton').textContent = '+';
+    // document.getElementById('sortTask').classList.remove('tasksToSort');
   } else {
     // Ready buttons for clearing or editing current text in inputbox
     button.textContent = languagePack['clearButtonText'][language][0]; // Black left-pointing small triangle
     button.title = languagePack['clearButtonText'][language][1];
+    document.getElementById('sortTask').classList.add('tasksToSort');
     document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
-    document.getElementById('sortTask').classList.toggle('tasksToSort', true);  // Add class tasksToSort due to 'true' flag
   }
 }
 
@@ -3719,7 +3720,7 @@ function fixClearButtonArrow() {
     clearButton.textContent = languagePack['clearButton'][language][0]; // Black down-pointing small triangle
     clearButton.title = languagePack['clearButton'][language][1];
     document.getElementById('addTaskButton').textContent = '+';
-    document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
+    document.getElementById('sortTask').classList.remove('tasksToSort');
     id = '';
   }
   adjustNowAndWakeUpButtons();
@@ -3751,7 +3752,7 @@ function clearDay() {
   setUpFunc();
   document.getElementById('dayInputBox').value = '';
   document.getElementById('addTaskButton').textContent = '+';
-  document.getElementById('sortTask').classList.toggle('tasksToSort', false);  // Remove class tasksToSort due to 'false' flag
+  document.getElementById('sortTask').classList.remove('tasksToSort');
   document.getElementById('dayInputBox').focus();
 
   // Check for old tasks in monhtView. This should happen when setUpFunc() run, but sometimes it doesn't...
@@ -3951,7 +3952,6 @@ function taskHasBeenClicked(event) {
 
   // The eventListener is tied to the parent, so the event given is the parent event
   let contentInputBox = document.getElementById('dayInputBox').value.trim();
-  let clearButton = document.getElementById('clearButton');
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
@@ -3969,17 +3969,15 @@ function taskHasBeenClicked(event) {
         addTaskBefore(myUniqueId, task);
       }
 
-      // clearButton.textContent = languagePack['clearButton'][language][0]; // Black down-pointing small triangle
-      // clearButton.title = languagePack['clearButton'][language][1];
       handleChoosebox('day');
       fixClearButtonArrow();
 
     } else {
       displayMessage(languagePack['formatReminder'][language], 6000, 'day')
     }
-    document.getElementById('addTaskButton').textContent = '+';
     if (!document.getElementById('dayChooseBox').classList.contains('active')) {
-      document.getElementById('sortTask').classList.toggle('tasksToSort', false); // Remove class tasksToSort due to 'false' flag
+      document.getElementById('addTaskButton').textContent = '+';
+      document.getElementById('sortTask').classList.remove('tasksToSort');
     }
 
   } else if (contentInputBox !== '' && chosenTaskId) {
@@ -4008,8 +4006,8 @@ function taskHasBeenClicked(event) {
       // displayMessage('Unasigned time can not be edited', 3000);  // More confusing than helpful(?) Yep. Need clean up.
     } else if (chosenTaskId === myUniqueId) {
       editTask();
+      document.getElementById('sortTask').classList.add('tasksToSort');
       document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
-      document.getElementById('sortTask').classList.toggle('tasksToSort', true);
     } else if (taskList[chosenId].fuzzyness === 'isNotFuzzy' || taskList[id].fuzzyness === 'isNotFuzzy') {
       displayMessage(languagePack['fixedTaskClicked'][language], 3000, 'day');
       taskList[chosenId].isClicked = 'isNotClicked';

@@ -615,8 +615,8 @@ html {
 
 #putBack {
   display: none;
-	line-height: 0.8em;
-	/* padding-top: 2px; */
+	line-height: 1.7em;
+  width: 40px;
 }
 
 #putBack.active {
