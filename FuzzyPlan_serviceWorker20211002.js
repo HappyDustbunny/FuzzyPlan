@@ -1,4 +1,6 @@
 
+let VERSION = 1.001; // Change version number to facilitate updates
+
 let FP_CACHE = 'FP-cache';
 let CACHED_URLS = [
   '200px-A_SVG_semicircle_heart_empty.svg.png',

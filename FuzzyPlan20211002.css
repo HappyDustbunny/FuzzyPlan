@@ -1258,7 +1258,7 @@ button[id*='memory'] {
 
 /* storage-view css above ^^^ */
 
-@media screen and (min-width: 450px) {
+@media screen and (min-width: 500px) {
   html {
     background-color: white;
   }
@@ -1272,7 +1272,7 @@ button[id*='memory'] {
   }
 }
 
-@media screen and (max-width: 449px) {
+@media screen and (max-width: 499px) {
   #blankBottom {
     height: 400px;
     grid-area: taskFooter;
