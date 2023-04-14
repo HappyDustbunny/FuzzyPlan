@@ -1129,9 +1129,9 @@ document.getElementById('upButton').addEventListener('click', function() {
 // document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
 document.getElementById('nowButton').addEventListener('click', jumpToNow);
 
-// Makes pressing Enter add task
+// Makes pressing Enter add task and change class of dayInputBox so the postpone button appear
 document.getElementById('dayInputBox').addEventListener('keypress', function() { inputAtEnter(event); });
-// document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
 document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
@@ -1365,7 +1365,7 @@ function addTaskButtonClicked() {
 
   inputBox_add.value = inputBox.value;
 
-  readInputBox_add();
+  readInputBox_add(); // Check for text from Day View
 
   if (inputBox_add.value == '') {
     inputBox_add.value = '';
@@ -1391,8 +1391,10 @@ function readInputBox_add() {
     //   playControlsQuery(false);
     // }
 
-    if (parsedList[0] != '') {  // This will rarely trigger because fixed times are currently stripped when double clicking a task to edit
-      fillTimeBox(parsedList[0]);
+    if (parsedList[0] != '') {  // This will trigger if a fixed times are edited
+      fillTimeBox(parsedList[0]);  // Fill the textbox
+
+      taskTime_add = parsedList[0]; // ... and set the associated variable
     }
 
     let drain = Number(parsedList[3]);
@@ -3506,6 +3508,7 @@ function inputAtEnter(event) {
     button.title = languagePack['clearButtonText'][language][1];
     document.getElementById('sortTask').classList.add('tasksToSort');
     document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
+    nullifyClick();
   }
 }
 
@@ -3533,6 +3536,18 @@ function nullifyClick() {
   let myId = getIndexFromUniqueId(chosenTaskId);
   taskList[myId].isClicked = 'isNotClicked';
   chosenTaskId = '';
+
+  // The following code was added to deal with hanging highlights a year after release. I may have missed dependencies that needed to be reset...
+  day.classList.add('isNotClicked');
+  day.classList.remove('isClicked');
+  // Remove highlights
+  let taskButtons = document.getElementsByClassName('task');
+  for (const button of taskButtons) {
+    if (/\d/.exec(button.id)) { // Only buttons with a number in their id gets highlighted
+      button.classList.add('isNotClicked');
+      button.classList.remove('isClicked');
+    }
+  }
 }
 
 function addTask(myId, task) {
@@ -3826,7 +3841,20 @@ function editTask() {
     drain = ' g' + (-taskList[id].drain) + ' ';
   }
 
-  taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';  //  Save the text from clickedElement
+  //  Save the text from clickedElement
+  if (taskList[id].fuzzyness == 'isNotFuzzy') {
+    let timeH = taskList[id].date.getHours();
+    let timeM = taskList[id].date.getMinutes();
+    if (timeM == 0) {
+      timeM = '00';
+    } else if (timeM < 10) {
+      timeM = '0' + timeM;
+    }
+    let thisTime = timeH.toString() + timeM.toString();
+    taskText = thisTime  + ' ' + taskList[id].text + ' ' + drain + ' ' + taskList[id].duration / 60000 + 'm';
+  } else {
+    taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';
+  }
 
   let dayInputBox = document.getElementById('dayInputBox');
   dayInputBox.value = taskText;  // Insert text in inputBox
@@ -3843,8 +3871,12 @@ function editTask() {
 
   dayInputBox.focus();
 
-  let nextLast = taskText.length - 1;
-  dayInputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
+  if (taskList[id].fuzzyness == 'isNotFuzzy') {
+    dayInputBox.setSelectionRange(0, 4); // Focus on the fixed time - if any
+  } else {
+    let nextLast = taskText.length - 1;
+    dayInputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
+  }
 }
 
 // Used by an eventListener. Toggles zoom.
