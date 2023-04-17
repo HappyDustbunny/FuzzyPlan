@@ -3428,7 +3428,10 @@ function wakeUpButton() {
 // Used by an eventListener. Inserts a 15 min planning task at the current time
 function nowButton() {
   if (taskList.length < 3) {
-    let task = new Task(new Date(), 15 * 60000, languagePack['planning'][0][language], 1);
+    let nowTime = new Date();
+    nowTime.setMinutes(nowTime.getMinutes() - nowTime.getMinutes()%5); // Round times to nearest 5 minutes
+
+    let task = new Task(nowTime, 15 * 60000, languagePack['planning'][0][language], 1);
     addFixedTask(task);
   }
   document.getElementById('nowButton').removeEventListener('click', nowButton, { once: true });
