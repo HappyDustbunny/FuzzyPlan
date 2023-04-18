@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
+// TODO: Incorporate putBack and undo button
 // TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
 // TODO: Integrate the help file in main
 // TODO: Make images for gear and expand/contract
@@ -109,6 +109,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
   ['Lagre', 'Klik for at vise lagrene (eller swipe til venstre)']],
   'info': [['?', "Information and user manual"],
   ['?', 'Information og brugsanvisning']],
+  "undo": [['Undo', ''],
+  ['Fortryd', '']],
   "postpone": [['\u25C2 Postpone', "Click to move content of input box to month (postpone task)"], // &#x25C2; Black left-pointing small triangle
   ['\u25C2 Udskyd', "Klik for at sende indholdet af indput-boxen til månedsvisningen (udskyd opgaven)"]],
   'upButton': [['\u25BE 7:00', "Click to insert a 15 minute planning period at the chosen wake up time"],  // &#x25BE; Black Down-Pointing Small Triangle
@@ -869,7 +871,7 @@ function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
     } else {
       console.log('Nothing to show in ChooseBox');
     }
-
+// TODO: Fix ChooseBox getting active if no tasks is sent from month to day
   } else {  // whichView is 'day'
     document.getElementById('postpone').classList.add('active'); // The class 'active' is being used for CSS formatting. I think
 
@@ -2325,7 +2327,6 @@ function monthRenderTasks() {
   }
 }
 
-
 function putBack() {
   if (monthTaskList[putBackId]) { // If one or more is put back manually, put the rest back where they came from
     for (var item of tasksFromClickedDayInMonth) {
@@ -3466,6 +3467,7 @@ function adjustNowAndWakeUpButtons() {
   } else {
     upBtn.title = languagePack['upButtonJump'][language][1] + wakeUpH + ':' + min;  // 'Jumpt to'
     upBtn.textContent = languagePack['upButtonJump'][language][0] + wakeUpH + ':' + min;  // '\u25B8' Black right-pointing small triangle
+
 
     nowBtn.title = languagePack['nowButtonJump'][language][1] // 'Jump to now';
     nowBtn.textContent = languagePack['nowButtonJump'][language][0] // '\u25B8' + 'Now';  // Black right-pointing small triangle
