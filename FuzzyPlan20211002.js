@@ -3849,6 +3849,7 @@ function renderLanguage() {
 function editTask() {
   let id = getIndexFromUniqueId(chosenTaskId);
   let drain = '';
+  let selectHowMany = 2;  // Used to control focus in inputbox
 
   if (1 < taskList[id].drain) {
     drain = ' d' + taskList[id].drain + ' ';
@@ -3858,6 +3859,8 @@ function editTask() {
 
   //  Save the text from clickedElement
   if (taskList[id].fuzzyness == 'isNotFuzzy') {
+    selectHowMany = 4;
+
     let timeH = taskList[id].date.getHours();
     let timeM = taskList[id].date.getMinutes();
     if (timeM == 0) {
@@ -3886,7 +3889,7 @@ function editTask() {
 
   dayInputBox.focus();
 
-  if (taskList[id].fuzzyness == 'isNotFuzzy') {
+  if (selectHowMany == 4) {
     dayInputBox.setSelectionRange(0, 4); // Focus on the fixed time - if any
   } else {
     let nextLast = taskText.length - 1;
