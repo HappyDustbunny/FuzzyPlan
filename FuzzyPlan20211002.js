@@ -816,7 +816,7 @@ function navigateTo(thisPlace) {
 
 
 function toDoButtonClicked() {
-  fillChooseBox('day');
+  fillChooseBoxDay();
   toDoButton = document.getElementById('toDoButton');
   toDoButton.hidden = true;
   toDoButton.title = languagePack['toDoButton'][language][1];
@@ -853,41 +853,51 @@ function getDueRemindersFromLast3Months() {  // If the day in the list lies in t
 }
 
 
-function fillChooseBox(whichView) {  // whichView can be 'month' or 'day'
-  let chooseBox = document.getElementById(whichView + 'ChooseBox');
+function fillChooseBoxMonth() {
+  let chooseBox = document.getElementById('monthChooseBox');
   chooseBox.classList.add('active');
   let tasks = [];
 
-  // Restore buttons in relevant view
-  if (whichView != 'day') { // whichView is 'month'
-    document.getElementById('putBack').classList.add('active');
-    document.getElementById('moveToDay').classList.add('active');
+  // Restore buttons
+  document.getElementById('putBack').classList.add('active');
+  document.getElementById('moveToDay').classList.add('active');
 
-    if (0 < tasksSentToMonth.length) {
-      tasks = tasksSentToMonth;
-      tasksSentToMonth = [];
-    } else if (0 < tasksFromClickedDayInMonth.length) {
-      tasks = tasksFromClickedDayInMonth;
-    } else {
-      console.log('Nothing to show in ChooseBox');
-    }
-// TODO: Fix ChooseBox getting active if no tasks is sent from month to day
-  } else {  // whichView is 'day'
+  if (0 < tasksSentToMonth.length) {
+    tasks = tasksSentToMonth;
+    tasksSentToMonth = [];
+  } else if (0 < tasksFromClickedDayInMonth.length) {
+    tasks = tasksFromClickedDayInMonth;
+  } else {
+    console.log('Nothing to show in ChooseBox');
+  }
+
+  fillChooseBox('month', tasks);
+}
+
+
+function fillChooseBoxDay() {
+  let chooseBox = document.getElementById('dayChooseBox');
+  chooseBox.classList.add('active');
+  let tasks = [];
+
+  // Restore buttons
+  // TODO: Fix ChooseBox getting active if no tasks is sent from month to day
     document.getElementById('postpone').classList.add('active'); // The class 'active' is being used for CSS formatting. I think
 
     tasks = tasksSentToDay;
     tasksSentToDay = [];
 
-    if (tasks.length != 0 || document.getElementById('dayChooseBox').classList.contains('active')) {
+    if (tasks.length != 0) { // || document.getElementById('dayChooseBox').classList.contains('active')) {
       document.getElementById('sortTask').classList.add('tasksToSort');
       document.getElementById('addTaskButton').textContent = '\u270D';  // Writing hand
     } else {
       document.getElementById('sortTask').classList.remove('tasksToSort');
     }
 
+    fillChooseBox('day', tasks);
   }
 
-  // Actually fill choose box
+function fillChooseBox(whichView, tasks) {
   if (tasks.length > 0) {
     let counter = 0;
     for (var task of tasks) {
@@ -1871,7 +1881,7 @@ function gotoMonthFromDay() {
   monthRenderTasks();
 
   if (0 < tasksSentToMonth.length) {
-    fillChooseBox('month');
+    fillChooseBoxMonth();
   }
 }
 
@@ -1880,7 +1890,7 @@ function gotoDayFromMonth() {
   displayClass('monthView', false);
   displayClass('dayView', true);
 
-  fillChooseBox('day');
+  fillChooseBoxDay();
 }
 
 
@@ -2040,7 +2050,7 @@ function monthTaskHasBeenClicked(event) {
         dayChildren[2].textContent = '';
         dayChildren[1].innerHTML = '';
 
-        fillChooseBox('month');
+        fillChooseBoxMonth();
       }
     }
     day.classList.add('isNotClicked');
@@ -4111,7 +4121,7 @@ function anneal() {
 
   overspill = fixOverspillingTasks();
   if (overspill) {
-    fillChooseBox('day');
+    fillChooseBoxDay();
     displayMessage(languagePack['taskPastEndOfDay'][language][0], 3000, 'day');
   }
 }
