@@ -1831,6 +1831,7 @@ function playButtonClicked() {
       displayMessage(languagePack['taskTextMsg'][language], 3000, 'add');  // Please write a task text
     } else {
       startTime_play = new Date();
+      startTime_play.setMinutes(startTime_play.getMinutes() - startTime_play.getMinutes() % 5);  // Round times to nearest 5 minutes
 
       playViewIsRecording = true;
 
@@ -3440,7 +3441,7 @@ function wakeUpButton() {
 function nowButton() {
   if (taskList.length < 3) {
     let nowTime = new Date();
-    nowTime.setMinutes(nowTime.getMinutes() - nowTime.getMinutes()%5); // Round times to nearest 5 minutes
+    nowTime.setMinutes(nowTime.getMinutes() - nowTime.getMinutes() % 5); // Round times to nearest 5 minutes
 
     let task = new Task(nowTime, 15 * 60000, languagePack['planning'][0][language], 1);
     addFixedTask(task);
