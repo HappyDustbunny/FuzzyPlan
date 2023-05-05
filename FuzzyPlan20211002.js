@@ -28,6 +28,7 @@
 let hashStack = [];
 let lastHash = '';
 let taskList = [];  // List of all tasks
+let lastTaskList = [];  // Backup of taskList for undo purposes
 let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
 let startAndEndTimes = [];
 let chosenTask = '';
@@ -558,6 +559,7 @@ function makeFirstTasks() {
 
 function storeLocally() {
   localStorage.taskList = JSON.stringify(taskList);
+  localStorage.lastTaskList = JSON.stringify(lastTaskList);
 
   localStorage.wakeUpOrNowClickedOnce = wakeUpOrNowClickedOnce;
 
@@ -661,6 +663,12 @@ function retrieveLocallyStoredStuff() {
     //   task.end = new Date(task.end);
     //   task.end.setDate(now.getDate());
     // }
+  }
+
+  if (localStorage.getItem('lastTaskList')) {
+    let list = JSON.parse(localStorage.lastTaskList);
+    lastTaskList = fixDatesInList(list);
+    // Fix dates messed up by JSON.stringify - and bring them up to current date
   }
 
   if (localStorage.getItem('wakeUpOrNowClickedOnce') == 'true') {
@@ -1140,6 +1148,7 @@ document.getElementById('upButton').addEventListener('click', function() {
 // Insert a 15 min planning task at the current time
 // document.getElementById('nowButton').addEventListener('click', nowButton, {once:true});
 document.getElementById('nowButton').addEventListener('click', jumpToNow);
+document.getElementById('undo').addEventListener('click', undo);
 
 // Makes pressing Enter add task and change class of dayInputBox so the postpone button appear
 document.getElementById('dayInputBox').addEventListener('keypress', function() { inputAtEnter(event); });
@@ -3598,6 +3607,7 @@ function addTaskAfter(uniqueId, task) {
   task.end = new Date(task.date.getTime() + task.duration);
   task.fuzzyness = 'isFuzzy';
   if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) {
+    lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     looseInputBoxFocus('day');
@@ -3624,6 +3634,7 @@ function addTaskBefore(myId, task) {
       task.end = new Date(task.date.getTime() + task.duration);
       task.fuzzyness = 'isFuzzy';
     }
+    lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     taskList.splice(id, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     looseInputBoxFocus('day');
@@ -3646,6 +3657,7 @@ function addFixedTask(task) {
   } else if (overlap === 'softOverlap') {
     overlappingTasks = removeFuzzyOverlap(task);
     let id = getIndexFromUniqueId(overlappingTasks[0][0]);
+    lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     taskList.splice(id + 1, 0, task);
     task.fuzzyness = 'isNotFuzzy';
     uniqueIdOfLastTouched = task.uniqueId;
@@ -3658,6 +3670,7 @@ function addFixedTask(task) {
   } else if (overlap === 'noOverlap') {
     for (var n = 0; n < len; n++) {
       if (task.end < taskList[n].date) {
+        lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
         taskList.splice(n, 0, task);
         task.fuzzyness = 'isNotFuzzy';
         uniqueIdOfLastTouched = task.uniqueId;
@@ -3716,6 +3729,7 @@ function removeFuzzyOverlap(task) {
     let uniqueId = overlappingTask[1].uniqueId;
     for (const [index, task] of taskList.entries()) {
       if (uniqueId === task.uniqueId) {
+        lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
         taskList.splice(index, 1);
       }
     }
@@ -3770,9 +3784,11 @@ function clearDay() {
   resetViews();
 
   // Clear stuff and reset
+  let tempList = [].concat(taskList); // Backup taskList by making a deep copy
   taskList = [];
   uniqueIdList = [];
   makeFirstTasks();
+  lastTaskList = [].concat(tempList); // Backup taskList by making a deep copy
   resetInputBox('day');
   wakeUpOrNowClickedOnce = false;
   localStorage.indexOfLastTouched = 0;
@@ -3878,6 +3894,7 @@ function editTask() {
   let dayInputBox = document.getElementById('dayInputBox');
   dayInputBox.value = taskText;  // Insert text in inputBox
 
+  lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
   taskList.splice(id, 1);  // Remove clicked task from taskList
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
@@ -4153,6 +4170,7 @@ function fixOverspillingTasks() {
     }
 
     for (var m = dayEndPos + 1; m < len; m++) {
+      lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
       taskList.pop();
     }
     fixOverspillingTasks();
@@ -4162,6 +4180,7 @@ function fixOverspillingTasks() {
   let nextLast = taskList[taskList.length - 2];
   if (taskList[taskList.length - 1].date.getTime() < nextLast.date.getTime() + nextLast.duration) {
     tasksSentToDay.push(nextLast);
+    lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     taskList.splice(taskList.length - 2, 1);
     len -= 1;
     overspill = true;
@@ -4321,6 +4340,14 @@ function jumpToTime(time, showMessage) {
       displayMessage(languagePack['numberNotRecognized'][language], 1000, 'day');
     }
   }
+}
+
+
+function undo() {
+  let tempList = [].concat(taskList);  // Store current taskList making a deep copy
+  taskList = [].concat(lastTaskList); // Backup taskList by making a deep copy
+  lastTaskList = [].concat(tempList); // Move current taskList to lastTaskList by making a deep copy
+  renderTasks();
 }
 
 
