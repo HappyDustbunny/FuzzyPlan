@@ -29,6 +29,7 @@ let hashStack = [];
 let lastHash = '';
 let taskList = [];  // List of all tasks
 let lastTaskList = [];  // Backup of taskList for undo purposes
+let latestAddition = '';  // Used for undo purposes
 let displayList = [];  // All tasks to be displayed, inclusive nullTime tasks
 let startAndEndTimes = [];
 let chosenTask = '';
@@ -3608,6 +3609,7 @@ function addTaskAfter(uniqueId, task) {
   task.fuzzyness = 'isFuzzy';
   if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) {
     lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
+    latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
     taskList.splice(id + 1, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     looseInputBoxFocus('day');
@@ -3635,6 +3637,7 @@ function addTaskBefore(myId, task) {
       task.fuzzyness = 'isFuzzy';
     }
     lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
+    latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
     taskList.splice(id, 0, task);
     uniqueIdOfLastTouched = task.uniqueId;
     looseInputBoxFocus('day');
@@ -3658,6 +3661,7 @@ function addFixedTask(task) {
     overlappingTasks = removeFuzzyOverlap(task);
     let id = getIndexFromUniqueId(overlappingTasks[0][0]);
     lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
+    latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
     taskList.splice(id + 1, 0, task);
     task.fuzzyness = 'isNotFuzzy';
     uniqueIdOfLastTouched = task.uniqueId;
@@ -3671,6 +3675,7 @@ function addFixedTask(task) {
     for (var n = 0; n < len; n++) {
       if (task.end < taskList[n].date) {
         lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
+        latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
         taskList.splice(n, 0, task);
         task.fuzzyness = 'isNotFuzzy';
         uniqueIdOfLastTouched = task.uniqueId;
@@ -3720,7 +3725,7 @@ function removeFuzzyOverlap(task) {
     if ((taskList[n].date <= task.date && task.date < taskList[n].end)
       || (taskList[n].date < task.end && task.end <= taskList[n].end)) {
       if (taskList[n].fuzzyness === 'isNotFuzzy') {
-        console.log('Bugger. Logic broke.', taskList[n]);
+        console.log('Bugger. Logic broke. Reboot math.', taskList[n]);
       };
       overlappingTasks.push([taskList[n - 1].uniqueId, taskList[n]]);
     }
@@ -3895,6 +3900,7 @@ function editTask() {
   dayInputBox.value = taskText;  // Insert text in inputBox
 
   lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
+  latestAddition = taskText;  // Backup text of latest task for unfo purposes
   taskList.splice(id, 1);  // Remove clicked task from taskList
   uniqueIdOfLastTouched = taskList[id - 1].uniqueId;
 
@@ -4113,6 +4119,8 @@ function getIndexFromUniqueId(uniqueId) {
 
 
 function swapTasks(myId) {
+  lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy for undo
+  latestAddition = '';  // Avoid old text appearing after undoing a swap
   let id1 = getIndexFromUniqueId(chosenTaskId);
   let id2 = getIndexFromUniqueId(myId);
   taskList[id1].isClicked = 'isNotClicked';
@@ -4125,7 +4133,7 @@ function swapTasks(myId) {
 }
 
 
-function anneal() {
+function anneal() { // TODO: Could anneal simply be called once in the start of renderTasks?
   fixTimes();
   let len = taskList.length;
   for (var n = 1; n < len - 1; n++) {
@@ -4259,7 +4267,7 @@ function renderTasks() {
     stressMarker.style.height = (zoom * task.height * 100) / (24 * 60) + '%';
 
     // Write text in task
-    let nodeText = textExtractor(task);
+    let nodeText = textExtractor(task, true);
     let textNode = document.createTextNode(nodeText);
     newNode.appendChild(textNode);
 
@@ -4347,11 +4355,14 @@ function undo() {
   let tempList = [].concat(taskList);  // Store current taskList making a deep copy
   taskList = [].concat(lastTaskList); // Backup taskList by making a deep copy
   lastTaskList = [].concat(tempList); // Move current taskList to lastTaskList by making a deep copy
+  anneal();
   renderTasks();
+  document.getElementById('dayInputBox').value = latestAddition;
+  latestAddition = '';
 }
 
 
-function textExtractor(task) {  // Extract the text to be written on screen
+function textExtractor(task, withTimeSpan) {  // Extract the text to be written on screen
   let text = task.text;
   let drain = '';
 
@@ -4376,7 +4387,7 @@ function textExtractor(task) {  // Extract the text to be written on screen
     }
   }
 
-  if (task.date != '') {
+  if (withTimeSpan && task.date != '') {
     let timeH = task.date.getHours();
     let timeM = task.date.getMinutes();
     let endTime = new Date(task.date.getTime() + task.duration);
@@ -4398,7 +4409,10 @@ function textExtractor(task) {  // Extract the text to be written on screen
     }
     let text1 = nils[0] + timeH + ':' + nils[1] + timeM + '-';
     text = text1 + nils[2] + endH + ':' + nils[3] + endM + ' ' + text;
-  }
+  } else {
+    text = text.replace('(', ''); // Ugly, but easiest way to make this function dual purpose
+    text = text.replace(')', '');
+}
 
   return text;
 }
@@ -4600,8 +4614,8 @@ function textListToTaskList(taskListAsText) {  // Used by debugExamples()
 
 // For debugging only:
 function showTaskListTimes() {
-  let len = taskList.length;
   for (var n = 0; n < len; n++) {
+  let len = taskList.length;
     console.log(n, 'Start:', taskList[n].date.getHours(), taskList[n].date.getMinutes(), 'End: ', taskList[n].end.getHours(), taskList[n].end.getMinutes(), taskList[n].text);
   }
 }
