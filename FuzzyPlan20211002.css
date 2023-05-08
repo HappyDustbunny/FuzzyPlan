@@ -110,10 +110,10 @@ html {
   justify-content: flex-end;
 }
 
-#storageHeadingText {
+/* #storageHeadingText {
   grid-area: cwcen;
   font-size: 12px;
-}
+} */
 
 #dayInputBox {
   display: none;

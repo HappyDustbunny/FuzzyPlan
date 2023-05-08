@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// TODO: Incorporate putBack and undo button
+
 // TODO: Clicking while a fixed task is in the input box inserts the tasks disregarding the fixed time. Bug or feature? Same in month view.
 // TODO: Integrate the help file in main
 // TODO: Make images for gear and expand/contract
@@ -246,8 +246,8 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
   'noResultPossible': ['From-date is after To-date\nNo result possible',
     'Fra-dato er efter Til-dato\nIntet resultat er muligt'],
   // Storage view
-  'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think
-  ['Gem eller gendan opgavelister', '']],
+  // 'storageHeadingText': [['Store or retrive tasklists', ''],  // TODO: Remove or make visible? Remove I think. Removed by commenting out may 2023 in .js .html and .css
+  // ['Gem eller gendan opgavelister', '']],
   'storeList': [['Store list in', 'To clear a stored list, just store an empty list'],
   ['Gem plan i', 'Gem en tom plan for at slette en gemt plan.']],
   'trashBin': [['Restore last discarded task list', ''],
@@ -890,7 +890,6 @@ function fillChooseBoxDay() {
   let tasks = [];
 
   // Restore buttons
-  // TODO: Fix ChooseBox getting active if no tasks is sent from month to day
     document.getElementById('postpone').classList.add('active'); // The class 'active' is being used for CSS formatting. I think
 
     tasks = tasksSentToDay;
@@ -1037,12 +1036,6 @@ function updateTimeMarker() {
     nowSpanElement.style.height = nowHeight;
   }
 
-  // if (taskList.length === 2) {
-  //   document.getElementById("info").style.animationPlayState = "running";
-  // } else {
-  //   document.getElementById("info").style.animationPlayState = "paused";
-  //   // TODO: Fix hanging border if animation is paused mid cycle
-  // }
 
   updateHearts();
 
@@ -2550,7 +2543,7 @@ function selectAllOrNone() {
   }
 }
 
-function trackCheckboxClicked(event) { // TODO: Is this actually used?
+function trackCheckboxClicked(event) {
   let trackedTask = event.target.id;
   let element = document.getElementsByClassName(trackedTask);
 
@@ -3607,7 +3600,7 @@ function addTaskAfter(uniqueId, task) {
   task.date = taskList[id].end;
   task.end = new Date(task.date.getTime() + task.duration);
   task.fuzzyness = 'isFuzzy';
-  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) {
+  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) { // TODO: Oups. Only checking next task for room. This needs to be recursive until dayEnd in some way. Usually not a problem, but ...
     lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
     taskList.splice(id + 1, 0, task);
@@ -4133,7 +4126,7 @@ function swapTasks(myId) {
 }
 
 
-function anneal() { // TODO: Could anneal simply be called once in the start of renderTasks?
+function anneal() { // Could anneal simply be called once in the start of renderTasks? Probably, but sometimes anneal is called well before renderTasks
   fixTimes();
   let len = taskList.length;
   for (var n = 1; n < len - 1; n++) {
@@ -4207,7 +4200,7 @@ function fixTimes() {
       taskList[n + 1].date = taskList[n].end;
       taskList[n + 1].end = new Date(taskList[n + 1].date.getTime() + taskList[n + 1].duration);
     } else {
-      // console.log(n, 'Overlapping a fixed task'); // TODO: A fuzzy task can be pushed into overlapping a fixed task
+      // console.log(n, 'Overlapping a fixed task');
     }
   }
 }
