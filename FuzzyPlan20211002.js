@@ -3652,6 +3652,7 @@ function addFixedTask(task) {
     return false;
   } else if (overlap === 'softOverlap') {
     overlappingTasks = removeFuzzyOverlap(task);
+
     let id = getIndexFromUniqueId(overlappingTasks[0][0]);
     lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
@@ -3678,6 +3679,8 @@ function addFixedTask(task) {
     }
   }
 
+  anneal();
+
   if (!succes) {
     taskList = [].concat(backUpTaskList);
   }
@@ -3690,8 +3693,8 @@ function isThereASoftOverlap(task) {
   let len = taskList.length;
 
   for (var n = 0; n < len; n++) {
-    if ((taskList[n].date <= task.date && task.date <= taskList[n].end) // If task start is in anoter task
-      || (taskList[n].date <= task.end && task.end <= taskList[n].end) // Or if task end is
+    if ((taskList[n].date <= task.date && task.date < taskList[n].end) // If task start is inside anoter task
+      || (taskList[n].date < task.end && task.end <= taskList[n].end) // Or if task end is inside anoter task
       || (task.date <= taskList[n].date && taskList[n].end <= task.end)) { // Or if the new task straddle an old task
       if (taskList[n].fuzzyness === 'isNotFuzzy') {
         overlap = 'hardOverlap';
