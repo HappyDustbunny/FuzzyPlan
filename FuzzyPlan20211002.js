@@ -3497,7 +3497,7 @@ function inputAtEnter(event) {
   if (event.key === 'Enter') {
     let contentInputBox = document.getElementById('dayInputBox').value.trim();
     // If text or emojis and no chosenTaskId
-    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, æ, ø, ǻ]/.exec(contentInputBox) != null || /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, \u00E6, \u00F8, \u00E5]/.exec(contentInputBox) != null || /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       handleTaskInput(contentInputBox);
     } else { // Just numbers
       if (/[^0-9]/.exec(contentInputBox) != null && chosenTask != '') {
@@ -3600,7 +3600,7 @@ function addTaskAfter(uniqueId, task) {
   task.date = taskList[id].end;
   task.end = new Date(task.date.getTime() + task.duration);
   task.fuzzyness = 'isFuzzy';
-  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) { // TODO: Oups. Only checking next task for room. This needs to be recursive until dayEnd in some way. Usually not a problem, but ...
+  if (taskList[id + 1].fuzzyness === 'isFuzzy' || task.end <= taskList[id + 1].date) { // TODO: Oups. Only checking next task for room. This needs to be recursive until dayEnd in some way. Usually not a problem, but ... Hard to reproduce error
     lastTaskList = [].concat(taskList); // Backup taskList by making a deep copy
     latestAddition = textExtractor(task, false);  // Backup text of latest task for unfo purposes
     taskList.splice(id + 1, 0, task);
@@ -3679,7 +3679,7 @@ function addFixedTask(task) {
     }
   }
 
-  anneal();
+  anneal();  // Added to fix a problem with fixed tasks refusing to be put back. Line 3696 and 3697 was modified too from <= to <
 
   if (!succes) {
     taskList = [].concat(backUpTaskList);
@@ -4025,7 +4025,7 @@ function taskHasBeenClicked(event) {
 
   if (contentInputBox !== '' && !chosenTaskId) {
     // Text in inputBox and no chosenTaskId. Create new task and insert before clicked element
-    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, æ, ø, ǻ]/.exec(contentInputBox) != null || /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
+    if (chosenTaskId === '' && /[a-c, e-g, i-l, n-z, \u00E6, \u00F8, \u00E5]/.exec(contentInputBox) != null || /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/.exec(contentInputBox) != null) {  // The latter is to allow emojis
       let parsedList = parseText(contentInputBox);
       let task = new Task(parsedList[0], parsedList[1], parsedList[2], parsedList[3]);
       anneal();
