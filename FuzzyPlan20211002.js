@@ -3887,7 +3887,7 @@ function editTask() {
       timeM = '0' + timeM;
     }
     let thisTime = timeH.toString() + timeM.toString();
-    taskText = thisTime  + ' ' + taskList[id].text + ' ' + drain + ' ' + taskList[id].duration / 60000 + 'm';
+    taskText = taskList[id].text + ' ' + drain + ' ' + taskList[id].duration / 60000 + 'm ' + thisTime;
   } else {
     taskText = taskList[id].text + ' ' + drain + taskList[id].duration / 60000 + 'm';
   }
@@ -3910,7 +3910,9 @@ function editTask() {
   dayInputBox.focus();
 
   if (selectHowMany == 4) {
-    dayInputBox.setSelectionRange(0, 4); // Focus on the fixed time - if any
+
+    let last = taskText.length;
+    dayInputBox.setSelectionRange(last - 4, last); // Focus on the fixed time - if any
   } else {
     let nextLast = taskText.length - 1;
     dayInputBox.setSelectionRange(nextLast - 2, nextLast); // Makes changing task time easier by focusing just before m in 45m
@@ -4071,7 +4073,7 @@ function taskHasBeenClicked(event) {
     }
 
   } else if (contentInputBox == '' && chosenTaskId) {
-    // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice
+    // No text in inputBox and a chosenTaskId: Swap elements - or edit if the same task is clicked twice (effectively doubleclicked)
     if (/[n]/.exec(myUniqueId) != null) {  // If nulltime ...
       // displayMessage('Unasigned time can not be edited', 3000);  // More confusing than helpful(?) Yep. Need clean up.
     } else if (chosenTaskId === myUniqueId) {
