@@ -59,7 +59,7 @@ let lang = ['en', 'da'];
 ///////// Add-view /////////
 let taskText_add = '';
 let taskDuration_add = defaultTaskDuration;  // In minutes
-let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+let taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 0);
 let drainGainLevel_add = 'd1';
 
 ///////// Play-view /////////
@@ -399,7 +399,7 @@ let languagePack = {  // {'id': [['text', 'title'], ['tekst', 'titel']]} The var
   'restoreLast': ['Restore last discarded task list',
     'Genskab den sidst forkastede dagsplan'],
   'retrieveFrom': [['Retrieved list from the \"', '\" storage'],
-  ['dagsplann hentet fra lageret \"', '\"']],
+  ['Dagsplan hentet fra lageret \"', '\"']],
   'storeIsEmpty': ['This store is empty',
     'Dette lager er tomt'],
   'only0-1438': ['Use only numbers between 0 and 1438, please.',
@@ -1145,8 +1145,8 @@ document.getElementById('nowButton').addEventListener('click', jumpToNow);
 document.getElementById('undo').addEventListener('click', undo);
 
 // Makes pressing Enter add task and change class of dayInputBox so the postpone button appear
-document.getElementById('dayInputBox').addEventListener('keypress', function() { inputAtEnter(event); });
-document.getElementById('dayInputBox').addEventListener('touchend', function () { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('keypress', function(event) { inputAtEnter(event); });
+document.getElementById('dayInputBox').addEventListener('touchend', function (event) { inputAtEnter(event); });
 
 // Tie event to Clear or Edit button
 document.getElementById('clearButton').addEventListener('click', clearTextboxOrDay);
@@ -1155,7 +1155,7 @@ document.getElementById('clearButton').addEventListener('click', clearTextboxOrD
 document.getElementById('zoom').addEventListener('click', zoomFunc);
 
 // Makes clicking anything inside the taskDiv container run taskHasBeenClicked()
-document.getElementById('taskDiv').addEventListener('click', function() { taskHasBeenClicked(event); }, true);
+document.getElementById('taskDiv').addEventListener('click', function(event) { taskHasBeenClicked(event); }, true);
 
 document.getElementById('toDoButton').addEventListener('click', toDoButtonClicked);
 
@@ -1169,7 +1169,7 @@ document.getElementById('addTaskButton').addEventListener('click', function() { 
 document.getElementById('inputBox_add').addEventListener('focusout', readInputBox_add);
 
 document.getElementById('inputBox_add').addEventListener('keypress',
-  function() { if (event.key === 'Enter') { readTaskText(); } });
+  function(event) { if (event.key === 'Enter') { readTaskText(); } });
 
 document.getElementById('inputDurationBox').addEventListener('focus',
   function() { document.getElementById('inputDurationBox').select(); });
@@ -1180,7 +1180,7 @@ document.getElementById('inputTimeBox').addEventListener('focus',
   });
 
 document.getElementById('inputDurationBox').addEventListener('keypress',
-  function() { if (event.key === 'Enter') { readDurationTime(); } });
+  function(event) { if (event.key === 'Enter') { readDurationTime(); } });
 
 document.getElementById('inputTimeBox').addEventListener('focusout',
   function() {
@@ -1194,12 +1194,12 @@ document.getElementById('inputDurationBox').addEventListener('focusout',
     document.getElementById('inputTimeBox').blur;
   });
 
-document.addEventListener('touchstart', function() { swipeNavigationStart(event); });
-document.addEventListener('touchend', function() { swipeNavigationEnd(event); });
+document.addEventListener('touchstart', function(event) { swipeNavigationStart(event); });
+document.addEventListener('touchend', function(event) { swipeNavigationEnd(event); });
 
-document.getElementById('duration').addEventListener('click', function() { addDuration(event); });
+document.getElementById('duration').addEventListener('click', function(event) { addDuration(event); });
 
-document.getElementById('time').addEventListener('click', function() { time_add(event); });
+document.getElementById('time').addEventListener('click', function(event) { time_add(event); });
 
 document.getElementById('clear').addEventListener('click', clearTimeBox);
 
@@ -1225,9 +1225,9 @@ document.getElementById('playButton').addEventListener('click', playButtonClicke
 
 document.getElementById('track').addEventListener('click', function() { location.hash = '#monthView_trackView'; pushHashChangeToStack(); });
 
-document.getElementById('monthInputBox').addEventListener('keypress', function() { monthInputAtEnter(event); });
+document.getElementById('monthInputBox').addEventListener('keypress', function(event) { monthInputAtEnter(event); });
 
-document.getElementById('monthTaskDiv').addEventListener('click', function() { monthTaskHasBeenClicked(event); }, true);
+document.getElementById('monthTaskDiv').addEventListener('click', function(event) { monthTaskHasBeenClicked(event); }, true);
 
 document.getElementById('day').addEventListener('click', function() { location.hash = '#monthView_dayView'; pushHashChangeToStack(); });
 
@@ -1251,26 +1251,26 @@ document.getElementById('colourPickerInputBox').addEventListener('focus', functi
 //   document.getElementById('colourButtons').hidden = true;
 // });
 
-document.getElementById('colourButtons').addEventListener('click', function() { colourButtonClicked(event); });
+document.getElementById('colourButtons').addEventListener('click', function(event) { colourButtonClicked(event); });
 
 document.getElementById('selectAllOrNoneChkbox').addEventListener('click', selectAllOrNone);
 
-document.getElementById('taskPickerInputBox').addEventListener('keypress', function() { taskPickerEvent(event); });
+document.getElementById('taskPickerInputBox').addEventListener('keypress', function(event) { taskPickerEvent(event); });
 
-document.getElementById('colourPickerInputBox').addEventListener('keypress', function() { colourPickerEvent(event); });
+document.getElementById('colourPickerInputBox').addEventListener('keypress', function(event) { colourPickerEvent(event); });
 
 document.getElementById('deleteTrackedButton').addEventListener('click', removeTracking);
 
 document.getElementById('showTimeSpentChkbox').addEventListener('click', showTimeSpent);
 
 document.getElementById('showTimeSpentFrom').addEventListener('keypress',
-  function() { if (event.key === 'Enter') { readShowTimeSpentFromAtEnter(); } });
+  function(event) { if (event.key === 'Enter') { readShowTimeSpentFromAtEnter(); } });
 document.getElementById('showTimeSpentFrom').addEventListener('input', readShowTimeSpentFrom);
 document.getElementById('showTimeSpentFrom').addEventListener('focus',
   function() { document.getElementById('showTimeSpentFrom').select(); });
 
 document.getElementById('showTimeSpentTo').addEventListener('keypress',
-  function() { if (event.key === 'Enter') { readShowTimeSpentToAtEnter(); } });
+  function(event) { if (event.key === 'Enter') { readShowTimeSpentToAtEnter(); } });
 document.getElementById('showTimeSpentTo').addEventListener('input', readShowTimeSpentTo);
 document.getElementById('showTimeSpentTo').addEventListener('focus',
   function() { document.getElementById('showTimeSpentTo').select(); });
@@ -1293,7 +1293,7 @@ document.getElementById('day1').addEventListener('click', function() { location.
 
 document.getElementById('storeList').addEventListener('click', storeList);
 
-document.getElementById('stores').addEventListener('click', function() { storeHasBeenClicked(event); }, true);
+document.getElementById('stores').addEventListener('click', function(event) { storeHasBeenClicked(event); }, true);
 
 ////////////////// Eventlisteners for settings-view ///////////////////////
 
@@ -1521,7 +1521,7 @@ function time_add(event) {
     taskTime_add = new Date(taskTime_add.getTime() + deltaTime * 60000);
     // Ensure that the time is between 00:00 and 23:59
     if (taskTime_add.getDate() < (new Date).getDate()) {
-      taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 00, 01);
+      taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 1);
     } else if ((new Date()).getDate() < taskTime_add.getDate()) {
       taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59);
     }
@@ -1550,7 +1550,7 @@ function setTimeNow() {
 function clearTimeBox() {
   document.getElementById('inputTimeBox').value = '';
   document.getElementById('applyAdd').textContent = languagePack['applyButtonText'][language][0];
-  taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 00);
+  taskTime_add = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 12, 0);
 }
 
 
@@ -2012,7 +2012,7 @@ function monthTaskHasBeenClicked(event) {
     // Text in inputBox and no previous clicked date
     if (contentInputBox != '') {
       let now = new Date();
-      let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId), 12, 00)
+      let clickedDate = new Date(now.getFullYear(), /\d+$/.exec(myId), /\d+/.exec(myId), 12, 0)
 
       let task = new Task(clickedDate, 15 * 60000, contentInputBox[0].toUpperCase() + contentInputBox.slice(1), 1);
       if (monthTaskList[myId]) {
